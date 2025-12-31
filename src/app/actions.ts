@@ -1,8 +1,6 @@
 'use server';
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import fs from 'node:fs';
-import path from 'node:path';
 
 export async function analyzeImageAction(imageUrl: string): Promise<string> {
   console.log('GEMINI_API_KEY check:', process.env.GEMINI_API_KEY ? 'Found' : 'Not found');
@@ -12,31 +10,42 @@ export async function analyzeImageAction(imageUrl: string): Promise<string> {
   }
 
   try {
-    // Convert public URL (e.g. /photos/album/img.jpg) to file system path
-    // This assumes images are stored in /public/photos
-    // Decode URL-encoded characters (e.g., %20 for spaces) before using as file path
-    const decodedUrl = decodeURIComponent(imageUrl);
-    const relativePath = decodedUrl.startsWith('/') ? decodedUrl.slice(1) : decodedUrl;
-    const absolutePath = path.join(process.cwd(), 'public', relativePath);
-    console.log('Looking for image at:', absolutePath);
-    console.log('File exists:', fs.existsSync(absolutePath));
-
-    if (!fs.existsSync(absolutePath)) {
-      console.error(`File not found: ${absolutePath}`);
+    // Fetch image from public URL instead of reading from filesystem
+    // This prevents Vercel from bundling images into serverless functions
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL 
+      || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null)
+      || 'http://localhost:3000';
+    
+    const fullImageUrl = imageUrl.startsWith('http') 
+      ? imageUrl 
+      : `${baseUrl}${imageUrl.startsWith('/') ? imageUrl : '/' + imageUrl}`;
+    
+    console.log('Fetching image from:', fullImageUrl);
+    
+    const imageResponse = await fetch(fullImageUrl);
+    if (!imageResponse.ok) {
+      console.error(`Failed to fetch image: ${imageResponse.status} ${imageResponse.statusText}`);
       return "Image file not found on server.";
     }
 
-    // Determine mime type based on extension
-    const ext = path.extname(absolutePath).toLowerCase();
-    let mimeType = 'image/jpeg';
-    if (ext === '.png') mimeType = 'image/png';
-    if (ext === '.webp') mimeType = 'image/webp';
-    if (ext === '.heic') mimeType = 'image/heic';
-    if (ext === '.heif') mimeType = 'image/heif';
-
-    const fileBuffer = fs.readFileSync(absolutePath);
-    const base64Image = fileBuffer.toString('base64');
-    console.log('Image loaded, size:', fileBuffer.length, 'bytes, mimeType:', mimeType);
+    const arrayBuffer = await imageResponse.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const base64Image = buffer.toString('base64');
+    
+    // Determine mime type from response headers or URL
+    const contentType = imageResponse.headers.get('content-type') || 'image/jpeg';
+    let mimeType = contentType;
+    if (!mimeType.startsWith('image/')) {
+      // Fallback: determine from URL extension
+      const ext = imageUrl.toLowerCase().split('.').pop();
+      if (ext === 'png') mimeType = 'image/png';
+      else if (ext === 'webp') mimeType = 'image/webp';
+      else if (ext === 'heic') mimeType = 'image/heic';
+      else if (ext === 'heif') mimeType = 'image/heif';
+      else mimeType = 'image/jpeg';
+    }
+    
+    console.log('Image loaded, size:', buffer.length, 'bytes, mimeType:', mimeType);
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     // Using gemini-2.0-flash-exp as it's the one available for this key
