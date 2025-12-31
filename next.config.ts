@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
         hostname: 'picsum.photos',
       },
     ],
+    // Optimize images for production
+    formats: ['image/avif', 'image/webp'],
   },
 };
 
