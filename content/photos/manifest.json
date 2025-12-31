@@ -1,0 +1,2723 @@
+{
+  "generatedAt": "2025-12-03T16:11:43.593Z",
+  "albums": [
+    {
+      "id": "Faves",
+      "title": "Favorites",
+      "description": "A curated selection of my best shots across all locations and themes",
+      "cover": "000160980007.jpg",
+      "images": [
+        {
+          "filename": "000160980007.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "000160980009.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "000160980013.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "000160980038.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "000160990012.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "000226830008.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "000361140009.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Dublin"
+        },
+        {
+          "filename": "DSCF0032.jpg",
+          "width": 2048,
+          "height": 1638,
+          "isFeatured": false,
+          "location": "Chengdu"
+        },
+        {
+          "filename": "DSCF0578.jpg",
+          "width": 1638,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Kyoto"
+        },
+        {
+          "filename": "DSCF0752.jpg",
+          "width": 2048,
+          "height": 1638,
+          "isFeatured": false,
+          "location": "Kyoto"
+        },
+        {
+          "filename": "DSCF0776.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Kyoto"
+        },
+        {
+          "filename": "DSCF0818.jpg",
+          "width": 1366,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Kyoto"
+        },
+        {
+          "filename": "DSCF1317.jpg",
+          "width": 1639,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Osaka"
+        },
+        {
+          "filename": "DSCF1364.jpg",
+          "width": 1638,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Osaka"
+        },
+        {
+          "filename": "DSCF1703.jpg",
+          "width": 2048,
+          "height": 1638,
+          "isFeatured": false,
+          "location": "Chengdu"
+        },
+        {
+          "filename": "DSCF2454.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "DSCF2458.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "DSCF3535.jpg",
+          "width": 2048,
+          "height": 1638,
+          "isFeatured": false,
+          "location": "Amsterdam"
+        },
+        {
+          "filename": "DSCF4457.jpg",
+          "width": 2048,
+          "height": 931,
+          "isFeatured": false,
+          "location": "Bordeaux"
+        },
+        {
+          "filename": "DSCF4590.jpg",
+          "width": 2048,
+          "height": 1024,
+          "isFeatured": false,
+          "location": "Bordeaux"
+        },
+        {
+          "filename": "DSCF4666.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Bordeaux"
+        },
+        {
+          "filename": "DSCF4846.jpg",
+          "width": 1638,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lisbon"
+        },
+        {
+          "filename": "DSCF4919.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Eastern Europe"
+        },
+        {
+          "filename": "DSCF4935.jpg",
+          "width": 2048,
+          "height": 1638,
+          "isFeatured": false,
+          "location": "Eastern Europe"
+        },
+        {
+          "filename": "DSCF5109.jpg",
+          "width": 1536,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lisbon"
+        },
+        {
+          "filename": "DSCF5444.jpg",
+          "width": 2048,
+          "height": 864,
+          "isFeatured": false,
+          "location": "Lisbon"
+        },
+        {
+          "filename": "DSCF5712.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Venice"
+        },
+        {
+          "filename": "DSCF5866.jpg",
+          "width": 2048,
+          "height": 864,
+          "isFeatured": false,
+          "location": "Lisbon"
+        },
+        {
+          "filename": "DSCF5909.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Venice"
+        },
+        {
+          "filename": "DSCF6037.jpg",
+          "width": 1638,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Venice"
+        },
+        {
+          "filename": "DSCF6083.jpg",
+          "width": 2048,
+          "height": 1024,
+          "isFeatured": false,
+          "location": "Venice"
+        },
+        {
+          "filename": "DSCF6102.jpg",
+          "width": 1639,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Venice"
+        },
+        {
+          "filename": "DSCF6615.jpg",
+          "width": 2048,
+          "height": 1638,
+          "isFeatured": false,
+          "location": "Venice"
+        },
+        {
+          "filename": "DSCF7793.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Beijing"
+        },
+        {
+          "filename": "DSCF8021.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Beijing"
+        },
+        {
+          "filename": "DSCF8148.jpg",
+          "width": 1536,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Beijing"
+        },
+        {
+          "filename": "DSCF8202.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Dublin"
+        },
+        {
+          "filename": "DSCF8237.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Dublin"
+        },
+        {
+          "filename": "DSCF8286.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Dublin"
+        },
+        {
+          "filename": "DSCF8343.jpg",
+          "width": 1638,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Dublin"
+        },
+        {
+          "filename": "DSCF8363.jpg",
+          "width": 2048,
+          "height": 1638,
+          "isFeatured": false,
+          "location": "Dublin"
+        },
+        {
+          "filename": "DSCF8381.jpg",
+          "width": 2048,
+          "height": 1638,
+          "isFeatured": false,
+          "location": "Dublin"
+        },
+        {
+          "filename": "DSCF8848.jpg",
+          "width": 1638,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Hong Kong"
+        },
+        {
+          "filename": "DSCF8955.jpg",
+          "width": 2048,
+          "height": 1024,
+          "isFeatured": false,
+          "location": "Hong Kong"
+        },
+        {
+          "filename": "DSCF9561.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Tokyo"
+        },
+        {
+          "filename": "DSCF9580.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Tokyo"
+        },
+        {
+          "filename": "DSCF9708.jpg",
+          "width": 2048,
+          "height": 1024,
+          "isFeatured": false,
+          "location": "Tokyo"
+        },
+        {
+          "filename": "img007.jpg",
+          "width": 1381,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lisbon on film"
+        },
+        {
+          "filename": "img022.jpg",
+          "width": 1377,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lisbon on film"
+        },
+        {
+          "filename": "img029.jpg",
+          "width": 2048,
+          "height": 1362,
+          "isFeatured": false,
+          "location": "Lisbon on film"
+        },
+        {
+          "filename": "img034.jpg",
+          "width": 1345,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lisbon on film"
+        }
+      ]
+    },
+    {
+      "id": "Portraits",
+      "title": "Portraits",
+      "description": "Faces and figures, captured in candid and composed moments",
+      "cover": "000153280003.jpg",
+      "images": [
+        {
+          "filename": "000153280003.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false
+        },
+        {
+          "filename": "000160980007.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "000160980009.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "000160980013.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "000160980038.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "000160990028.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "000184140002.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lecce"
+        },
+        {
+          "filename": "000226830035.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "000226840003.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "009168860027.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "009190440003.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lecce"
+        },
+        {
+          "filename": "009190440005.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Lecce"
+        },
+        {
+          "filename": "DSCF0032.jpg",
+          "width": 2048,
+          "height": 1638,
+          "isFeatured": false,
+          "location": "Chengdu"
+        },
+        {
+          "filename": "DSCF0039.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Tokyo"
+        },
+        {
+          "filename": "DSCF0064.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Tokyo"
+        },
+        {
+          "filename": "DSCF0290.jpg",
+          "width": 1638,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Tokyo"
+        },
+        {
+          "filename": "DSCF0578.jpg",
+          "width": 1638,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Kyoto"
+        },
+        {
+          "filename": "DSCF0818.jpg",
+          "width": 1366,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Kyoto"
+        },
+        {
+          "filename": "DSCF0942.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Chengdu"
+        },
+        {
+          "filename": "DSCF1317.jpg",
+          "width": 1639,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Osaka"
+        },
+        {
+          "filename": "DSCF1364.jpg",
+          "width": 1638,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Osaka"
+        },
+        {
+          "filename": "DSCF2454.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "DSCF3040.jpg",
+          "width": 1638,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Howth"
+        },
+        {
+          "filename": "DSCF3535.jpg",
+          "width": 2048,
+          "height": 1638,
+          "isFeatured": false,
+          "location": "Amsterdam"
+        },
+        {
+          "filename": "DSCF3604.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Donegal"
+        },
+        {
+          "filename": "DSCF4666.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Bordeaux"
+        },
+        {
+          "filename": "DSCF5109.jpg",
+          "width": 1536,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lisbon"
+        },
+        {
+          "filename": "DSCF5156.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Lisbon"
+        },
+        {
+          "filename": "DSCF5444.jpg",
+          "width": 2048,
+          "height": 864,
+          "isFeatured": false,
+          "location": "Lisbon"
+        },
+        {
+          "filename": "DSCF5701.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lisbon"
+        },
+        {
+          "filename": "DSCF5837.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lisbon"
+        },
+        {
+          "filename": "DSCF5866.jpg",
+          "width": 2048,
+          "height": 864,
+          "isFeatured": false,
+          "location": "Lisbon"
+        },
+        {
+          "filename": "DSCF5974.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Venice"
+        },
+        {
+          "filename": "DSCF6102.jpg",
+          "width": 1639,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Venice"
+        },
+        {
+          "filename": "DSCF7793.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Beijing"
+        },
+        {
+          "filename": "DSCF7880.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Dublin"
+        },
+        {
+          "filename": "DSCF7960.jpg",
+          "width": 2048,
+          "height": 1638,
+          "isFeatured": false,
+          "location": "Beijing"
+        },
+        {
+          "filename": "DSCF7968.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Beijing"
+        },
+        {
+          "filename": "DSCF8021.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Beijing"
+        },
+        {
+          "filename": "DSCF8227.jpg",
+          "width": 2048,
+          "height": 1637,
+          "isFeatured": false,
+          "location": "Dublin"
+        },
+        {
+          "filename": "DSCF8229.jpg",
+          "width": 1366,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Dublin"
+        },
+        {
+          "filename": "DSCF8237.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Dublin"
+        },
+        {
+          "filename": "DSCF8286.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Dublin"
+        },
+        {
+          "filename": "DSCF8343.jpg",
+          "width": 1638,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Dublin"
+        },
+        {
+          "filename": "DSCF8363.jpg",
+          "width": 2048,
+          "height": 1638,
+          "isFeatured": false,
+          "location": "Dublin"
+        },
+        {
+          "filename": "DSCF8955.jpg",
+          "width": 2048,
+          "height": 1024,
+          "isFeatured": false,
+          "location": "Hong Kong"
+        },
+        {
+          "filename": "DSCF9448.jpg",
+          "width": 1536,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Tokyo"
+        },
+        {
+          "filename": "DSCF9554.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Tokyo"
+        },
+        {
+          "filename": "DSCF9708.jpg",
+          "width": 2048,
+          "height": 1024,
+          "isFeatured": false,
+          "location": "Tokyo"
+        },
+        {
+          "filename": "DSCF9995.jpg",
+          "width": 2048,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Chengdu"
+        },
+        {
+          "filename": "img003.jpg",
+          "width": 1398,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lisbon on film"
+        },
+        {
+          "filename": "img022.jpg",
+          "width": 1377,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lisbon on film"
+        },
+        {
+          "filename": "img024.jpg",
+          "width": 2048,
+          "height": 1378,
+          "isFeatured": false,
+          "location": "Lisbon on film"
+        },
+        {
+          "filename": "img028.jpg",
+          "width": 1370,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lisbon on film"
+        }
+      ]
+    },
+    {
+      "id": "BnW",
+      "title": "Black & White",
+      "description": "Stripped of color, focused on light, shadow, and form",
+      "cover": "000184140002.jpg",
+      "images": [
+        {
+          "filename": "000184140002.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lecce"
+        },
+        {
+          "filename": "000184140005.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Lecce"
+        },
+        {
+          "filename": "000184140007.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Lecce"
+        },
+        {
+          "filename": "000184140023.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lecce"
+        },
+        {
+          "filename": "000184140026.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Lecce"
+        },
+        {
+          "filename": "000184140032.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Lecce"
+        },
+        {
+          "filename": "000184140038.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lecce"
+        },
+        {
+          "filename": "000226840003.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "000226840012.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lambay"
+        },
+        {
+          "filename": "000226840017.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lambay"
+        },
+        {
+          "filename": "000230820004.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Dublin"
+        },
+        {
+          "filename": "DSCF2424.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Malahide"
+        },
+        {
+          "filename": "DSCF2539.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Malahide"
+        },
+        {
+          "filename": "DSCF2763.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Malahide"
+        },
+        {
+          "filename": "DSCF2871.jpg",
+          "width": 2048,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Howth"
+        },
+        {
+          "filename": "DSCF2877.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Howth"
+        },
+        {
+          "filename": "DSCF3040.jpg",
+          "width": 1638,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Howth"
+        },
+        {
+          "filename": "DSCF4445.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Bordeaux"
+        },
+        {
+          "filename": "DSCF4457.jpg",
+          "width": 2048,
+          "height": 931,
+          "isFeatured": false,
+          "location": "Bordeaux"
+        },
+        {
+          "filename": "DSCF4476.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Bordeaux"
+        },
+        {
+          "filename": "DSCF4718.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Bordeaux"
+        },
+        {
+          "filename": "DSCF4747.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Bordeaux"
+        },
+        {
+          "filename": "DSCF5076.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lisbon"
+        },
+        {
+          "filename": "DSCF5109.jpg",
+          "width": 1536,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lisbon"
+        },
+        {
+          "filename": "DSCF5156.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Lisbon"
+        },
+        {
+          "filename": "DSCF5263.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lisbon"
+        },
+        {
+          "filename": "DSCF5595.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Lisbon"
+        },
+        {
+          "filename": "DSCF5701.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lisbon"
+        },
+        {
+          "filename": "DSCF6851.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Venice"
+        },
+        {
+          "filename": "DSCF7901.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Dublin"
+        },
+        {
+          "filename": "DSCF8202.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Dublin"
+        }
+      ]
+    },
+    {
+      "id": "Film",
+      "title": "Film",
+      "description": "Shot on analog film — grain, texture, and the joy of waiting",
+      "cover": "000153280003.jpg",
+      "images": [
+        {
+          "filename": "000153280003.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false
+        },
+        {
+          "filename": "000153280023.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Copenhagen"
+        },
+        {
+          "filename": "000160980001.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Malahide"
+        },
+        {
+          "filename": "000160980004.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "000160980007.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "000160980009.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "000160980013.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "000160980028.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Malahide"
+        },
+        {
+          "filename": "000160990007.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Malahide"
+        },
+        {
+          "filename": "000160990012.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "000160990028.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "000160990038.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Malahide"
+        },
+        {
+          "filename": "000184140002.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lecce"
+        },
+        {
+          "filename": "000184140005.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Lecce"
+        },
+        {
+          "filename": "000184140007.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Lecce"
+        },
+        {
+          "filename": "000184140026.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Lecce"
+        },
+        {
+          "filename": "000184140038.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lecce"
+        },
+        {
+          "filename": "000226830003.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Malahide"
+        },
+        {
+          "filename": "000226830010.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "000226830026.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Malahide"
+        },
+        {
+          "filename": "000226830035.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "000226840003.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "000226840012.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lambay"
+        },
+        {
+          "filename": "000226840017.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lambay"
+        },
+        {
+          "filename": "000230820004.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Dublin"
+        },
+        {
+          "filename": "000361140009.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Dublin"
+        },
+        {
+          "filename": "000393120002.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Dublin"
+        },
+        {
+          "filename": "000393120003.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Dublin"
+        },
+        {
+          "filename": "000393120008.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Dublin"
+        },
+        {
+          "filename": "000393120012.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Dublin"
+        },
+        {
+          "filename": "000393120030.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Dublin"
+        },
+        {
+          "filename": "000393120038.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Donegal"
+        },
+        {
+          "filename": "000393150006.jpg",
+          "width": 2048,
+          "height": 1024,
+          "isFeatured": false,
+          "location": "Donegal"
+        },
+        {
+          "filename": "009190440003.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lecce"
+        },
+        {
+          "filename": "009190440008.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lecce"
+        },
+        {
+          "filename": "009190440013.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lecce"
+        },
+        {
+          "filename": "009190440014.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lecce"
+        },
+        {
+          "filename": "009190440020.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "009190440025.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Home"
+        }
+      ]
+    },
+    {
+      "id": "People",
+      "title": "People",
+      "description": "Street life and human moments from around the world",
+      "cover": "000226830003.jpg",
+      "images": [
+        {
+          "filename": "000226830003.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Malahide"
+        },
+        {
+          "filename": "000226830016.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Malahide"
+        },
+        {
+          "filename": "DSCF0027.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Tokyo"
+        },
+        {
+          "filename": "DSCF0032.jpg",
+          "width": 2048,
+          "height": 1638,
+          "isFeatured": false,
+          "location": "Chengdu"
+        },
+        {
+          "filename": "DSCF0039.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Tokyo"
+        },
+        {
+          "filename": "DSCF0064.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Tokyo"
+        },
+        {
+          "filename": "DSCF0290.jpg",
+          "width": 1638,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Tokyo"
+        },
+        {
+          "filename": "DSCF0578.jpg",
+          "width": 1638,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Kyoto"
+        },
+        {
+          "filename": "DSCF0752.jpg",
+          "width": 2048,
+          "height": 1638,
+          "isFeatured": false,
+          "location": "Kyoto"
+        },
+        {
+          "filename": "DSCF0776.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Kyoto"
+        },
+        {
+          "filename": "DSCF0818.jpg",
+          "width": 1366,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Kyoto"
+        },
+        {
+          "filename": "DSCF1103.jpg",
+          "width": 2048,
+          "height": 1638,
+          "isFeatured": false,
+          "location": "Osaka"
+        },
+        {
+          "filename": "DSCF1138.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Osaka"
+        },
+        {
+          "filename": "DSCF1227.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Osaka"
+        },
+        {
+          "filename": "DSCF1269.jpg",
+          "width": 2048,
+          "height": 1638,
+          "isFeatured": false,
+          "location": "Osaka"
+        },
+        {
+          "filename": "DSCF1317.jpg",
+          "width": 1639,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Osaka"
+        },
+        {
+          "filename": "DSCF1364.jpg",
+          "width": 1638,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Osaka"
+        },
+        {
+          "filename": "DSCF1488.jpg",
+          "width": 2048,
+          "height": 1024,
+          "isFeatured": false,
+          "location": "Chengdu"
+        },
+        {
+          "filename": "DSCF1703.jpg",
+          "width": 2048,
+          "height": 1638,
+          "isFeatured": false,
+          "location": "Chengdu"
+        },
+        {
+          "filename": "DSCF1720.jpg",
+          "width": 2048,
+          "height": 906,
+          "isFeatured": false,
+          "location": "Chengdu"
+        },
+        {
+          "filename": "DSCF3040.jpg",
+          "width": 1638,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Howth"
+        },
+        {
+          "filename": "DSCF3070.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Howth"
+        },
+        {
+          "filename": "DSCF3535.jpg",
+          "width": 2048,
+          "height": 1638,
+          "isFeatured": false,
+          "location": "Amsterdam"
+        },
+        {
+          "filename": "DSCF4457.jpg",
+          "width": 2048,
+          "height": 931,
+          "isFeatured": false,
+          "location": "Bordeaux"
+        },
+        {
+          "filename": "DSCF4590.jpg",
+          "width": 2048,
+          "height": 1024,
+          "isFeatured": false,
+          "location": "Bordeaux"
+        },
+        {
+          "filename": "DSCF4607.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Bordeaux"
+        },
+        {
+          "filename": "DSCF4666.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Bordeaux"
+        },
+        {
+          "filename": "DSCF4718.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Bordeaux"
+        },
+        {
+          "filename": "DSCF4747.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Bordeaux"
+        },
+        {
+          "filename": "DSCF5712.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Venice"
+        },
+        {
+          "filename": "DSCF5974.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Venice"
+        },
+        {
+          "filename": "DSCF6032.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Venice"
+        },
+        {
+          "filename": "DSCF6037.jpg",
+          "width": 1638,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Venice"
+        },
+        {
+          "filename": "DSCF6083.jpg",
+          "width": 2048,
+          "height": 1024,
+          "isFeatured": false,
+          "location": "Venice"
+        },
+        {
+          "filename": "DSCF6102.jpg",
+          "width": 1639,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Venice"
+        },
+        {
+          "filename": "DSCF6615.jpg",
+          "width": 2048,
+          "height": 1638,
+          "isFeatured": false,
+          "location": "Venice"
+        },
+        {
+          "filename": "DSCF7812.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Beijing"
+        },
+        {
+          "filename": "DSCF7851.jpg",
+          "width": 2048,
+          "height": 1638,
+          "isFeatured": false,
+          "location": "Beijing"
+        },
+        {
+          "filename": "DSCF7960.jpg",
+          "width": 2048,
+          "height": 1638,
+          "isFeatured": false,
+          "location": "Beijing"
+        },
+        {
+          "filename": "DSCF7968.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Beijing"
+        },
+        {
+          "filename": "DSCF7984.jpg",
+          "width": 2048,
+          "height": 1024,
+          "isFeatured": false,
+          "location": "Beijing"
+        },
+        {
+          "filename": "DSCF8148.jpg",
+          "width": 1536,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Beijing"
+        },
+        {
+          "filename": "DSCF8229.jpg",
+          "width": 1366,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Dublin"
+        },
+        {
+          "filename": "DSCF8231.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Dublin"
+        },
+        {
+          "filename": "DSCF8232.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Dublin"
+        },
+        {
+          "filename": "DSCF8237.jpg",
+          "width": 2048,
+          "height": 1638,
+          "isFeatured": false,
+          "location": "Dublin"
+        },
+        {
+          "filename": "DSCF8815.jpg",
+          "width": 2048,
+          "height": 1638,
+          "isFeatured": false,
+          "location": "Hong Kong"
+        },
+        {
+          "filename": "DSCF8916.jpg",
+          "width": 2048,
+          "height": 1024,
+          "isFeatured": false,
+          "location": "Hong Kong"
+        },
+        {
+          "filename": "DSCF8941.jpg",
+          "width": 2048,
+          "height": 1638,
+          "isFeatured": false,
+          "location": "Hong Kong"
+        },
+        {
+          "filename": "DSCF8955.jpg",
+          "width": 2048,
+          "height": 1024,
+          "isFeatured": false,
+          "location": "Hong Kong"
+        },
+        {
+          "filename": "DSCF8997.jpg",
+          "width": 1640,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Hong Kong"
+        },
+        {
+          "filename": "DSCF9423.jpg",
+          "width": 2048,
+          "height": 1638,
+          "isFeatured": false,
+          "location": "Tokyo"
+        },
+        {
+          "filename": "DSCF9448.jpg",
+          "width": 1536,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Tokyo"
+        },
+        {
+          "filename": "DSCF9554.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Tokyo"
+        },
+        {
+          "filename": "DSCF9561.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Tokyo"
+        },
+        {
+          "filename": "DSCF9562.jpg",
+          "width": 1639,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Chengdu"
+        },
+        {
+          "filename": "DSCF9567.jpg",
+          "width": 2048,
+          "height": 1638,
+          "isFeatured": false,
+          "location": "Tokyo"
+        },
+        {
+          "filename": "DSCF9580.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Tokyo"
+        },
+        {
+          "filename": "DSCF9708.jpg",
+          "width": 2048,
+          "height": 1024,
+          "isFeatured": false,
+          "location": "Tokyo"
+        },
+        {
+          "filename": "DSCF9726.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Tokyo"
+        },
+        {
+          "filename": "DSCF9995.jpg",
+          "width": 2048,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Chengdu"
+        }
+      ]
+    },
+    {
+      "id": "Buildings",
+      "title": "Architecture",
+      "description": "Structures, facades, and the geometry of the built environment",
+      "cover": "000184140007.jpg",
+      "images": [
+        {
+          "filename": "000184140007.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Lecce"
+        },
+        {
+          "filename": "000393120012.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Dublin"
+        },
+        {
+          "filename": "009190440013.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lecce"
+        },
+        {
+          "filename": "DSCF0027.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Tokyo"
+        },
+        {
+          "filename": "DSCF0401.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Tokyo"
+        },
+        {
+          "filename": "DSCF1160.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Osaka"
+        },
+        {
+          "filename": "DSCF2539.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Malahide"
+        },
+        {
+          "filename": "DSCF2722.jpg",
+          "width": 2048,
+          "height": 1338,
+          "isFeatured": false,
+          "location": "Malahide"
+        },
+        {
+          "filename": "DSCF4126.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Malahide"
+        },
+        {
+          "filename": "DSCF4240.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Milan"
+        },
+        {
+          "filename": "DSCF4260.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Milan"
+        },
+        {
+          "filename": "DSCF4362.jpg",
+          "width": 2048,
+          "height": 1364,
+          "isFeatured": false,
+          "location": "Milan"
+        },
+        {
+          "filename": "DSCF4404.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Milan"
+        },
+        {
+          "filename": "DSCF4821.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lisbon"
+        },
+        {
+          "filename": "DSCF4846.jpg",
+          "width": 1638,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lisbon"
+        },
+        {
+          "filename": "DSCF5076.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lisbon"
+        },
+        {
+          "filename": "DSCF7850.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Dublin"
+        },
+        {
+          "filename": "DSCF7865.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Dublin"
+        },
+        {
+          "filename": "DSCF7872.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Dublin"
+        },
+        {
+          "filename": "DSCF7912.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Dublin"
+        },
+        {
+          "filename": "DSCF8202.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Dublin"
+        },
+        {
+          "filename": "DSCF8621.jpg",
+          "width": 1638,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Shanghai"
+        },
+        {
+          "filename": "DSCF8969.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Shanghai"
+        },
+        {
+          "filename": "DSCF9241.jpg",
+          "width": 2048,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Shanghai"
+        },
+        {
+          "filename": "DSCF9580.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Tokyo"
+        },
+        {
+          "filename": "DSCF9890.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Tokyo"
+        },
+        {
+          "filename": "DSCF9893.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Tokyo"
+        },
+        {
+          "filename": "img006.jpg",
+          "width": 1404,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lisbon on film"
+        },
+        {
+          "filename": "img035.jpg",
+          "width": 1354,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lisbon on film"
+        }
+      ]
+    },
+    {
+      "id": "Minimal",
+      "title": "Minimal",
+      "description": "Less is more — clean compositions and quiet subjects",
+      "cover": "000230820004.jpg",
+      "images": [
+        {
+          "filename": "000230820004.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Dublin"
+        },
+        {
+          "filename": "000393150003.jpg",
+          "width": 2048,
+          "height": 1024,
+          "isFeatured": false,
+          "location": "Donegal"
+        },
+        {
+          "filename": "DSCF0776.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Kyoto"
+        },
+        {
+          "filename": "DSCF0816.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Kyoto"
+        },
+        {
+          "filename": "DSCF1317.jpg",
+          "width": 1639,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Osaka"
+        },
+        {
+          "filename": "DSCF1364.jpg",
+          "width": 1638,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Osaka"
+        },
+        {
+          "filename": "DSCF2697.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Malahide"
+        },
+        {
+          "filename": "DSCF2722.jpg",
+          "width": 2048,
+          "height": 1338,
+          "isFeatured": false,
+          "location": "Malahide"
+        },
+        {
+          "filename": "DSCF2806.jpg",
+          "width": 1463,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Howth"
+        },
+        {
+          "filename": "DSCF3070.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Howth"
+        },
+        {
+          "filename": "DSCF3253.jpg",
+          "width": 1638,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Malahide"
+        },
+        {
+          "filename": "DSCF4126.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Malahide"
+        },
+        {
+          "filename": "DSCF4240.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Milan"
+        },
+        {
+          "filename": "DSCF4362.jpg",
+          "width": 2048,
+          "height": 1364,
+          "isFeatured": false,
+          "location": "Milan"
+        },
+        {
+          "filename": "DSCF4718.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Bordeaux"
+        },
+        {
+          "filename": "DSCF4935.jpg",
+          "width": 2048,
+          "height": 1638,
+          "isFeatured": false,
+          "location": "Eastern Europe"
+        },
+        {
+          "filename": "DSCF7865.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Dublin"
+        },
+        {
+          "filename": "DSCF8021.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Beijing"
+        },
+        {
+          "filename": "DSCF8202.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Dublin"
+        },
+        {
+          "filename": "DSCF8848.jpg",
+          "width": 1638,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Hong Kong"
+        }
+      ]
+    },
+    {
+      "id": "Animals",
+      "title": "Animals",
+      "description": "Creatures great and small, wild and domestic",
+      "cover": "000160980004.jpg",
+      "images": [
+        {
+          "filename": "000160980004.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "000160980005.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "000160980007.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "000160980009.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "000160980013.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "000160980038.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "000160990012.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "000160990028.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "000226830008.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "000226830010.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "000226830035.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "000226840003.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "009168860027.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "009190440020.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "009190440025.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "DSCF0553.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "DSCF0978.jpg",
+          "width": 2048,
+          "height": 1638,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "DSCF1027.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "DSCF1132.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Osaka"
+        },
+        {
+          "filename": "DSCF1138.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Osaka"
+        },
+        {
+          "filename": "DSCF4299.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Milan"
+        },
+        {
+          "filename": "DSCF4507.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Bordeaux"
+        },
+        {
+          "filename": "DSCF4693.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Bordeaux"
+        },
+        {
+          "filename": "DSCF5162.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Eastern Europe"
+        },
+        {
+          "filename": "DSCF6611.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Venice"
+        },
+        {
+          "filename": "DSCF6655.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Venice"
+        },
+        {
+          "filename": "DSCF8858.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Hong Kong"
+        },
+        {
+          "filename": "DSCF8871.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Hong Kong"
+        },
+        {
+          "filename": "DSCF9749.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Tokyo"
+        },
+        {
+          "filename": "DSCF9762.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false
+        }
+      ]
+    },
+    {
+      "id": "Mountains",
+      "title": "Mountains",
+      "description": "Peaks, valleys, and the grandeur of elevated landscapes",
+      "cover": "DSCF0553.jpg",
+      "images": [
+        {
+          "filename": "DSCF0553.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "DSCF0587.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Chengdu"
+        },
+        {
+          "filename": "DSCF0613.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Chengdu"
+        },
+        {
+          "filename": "DSCF0641.jpg",
+          "width": 1640,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Chengdu"
+        },
+        {
+          "filename": "DSCF0841.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Chengdu"
+        },
+        {
+          "filename": "DSCF0846.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Chengdu"
+        },
+        {
+          "filename": "DSCF0883.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Chengdu"
+        },
+        {
+          "filename": "DSCF0929.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Chengdu"
+        },
+        {
+          "filename": "DSCF0942.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Chengdu"
+        },
+        {
+          "filename": "DSCF0978.jpg",
+          "width": 2048,
+          "height": 1638,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "DSCF1027.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "DSCF1081.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Chengdu"
+        },
+        {
+          "filename": "DSCF1114.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Chengdu"
+        },
+        {
+          "filename": "DSCF1182.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Chengdu"
+        },
+        {
+          "filename": "DSCF1311.jpg",
+          "width": 2048,
+          "height": 1536,
+          "isFeatured": false,
+          "location": "Chengdu"
+        },
+        {
+          "filename": "DSCF1328.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Chengdu"
+        },
+        {
+          "filename": "DSCF1378.jpg",
+          "width": 2048,
+          "height": 1024,
+          "isFeatured": false,
+          "location": "Chengdu"
+        }
+      ]
+    },
+    {
+      "id": "Diptych",
+      "title": "Diptychs",
+      "description": "Paired images that speak to each other",
+      "cover": "000226830010.jpg",
+      "images": [
+        {
+          "filename": "000226830010.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "000226830035.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Home"
+        },
+        {
+          "filename": "000393120002.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Dublin"
+        },
+        {
+          "filename": "000393120003.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Dublin"
+        },
+        {
+          "filename": "DSCF0032.jpg",
+          "width": 2048,
+          "height": 1638,
+          "isFeatured": false,
+          "location": "Chengdu"
+        },
+        {
+          "filename": "DSCF1539.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Chengdu"
+        },
+        {
+          "filename": "DSCF1576.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Chengdu"
+        },
+        {
+          "filename": "DSCF3597.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Donegal"
+        },
+        {
+          "filename": "DSCF3604.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Donegal"
+        },
+        {
+          "filename": "DSCF5866.jpg",
+          "width": 2048,
+          "height": 864,
+          "isFeatured": false,
+          "location": "Lisbon"
+        },
+        {
+          "filename": "DSCF5871.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lisbon"
+        },
+        {
+          "filename": "DSCF7827.jpg",
+          "width": 2048,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Beijing"
+        },
+        {
+          "filename": "DSCF7842.jpg",
+          "width": 2048,
+          "height": 1024,
+          "isFeatured": false,
+          "location": "Beijing"
+        },
+        {
+          "filename": "DSCF7968.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Beijing"
+        },
+        {
+          "filename": "DSCF8219.jpg",
+          "width": 1638,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Beijing"
+        },
+        {
+          "filename": "DSCF8303.jpg",
+          "width": 1364,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Shanghai"
+        },
+        {
+          "filename": "DSCF8312.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Shanghai"
+        },
+        {
+          "filename": "DSCF8621.jpg",
+          "width": 1638,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Shanghai"
+        },
+        {
+          "filename": "DSCF8969.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Shanghai"
+        },
+        {
+          "filename": "DSCF9219.jpg",
+          "width": 2048,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Shanghai"
+        },
+        {
+          "filename": "DSCF9241.jpg",
+          "width": 2048,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Shanghai"
+        },
+        {
+          "filename": "DSCF9562.jpg",
+          "width": 1639,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Chengdu"
+        },
+        {
+          "filename": "DSCF9995.jpg",
+          "width": 2048,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Chengdu"
+        }
+      ]
+    }
+  ],
+  "locations": [
+    {
+      "id": "Amsterdam",
+      "name": "Amsterdam",
+      "photoCount": 3,
+      "cover": "DSCF3535.jpg",
+      "coverAlbum": "Faves"
+    },
+    {
+      "id": "Beijing",
+      "name": "Beijing",
+      "photoCount": 18,
+      "cover": "DSCF7827.jpg",
+      "coverAlbum": "Diptych"
+    },
+    {
+      "id": "Bordeaux",
+      "name": "Bordeaux",
+      "photoCount": 18,
+      "cover": "DSCF4507.jpg",
+      "coverAlbum": "Animals"
+    },
+    {
+      "id": "Chengdu",
+      "name": "Chengdu",
+      "photoCount": 30,
+      "cover": "DSCF0032.jpg",
+      "coverAlbum": "Diptych"
+    },
+    {
+      "id": "Copenhagen",
+      "name": "Copenhagen",
+      "photoCount": 1,
+      "cover": "000153280023.jpg",
+      "coverAlbum": "Film"
+    },
+    {
+      "id": "Donegal",
+      "name": "Donegal",
+      "photoCount": 6,
+      "cover": "DSCF3597.jpg",
+      "coverAlbum": "Diptych"
+    },
+    {
+      "id": "Dublin",
+      "name": "Dublin",
+      "photoCount": 39,
+      "cover": "000230820004.jpg",
+      "coverAlbum": "BnW"
+    },
+    {
+      "id": "Eastern Europe",
+      "name": "Eastern Europe",
+      "photoCount": 4,
+      "cover": "DSCF5162.jpg",
+      "coverAlbum": "Animals"
+    },
+    {
+      "id": "Home",
+      "name": "Home",
+      "photoCount": 52,
+      "cover": "000160980004.jpg",
+      "coverAlbum": "Animals"
+    },
+    {
+      "id": "Hong Kong",
+      "name": "Hong Kong",
+      "photoCount": 11,
+      "cover": "DSCF8858.jpg",
+      "coverAlbum": "Animals"
+    },
+    {
+      "id": "Howth",
+      "name": "Howth",
+      "photoCount": 8,
+      "cover": "DSCF2871.jpg",
+      "coverAlbum": "BnW"
+    },
+    {
+      "id": "Kyoto",
+      "name": "Kyoto",
+      "photoCount": 12,
+      "cover": "DSCF0578.jpg",
+      "coverAlbum": "Faves"
+    },
+    {
+      "id": "Lambay",
+      "name": "Lambay",
+      "photoCount": 4,
+      "cover": "000226840012.jpg",
+      "coverAlbum": "BnW"
+    },
+    {
+      "id": "Lecce",
+      "name": "Lecce",
+      "photoCount": 21,
+      "cover": "000184140002.jpg",
+      "coverAlbum": "BnW"
+    },
+    {
+      "id": "Lisbon",
+      "name": "Lisbon",
+      "photoCount": 21,
+      "cover": "DSCF5076.jpg",
+      "coverAlbum": "BnW"
+    },
+    {
+      "id": "Lisbon on film",
+      "name": "Lisbon on film",
+      "photoCount": 10,
+      "cover": "img006.jpg",
+      "coverAlbum": "Buildings"
+    },
+    {
+      "id": "Malahide",
+      "name": "Malahide",
+      "photoCount": 18,
+      "cover": "DSCF2424.jpg",
+      "coverAlbum": "BnW"
+    },
+    {
+      "id": "Milan",
+      "name": "Milan",
+      "photoCount": 7,
+      "cover": "DSCF4299.jpg",
+      "coverAlbum": "Animals"
+    },
+    {
+      "id": "Osaka",
+      "name": "Osaka",
+      "photoCount": 15,
+      "cover": "DSCF1132.jpg",
+      "coverAlbum": "Animals"
+    },
+    {
+      "id": "Shanghai",
+      "name": "Shanghai",
+      "photoCount": 9,
+      "cover": "DSCF8621.jpg",
+      "coverAlbum": "Buildings"
+    },
+    {
+      "id": "Tokyo",
+      "name": "Tokyo",
+      "photoCount": 27,
+      "cover": "DSCF9749.jpg",
+      "coverAlbum": "Animals"
+    },
+    {
+      "id": "Venice",
+      "name": "Venice",
+      "photoCount": 18,
+      "cover": "DSCF6611.jpg",
+      "coverAlbum": "Animals"
+    }
+  ]
+}

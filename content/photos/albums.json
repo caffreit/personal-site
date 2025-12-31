@@ -1,0 +1,62 @@
+[
+  {
+    "id": "Faves",
+    "title": "Favorites",
+    "description": "A curated selection of my best shots across all locations and themes",
+    "order": 1
+  },
+  {
+    "id": "Portraits",
+    "title": "Portraits",
+    "description": "Faces and figures, captured in candid and composed moments",
+    "order": 2
+  },
+  {
+    "id": "BnW",
+    "title": "Black & White",
+    "description": "Stripped of color, focused on light, shadow, and form",
+    "order": 3
+  },
+  {
+    "id": "Film",
+    "title": "Film",
+    "description": "Shot on analog film — grain, texture, and the joy of waiting",
+    "order": 4
+  },
+  {
+    "id": "People",
+    "title": "People",
+    "description": "Street life and human moments from around the world",
+    "order": 5
+  },
+  {
+    "id": "Buildings",
+    "title": "Architecture",
+    "description": "Structures, facades, and the geometry of the built environment",
+    "order": 6
+  },
+  {
+    "id": "Minimal",
+    "title": "Minimal",
+    "description": "Less is more — clean compositions and quiet subjects",
+    "order": 7
+  },
+  {
+    "id": "Animals",
+    "title": "Animals",
+    "description": "Creatures great and small, wild and domestic",
+    "order": 8
+  },
+  {
+    "id": "Mountains",
+    "title": "Mountains",
+    "description": "Peaks, valleys, and the grandeur of elevated landscapes",
+    "order": 9
+  },
+  {
+    "id": "Diptych",
+    "title": "Diptychs",
+    "description": "Paired images that speak to each other",
+    "order": 10
+  }
+]

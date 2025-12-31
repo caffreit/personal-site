@@ -1,3 +1,56 @@
+# Personal Site (Next.js + TypeScript)\r
+\r
+Local photos + MDX blog with interactive React tools.\r
+\r
+## Quick start\r
+\r
+```bash\r
+npm install\r
+npm run dev\r
+```\r
+\r
+Open http://localhost:3000\r
+\r
+## Authoring\r
+\r
+- Photos (albums)\r
+  - Put images under `public/photos/<album>/`\r
+  - Optional: `public/photos/<album>/captions.json` mapping filename -> caption\r
+  - Generate manifest:\r
+    ```bash\r
+    npm run generate:albums\r
+    ```\r
+  - Optional curation: `content/photos/albums.json` to set title/description/order/cover\r
+\r
+- Blog (MDX)\r
+  - Create folder `content/blog/<slug>/index.mdx`\r
+  - Frontmatter:\r
+    ```md\r
+    ---\r
+    title: Post title\r
+    date: 2025-11-13\r
+    summary: Optional summary\r
+    tags: [tag1, tag2]\r
+    draft: false\r
+    ---\r
+    ```\r
+  - Embed React tools directly: `<DemoCounter />`\r
+\r
+## Commands\r
+\r
+- `npm run dev` — Start dev server\r
+- `npm run build` — Production build\r
+- `npm start` — Start production server\r
+- `npm run generate:albums` — Build photo manifest\r
+\r
+## Environment\r
+\r
+Optionally set `NEXT_PUBLIC_SITE_URL` (e.g. in Vercel) for correct sitemap/OG URLs.\r
+\r
+## Deploy\r
+\r
+See `docs/DEPLOY.md`.\r
+\r
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started

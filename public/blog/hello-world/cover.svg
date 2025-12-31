@@ -1,0 +1,27 @@
+<svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="helloGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE68A"/>
+      <stop offset="35%" stop-color="#FCA5A5"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
+    </linearGradient>
+    <radialGradient id="helloGlow" cx="25%" cy="25%" r="60%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.75"/>
+      <stop offset="50%" stop-color="#FDE68A" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#7C3AED" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="800" fill="#0F0F0F"/>
+  <rect width="1200" height="800" fill="url(#helloGradient)" opacity="0.9"/>
+  <circle cx="350" cy="280" r="420" fill="url(#helloGlow)"/>
+  <circle cx="950" cy="550" r="260" fill="rgba(255,255,255,0.15)"/>
+  <path d="M150 640 C300 520 420 520 600 640 S900 760 1050 640" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="8" stroke-linecap="round"/>
+  <path d="M200 220 Q400 100 600 220 T1000 220" fill="none" stroke="rgba(15,15,15,0.35)" stroke-width="6" stroke-linecap="round"/>
+  <text x="150" y="190" font-family="Space Grotesk, 'Segoe UI', sans-serif" font-size="96" font-weight="700" fill="rgba(15,15,15,0.85)">
+    Hello, World.
+  </text>
+  <text x="150" y="260" font-family="Space Grotesk, 'Segoe UI', sans-serif" font-size="28" fill="rgba(15,15,15,0.75)">
+    Notes on experiments, interactive demos, and first drafts.
+  </text>
+</svg>
+
