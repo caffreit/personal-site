@@ -312,9 +312,9 @@ const CustomTooltipScatter = ({
   payload,
   xLabel,
   yLabel,
-}: TooltipProps<number, string> & { xLabel: string; yLabel: string }) => {
+}: any) => {
   if (active && payload && payload.length) {
-    const dataPayload = payload.find((p) => p && p.dataKey !== "y") ?? payload[0];
+    const dataPayload = payload.find((p: any) => p && p.dataKey !== "y") ?? payload[0];
     const data = dataPayload?.payload as ChartRow | undefined;
     if (!data) return null;
 
@@ -348,7 +348,7 @@ const CustomTooltipScatter = ({
 const CustomTooltipBurden = ({
   active,
   payload,
-}: TooltipProps<number, string>) => {
+}: any) => {
   if (active && payload && payload.length) {
     const data = payload[0]?.payload as ChartRow | undefined;
     if (!data) return null;
@@ -1001,8 +1001,8 @@ const HousingMarketAnalysis = () => {
                     }
                     return (
                       <text
-                        x={(x ?? 0) + 6}
-                        y={(y ?? 0) + 3}
+                        x={((x ?? 0) as number) + 6}
+                        y={((y ?? 0) as number) + 3}
                         fill={
                           cohortChartData.colors[index % cohortChartData.colors.length]
                         }
@@ -1084,7 +1084,6 @@ const HousingMarketAnalysis = () => {
               type="monotone"
               data={dashedLineData}
               dataKey="y"
-              xKey="x"
               stroke="#888"
               strokeWidth={2}
               strokeDasharray="5 5"
@@ -1164,7 +1163,6 @@ const HousingMarketAnalysis = () => {
               type="monotone"
               data={dashedLineData}
               dataKey="y"
-              xKey="x"
               stroke="#888"
               strokeWidth={2}
               strokeDasharray="5 5"

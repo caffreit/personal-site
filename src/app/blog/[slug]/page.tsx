@@ -58,7 +58,7 @@ export default async function BlogPostPage({ params }: { params: Promise<PostPar
             rehypePlugins: [rehypeHighlight],
           },
         }}
-        components={components as Record<string, ComponentType>}
+        components={components as Record<string, ComponentType<any>>}
       />
     </BlogPostLayout>
   );
