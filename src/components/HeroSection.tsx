@@ -1,11 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowDown } from "lucide-react";
 
 export default function HeroSection() {
   const [viewportHeight, setViewportHeight] = useState<number>(0);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     // Set initial viewport height
     const setHeight = () => {
       setViewportHeight(window.innerHeight);
@@ -28,12 +32,30 @@ export default function HeroSection() {
     };
   }, []);
 
+  const scrollToNextSection = () => {
+    const nextSection = document.getElementById("selected-works-section");
+    if (nextSection) {
+      nextSection.scrollIntoView({ behavior: "smooth" });
+    } else {
+      window.scrollTo({
+        top: window.innerHeight,
+        behavior: "smooth"
+      });
+    }
+  };
+
+  // Approximate header height is 81px
+  const sectionHeight = mounted && viewportHeight > 0 
+    ? `${viewportHeight - 81}px` 
+    : 'calc(100vh - 81px)';
+
   return (
     <section 
-      className="flex w-full flex-col pt-6 pb-10"
+      className="flex w-full flex-col pt-6 pb-4 relative"
       style={{ 
-        minHeight: viewportHeight > 0 ? `${viewportHeight}px` : '100vh',
+        minHeight: sectionHeight,
         display: 'flex',
+        flexDirection: 'column',
         justifyContent: 'space-between'
       }}
     >
@@ -53,6 +75,36 @@ export default function HeroSection() {
           </p>
         </div>
       </div>
+
+      {/* Scroll Indicator */}
+      <AnimatePresence>
+        {mounted && (
+          <motion.div 
+            className="cursor-pointer flex flex-col items-center gap-3 z-10 py-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1, duration: 0.8 }}
+            onClick={scrollToNextSection}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500 ml-1">
+              Scroll
+            </span>
+            <motion.div
+              animate={{ y: [0, 6, 0] }}
+              transition={{ 
+                duration: 2, 
+                repeat: Infinity, 
+                ease: "easeInOut" 
+              }}
+              className="rounded-full border border-zinc-200 p-2.5 dark:border-zinc-800 bg-white/50 dark:bg-black/50 backdrop-blur-sm shadow-sm"
+            >
+              <ArrowDown className="h-4 w-4 text-zinc-500 dark:text-zinc-400" />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

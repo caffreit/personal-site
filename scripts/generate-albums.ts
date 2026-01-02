@@ -9,6 +9,7 @@ type CuratedAlbum = {
   cover?: string;
   order?: number;
   featuredImages?: string[];
+  imageOrder?: string[];
 };
 
 type PhotoMeta = {
@@ -265,9 +266,26 @@ async function main() {
     });
   }
 
-  // Sort images by filename for stability
+  // Sort images by filename or custom order
   for (const album of albumsById.values()) {
-    album.images.sort((a, b) => a.filename.localeCompare(b.filename));
+    const curatedAlbum = curated[album.id];
+    const customOrder = curatedAlbum?.imageOrder;
+
+    if (customOrder && customOrder.length > 0) {
+      // Create a map for fast lookup of position
+      const orderMap = new Map(customOrder.map((filename, index) => [filename, index]));
+      
+      album.images.sort((a, b) => {
+        const posA = orderMap.has(a.filename) ? orderMap.get(a.filename)! : Number.MAX_SAFE_INTEGER;
+        const posB = orderMap.has(b.filename) ? orderMap.get(b.filename)! : Number.MAX_SAFE_INTEGER;
+        
+        if (posA !== posB) return posA - posB;
+        return a.filename.localeCompare(b.filename);
+      });
+    } else {
+      album.images.sort((a, b) => a.filename.localeCompare(b.filename));
+    }
+
     if (!album.cover) {
       album.cover = album.images[0]?.filename ?? "";
     }

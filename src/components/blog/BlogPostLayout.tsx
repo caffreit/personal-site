@@ -254,8 +254,8 @@ export default function BlogPostLayout({
              <div className="bg-stone-100 dark:bg-zinc-800/50 rounded-3xl p-8 flex items-center gap-6">
                 <img src="https://picsum.photos/200/200?grayscale" className="w-16 h-16 rounded-full object-cover border-2 border-white dark:border-zinc-700 shadow-md" alt="Author" />
                 <div>
-                    <h4 className="font-bold text-stone-900 dark:text-white font-sans">Written by Alex Sterling</h4>
-                    <p className="text-stone-500 dark:text-stone-400 text-sm mt-1 font-sans">Data Scientist & Photographer exploring the intersection of light and logic.</p>
+                    <h4 className="font-bold text-stone-900 dark:text-white font-sans">Written by drdimg</h4>
+                    <p className="text-stone-500 dark:text-stone-400 text-sm mt-1 font-sans">Creative Technologist & Photographer building at the intersection of data, design, and digital storytelling.</p>
                 </div>
              </div>
           </div>

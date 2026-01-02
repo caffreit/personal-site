@@ -37,7 +37,7 @@ export default function Home() {
         <HeroSection />
       </div>
 
-      <div className="pb-24 pt-0">
+      <div className="pb-24 pt-0" id="selected-works-section">
         <div className={`${sectionContainer} flex w-full flex-col gap-24`}>
           <SelectedWorks />
           <PhotoGallery albums={albums} />

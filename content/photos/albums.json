@@ -3,60 +3,83 @@
     "id": "Faves",
     "title": "Favorites",
     "description": "A curated selection of my best shots across all locations and themes",
+    "cover": "DSCF3535.jpg",
     "order": 1
   },
   {
     "id": "Portraits",
     "title": "Portraits",
     "description": "Faces and figures, captured in candid and composed moments",
+    "cover": "DSCF4666.jpg",
     "order": 2
   },
   {
     "id": "BnW",
     "title": "Black & White",
     "description": "Stripped of color, focused on light, shadow, and form",
+    "cover": "000226840017.jpg",
     "order": 3
   },
   {
     "id": "Film",
     "title": "Film",
     "description": "Shot on analog film — grain, texture, and the joy of waiting",
+    "cover": "000361140009.jpg",
     "order": 4
   },
   {
     "id": "People",
     "title": "People",
     "description": "Street life and human moments from around the world",
+    "cover": "DSCF6615.jpg",
     "order": 5
   },
   {
     "id": "Buildings",
     "title": "Architecture",
     "description": "Structures, facades, and the geometry of the built environment",
+    "cover": "DSCF9580.jpg",
     "order": 6
   },
   {
     "id": "Minimal",
     "title": "Minimal",
     "description": "Less is more — clean compositions and quiet subjects",
+    "cover": "DSCF3070.jpg",
     "order": 7
   },
   {
     "id": "Animals",
     "title": "Animals",
     "description": "Creatures great and small, wild and domestic",
+    "cover": "000160980013.jpg",
     "order": 8
   },
   {
     "id": "Mountains",
     "title": "Mountains",
     "description": "Peaks, valleys, and the grandeur of elevated landscapes",
+    "cover": "DSCF1182.jpg",
     "order": 9
   },
   {
     "id": "Diptych",
     "title": "Diptychs",
     "description": "Paired images that speak to each other",
-    "order": 10
+    "cover": "DSCF8969.jpg",
+    "order": 10,
+    "imageOrder": [
+      "DSCF8969.jpg", "DSCF9219.jpg",
+      "DSCF7842.jpg", "DSCF7827.jpg",
+      "000226830010.jpg", "000226830035.jpg",
+      "DSCF3604.jpg", "DSCF3597.jpg",
+      "DSCF5866.jpg", "DSCF5871.jpg",
+      "000393120003.jpg", "000393120002.jpg",
+      "DSCF7968.jpg", "DSCF8303.jpg",
+      "DSCF8219.jpg", "DSCF8312.jpg",
+      "DSCF8621.jpg", "DSCF9241.jpg",
+      "DSCF1576.jpg", "DSCF1539.jpg",
+      "DSCF0032.jpg", "DSCF9995.jpg"
+    ]
   }
 ]

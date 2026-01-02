@@ -38,11 +38,15 @@
    - **Build Command:** `npm run build` (default)
    - **Output Directory:** `.next` (default)
 
-4. **Set environment variable:**
-   - Add environment variable:
+4. **Set environment variables:**
+   - Add environment variables:
      - **Name:** `NEXT_PUBLIC_SITE_URL`
-     - **Value:** `https://www.drdimg.com`
-   - This ensures sitemap and robots.txt use the correct domain
+       - **Value:** `https://www.drdimg.com`
+       - This ensures sitemap and robots.txt use the correct domain
+     - **Name:** `GEMINI_API_KEY`
+       - **Value:** Your Google Gemini API key (get from https://aistudio.google.com/app/apikey)
+       - This enables AI image analysis features
+   - Set for **Production** environment (and Preview/Development if desired)
 
 5. **Deploy:**
    - Click "Deploy"

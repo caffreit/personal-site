@@ -23,12 +23,13 @@ export interface Photo {
 
 interface AlbumViewProps {
   album: string;
+  albumId?: string;
   description?: string;
   images: Photo[];
   onBack?: () => void;
 }
 
-export const AlbumView: React.FC<AlbumViewProps> = ({ album, description, images, onBack }) => {
+export const AlbumView: React.FC<AlbumViewProps> = ({ album, albumId, description, images, onBack }) => {
   const router = useRouter();
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
   const [analysis, setAnalysis] = useState<string | null>(null);
@@ -121,82 +122,166 @@ export const AlbumView: React.FC<AlbumViewProps> = ({ album, description, images
             </p>
         </div>
 
-        {/* Masonry Grid */}
-        <Masonry
-          breakpointCols={breakpointColumnsObj}
-          className="my-masonry-grid"
-          columnClassName="my-masonry-grid_column"
-        >
-            {images.map((photo, index) => (
-            <div 
-                key={photo.id} 
-                onClick={() => !selectedPhoto && openLightbox(index)}
-                className="mb-8 group relative overflow-hidden rounded-[16px] bg-stone-200 cursor-pointer transition-all duration-500 hover:shadow-2xl"
-            >
-                <img 
-                  src={photo.url} 
-                  alt={photo.title} 
-                  width={photo.width}
-                  height={photo.height}
-                  className="h-auto w-full object-cover transition-transform duration-1000 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-110"
-                />
-                
-                {/* Grain Overlay */}
-                <div className="absolute inset-0 opacity-20 pointer-events-none mix-blend-overlay" 
-                    style={{backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")'}}></div>
+        {/* Masonry Grid or Diptych Grid */}
+        {albumId === 'Diptych' ? (
+          <div className="flex flex-col gap-16 md:gap-32">
+            {/* Process in pairs of 2 */}
+            {Array.from({ length: Math.ceil(images.length / 2) }).map((_, pairIndex) => {
+              const pair = images.slice(pairIndex * 2, pairIndex * 2 + 2);
+              
+              // Calculate aspect ratios for the pair to match heights
+              const r1 = (pair[0].width || 1) / (pair[0].height || 1);
+              const r2 = pair[1] ? (pair[1].width || 1) / (pair[1].height || 1) : 0;
+              
+              return (
+                <div key={pairIndex} className="flex flex-col md:flex-row gap-4 md:gap-2 items-start justify-center max-w-6xl mx-auto w-full">
+                  {pair.map((photo, index) => {
+                    const globalIndex = pairIndex * 2 + index;
+                    const ratio = (photo.width || 1) / (photo.height || 1);
+                    
+                    return (
+                      <div 
+                          key={photo.id} 
+                          onClick={() => !selectedPhoto && openLightbox(globalIndex)}
+                          style={{ 
+                            flex: pair.length > 1 ? `${ratio} ${ratio} 0%` : 'unset',
+                            width: pair.length === 1 ? `${(ratio / (ratio + 1)) * 100}%` : 'auto'
+                          }}
+                          className={`
+                            group relative overflow-hidden bg-stone-200 cursor-pointer transition-all duration-500 hover:shadow-2xl w-full
+                            ${index === 0 ? 'rounded-2xl md:rounded-r-none' : 'rounded-2xl md:rounded-l-none'}
+                            ${pair.length === 1 ? 'rounded-2xl mx-auto' : ''}
+                          `}
+                      >
+                          <img 
+                            src={photo.url} 
+                            alt={photo.title} 
+                            className="w-full h-auto block transition-transform duration-1000 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-110"
+                          />
+                          
+                          {/* Grain Overlay */}
+                          <div className="absolute inset-0 opacity-20 pointer-events-none mix-blend-overlay" 
+                              style={{backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")'}}></div>
 
-                {/* Hover Info Card */}
-                <div className="absolute inset-0 bg-stone-900/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-6">
-                    <div className="flex justify-end items-start w-full">
-                        <button 
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                handleAnalyze(photo.url, photo.id);
-                            }}
-                            className="bg-[var(--color-yellow)] text-stone-900 p-2 rounded-full hover:scale-110 transition-transform shadow-lg"
-                            title="Analyze with Gemini"
-                        >
-                            <Sparkles className="w-5 h-5" />
-                        </button>
-                    </div>
+                          {/* Analysis Trigger - Always visible on mobile, hover on desktop */}
+                          <div className="absolute top-4 right-4 z-10 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
+                              <button 
+                                  onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleAnalyze(photo.url, photo.id);
+                                  }}
+                                  className="bg-stone-900/40 backdrop-blur-sm border border-[var(--color-yellow)]/30 text-[var(--color-yellow)] px-4 py-2 rounded-full hover:bg-stone-900/60 transition-all shadow-lg flex items-center gap-2 group/btn"
+                              >
+                                  <Sparkles className="w-4 h-4" />
+                                  <span className="font-serif italic text-lg">Analyse with Gemini</span>
+                              </button>
+                          </div>
 
-                    <div className="translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                        <h3 className="text-white text-2xl font-bold leading-tight mb-2">{photo.title}</h3>
-                    </div>
+                          {/* Analysis Popover (In-place at bottom) */}
+                          {selectedPhoto === photo.id && (
+                              <div 
+                                  className="absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-stone-900/90 via-stone-900/70 to-transparent p-6 pt-20 md:p-8 md:pt-24 flex flex-col justify-end animate-in slide-in-from-bottom-4 duration-500"
+                                  onClick={(e) => e.stopPropagation()} // Prevent lightbox open when clicking analysis background
+                              >
+                                  <button onClick={closeAnalysis} className="absolute top-4 right-4 text-stone-400 hover:text-white transition-colors">
+                                      <X className="w-5 h-5" />
+                                  </button>
+                                  
+                                  <div className="space-y-2">
+                                      <div className="flex items-center gap-2 text-[var(--color-yellow)] font-mono text-[10px] uppercase tracking-[0.2em] opacity-80">
+                                          <Sparkles className="w-3 h-3 animate-spin-slow" /> AI Analysis
+                                      </div>
+                                      
+                                      {loading ? (
+                                          <div className="space-y-2">
+                                              <div className="h-3 w-3/4 bg-white/10 rounded animate-pulse"></div>
+                                              <div className="h-3 w-1/2 bg-white/10 rounded animate-pulse"></div>
+                                          </div>
+                                      ) : (
+                                          <p className="text-base md:text-lg font-serif text-stone-100 leading-relaxed italic drop-shadow-sm">
+                                              "{analysis}"
+                                          </p>
+                                      )}
+                                  </div>
+                              </div>
+                          )}
+                      </div>
+                    );
+                  })}
                 </div>
+              );
+            })}
+          </div>
+        ) : (
+          <Masonry
+            breakpointCols={breakpointColumnsObj}
+            className="my-masonry-grid"
+            columnClassName="my-masonry-grid_column"
+          >
+              {images.map((photo, index) => (
+              <div 
+                  key={photo.id} 
+                  onClick={() => !selectedPhoto && openLightbox(index)}
+                  className="mb-8 group relative overflow-hidden rounded-[16px] bg-stone-200 cursor-pointer transition-all duration-500 hover:shadow-2xl"
+              >
+                  <img 
+                    src={photo.url} 
+                    alt={photo.title} 
+                    width={photo.width}
+                    height={photo.height}
+                    className="h-auto w-full object-cover transition-transform duration-1000 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-110"
+                  />
+                  
+                  {/* Grain Overlay */}
+                  <div className="absolute inset-0 opacity-20 pointer-events-none mix-blend-overlay" 
+                      style={{backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")'}}></div>
 
-                {/* Analysis Popover (In-place) */}
-                {selectedPhoto === photo.id && (
-                    <div 
-                        className="absolute inset-0 z-20 bg-stone-900/95 p-6 md:p-8 flex flex-col justify-center animate-in fade-in duration-300"
-                        onClick={(e) => e.stopPropagation()} // Prevent lightbox open when clicking analysis background
-                    >
-                        <button onClick={closeAnalysis} className="absolute top-6 right-6 text-stone-400 hover:text-white">
-                            <X className="w-6 h-6" />
-                        </button>
-                        
-                        <div className="space-y-4">
-                            <div className="flex items-center gap-2 text-[var(--color-yellow)] font-mono text-xs uppercase tracking-widest">
-                                <Sparkles className="w-4 h-4 animate-spin-slow" /> AI Analysis
-                            </div>
-                            
-                            {loading ? (
-                                <div className="space-y-3">
-                                    <div className="h-4 w-3/4 bg-stone-800 rounded animate-pulse"></div>
-                                    <div className="h-4 w-1/2 bg-stone-800 rounded animate-pulse"></div>
-                                    <div className="h-4 w-5/6 bg-stone-800 rounded animate-pulse"></div>
-                                </div>
-                            ) : (
-                                <p className="text-lg md:text-xl font-serif text-stone-200 leading-relaxed italic">
-                                    "{analysis}"
-                                </p>
-                            )}
-                        </div>
-                    </div>
-                )}
-            </div>
-            ))}
-        </Masonry>
+                  {/* Analysis Trigger - Always visible on mobile, hover on desktop */}
+                  <div className="absolute top-4 right-4 z-10 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
+                      <button 
+                          onClick={(e) => {
+                              e.stopPropagation();
+                              handleAnalyze(photo.url, photo.id);
+                          }}
+                          className="bg-stone-900/40 backdrop-blur-sm border border-[var(--color-yellow)]/30 text-[var(--color-yellow)] px-4 py-2 rounded-full hover:bg-stone-900/60 transition-all shadow-lg flex items-center gap-2 group/btn"
+                      >
+                          <Sparkles className="w-4 h-4" />
+                          <span className="font-serif italic text-lg">Analyse with Gemini</span>
+                      </button>
+                  </div>
+
+                  {/* Analysis Popover (In-place at bottom) */}
+                  {selectedPhoto === photo.id && (
+                      <div 
+                          className="absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-stone-900/90 via-stone-900/70 to-transparent p-6 pt-20 md:p-8 md:pt-24 flex flex-col justify-end animate-in slide-in-from-bottom-4 duration-500"
+                          onClick={(e) => e.stopPropagation()} // Prevent lightbox open when clicking analysis background
+                      >
+                          <button onClick={closeAnalysis} className="absolute top-4 right-4 text-stone-400 hover:text-white transition-colors">
+                              <X className="w-5 h-5" />
+                          </button>
+                          
+                          <div className="space-y-2">
+                              <div className="flex items-center gap-2 text-[var(--color-yellow)] font-mono text-[10px] uppercase tracking-[0.2em] opacity-80">
+                                  <Sparkles className="w-3 h-3 animate-spin-slow" /> AI Analysis
+                              </div>
+                              
+                              {loading ? (
+                                  <div className="space-y-2">
+                                      <div className="h-3 w-3/4 bg-white/10 rounded animate-pulse"></div>
+                                      <div className="h-3 w-1/2 bg-white/10 rounded animate-pulse"></div>
+                                  </div>
+                              ) : (
+                                  <p className="text-base md:text-lg font-serif text-stone-100 leading-relaxed italic drop-shadow-sm">
+                                      "{analysis}"
+                                  </p>
+                              )}
+                          </div>
+                      </div>
+                  )}
+              </div>
+              ))}
+          </Masonry>
+        )}
       </div>
       
       <Lightbox

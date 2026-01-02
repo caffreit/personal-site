@@ -10,7 +10,7 @@ export const SelectedWorks = () => {
       href: '/photos/Faves',
       title: 'Favorites',
       subtitle: 'Photo Album',
-      image: '/photos/Faves/000160980007.jpg',
+      image: '/photos/Faves/DSCF3535.jpg',
       colSpan: 'md:col-span-2'
     },
     {
@@ -34,7 +34,7 @@ export const SelectedWorks = () => {
       href: '/photos/BnW',
       title: 'Black & White',
       subtitle: 'Photo Album',
-      image: '/photos/BnW/000184140002.jpg',
+      image: '/photos/BnW/000226840017.jpg',
       colSpan: 'md:col-span-1'
     },
     {
@@ -42,7 +42,7 @@ export const SelectedWorks = () => {
       href: '/photos/Portraits',
       title: 'Portraits',
       subtitle: 'Photo Album',
-      image: '/photos/Portraits/000153280003.jpg',
+      image: '/photos/Portraits/000160980007.jpg',
       colSpan: 'md:col-span-1'
     },
   ];

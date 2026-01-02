@@ -80,8 +80,8 @@ export function PhotoGalleryView({ albums, locations }: PhotoGalleryViewProps) {
                     style={{backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")'}}></div>
 
                 {/* Hover Info Card */}
-                <div className="absolute inset-0 bg-stone-900/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
-                    <div className="translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                <div className="absolute inset-0 bg-gradient-to-tr from-stone-900/80 via-stone-900/20 to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                    <div className="translate-y-0 md:translate-y-4 md:group-hover:translate-y-0 transition-transform duration-300">
                         <h3 className="text-white text-2xl font-bold leading-tight mb-1">{a.title}</h3>
                         <p className="text-stone-300 text-sm font-mono uppercase tracking-widest">{a.images.length} Photos</p>
                     </div>
@@ -126,8 +126,8 @@ export function PhotoGalleryView({ albums, locations }: PhotoGalleryViewProps) {
                 </div>
 
                 {/* Hover Info Card */}
-                <div className="absolute inset-0 bg-stone-900/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
-                    <div className="translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                <div className="absolute inset-0 bg-gradient-to-tr from-stone-900/80 via-stone-900/20 to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+                    <div className="translate-y-0 md:translate-y-4 md:group-hover:translate-y-0 transition-transform duration-300">
                         <h3 className="text-white text-2xl font-bold leading-tight mb-1">{loc.name}</h3>
                         <p className="text-stone-300 text-sm font-mono uppercase tracking-widest">{loc.photoCount} Photos</p>
                     </div>

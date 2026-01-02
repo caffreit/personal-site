@@ -56,15 +56,32 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({ albums, onAlbumClick
   };
 
   const filteredPhotos = useMemo(() => {
-    let currentPhotos = photos;
+    let currentPhotos = [];
     
     if (activeCategory !== 'All') {
         const categoryPhotos = photos.filter(p => p.category === activeCategory);
         // Randomly select up to 12 photos from the category
         currentPhotos = shuffleArray(categoryPhotos).slice(0, 12);
     } else {
-        // Randomly select 10 photos from all albums
-        currentPhotos = shuffleArray(photos).slice(0, 10);
+        // Pick one photo from each album to represent the theme
+        currentPhotos = albums.map(album => {
+            // Use the cover image if specified, otherwise find a featured image, or just the first one
+            const coverFilename = album.cover;
+            const coverImage = album.images.find(img => img.filename === coverFilename) 
+                || album.images.find(img => img.isFeatured) 
+                || album.images[0];
+
+            return {
+                id: `${album.id}-${coverImage.filename}`,
+                category: album.title,
+                albumId: album.id,
+                url: `/photos/${encodeURIComponent(album.id)}/${encodeURIComponent(coverImage.filename)}`,
+                title: album.title, // Show the theme name as the title
+                location: coverImage.location,
+                isFeatured: coverImage.isFeatured,
+                className: ''
+            };
+        });
     }
 
     // Define a layout pattern to mix up sizes
@@ -88,7 +105,7 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({ albums, onAlbumClick
             className: `md:col-span-${layout.col} md:row-span-${layout.row}`
         };
     });
-  }, [activeCategory, photos]);
+  }, [activeCategory, photos, albums]);
 
   const categories = useMemo(() => {
     // We only want categories that actually have photos
@@ -178,7 +195,7 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({ albums, onAlbumClick
                  style={{backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")'}}></div>
 
             {/* Hover Info */}
-            <div className="absolute inset-0 bg-gradient-to-t from-stone-900/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+            <div className="absolute inset-0 bg-gradient-to-tr from-stone-900/80 via-stone-900/20 to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
                 <span className="text-[var(--color-yellow)] font-serif italic text-lg mb-1">{photo.location ? photo.location.charAt(0).toUpperCase() + photo.location.slice(1).toLowerCase() : ''}</span>
                 <h3 className="text-white text-4xl font-black leading-tight tracking-tight">{photo.title}</h3>
             </div>

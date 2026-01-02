@@ -136,54 +136,59 @@ export function ThreeStations({ onBack }: ThreeStationsProps) {
       return;
     }
 
-    const center = { lat: 53.34739, lng: -6.251 };
-    const map = new window.google.maps.Map(mapContainerRef.current, {
-      zoom: 15,
-      center,
-      styles: MAP_STYLES,
-      disableDefaultUI: true,
-      zoomControl: false,
-    });
+    // Ensure the container element is actually in the DOM
+    if (!mapContainerRef.current.parentElement) {
+      return;
+    }
 
-    directionsServiceRef.current = new window.google.maps.DirectionsService();
-
-    STATIONS.forEach((station) => {
-      new window.google.maps.Marker({
-        position: { lat: station.lat, lng: station.lng },
-        map,
-        title: station.name,
-        icon: {
-          path: window.google.maps.SymbolPath.CIRCLE,
-          scale: 8,
-          fillColor: station.color,
-          fillOpacity: 1,
-          strokeColor: '#ffffff',
-          strokeWeight: 2,
-        },
+    try {
+      const center = { lat: 53.34739, lng: -6.251 };
+      const map = new window.google.maps.Map(mapContainerRef.current, {
+        zoom: 15,
+        center,
+        styles: MAP_STYLES,
+        disableDefaultUI: true,
+        zoomControl: false,
       });
-    });
 
-    const clickListener = map.addListener('click', (event: any) => {
-      if (event.latLng) {
-        handleMapClick(event.latLng);
-      }
-    });
+      directionsServiceRef.current = new window.google.maps.DirectionsService();
 
-    mapRef.current = map;
+      STATIONS.forEach((station) => {
+        new window.google.maps.Marker({
+          position: { lat: station.lat, lng: station.lng },
+          map,
+          title: station.name,
+          icon: {
+            path: window.google.maps.SymbolPath.CIRCLE,
+            scale: 8,
+            fillColor: station.color,
+            fillOpacity: 1,
+            strokeColor: '#ffffff',
+            strokeWeight: 2,
+          },
+        });
+      });
 
-    return () => {
-      clickListener.remove();
-      clearRoutes();
-      mapRef.current = null;
-      directionsServiceRef.current = null;
-    };
+      const clickListener = map.addListener('click', (event: any) => {
+        if (event.latLng) {
+          handleMapClick(event.latLng);
+        }
+      });
+
+      mapRef.current = map;
+
+      return () => {
+        clickListener.remove();
+        clearRoutes();
+        mapRef.current = null;
+        directionsServiceRef.current = null;
+      };
+    } catch (error) {
+      console.error('Error initializing Google Maps:', error);
+    }
   }, [mapsReady, handleMapClick, clearRoutes]);
 
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.google) {
-      setMapsReady(true);
-    }
-  }, []);
+  // Remove redundant check - Script's onLoad callback handles setting mapsReady
 
   return (
     <>
@@ -191,7 +196,14 @@ export function ThreeStations({ onBack }: ThreeStationsProps) {
         id="google-maps-sdk"
         src={GOOGLE_MAPS_SRC}
         strategy="afterInteractive"
-        onLoad={() => setMapsReady(true)}
+        onLoad={() => {
+          if (window.google && window.google.maps) {
+            setMapsReady(true);
+          }
+        }}
+        onError={(e) => {
+          console.error('Failed to load Google Maps script:', e);
+        }}
       />
       <div className="fixed inset-0 z-50 flex flex-col bg-stone-50 md:flex-row animate-in fade-in duration-300">
         <div className="order-1 md:order-2 relative h-[45vh] flex-grow bg-stone-200 md:h-full">

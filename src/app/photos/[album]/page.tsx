@@ -44,6 +44,7 @@ export default async function AlbumPage({ params }: { params: Promise<AlbumParam
   return (
     <AlbumView 
       album={album.title} 
+      albumId={album.id}
       description={album.description}
       images={images}
     />

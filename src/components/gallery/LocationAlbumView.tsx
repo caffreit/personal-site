@@ -155,21 +155,21 @@ export const LocationAlbumView: React.FC<LocationAlbumViewProps> = ({ location, 
                 </div>
 
                 {/* Hover Info Card */}
-                <div className="absolute inset-0 bg-stone-900/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-6">
+                <div className="absolute inset-0 bg-gradient-to-tr from-stone-900/80 via-stone-900/20 to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-6">
                     <div className="flex justify-end items-start w-full">
                         <button 
                             onClick={(e) => {
                                 e.stopPropagation();
                                 handleAnalyze(photo.url, photo.id);
                             }}
-                            className="bg-[var(--color-yellow)] text-stone-900 p-2 rounded-full hover:scale-110 transition-transform shadow-lg"
-                            title="Analyze with Gemini"
+                            className="bg-stone-900/40 backdrop-blur-sm border border-[var(--color-yellow)]/30 text-[var(--color-yellow)] px-4 py-2 rounded-full hover:bg-stone-900/60 transition-all shadow-lg flex items-center gap-2 group/btn"
                         >
-                            <Sparkles className="w-5 h-5" />
+                            <Sparkles className="w-4 h-4" />
+                            <span className="font-serif italic text-lg">Analyse with Gemini</span>
                         </button>
                     </div>
 
-                    <div className="translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                    <div className="translate-y-0 md:translate-y-4 md:group-hover:translate-y-0 transition-transform duration-300">
                         <h3 className="text-white text-2xl font-bold leading-tight mb-2">{photo.title}</h3>
                     </div>
                 </div>

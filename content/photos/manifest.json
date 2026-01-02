@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2025-12-03T16:11:43.593Z",
+  "generatedAt": "2026-01-02T18:57:39.821Z",
   "albums": [
     {
       "id": "Faves",
       "title": "Favorites",
       "description": "A curated selection of my best shots across all locations and themes",
-      "cover": "000160980007.jpg",
+      "cover": "DSCF3535.jpg",
       "images": [
         {
           "filename": "000160980007.jpg",
@@ -370,7 +370,7 @@
       "id": "Portraits",
       "title": "Portraits",
       "description": "Faces and figures, captured in candid and composed moments",
-      "cover": "000153280003.jpg",
+      "cover": "DSCF4666.jpg",
       "images": [
         {
           "filename": "000153280003.jpg",
@@ -755,7 +755,7 @@
       "id": "BnW",
       "title": "Black & White",
       "description": "Stripped of color, focused on light, shadow, and form",
-      "cover": "000184140002.jpg",
+      "cover": "000226840017.jpg",
       "images": [
         {
           "filename": "000184140002.jpg",
@@ -980,7 +980,7 @@
       "id": "Film",
       "title": "Film",
       "description": "Shot on analog film — grain, texture, and the joy of waiting",
-      "cover": "000153280003.jpg",
+      "cover": "000361140009.jpg",
       "images": [
         {
           "filename": "000153280003.jpg",
@@ -1260,7 +1260,7 @@
       "id": "People",
       "title": "People",
       "description": "Street life and human moments from around the world",
-      "cover": "000226830003.jpg",
+      "cover": "DSCF6615.jpg",
       "images": [
         {
           "filename": "000226830003.jpg",
@@ -1695,7 +1695,7 @@
       "id": "Buildings",
       "title": "Architecture",
       "description": "Structures, facades, and the geometry of the built environment",
-      "cover": "000184140007.jpg",
+      "cover": "DSCF9580.jpg",
       "images": [
         {
           "filename": "000184140007.jpg",
@@ -1906,7 +1906,7 @@
       "id": "Minimal",
       "title": "Minimal",
       "description": "Less is more — clean compositions and quiet subjects",
-      "cover": "000230820004.jpg",
+      "cover": "DSCF3070.jpg",
       "images": [
         {
           "filename": "000230820004.jpg",
@@ -2054,7 +2054,7 @@
       "id": "Animals",
       "title": "Animals",
       "description": "Creatures great and small, wild and domestic",
-      "cover": "000160980004.jpg",
+      "cover": "000160980013.jpg",
       "images": [
         {
           "filename": "000160980004.jpg",
@@ -2271,7 +2271,7 @@
       "id": "Mountains",
       "title": "Mountains",
       "description": "Peaks, valleys, and the grandeur of elevated landscapes",
-      "cover": "DSCF0553.jpg",
+      "cover": "DSCF1182.jpg",
       "images": [
         {
           "filename": "DSCF0553.jpg",
@@ -2398,8 +2398,36 @@
       "id": "Diptych",
       "title": "Diptychs",
       "description": "Paired images that speak to each other",
-      "cover": "000226830010.jpg",
+      "cover": "DSCF8969.jpg",
       "images": [
+        {
+          "filename": "DSCF8969.jpg",
+          "width": 2048,
+          "height": 1365,
+          "isFeatured": false,
+          "location": "Shanghai"
+        },
+        {
+          "filename": "DSCF9219.jpg",
+          "width": 2048,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Shanghai"
+        },
+        {
+          "filename": "DSCF7842.jpg",
+          "width": 2048,
+          "height": 1024,
+          "isFeatured": false,
+          "location": "Beijing"
+        },
+        {
+          "filename": "DSCF7827.jpg",
+          "width": 2048,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Beijing"
+        },
         {
           "filename": "000226830010.jpg",
           "width": 1358,
@@ -2415,51 +2443,16 @@
           "location": "Home"
         },
         {
-          "filename": "000393120002.jpg",
-          "width": 2048,
-          "height": 1358,
-          "isFeatured": false,
-          "location": "Dublin"
-        },
-        {
-          "filename": "000393120003.jpg",
-          "width": 2048,
-          "height": 1358,
-          "isFeatured": false,
-          "location": "Dublin"
-        },
-        {
-          "filename": "DSCF0032.jpg",
-          "width": 2048,
-          "height": 1638,
-          "isFeatured": false,
-          "location": "Chengdu"
-        },
-        {
-          "filename": "DSCF1539.jpg",
+          "filename": "DSCF3604.jpg",
           "width": 1365,
           "height": 2048,
           "isFeatured": false,
-          "location": "Chengdu"
-        },
-        {
-          "filename": "DSCF1576.jpg",
-          "width": 1365,
-          "height": 2048,
-          "isFeatured": false,
-          "location": "Chengdu"
+          "location": "Donegal"
         },
         {
           "filename": "DSCF3597.jpg",
           "width": 2048,
           "height": 1365,
-          "isFeatured": false,
-          "location": "Donegal"
-        },
-        {
-          "filename": "DSCF3604.jpg",
-          "width": 1365,
-          "height": 2048,
           "isFeatured": false,
           "location": "Donegal"
         },
@@ -2478,29 +2471,22 @@
           "location": "Lisbon"
         },
         {
-          "filename": "DSCF7827.jpg",
+          "filename": "000393120003.jpg",
           "width": 2048,
-          "height": 2048,
+          "height": 1358,
           "isFeatured": false,
-          "location": "Beijing"
+          "location": "Dublin"
         },
         {
-          "filename": "DSCF7842.jpg",
+          "filename": "000393120002.jpg",
           "width": 2048,
-          "height": 1024,
+          "height": 1358,
           "isFeatured": false,
-          "location": "Beijing"
+          "location": "Dublin"
         },
         {
           "filename": "DSCF7968.jpg",
           "width": 1365,
-          "height": 2048,
-          "isFeatured": false,
-          "location": "Beijing"
-        },
-        {
-          "filename": "DSCF8219.jpg",
-          "width": 1638,
           "height": 2048,
           "isFeatured": false,
           "location": "Beijing"
@@ -2511,6 +2497,13 @@
           "height": 2048,
           "isFeatured": false,
           "location": "Shanghai"
+        },
+        {
+          "filename": "DSCF8219.jpg",
+          "width": 1638,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Beijing"
         },
         {
           "filename": "DSCF8312.jpg",
@@ -2527,20 +2520,6 @@
           "location": "Shanghai"
         },
         {
-          "filename": "DSCF8969.jpg",
-          "width": 2048,
-          "height": 1365,
-          "isFeatured": false,
-          "location": "Shanghai"
-        },
-        {
-          "filename": "DSCF9219.jpg",
-          "width": 2048,
-          "height": 2048,
-          "isFeatured": false,
-          "location": "Shanghai"
-        },
-        {
           "filename": "DSCF9241.jpg",
           "width": 2048,
           "height": 2048,
@@ -2548,9 +2527,23 @@
           "location": "Shanghai"
         },
         {
-          "filename": "DSCF9562.jpg",
-          "width": 1639,
+          "filename": "DSCF1576.jpg",
+          "width": 1365,
           "height": 2048,
+          "isFeatured": false,
+          "location": "Chengdu"
+        },
+        {
+          "filename": "DSCF1539.jpg",
+          "width": 1365,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Chengdu"
+        },
+        {
+          "filename": "DSCF0032.jpg",
+          "width": 2048,
+          "height": 1638,
           "isFeatured": false,
           "location": "Chengdu"
         },
@@ -2589,7 +2582,7 @@
     {
       "id": "Chengdu",
       "name": "Chengdu",
-      "photoCount": 30,
+      "photoCount": 29,
       "cover": "DSCF0032.jpg",
       "coverAlbum": "Diptych"
     },
