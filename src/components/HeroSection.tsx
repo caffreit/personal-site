@@ -71,7 +71,7 @@ export default function HeroSection() {
           <p className="text-lg leading-relaxed text-zinc-500 dark:text-zinc-400 lg:text-xl">
             Putting data in the frame.
             <br />
-            A collection of moments and stories.
+            Charts, dog portraits, occasional opinions.
           </p>
         </div>
       </div>

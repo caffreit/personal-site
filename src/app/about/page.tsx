@@ -12,19 +12,19 @@ export default function AboutPage() {
               About Me
             </h1>
             <p className="text-xl sm:text-2xl font-medium text-zinc-500 dark:text-zinc-400 leading-relaxed">
-              I explore the intersection of visual storytelling, data analytics, and creative technology.
+              Charts, photos, occasional opinions.
             </p>
           </header>
 
           <div className="prose prose-zinc dark:prose-invert text-zinc-600 dark:text-zinc-400 leading-loose text-lg">
-            <p>
-              Hello! I'm a creative technologist and photographer with a passion for making complex information accessible and beautiful.
+            <p className="mb-6">
+              I write articles and build interactive tools about economics and finance — clear explanations, useful takeaways, and charts you don't need an economics degree to read. Neither incomprehensible nor dry — just allergic to jargon and fond of charts.
+            </p>
+            <p className="mb-6">
+              The photos are a hobby. People are the main subject, though I also photograph the dogs I look after (every dog deserves a portrait session).
             </p>
             <p>
-              This site serves as a digital garden where I cultivate my interests in photography, interactive data visualization, and web development. Whether I'm capturing street scenes or building tools to analyze housing markets, my goal is always to find the signal in the noise.
-            </p>
-            <p>
-              When I'm not coding or behind the camera, you can find me exploring new cities, reading about urban planning, or experimenting with generative art.
+              By day I do AI in medtech. On the side I'm building fintech for the people banks ignore. This site is just for fun stuff.
             </p>
           </div>
 

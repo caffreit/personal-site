@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowUpRight, Camera, FileText, Code } from 'lucide-react';
 
 export const SelectedWorks = () => {
@@ -26,7 +27,7 @@ export const SelectedWorks = () => {
       href: '/three-stations',
       title: 'Three Stations',
       subtitle: 'Interactive Tool',
-      image: null, // Will use gradient background
+      image: '/labs/three-stations/thumbnail.png',
       colSpan: 'md:col-span-1'
     },
     {
@@ -72,10 +73,11 @@ export const SelectedWorks = () => {
           >
             {/* Background Image or Gradient */}
             {item.image ? (
-              <img 
+              <Image 
                 src={item.image} 
                 alt={item.title}
-                className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700 ease-out"
+                fill
+                className="object-cover opacity-80 group-hover:scale-105 transition-transform duration-700 ease-out"
               />
             ) : (
               <div 
@@ -89,7 +91,7 @@ export const SelectedWorks = () => {
                  style={{backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")'}}></div>
 
             {/* Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-stone-950/90 via-stone-950/20 to-transparent z-20"></div>
+            <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.6)_0%,rgba(0,0,0,0.1)_25%,transparent_75%)] z-20"></div>
 
             {/* Content */}
             <div className="absolute inset-0 z-30 p-8 flex flex-col justify-between">
