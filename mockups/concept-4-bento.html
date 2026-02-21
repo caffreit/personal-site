@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concept 4 — Bento Grid / Modern Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Geist+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #F0EFEB;
+    --card: #ffffff;
+    --card-dark: #1a1a1a;
+    --black: #1a1a1a;
+    --yellow: #F4CA16;
+    --yellow-light: #FDF6D8;
+    --gray-400: #999;
+    --gray-200: #e5e5e5;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-hover: 0 10px 30px rgba(0,0,0,0.08);
+    --radius: 20px;
+    --sans: 'Inter', -apple-system, system-ui, sans-serif;
+    --mono: 'Geist Mono', monospace;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--black);
+    font-family: var(--sans);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    padding: 1rem;
+  }
+  @media (min-width: 768px) {
+    body { padding: 1.5rem; }
+  }
+
+  ::selection {
+    background: var(--yellow);
+    color: var(--black);
+  }
+
+  .bento {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: 180px;
+    gap: 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  @media (max-width: 1024px) {
+    .bento { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 640px) {
+    .bento {
+      grid-template-columns: 1fr;
+      grid-auto-rows: auto;
+    }
+  }
+
+  .cell {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    position: relative;
+    transition: box-shadow 0.3s, transform 0.3s;
+    cursor: default;
+  }
+  .cell:hover {
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-2px);
+  }
+  .cell a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .cell-pad { padding: 1.5rem; display: flex; flex-direction: column; }
+
+  /* Spanning utilities */
+  .col-2 { grid-column: span 2; }
+  .col-3 { grid-column: span 3; }
+  .row-2 { grid-row: span 2; }
+  @media (max-width: 640px) {
+    .col-2, .col-3 { grid-column: span 1; }
+    .row-2 { grid-row: span 1; }
+  }
+
+  /* CELL TYPES */
+
+  /* Identity cell */
+  .cell-identity { background: var(--card-dark); color: white; }
+  .cell-identity .name {
+    font-size: 1.8rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+  }
+  .cell-identity .tagline {
+    margin-top: auto;
+    font-size: 0.85rem;
+    font-weight: 300;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.5;
+  }
+
+  /* Nav cell */
+  .cell-nav { background: var(--card); }
+  .cell-nav .nav-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    height: 100%;
+    align-content: center;
+  }
+  .nav-pill {
+    padding: 0.5rem 1.15rem;
+    border-radius: 100px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--black);
+    background: var(--bg);
+    transition: all 0.2s;
+  }
+  .nav-pill:hover { background: var(--yellow); }
+  .nav-pill.active { background: var(--black); color: white; }
+
+  /* Clock cell */
+  .cell-clock {
+    background: var(--yellow);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+  .clock-time {
+    font-family: var(--mono);
+    font-size: 2.2rem;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+  }
+  .clock-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: rgba(0,0,0,0.5);
+    margin-top: 0.35rem;
+  }
+
+  /* Photo cells */
+  .cell-photo {
+    cursor: pointer;
+  }
+  .cell-photo .photo-placeholder {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    transition: transform 0.5s;
+  }
+  .cell-photo .photo-placeholder img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .cell-photo:hover .photo-placeholder { transform: scale(1.05); }
+  .cell-photo .photo-label {
+    position: absolute;
+    bottom: 1.25rem;
+    left: 1.25rem;
+    z-index: 5;
+  }
+  .cell-photo .photo-label h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: white;
+  }
+  .cell-photo .photo-label span {
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.6);
+  }
+  .cell-photo::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .photo-bg-1 { background: linear-gradient(135deg, #2a3a4a 0%, #1a2a3a 100%); }
+  .photo-bg-2 { background: linear-gradient(135deg, #3a2a2a 0%, #2a1a1a 100%); }
+  .photo-bg-3 { background: linear-gradient(135deg, #2a2a3a 0%, #1a1a2a 100%); }
+  .photo-bg-4 { background: linear-gradient(135deg, #2a3a2a 0%, #1a2a1a 100%); }
+  .photo-bg-5 { background: linear-gradient(135deg, #3a3a2a 0%, #2a2a1a 100%); }
+  .photo-bg-6 { background: linear-gradient(135deg, #3a2a3a 0%, #2a1a2a 100%); }
+
+  /* Blog post cell */
+  .cell-post .cell-pad {
+    justify-content: space-between;
+    height: 100%;
+  }
+  .post-cat {
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--yellow);
+    background: var(--black);
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    align-self: flex-start;
+  }
+  .post-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+    margin-top: 0.75rem;
+  }
+  .post-date {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--gray-400);
+    margin-top: auto;
+    padding-top: 0.75rem;
+  }
+
+  /* Featured blog cell (large, dark) */
+  .cell-featured-post {
+    background: var(--card-dark);
+    color: white;
+    cursor: pointer;
+  }
+  .cell-featured-post .cell-pad {
+    justify-content: flex-end;
+    height: 100%;
+  }
+  .cell-featured-post .post-cat {
+    color: var(--black);
+    background: var(--yellow);
+  }
+  .cell-featured-post .post-title {
+    font-size: 1.5rem;
+    color: white;
+  }
+  .cell-featured-post .post-summary {
+    font-size: 0.85rem;
+    font-weight: 300;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.6;
+    margin-top: 0.5rem;
+  }
+  .cell-featured-post .post-date {
+    color: rgba(255,255,255,0.3);
+  }
+
+  /* About cell */
+  .cell-about .about-text {
+    font-size: 0.85rem;
+    font-weight: 400;
+    color: #555;
+    line-height: 1.65;
+  }
+  .cell-about .about-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--gray-400);
+    margin-bottom: 0.75rem;
+  }
+
+  /* Stats cell */
+  .cell-stats {
+    background: var(--yellow-light);
+  }
+  .stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    height: 100%;
+    align-content: center;
+  }
+  .stat-item { text-align: center; }
+  .stat-num {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+  .stat-label {
+    font-size: 0.65rem;
+    font-weight: 500;
+    color: var(--gray-400);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 0.25rem;
+  }
+
+  /* Location cell */
+  .cell-location {
+    background: linear-gradient(135deg, #e8f4e8 0%, #d4e8d4 100%);
+  }
+  .location-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+  .location-city {
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .location-country {
+    font-size: 0.75rem;
+    color: var(--gray-400);
+    margin-top: 0.15rem;
+  }
+
+  /* CTA cell */
+  .cell-cta {
+    background: var(--black);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    transition: background 0.2s;
+  }
+  .cell-cta:hover { background: #333; }
+  .cta-text {
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .cta-arrow {
+    font-size: 1.5rem;
+    margin-top: 0.5rem;
+    display: block;
+  }
+
+  @media (max-width: 640px) {
+    .cell { min-height: 160px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bento">
+
+  <!-- Row 1: Identity + Nav + Clock -->
+  <div class="cell cell-identity col-2 cell-pad">
+    <div class="name">drdimg</div>
+    <div class="tagline">Putting data in the frame.<br>Charts, dog portraits, occasional opinions.</div>
+  </div>
+
+  <div class="cell cell-nav cell-pad">
+    <div class="nav-grid">
+      <a href="#" class="nav-pill active">Home</a>
+      <a href="#" class="nav-pill">Photos</a>
+      <a href="#" class="nav-pill">Blog</a>
+      <a href="#" class="nav-pill">Labs</a>
+      <a href="#" class="nav-pill">About</a>
+    </div>
+  </div>
+
+  <div class="cell cell-clock cell-pad">
+    <div class="clock-time" id="clock">14:57</div>
+    <div class="clock-label">Dublin, Ireland</div>
+  </div>
+
+  <!-- Row 2-3: Featured photo (2x2) + blog + photo -->
+  <div class="cell cell-photo col-2 row-2 photo-bg-1">
+    <div class="photo-placeholder"><img src="../public/photos/Faves/DSCF3535.jpg" alt="Favorites"></div>
+    <div class="photo-label">
+      <h4>Favorites</h4>
+      <span>Curated collection</span>
+    </div>
+  </div>
+
+  <div class="cell cell-featured-post col-2 row-2">
+    <div class="cell-pad">
+      <div class="post-cat">Data Science</div>
+      <div class="post-title">Calling Dunbar's Number: Number not in service</div>
+      <div class="post-summary">Is the cognitive limit on social relationships a real biological constraint or a statistical artifact?</div>
+      <div class="post-date">Nov 20, 2025</div>
+    </div>
+  </div>
+
+  <!-- Row 4: Blog posts + photos + stats -->
+  <div class="cell cell-post">
+    <div class="cell-pad">
+      <div class="post-cat">AI &amp; Product</div>
+      <div class="post-title">Software Costs Approach Zero</div>
+      <div class="post-date">Nov 28, 2025</div>
+    </div>
+  </div>
+
+  <div class="cell cell-photo photo-bg-2">
+    <div class="photo-placeholder"><img src="../public/photos/Portraits/DSCF4666.jpg" alt="Portraits"></div>
+    <div class="photo-label">
+      <h4>Portraits</h4>
+      <span>Faces & figures</span>
+    </div>
+  </div>
+
+  <div class="cell cell-photo photo-bg-3">
+    <div class="photo-placeholder"><img src="../public/photos/BnW/000226840017.jpg" alt="Black & White"></div>
+    <div class="photo-label">
+      <h4>B&amp;W</h4>
+      <span>Light & shadow</span>
+    </div>
+  </div>
+
+  <div class="cell cell-stats cell-pad">
+    <div class="stat-grid">
+      <div class="stat-item">
+        <div class="stat-num">10</div>
+        <div class="stat-label">Albums</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">4</div>
+        <div class="stat-label">Articles</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">1</div>
+        <div class="stat-label">Lab</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">∞</div>
+        <div class="stat-label">Ideas</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 5: About + photos + location -->
+  <div class="cell cell-about col-2 cell-pad">
+    <div class="about-label">About</div>
+    <div class="about-text">
+      Visual analytics, photography, and occasional opinions. Exploring the intersection of data, design, and the decisive moment. Based in Dublin, shooting on Fujifilm and analog film.
+    </div>
+  </div>
+
+  <div class="cell cell-photo photo-bg-4">
+    <div class="photo-placeholder"><img src="../public/photos/Film/000361140009.jpg" alt="Film"></div>
+    <div class="photo-label">
+      <h4>Film</h4>
+      <span>Analog grain</span>
+    </div>
+  </div>
+
+  <div class="cell cell-location cell-pad">
+    <div class="location-icon">📍</div>
+    <div class="location-city">Dublin</div>
+    <div class="location-country">Ireland</div>
+  </div>
+
+  <!-- Row 6: More content -->
+  <div class="cell cell-photo photo-bg-5">
+    <div class="photo-placeholder"><img src="../public/photos/Buildings/DSCF9580.jpg" alt="Architecture"></div>
+    <div class="photo-label">
+      <h4>Architecture</h4>
+      <span>Built geometry</span>
+    </div>
+  </div>
+
+  <div class="cell cell-post">
+    <div class="cell-pad">
+      <div class="post-cat">Data</div>
+      <div class="post-title">Ireland Housing Market Visuals</div>
+      <div class="post-date">Nov 14, 2025</div>
+    </div>
+  </div>
+
+  <div class="cell cell-photo photo-bg-6">
+    <div class="photo-placeholder"><img src="../public/photos/Mountains/DSCF1182.jpg" alt="Mountains"></div>
+    <div class="photo-label">
+      <h4>Mountains</h4>
+      <span>Peaks & valleys</span>
+    </div>
+  </div>
+
+  <div class="cell cell-cta">
+    <div>
+      <div class="cta-text">View all<br>photography</div>
+      <span class="cta-arrow">→</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- Clock JS -->
+<script>
+  function updateClock() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2, '0');
+    const m = String(now.getMinutes()).padStart(2, '0');
+    document.getElementById('clock').textContent = h + ':' + m;
+  }
+  updateClock();
+  setInterval(updateClock, 30000);
+</script>
+
+</body>
+</html>

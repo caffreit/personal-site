@@ -4,6 +4,8 @@ import "./globals.css";
 import "@/styles/masonry.css";
 import ThemeProviders from "@/components/theme/ThemeProviders";
 import HeaderNav from "@/components/theme/HeaderNav";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const display = Space_Grotesk({
   variable: "--font-display",
@@ -60,6 +62,8 @@ export default function RootLayout({
             </div>
           </footer>
         </ThemeProviders>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

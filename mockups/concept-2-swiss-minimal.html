@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concept 2 — Swiss Minimal / International Typographic</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Geist+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --white: #ffffff;
+    --black: #000000;
+    --red: #FF3B30;
+    --gray-400: #999999;
+    --gray-200: #e5e5e5;
+    --gray-100: #f5f5f5;
+    --sans: 'Inter', -apple-system, system-ui, sans-serif;
+    --mono: 'Geist Mono', 'SF Mono', monospace;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--white);
+    color: var(--black);
+    font-family: var(--sans);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background: var(--red);
+    color: white;
+  }
+
+  /* NAV */
+  nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 3rem;
+    border-bottom: 1px solid var(--gray-200);
+  }
+  @media (max-width: 640px) {
+    nav { padding: 1.25rem 1.5rem; }
+  }
+  nav .name {
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  nav .links {
+    display: flex;
+    gap: 2rem;
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: var(--gray-400);
+  }
+  nav .links a {
+    text-decoration: none;
+    color: inherit;
+    transition: color 0.15s;
+  }
+  nav .links a:hover { color: var(--black); }
+  nav .links a.active {
+    color: var(--black);
+    font-weight: 500;
+  }
+  nav .links a.active::before {
+    content: '•';
+    color: var(--red);
+    margin-right: 0.35rem;
+    font-weight: 700;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 3rem;
+  }
+  @media (max-width: 640px) {
+    .container { padding: 0 1.5rem; }
+  }
+
+  /* HERO */
+  .hero {
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding-bottom: 4rem;
+  }
+  .hero h1 {
+    font-size: clamp(2rem, 3.5vw, 3rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+    max-width: 500px;
+  }
+  .hero .bio {
+    margin-top: 1.5rem;
+    font-size: 1rem;
+    font-weight: 300;
+    color: var(--gray-400);
+    max-width: 420px;
+    line-height: 1.65;
+  }
+
+  /* DIVIDERS */
+  .rule {
+    height: 1px;
+    background: var(--gray-200);
+    width: 100%;
+  }
+
+  /* SECTION HEADER */
+  .section-label {
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gray-400);
+    padding: 3rem 0 1rem;
+  }
+
+  /* PHOTO GRID */
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    padding-bottom: 1rem;
+  }
+  @media (max-width: 768px) {
+    .photo-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  .photo-cell {
+    aspect-ratio: 1;
+    background: var(--gray-100);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .photo-cell .placeholder-img {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #e8e8e8 0%, #d5d5d5 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--gray-400);
+    transition: opacity 0.3s;
+  }
+  .photo-cell:hover .placeholder-img { opacity: 0.85; }
+  .photo-cell .featured-dot {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--red);
+  }
+  .album-labels {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    padding-top: 0.5rem;
+    padding-bottom: 3rem;
+  }
+  @media (max-width: 768px) {
+    .album-labels { grid-template-columns: repeat(2, 1fr); }
+  }
+  .album-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--black);
+    letter-spacing: -0.01em;
+  }
+  .album-count {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--gray-400);
+    margin-left: 0.35rem;
+  }
+
+  /* BLOG LIST */
+  .blog-list {
+    padding-bottom: 3rem;
+  }
+  .blog-row {
+    display: grid;
+    grid-template-columns: 120px 1fr 140px;
+    gap: 2rem;
+    align-items: baseline;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--gray-200);
+    text-decoration: none;
+    color: var(--black);
+    transition: background 0.15s;
+  }
+  @media (max-width: 640px) {
+    .blog-row {
+      grid-template-columns: 1fr;
+      gap: 0.25rem;
+    }
+  }
+  .blog-row:hover {
+    background: var(--gray-100);
+    margin: 0 -1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  .blog-date {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--gray-400);
+    white-space: nowrap;
+  }
+  .blog-title-text {
+    font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .blog-row:hover .blog-title-text {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .blog-cat {
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--gray-400);
+    text-align: right;
+  }
+  @media (max-width: 640px) {
+    .blog-cat { text-align: left; }
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 2rem 0;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    color: var(--gray-400);
+    font-weight: 400;
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="name">drdimg</div>
+  <div class="links">
+    <a href="#" class="active">Home</a>
+    <a href="#">Photos</a>
+    <a href="#">Blog</a>
+    <a href="#">Labs</a>
+    <a href="#">About</a>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- HERO -->
+  <div class="hero">
+    <h1>drdimg</h1>
+    <p class="bio">
+      Visual analytics, photography, and occasional opinions. Putting data in the frame — charts, dog portraits, and everything between.
+    </p>
+  </div>
+
+  <div class="rule"></div>
+
+  <!-- PHOTOGRAPHY -->
+  <div class="section-label">Photography — 10 Albums</div>
+
+  <div class="photo-grid">
+    <div class="photo-cell">
+      <img src="../public/photos/Faves/DSCF3535.jpg" alt="Favorites" class="placeholder-img" style="width:100%;height:100%;object-fit:cover;">
+      <div class="featured-dot"></div>
+    </div>
+    <div class="photo-cell">
+      <img src="../public/photos/Portraits/DSCF4666.jpg" alt="Portraits" class="placeholder-img" style="width:100%;height:100%;object-fit:cover;">
+    </div>
+    <div class="photo-cell">
+      <img src="../public/photos/BnW/000226840017.jpg" alt="Black & White" class="placeholder-img" style="width:100%;height:100%;object-fit:cover;">
+    </div>
+    <div class="photo-cell">
+      <img src="../public/photos/Film/000361140009.jpg" alt="Film" class="placeholder-img" style="width:100%;height:100%;object-fit:cover;">
+    </div>
+    <div class="photo-cell">
+      <img src="../public/photos/People/DSCF6615.jpg" alt="People" class="placeholder-img" style="width:100%;height:100%;object-fit:cover;">
+    </div>
+    <div class="photo-cell">
+      <img src="../public/photos/Buildings/DSCF9580.jpg" alt="Architecture" class="placeholder-img" style="width:100%;height:100%;object-fit:cover;">
+    </div>
+    <div class="photo-cell">
+      <img src="../public/photos/Minimal/DSCF3070.jpg" alt="Minimal" class="placeholder-img" style="width:100%;height:100%;object-fit:cover;">
+    </div>
+    <div class="photo-cell">
+      <img src="../public/photos/Animals/000160980013.jpg" alt="Animals" class="placeholder-img" style="width:100%;height:100%;object-fit:cover;">
+    </div>
+    <div class="photo-cell">
+      <img src="../public/photos/Mountains/DSCF1182.jpg" alt="Mountains" class="placeholder-img" style="width:100%;height:100%;object-fit:cover;">
+    </div>
+    <div class="photo-cell">
+      <img src="../public/photos/Diptych/DSCF8969.jpg" alt="Diptychs" class="placeholder-img" style="width:100%;height:100%;object-fit:cover;">
+    </div>
+  </div>
+
+  <div class="album-labels">
+    <div class="album-label">Favorites<span class="album-count">★</span></div>
+    <div class="album-label">Portraits</div>
+    <div class="album-label">Black & White</div>
+    <div class="album-label">Film</div>
+    <div class="album-label">People</div>
+    <div class="album-label">Architecture</div>
+    <div class="album-label">Minimal</div>
+    <div class="album-label">Animals</div>
+    <div class="album-label">Mountains</div>
+    <div class="album-label">Diptychs</div>
+  </div>
+
+  <div class="rule"></div>
+
+  <!-- BLOG LIST -->
+  <div class="section-label">Writing — 4 Articles</div>
+
+  <div class="blog-list">
+    <a class="blog-row" href="#">
+      <span class="blog-date">2025-11-28</span>
+      <span class="blog-title-text">Software Costs Approach Zero</span>
+      <span class="blog-cat">AI & Product</span>
+    </a>
+    <a class="blog-row" href="#">
+      <span class="blog-date">2025-11-20</span>
+      <span class="blog-title-text">Calling Dunbar's Number: Number not in service</span>
+      <span class="blog-cat">Data Science</span>
+    </a>
+    <a class="blog-row" href="#">
+      <span class="blog-date">2025-11-14</span>
+      <span class="blog-title-text">Ireland Housing Market Visuals</span>
+      <span class="blog-cat">Data</span>
+    </a>
+    <a class="blog-row" href="#">
+      <span class="blog-date">2025-11-13</span>
+      <span class="blog-title-text">Hello World</span>
+      <span class="blog-cat">Intro</span>
+    </a>
+  </div>
+
+  <div class="rule"></div>
+
+  <!-- FOOTER -->
+  <footer>
+    <span>&copy; 2026 drdimg</span>
+    <span>Dublin, Ireland</span>
+  </footer>
+
+</div>
+
+</body>
+</html>

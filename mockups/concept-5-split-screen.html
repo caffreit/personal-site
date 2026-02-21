@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concept 5 — Split-Screen Storyteller</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=Source+Sans+3:wght@300;400;600&family=Geist+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --black: #0A0A0A;
+    --white: #FAFAFA;
+    --yellow: #F4CA16;
+    --gray: #777;
+    --display: 'Space Grotesk', system-ui, sans-serif;
+    --body: 'Source Sans 3', system-ui, sans-serif;
+    --mono: 'Geist Mono', monospace;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--body);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: var(--yellow);
+    color: var(--black);
+  }
+
+  /* ======= HERO: 50/50 SPLIT ======= */
+  .hero-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 100vh;
+  }
+  @media (max-width: 768px) {
+    .hero-split { grid-template-columns: 1fr; }
+  }
+
+  .hero-left {
+    background: var(--black);
+    color: var(--white);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 4rem;
+    position: relative;
+  }
+  @media (max-width: 768px) {
+    .hero-left { min-height: 60vh; padding: 3rem 2rem; }
+  }
+  .hero-name {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(4rem, 10vw, 8rem);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+  }
+  .hero-name span {
+    display: block;
+  }
+  .hero-tagline {
+    margin-top: 2rem;
+    font-size: 1rem;
+    font-weight: 300;
+    color: rgba(255,255,255,0.4);
+    max-width: 280px;
+    line-height: 1.65;
+  }
+  .hero-divider {
+    position: absolute;
+    right: 0;
+    top: 20%;
+    bottom: 20%;
+    width: 3px;
+    background: var(--yellow);
+  }
+  @media (max-width: 768px) {
+    .hero-divider { display: none; }
+  }
+
+  .hero-right {
+    background: var(--white);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-right .hero-photo {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    animation: kenBurns 20s ease-in-out alternate infinite;
+  }
+  .hero-right .hero-photo img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  @keyframes kenBurns {
+    from { transform: scale(1); }
+    to { transform: scale(1.06); }
+  }
+  @media (max-width: 768px) {
+    .hero-right { min-height: 50vh; }
+  }
+
+  /* Vertical nav on left */
+  .side-nav {
+    position: absolute;
+    bottom: 4rem;
+    left: 4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  @media (max-width: 768px) {
+    .side-nav { bottom: 2rem; left: 2rem; }
+  }
+  .side-nav a {
+    text-decoration: none;
+    font-family: var(--display);
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    transition: color 0.2s;
+  }
+  .side-nav a:hover { color: rgba(255,255,255,0.8); }
+  .side-nav a.active { color: var(--white); }
+  .nav-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    flex-shrink: 0;
+  }
+  .side-nav a.active .nav-dot { background: var(--yellow); }
+
+  /* ======= MAIN SPLIT CONTENT ======= */
+  .split-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 100vh;
+  }
+  @media (max-width: 768px) {
+    .split-section { grid-template-columns: 1fr; }
+  }
+
+  .split-left {
+    background: var(--black);
+    color: var(--white);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 4rem;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+  }
+  @media (max-width: 768px) {
+    .split-left {
+      position: relative;
+      height: auto;
+      min-height: 40vh;
+      padding: 3rem 2rem;
+    }
+  }
+  .split-left .section-num {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--yellow);
+    letter-spacing: 0.15em;
+    margin-bottom: 2rem;
+  }
+  .split-left .section-title {
+    font-family: var(--display);
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 0.95;
+  }
+  .split-left .section-desc {
+    margin-top: 1.5rem;
+    font-size: 1rem;
+    font-weight: 300;
+    color: rgba(255,255,255,0.4);
+    max-width: 320px;
+    line-height: 1.65;
+  }
+  .split-left .section-meta {
+    margin-top: 2.5rem;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.25);
+    letter-spacing: 0.1em;
+  }
+
+  .split-right {
+    background: var(--white);
+  }
+
+  /* Photo sequence in right column */
+  .photo-sequence {
+    display: flex;
+    flex-direction: column;
+  }
+  .photo-item {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4/3;
+    overflow: hidden;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+  }
+  .photo-item .p-img {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    transition: transform 0.6s;
+  }
+  .photo-item .p-img img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .photo-item:hover .p-img { transform: scale(1.03); }
+
+  .photo-item .photo-info {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 1.5rem;
+    right: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  .photo-info h4 {
+    font-family: var(--display);
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--black);
+    letter-spacing: -0.01em;
+  }
+  .photo-info span {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--gray);
+  }
+
+  /* Blog cards in right column */
+  .blog-cards {
+    display: flex;
+    flex-direction: column;
+  }
+  .blog-card {
+    padding: 2.5rem;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    text-decoration: none;
+    color: var(--black);
+    transition: background 0.2s;
+    display: block;
+  }
+  .blog-card:hover { background: rgba(0,0,0,0.02); }
+  .blog-card .bc-cat {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gray);
+    margin-bottom: 0.75rem;
+  }
+  .blog-card h3 {
+    font-family: var(--display);
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+    margin-bottom: 0.75rem;
+  }
+  .blog-card p {
+    font-size: 0.95rem;
+    font-weight: 300;
+    color: #555;
+    line-height: 1.65;
+    max-width: 480px;
+  }
+  .blog-card .bc-date {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--gray);
+    margin-top: 1rem;
+    display: block;
+  }
+  .blog-card .bc-arrow {
+    display: inline-block;
+    margin-top: 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--black);
+    transition: transform 0.2s;
+  }
+  .blog-card:hover .bc-arrow { transform: translateX(4px); }
+
+  /* Works index on left side */
+  .works-index {
+    margin-top: 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .works-index-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: var(--display);
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: rgba(255,255,255,0.3);
+    transition: color 0.2s;
+    cursor: pointer;
+  }
+  .works-index-item:hover { color: rgba(255,255,255,0.7); }
+  .works-index-item.highlight { color: var(--white); }
+  .wi-num {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    color: rgba(255,255,255,0.2);
+    min-width: 1.5rem;
+  }
+  .works-index-item.highlight .wi-num { color: var(--yellow); }
+
+  /* ======= MOBILE ALTERNATING ======= */
+  @media (max-width: 768px) {
+    .split-section.reverse { direction: ltr; }
+  }
+
+  /* ======= FOOTER ======= */
+  .footer-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  @media (max-width: 768px) {
+    .footer-split { grid-template-columns: 1fr; }
+  }
+  .footer-left {
+    background: var(--black);
+    color: rgba(255,255,255,0.3);
+    padding: 2rem 4rem;
+    font-family: var(--display);
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+  .footer-right {
+    background: var(--white);
+    color: var(--gray);
+    padding: 2rem 2.5rem;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    text-align: right;
+  }
+  @media (max-width: 768px) {
+    .footer-left, .footer-right { padding: 1.5rem 2rem; }
+    .footer-right { text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ======= HERO SPLIT ======= -->
+<div class="hero-split">
+  <div class="hero-left">
+    <h1 class="hero-name">
+      <span>Visual</span>
+      <span>Ana&shy;lytics</span>
+    </h1>
+    <p class="hero-tagline">
+      Putting data in the frame. Charts, dog portraits, occasional opinions. By drdimg.
+    </p>
+    <div class="hero-divider"></div>
+
+    <div class="side-nav">
+      <a href="#" class="active"><span class="nav-dot"></span> Home</a>
+      <a href="#photos"><span class="nav-dot"></span> Photos</a>
+      <a href="#writing"><span class="nav-dot"></span> Writing</a>
+      <a href="#"><span class="nav-dot"></span> Labs</a>
+      <a href="#"><span class="nav-dot"></span> About</a>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="hero-photo"><img src="../public/photos/Faves/DSCF3535.jpg" alt="Featured photograph"></div>
+  </div>
+</div>
+
+<!-- ======= PHOTOGRAPHY SECTION ======= -->
+<div class="split-section" id="photos">
+  <div class="split-left">
+    <div class="section-num">01 — PHOTOGRAPHY</div>
+    <h2 class="section-title">Photo<br>Albums</h2>
+    <p class="section-desc">10 collections spanning portraits, architecture, film, mountains, and more. Shot on Fujifilm digital and analog film.</p>
+    <div class="section-meta">10 albums • Updated Feb 2026</div>
+
+    <div class="works-index">
+      <div class="works-index-item highlight"><span class="wi-num">01</span> Favorites</div>
+      <div class="works-index-item"><span class="wi-num">02</span> Portraits</div>
+      <div class="works-index-item"><span class="wi-num">03</span> Black & White</div>
+      <div class="works-index-item"><span class="wi-num">04</span> Film</div>
+      <div class="works-index-item"><span class="wi-num">05</span> People</div>
+      <div class="works-index-item"><span class="wi-num">06</span> Architecture</div>
+      <div class="works-index-item"><span class="wi-num">07</span> Minimal</div>
+      <div class="works-index-item"><span class="wi-num">08</span> Animals</div>
+      <div class="works-index-item"><span class="wi-num">09</span> Mountains</div>
+      <div class="works-index-item"><span class="wi-num">10</span> Diptychs</div>
+    </div>
+  </div>
+
+  <div class="split-right">
+    <div class="photo-sequence">
+      <div class="photo-item">
+        <div class="p-img"><img src="../public/photos/Faves/DSCF3535.jpg" alt="Favorites"></div>
+        <div class="photo-info">
+          <h4>Favorites</h4>
+          <span>Curated selection</span>
+        </div>
+      </div>
+      <div class="photo-item">
+        <div class="p-img"><img src="../public/photos/Portraits/DSCF4666.jpg" alt="Portraits"></div>
+        <div class="photo-info">
+          <h4>Portraits</h4>
+          <span>Faces & figures</span>
+        </div>
+      </div>
+      <div class="photo-item">
+        <div class="p-img"><img src="../public/photos/BnW/000226840017.jpg" alt="Black & White"></div>
+        <div class="photo-info">
+          <h4>Black &amp; White</h4>
+          <span>Light & shadow</span>
+        </div>
+      </div>
+      <div class="photo-item">
+        <div class="p-img">[ Film cover photo ]</div>
+        <div class="photo-info">
+          <h4>Film</h4>
+          <span>Analog grain & texture</span>
+        </div>
+      </div>
+      <div class="photo-item">
+        <div class="p-img"><img src="../public/photos/Buildings/DSCF9580.jpg" alt="Architecture"></div>
+        <div class="photo-info">
+          <h4>Architecture</h4>
+          <span>Built geometry</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======= WRITING SECTION ======= -->
+<div class="split-section" id="writing">
+  <div class="split-left">
+    <div class="section-num">02 — WRITING</div>
+    <h2 class="section-title">Blog</h2>
+    <p class="section-desc">Long-form notes, research logs, and visual essays on data, engineering, and travel.</p>
+    <div class="section-meta">4 articles • Data, AI, Housing</div>
+  </div>
+
+  <div class="split-right">
+    <div class="blog-cards">
+      <a class="blog-card" href="#">
+        <div class="bc-cat">AI &amp; Product</div>
+        <h3>Software Costs Approach Zero</h3>
+        <p>LLMs are collapsing development costs and inviting domain experts to become technical founders.</p>
+        <span class="bc-date">November 28, 2025</span>
+        <span class="bc-arrow">Read article →</span>
+      </a>
+      <a class="blog-card" href="#">
+        <div class="bc-cat">Data Science</div>
+        <h3>Calling Dunbar's Number: Number not in service</h3>
+        <p>Is the cognitive limit on social relationships a real biological constraint or a statistical artifact?</p>
+        <span class="bc-date">November 20, 2025</span>
+        <span class="bc-arrow">Read article →</span>
+      </a>
+      <a class="blog-card" href="#">
+        <div class="bc-cat">Data</div>
+        <h3>Ireland Housing Market Visuals</h3>
+        <p>Interactive charts exploring affordability, inflation, and wages in the Irish housing market.</p>
+        <span class="bc-date">November 14, 2025</span>
+        <span class="bc-arrow">Read article →</span>
+      </a>
+      <a class="blog-card" href="#">
+        <div class="bc-cat">Intro</div>
+        <h3>Hello World</h3>
+        <p>A first post with an embedded interactive component — welcome to the new site.</p>
+        <span class="bc-date">November 13, 2025</span>
+        <span class="bc-arrow">Read article →</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ======= FOOTER ======= -->
+<div class="footer-split">
+  <div class="footer-left">&copy; 2026 drdimg</div>
+  <div class="footer-right">Dublin, Ireland</div>
+</div>
+
+</body>
+</html>

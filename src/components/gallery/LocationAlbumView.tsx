@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Masonry from 'react-masonry-css';
 import Lightbox from "yet-another-react-lightbox";
+import Zoom from "yet-another-react-lightbox/plugins/zoom";
 import "yet-another-react-lightbox/styles.css";
 
 export interface LocationPhoto {
@@ -69,8 +70,8 @@ export const LocationAlbumView: React.FC<LocationAlbumViewProps> = ({ location, 
   };
 
   const breakpointColumnsObj = {
-    default: 3,
-    1024: 3,
+    default: 2,
+    1024: 2,
     640: 2,
     500: 1,
   };
@@ -213,6 +214,12 @@ export const LocationAlbumView: React.FC<LocationAlbumViewProps> = ({ location, 
         close={() => setLightboxOpen(false)}
         index={lightboxIndex}
         slides={images.map((img) => ({ src: img.url, title: img.title }))}
+        plugins={[Zoom]}
+        zoom={{
+          maxZoomPixelRatio: 4,
+          zoomInMultiplier: 2,
+          scrollToZoom: true,
+        }}
       />
     </div>
   );
