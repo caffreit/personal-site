@@ -15,7 +15,7 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({ albums }) => {
       {/* Header */}
       <div className="mx-auto flex max-w-[1200px] flex-col gap-1 px-6 pb-8 sm:flex-row sm:items-end sm:justify-between lg:px-10">
         <Link href="/photos">
-          <h2 className="font-serif text-[2.5rem] font-bold transition-colors hover:text-[var(--color-yellow)]">
+          <h2 className="font-serif text-[3rem] font-bold transition-colors hover:text-[var(--color-yellow)]">
             Photography
           </h2>
         </Link>

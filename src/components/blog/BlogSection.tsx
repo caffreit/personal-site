@@ -19,7 +19,7 @@ export function BlogSection({ posts }: { posts: PostListItem[] }) {
         {/* Header */}
         <div className="mb-12 flex flex-col gap-1 border-b-2 border-[var(--foreground)] pb-6 sm:flex-row sm:items-end sm:justify-between">
           <Link href="/blog">
-            <h2 className="font-serif text-[2.5rem] font-bold transition-colors hover:text-[var(--color-yellow)]">
+            <h2 className="font-serif text-[3rem] font-bold transition-colors hover:text-[var(--color-yellow)]">
               Writing
             </h2>
           </Link>
