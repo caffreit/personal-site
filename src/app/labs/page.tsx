@@ -31,20 +31,13 @@ export default function LabsPage() {
           </span>
         </Link>
 
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <span className="mb-4 block font-mono text-xs font-bold uppercase tracking-[0.4em] text-yellow-600">
-              Labs
-            </span>
-            <h1 className="text-5xl font-black uppercase leading-[0.9] tracking-tight text-stone-900 sm:text-7xl">
-              Experiments &<br className="hidden sm:block" /> Interactive Tools
-            </h1>
-          </div>
-          <p className="max-w-2xl font-serif text-lg italic text-stone-600">
-            WIP explorations that lean on APIs, data viz, and playful UI patterns—
-            sharing the same editorial feel as the photo and blog archives.
-          </p>
-        </div>
+        <h1 className="text-6xl font-black uppercase leading-[0.8] tracking-tighter text-stone-900 sm:text-8xl mb-8">
+          Labs
+        </h1>
+        <p className="max-w-2xl text-xl leading-relaxed text-stone-600 font-serif italic">
+          WIP explorations that lean on APIs, data viz, and playful UI patterns—
+          sharing the same editorial feel as the photo and blog archives.
+        </p>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">

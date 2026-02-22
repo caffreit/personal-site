@@ -1,111 +1,89 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ArrowDown } from "lucide-react";
+import { useEffect, useState, useRef, useCallback } from "react";
+import Image from "next/image";
+
+const HERO_SLIDES = [
+  { src: "/photos/Faves/DSCF3535.jpg", alt: "Favourites" },
+  { src: "/photos/BnW/000226840017.jpg", alt: "Black & White" },
+  { src: "/photos/Mountains/DSCF1182.jpg", alt: "Mountains" },
+];
+
+const INTERVAL = 5000;
 
 export default function HeroSection() {
-  const [viewportHeight, setViewportHeight] = useState<number>(0);
+  const [current, setCurrent] = useState(0);
   const [mounted, setMounted] = useState(false);
+  const fillRef = useRef<HTMLDivElement>(null);
+
+  const restartProgress = useCallback(() => {
+    const el = fillRef.current;
+    if (!el) return;
+    el.style.animation = "none";
+    void el.offsetWidth;
+    el.style.animation = "ruleFill 5s linear forwards";
+  }, []);
 
   useEffect(() => {
     setMounted(true);
-    // Set initial viewport height
-    const setHeight = () => {
-      setViewportHeight(window.innerHeight);
-    };
-
-    // Set on mount
-    setHeight();
-
-    // Update on resize
-    window.addEventListener("resize", setHeight);
-    
-    // Also handle orientation change on mobile
-    window.addEventListener("orientationchange", () => {
-      setTimeout(setHeight, 100);
-    });
-
-    return () => {
-      window.removeEventListener("resize", setHeight);
-      window.removeEventListener("orientationchange", setHeight);
-    };
   }, []);
 
-  const scrollToNextSection = () => {
-    const nextSection = document.getElementById("selected-works-section");
-    if (nextSection) {
-      nextSection.scrollIntoView({ behavior: "smooth" });
-    } else {
-      window.scrollTo({
-        top: window.innerHeight,
-        behavior: "smooth"
-      });
-    }
-  };
+  useEffect(() => {
+    if (!mounted) return;
+    restartProgress();
 
-  // Approximate header height is 81px
-  const sectionHeight = mounted && viewportHeight > 0 
-    ? `${viewportHeight - 81}px` 
-    : 'calc(100vh - 81px)';
+    const timer = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % HERO_SLIDES.length);
+      restartProgress();
+    }, INTERVAL);
+
+    return () => clearInterval(timer);
+  }, [mounted, restartProgress]);
+
+  const counter = `${String(current + 1).padStart(2, "0")} / ${String(HERO_SLIDES.length).padStart(2, "0")}`;
 
   return (
-    <section 
-      className="flex w-full flex-col pt-6 pb-4 relative"
-      style={{ 
-        minHeight: sectionHeight,
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between'
-      }}
-    >
-      {/* Hero Text Area */}
-      <div className="mb-12 flex flex-col justify-between gap-8 pt-10 lg:flex-row lg:items-end lg:pt-20">
-        <h1 className="max-w-4xl text-[11vw] font-bold leading-[0.85] tracking-tighter text-[#0A0A0A] dark:text-white lg:text-[12vw]">
-          <span className="block">Visual Analytics</span>
-          <span className="block text-2xl font-medium tracking-normal text-zinc-400 dark:text-zinc-500 lg:text-4xl">
-             by <span className="text-[var(--color-yellow)]">drdimg</span>
-          </span>
+    <section className="relative h-[85vh] w-full overflow-hidden">
+      {/* Slides */}
+      {HERO_SLIDES.map((slide, i) => (
+        <div
+          key={slide.src}
+          className={`absolute inset-0 transition-opacity duration-[1500ms] ease-in-out ${
+            i === current ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          <div className="relative h-full w-full overflow-hidden" style={{ animation: "kenBurns 15s ease-in-out alternate infinite" }}>
+            <Image
+              src={slide.src}
+              alt={slide.alt}
+              fill
+              className="object-cover"
+              priority={i === 0}
+              sizes="100vw"
+            />
+          </div>
+        </div>
+      ))}
+
+      {/* Overlay with editorial content */}
+      <div className="absolute inset-0 z-10 flex flex-col justify-end bg-gradient-to-t from-[rgba(10,10,10,0.75)] via-[rgba(10,10,10,0.15)_40%] to-transparent p-8 sm:p-12 lg:p-20 pb-16 sm:pb-20">
+        <h1 className="max-w-[700px] font-serif text-[clamp(3rem,7vw,6rem)] font-bold leading-none tracking-tight text-white">
+          Putting Data in the Frame
         </h1>
-        <div className="max-w-xs lg:max-w-sm lg:pb-4 lg:text-right">
-          <p className="text-lg leading-relaxed text-zinc-500 dark:text-zinc-400 lg:text-xl">
-            Putting data in the frame.
-            <br />
-            Potraits, patterns, occasional opinions.
-          </p>
+        {/* Timer bar */}
+        <div className="mt-6 h-[3px] w-[72px] overflow-hidden bg-[var(--hero-track)]">
+          <div
+            ref={fillRef}
+            className="h-full w-full origin-left bg-[var(--color-yellow)]"
+            style={{ transform: "scaleX(0)" }}
+          />
         </div>
       </div>
 
-      {/* Scroll Indicator */}
-      <AnimatePresence>
-        {mounted && (
-          <motion.div 
-            className="cursor-pointer flex flex-col items-center gap-3 z-10 py-6"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1, duration: 0.8 }}
-            onClick={scrollToNextSection}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500 ml-1">
-              Scroll
-            </span>
-            <motion.div
-              animate={{ y: [0, 6, 0] }}
-              transition={{ 
-                duration: 2, 
-                repeat: Infinity, 
-                ease: "easeInOut" 
-              }}
-              className="rounded-full border border-zinc-200 p-2.5 dark:border-zinc-800 bg-white/50 dark:bg-black/50 backdrop-blur-sm shadow-sm"
-            >
-              <ArrowDown className="h-4 w-4 text-zinc-500 dark:text-zinc-400" />
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Slide counter */}
+      <div className="absolute bottom-16 right-8 z-10 font-mono text-[0.75rem] text-white/40 sm:bottom-20 sm:right-12">
+        {counter}
+      </div>
     </section>
   );
 }
-

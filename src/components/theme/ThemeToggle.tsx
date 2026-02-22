@@ -13,7 +13,7 @@ export default function ThemeToggle() {
 
   if (!mounted) return null;
 
-  const current = theme ?? resolvedTheme ?? "light";
+  const current = theme ?? resolvedTheme ?? "dark";
   const isDark = current === "dark";
 
   const toggleTheme = () => {
@@ -26,48 +26,16 @@ export default function ThemeToggle() {
       onClick={toggleTheme}
       aria-label="Toggle theme"
       title="Toggle theme"
-      className="flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-1.5 py-1.5 text-xs font-medium text-zinc-700 shadow-sm transition hover:border-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+      className="group relative inline-flex h-9 items-center gap-2 rounded-full border border-[var(--rule-color)] px-2.5 font-mono text-[0.7rem] tracking-wide text-[var(--text-muted)] transition-[color,border-color] duration-300 hover:border-zinc-500 hover:text-[var(--foreground)] cursor-pointer"
     >
       <span
-        className={`flex h-7 w-7 items-center justify-center rounded-full text-[11px] transition ${
-          !isDark
-            ? "bg-zinc-900 text-white dark:bg-white dark:text-zinc-900"
-            : "text-zinc-400"
+        className={`inline-flex h-6 w-6 items-center justify-center rounded-full bg-[var(--rule-color)] text-sm leading-none text-[var(--foreground)] transition-transform duration-300 ${
+          isDark ? "translate-x-0" : "translate-x-[2px] rotate-180"
         }`}
       >
-        <svg
-          viewBox="0 0 24 24"
-          className="h-3.5 w-3.5"
-          aria-hidden="true"
-        >
-          <circle cx="12" cy="12" r="4" fill="currentColor" />
-          <path
-            d="M12 2v2m0 16v2M4 12H2m20 0h-2M5.64 5.64 7.05 7.05m9.9 9.9 1.41 1.41M5.64 18.36 7.05 16.95m9.9-9.9 1.41-1.41"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-          />
-        </svg>
+        {isDark ? "☾" : "☀"}
       </span>
-      <span
-        className={`flex h-7 w-7 items-center justify-center rounded-full text-[11px] transition ${
-          isDark
-            ? "bg-zinc-900 text-white dark:bg-white dark:text-zinc-900"
-            : "text-zinc-400"
-        }`}
-      >
-        <svg
-          viewBox="0 0 24 24"
-          className="h-3.5 w-3.5"
-          aria-hidden="true"
-        >
-          <path
-            d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
-            fill="currentColor"
-          />
-        </svg>
-      </span>
+      <span className="pr-1">{isDark ? "Dark" : "Light"}</span>
     </button>
   );
 }
-

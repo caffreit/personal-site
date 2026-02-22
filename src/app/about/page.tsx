@@ -1,20 +1,30 @@
 import Image from "next/image";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
 export default function AboutPage() {
   return (
-    <div className="px-4 sm:px-6 lg:px-8 w-full max-w-7xl mx-auto pt-12 pb-24">
+    <div className="mx-auto max-w-7xl px-4 pt-12 pb-32 sm:px-6 lg:px-8">
+      <div className="mb-12">
+        <Link
+          href="/"
+          className="mb-8 inline-flex items-center gap-2 text-stone-500 transition-colors hover:text-stone-900 dark:text-stone-400 dark:hover:text-stone-100"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          <span className="font-mono text-sm font-medium uppercase tracking-[0.2em]">Back to Home</span>
+        </Link>
+
+        <h1 className="text-6xl sm:text-8xl font-black text-stone-900 tracking-tighter uppercase leading-[0.8] mb-8 dark:text-white">
+          About Me
+        </h1>
+        <p className="max-w-2xl text-xl leading-relaxed text-stone-600 font-serif italic dark:text-stone-300">
+          Charts, photos, occasional opinions.
+        </p>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 items-start">
-        {/* Left Column: Header & Bio */}
+        {/* Left Column: Bio */}
         <div className="lg:col-span-7 flex flex-col gap-8">
-          <header>
-            <h1 className="text-6xl sm:text-8xl font-bold tracking-tighter text-zinc-900 dark:text-zinc-50 mb-6">
-              About Me
-            </h1>
-            <p className="text-xl sm:text-2xl font-medium text-zinc-500 dark:text-zinc-400 leading-relaxed">
-              Charts, photos, occasional opinions.
-            </p>
-          </header>
 
           <div className="prose prose-zinc dark:prose-invert text-zinc-600 dark:text-zinc-400 leading-loose text-lg">
             <p className="mb-6">

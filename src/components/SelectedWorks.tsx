@@ -1,123 +1,110 @@
-import React from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { ArrowUpRight, Camera, FileText, Code } from 'lucide-react';
+import Link from "next/link";
+import Image from "next/image";
+import { PostListItem } from "@/lib/posts";
 
-export const SelectedWorks = () => {
-  // Manually curating a mix of interesting content
-  const selectedItems = [
-    {
-      type: 'ALBUM',
-      href: '/photos/Faves',
-      title: 'Favorites',
-      subtitle: 'Photo Album',
-      image: '/photos/Faves/DSCF3535.jpg',
-      colSpan: 'md:col-span-2'
-    },
-    {
-      type: 'ARTICLE',
-      href: '/blog/dunbars-number',
-      title: "Dunbar's Number",
-      subtitle: 'Data Visualization',
-      image: '/blog/dunbars-number/header.png',
-      colSpan: 'md:col-span-1'
-    },
-    {
-      type: 'LAB',
-      href: '/three-stations',
-      title: 'Three Stations',
-      subtitle: 'Interactive Tool',
-      image: '/labs/three-stations/thumbnail.png',
-      colSpan: 'md:col-span-1'
-    },
-    {
-      type: 'ALBUM',
-      href: '/photos/BnW',
-      title: 'Black & White',
-      subtitle: 'Photo Album',
-      image: '/photos/BnW/000226840017.jpg',
-      colSpan: 'md:col-span-1'
-    },
-    {
-      type: 'ALBUM',
-      href: '/photos/Portraits',
-      title: 'Portraits',
-      subtitle: 'Photo Album',
-      image: '/photos/Portraits/000160980007.jpg',
-      colSpan: 'md:col-span-1'
-    },
-  ];
+interface EditorialThreeColProps {
+  posts: PostListItem[];
+  featuredPost: PostListItem;
+}
 
+const formatShortDate = (date: string) =>
+  new Date(date).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+
+export function SelectedWorks({ posts, featuredPost }: EditorialThreeColProps) {
   return (
-    <section className="pt-2 pb-24 sm:pt-6 sm:pb-32 w-full">
-      <div className="mb-12 flex items-end justify-between border-b border-stone-200 pb-6">
+    <section>
+      <div className="mx-auto grid max-w-[1200px] gap-10 px-6 py-16 md:grid-cols-[240px_1fr_240px] md:gap-10 lg:px-10">
+        {/* Left: Table of Contents */}
         <div>
-          <span className="block text-sm font-mono font-bold text-yellow-600 mb-2 tracking-widest uppercase">
-            Curated
-          </span>
-          <h2 className="text-5xl sm:text-7xl font-black text-stone-900 tracking-tighter">
-            Selected Works
-          </h2>
+          <h3 className="mb-6 border-b border-[var(--rule-color)] pb-3 font-[family-name:var(--font-display)] text-[0.7rem] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)]">
+            Recent Writing
+          </h3>
+          {posts.slice(0, 5).map((post) => (
+            <Link
+              key={post.slug}
+              href={`/blog/${post.slug}`}
+              className="block border-b border-[var(--rule-color)] py-3 transition-all hover:pl-2"
+            >
+              <span className="block font-mono text-[0.7rem] text-[var(--text-muted)]">
+                {formatShortDate(post.date)}
+              </span>
+              <span className="text-[0.95rem] font-semibold leading-snug">
+                {post.title}
+              </span>
+            </Link>
+          ))}
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[350px]">
-        {selectedItems.map((item, index) => (
+        {/* Center: Featured Essay */}
+        <div className="border-[var(--rule-color)] md:border-x md:px-10">
+          <p className="mb-3 font-[family-name:var(--font-display)] text-[0.7rem] font-bold uppercase tracking-[0.2em] text-[var(--color-yellow)]">
+            Featured Essay
+          </p>
           <Link
-            key={index}
-            href={item.href}
-            className={`
-              group relative overflow-hidden rounded-[2.5rem] cursor-pointer bg-stone-900
-              ${item.colSpan}
-            `}
+            href={`/blog/${featuredPost.slug}`}
+            className="block transition-opacity hover:opacity-90"
           >
-            {/* Background Image or Gradient */}
-            {item.image ? (
-              <Image 
-                src={item.image} 
-                alt={item.title}
-                fill
-                className="object-cover opacity-80 group-hover:scale-105 transition-transform duration-700 ease-out"
-              />
-            ) : (
-              <div 
-                className="absolute inset-0 w-full h-full opacity-80 group-hover:scale-105 transition-transform duration-700 ease-out"
-                style={{ backgroundImage: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)' }}
-              />
-            )}
-
-            {/* Grain Overlay */}
-            <div className="absolute inset-0 opacity-20 pointer-events-none mix-blend-overlay z-10" 
-                 style={{backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")'}}></div>
-
-            {/* Gradient Overlay */}
-            <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.6)_0%,rgba(0,0,0,0.1)_25%,transparent_75%)] z-20"></div>
-
-            {/* Content */}
-            <div className="absolute inset-0 z-30 p-8 flex flex-col justify-between">
-              <div className="flex justify-between items-start">
-                 <div className={`
-                   px-3 py-1.5 rounded-full backdrop-blur-md border border-white/10 text-xs font-bold uppercase tracking-widest flex items-center gap-2
-                   ${item.type === 'ARTICLE' ? 'bg-[var(--color-yellow)]/90 text-stone-900' : item.type === 'LAB' ? 'bg-blue-500/90 text-white' : 'bg-white/20 text-white'}
-                 `}>
-                   {item.type === 'ARTICLE' ? <FileText className="w-3 h-3"/> : item.type === 'LAB' ? <Code className="w-3 h-3"/> : <Camera className="w-3 h-3"/>}
-                   {item.type === 'ARTICLE' ? 'Article' : item.type === 'LAB' ? 'Lab' : 'Album'}
-                 </div>
-                 
-                 <div className="w-10 h-10 rounded-full bg-white text-stone-900 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0 group-hover:rotate-45">
-                    <ArrowUpRight className="w-5 h-5" />
-                 </div>
-              </div>
-
-              <div className="transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-                <span className="block text-[var(--color-yellow)] font-serif italic text-lg mb-1">{item.subtitle}</span>
-                <h3 className="text-white text-4xl font-black leading-tight tracking-tight">{item.title}</h3>
-              </div>
-            </div>
+            <h2 className="mb-4 font-serif text-[2.2rem] font-bold leading-tight">
+              {featuredPost.title}
+            </h2>
           </Link>
-        ))}
+          {featuredPost.image && (
+            <Link
+              href={`/blog/${featuredPost.slug}`}
+              className="block transition-opacity hover:opacity-90"
+            >
+              <div className="relative mb-6 aspect-[3/2] overflow-hidden">
+                <Image
+                  src={featuredPost.image}
+                  alt={featuredPost.title}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 900px) 100vw, 600px"
+                />
+              </div>
+            </Link>
+          )}
+          {featuredPost.summary && (
+            <p className="dropcap text-[1.1rem] leading-relaxed text-[var(--text-body-rgb)]">
+              {featuredPost.summary}
+            </p>
+          )}
+          <Link
+            href={`/blog/${featuredPost.slug}`}
+            className="mt-6 inline-block font-[family-name:var(--font-display)] text-sm font-medium uppercase tracking-[0.15em] text-[var(--color-yellow)] transition-opacity hover:opacity-80"
+          >
+            Read essay &rarr;
+          </Link>
+        </div>
+
+        {/* Right: Colophon / Sidebar */}
+        <div>
+          <h3 className="mb-6 border-b border-[var(--rule-color)] pb-3 font-[family-name:var(--font-display)] text-[0.7rem] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)]">
+            Colophon
+          </h3>
+          <p className="mb-5 text-[0.85rem] italic leading-relaxed text-[var(--text-muted)]">
+            Patterns &amp; Portraits — Occasional Opinion
+          </p>
+          <SidebarItem label="Photographs" value="211 selected from over 30,000 taken" />
+          <SidebarItem label="Cameras" value="Fujifilm X100F, Beirette, Nikon FL2" />
+          <SidebarItem label="Analysis" value="Python, built in Cursor" />
+        </div>
       </div>
     </section>
   );
-};
+}
 
+function SidebarItem({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="mb-3 text-[0.85rem] leading-normal text-[var(--text-body-rgb)]">
+      <strong className="mb-0.5 block font-[family-name:var(--font-display)] text-[0.75rem] font-bold uppercase tracking-[0.1em] text-[var(--foreground)]">
+        {label}
+      </strong>
+      {value}
+    </div>
+  );
+}

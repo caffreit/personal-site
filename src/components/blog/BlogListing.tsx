@@ -65,20 +65,13 @@ export default function BlogListing({ posts }: BlogListingProps) {
             </span>
           </Link>
 
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <span className="mb-4 block font-mono text-xs font-bold uppercase tracking-[0.4em] text-yellow-600">
-                Blog Archive
-              </span>
-              <h1 className="text-5xl font-black uppercase leading-[0.9] tracking-tight text-stone-900 sm:text-7xl dark:text-white">
-                Blog
-              </h1>
-            </div>
-            <p className="max-w-2xl font-serif text-lg italic text-stone-600 dark:text-stone-300">
-              Essays, build logs, and notes from data-forward experiments—curated
-              with the same editorial energy as the labs playground.
-            </p>
-          </div>
+          <h1 className="text-6xl font-black uppercase leading-[0.8] tracking-tighter text-stone-900 sm:text-8xl dark:text-white mb-8">
+            Blog
+          </h1>
+          <p className="max-w-2xl text-xl leading-relaxed text-stone-600 font-serif italic dark:text-stone-300">
+            Essays, build logs, and notes from data-forward experiments—curated
+            with the same editorial energy as the labs playground.
+          </p>
         </div>
 
         {/* Navigation Bar with Filters and Search */}

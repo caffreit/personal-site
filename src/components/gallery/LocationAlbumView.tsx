@@ -97,13 +97,13 @@ export const LocationAlbumView: React.FC<LocationAlbumViewProps> = ({ location, 
       <div className="pt-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto pb-32">
         {/* Location Header */}
         <div className="mb-12">
-            <button 
-               onClick={handleBack}
-               className="inline-flex items-center gap-2 text-stone-500 hover:text-stone-900 mb-10 transition-colors"
-             >
-                <ArrowLeft className="w-4 h-4" />
-                <span className="font-medium text-sm font-mono uppercase tracking-wider">Back to Albums</span>
-             </button>
+            <button
+              onClick={handleBack}
+              className="mb-8 inline-flex items-center gap-2 text-stone-500 transition-colors hover:text-stone-900"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span className="font-mono text-sm font-medium uppercase tracking-[0.2em]">Back to Albums</span>
+            </button>
 
             <div className="flex items-center gap-3 mb-4">
               <span className="inline-flex items-center gap-1.5 bg-stone-200 px-3 py-1.5 rounded-full text-xs font-medium text-stone-600">

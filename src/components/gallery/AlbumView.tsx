@@ -107,15 +107,21 @@ export const AlbumView: React.FC<AlbumViewProps> = ({ album, albumId, descriptio
       <div className="pt-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto pb-32">
         {/* Album Header */}
         <div className="mb-12">
-            <button 
-               onClick={handleBack}
-               className="inline-flex items-center gap-2 text-stone-500 hover:text-stone-900 mb-10 transition-colors"
-             >
-                <ArrowLeft className="w-4 h-4" />
-                <span className="font-medium text-sm font-mono uppercase tracking-wider">Back to Albums</span>
-             </button>
+            <button
+              onClick={handleBack}
+              className="mb-8 inline-flex items-center gap-2 text-stone-500 transition-colors hover:text-stone-900"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span className="font-mono text-sm font-medium uppercase tracking-[0.2em]">Back to Albums</span>
+            </button>
 
-            <h1 className="text-6xl sm:text-8xl font-black text-stone-900 tracking-tighter uppercase leading-[0.8] mb-8">
+            <h1
+              className={`${
+                album.length >= 10
+                  ? "text-[clamp(1.75rem,10vw,6rem)]"
+                  : "text-[clamp(2.5rem,14vw,6rem)]"
+              } font-black text-stone-900 tracking-tighter uppercase leading-[0.8] mb-8 min-w-0 whitespace-nowrap`}
+            >
                 {album}
             </h1>
             <p className="max-w-xl text-xl text-stone-600 font-serif italic">

@@ -8,11 +8,45 @@
   --background: var(--color-white);
   --foreground: var(--color-black);
 
-  --font-heading: var(--font-display, "Space Grotesk", "Geist", "Helvetica", sans-serif);
-  --font-body: var(--font-body, "Source Sans 3", "Geist", "Helvetica", sans-serif);
+  --font-heading: var(--font-newsreader, "Newsreader", Georgia, serif);
+  --font-body: var(--font-newsreader, "Newsreader", Georgia, serif);
   --font-mono: var(--font-mono, "Geist Mono", "SFMono-Regular", "Consolas", monospace);
   --font-inter: var(--font-inter, "Inter", sans-serif);
   --font-serif: var(--font-newsreader, "Newsreader", serif);
+
+  --rule-color: #d4d0c8;
+  --text-muted: rgba(0,0,0,0.45);
+  --text-body-rgb: #555;
+  --nav-bg: rgba(250,249,246,0.92);
+  --card-badge-bg: #1a1a1a;
+  --hero-track: rgba(0,0,0,0.15);
+  --caption-gradient: rgba(0,0,0,0.55);
+}
+
+.dark {
+  --background: #0A0A0A;
+  --foreground: #FFFFFF;
+  --rule-color: #222;
+  --text-muted: rgba(255,255,255,0.5);
+  --text-body-rgb: rgba(255,255,255,0.7);
+  --nav-bg: rgba(10,10,10,0.92);
+  --card-badge-bg: rgba(255,255,255,0.08);
+  --hero-track: rgba(255,255,255,0.15);
+  --caption-gradient: rgba(10,10,10,0.7);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0A0A0A;
+    --foreground: #FFFFFF;
+    --rule-color: #222;
+    --text-muted: rgba(255,255,255,0.5);
+    --text-body-rgb: rgba(255,255,255,0.7);
+    --nav-bg: rgba(10,10,10,0.92);
+    --card-badge-bg: rgba(255,255,255,0.08);
+    --hero-track: rgba(255,255,255,0.15);
+    --caption-gradient: rgba(10,10,10,0.7);
+  }
 }
 
 @theme inline {
@@ -24,23 +58,12 @@
   --font-serif: var(--font-serif);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0A0A0A;
-    --foreground: #FFFFFF;
-  }
-}
-
-.dark {
-  --background: #0A0A0A;
-  --foreground: #FFFFFF;
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-body);
   min-height: 100vh;
+  transition: background 0.4s ease, color 0.4s ease;
 }
 
 h1,
@@ -53,19 +76,32 @@ h4,
   font-weight: 700;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #f5f5f4; 
+  background: #f5f5f4;
+}
+.dark ::-webkit-scrollbar-track {
+  background: #111;
 }
 ::-webkit-scrollbar-thumb {
-  background: #d6d3d1; 
+  background: #d6d3d1;
   border-radius: 4px;
 }
+.dark ::-webkit-scrollbar-thumb {
+  background: #333;
+}
 ::-webkit-scrollbar-thumb:hover {
-  background: #a8a29e; 
+  background: #a8a29e;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 
 /* Noise Texture */
@@ -87,28 +123,20 @@ h4,
   color: #1c1917;
 }
 
-/* Smooth scroll behavior */
-html {
-  scroll-behavior: smooth;
+/* Hero carousel keyframes */
+@keyframes kenBurns {
+  from { transform: scale(1); }
+  to { transform: scale(1.08); }
 }
 
-/* Subtle animation for interactive elements */
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
+@keyframes ruleFill {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .animate-fadeIn {
@@ -116,12 +144,8 @@ html {
 }
 
 @keyframes heroZoom {
-  0% {
-    transform: scale(1.02);
-  }
-  100% {
-    transform: scale(1.08);
-  }
+  0% { transform: scale(1.02); }
+  100% { transform: scale(1.08); }
 }
 
 .hero-zoom {
@@ -130,18 +154,25 @@ html {
 }
 
 @keyframes indicatorProgress {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: scaleX(1);
-  }
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
 }
 
 .indicator-progress {
   transform-origin: left center;
   transform: scaleX(0);
   animation: indicatorProgress 5s linear forwards;
+}
+
+/* Editorial dropcap */
+.dropcap::first-letter {
+  font-family: var(--font-serif);
+  font-size: 4rem;
+  font-weight: 700;
+  float: left;
+  line-height: 0.8;
+  margin: 0.1em 0.15em 0 0;
+  color: var(--color-yellow);
 }
 
 /* Add subtle shadow on focus for accessibility */
@@ -155,7 +186,7 @@ button:focus-visible {
 /* Blog post body text sizing & rhythm */
 .blog-post-body p,
 .blog-post-body li {
-  font-size: 1.125rem; /* 18px for easier reading */
+  font-size: 1.125rem;
   line-height: 1.8;
 }
 
@@ -187,10 +218,6 @@ button:focus-visible {
 }
 
 @keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }

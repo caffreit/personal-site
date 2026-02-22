@@ -3,35 +3,59 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Concept 1 — Editorial / Print Magazine</title>
+<title>Concept 1a — Dark Editorial</title>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,600&family=Space+Grotesk:wght@400;500;700&family=Geist+Mono:wght@400&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
   :root {
-    --cream: #FAF9F6;
-    --black: #1a1a1a;
+    --bg: #0A0A0A;
+    --white: #ffffff;
     --yellow: #F4CA16;
-    --gray: #8a8a8a;
-    --light-rule: #d4d0c8;
+    --gray: #888;
+    --rule: #222;
+    --text-muted: rgba(255,255,255,0.5);
+    --text-body: rgba(255,255,255,0.7);
+    --nav-bg: rgba(10,10,10,0.92);
+    --card-badge-bg: rgba(255,255,255,0.08);
+    --hero-track: rgba(255,255,255,0.15);
+    --caption-gradient: rgba(10,10,10,0.7);
     --serif: 'Newsreader', Georgia, serif;
     --sans: 'Space Grotesk', system-ui, sans-serif;
     --mono: 'Geist Mono', monospace;
   }
 
-  html { scroll-behavior: smooth; }
+  [data-theme="light"] {
+    --bg: #FAF9F6;
+    --white: #1a1a1a;
+    --gray: #8a8a8a;
+    --rule: #d4d0c8;
+    --text-muted: rgba(0,0,0,0.45);
+    --text-body: #555;
+    --nav-bg: rgba(250,249,246,0.92);
+    --card-badge-bg: #1a1a1a;
+    --hero-track: rgba(0,0,0,0.15);
+    --caption-gradient: rgba(0,0,0,0.55);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-snap-type: y proximity;
+  }
 
   body {
-    background: var(--cream);
-    color: var(--black);
+    background: var(--bg);
+    color: var(--white);
     font-family: var(--serif);
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    transition: background 0.4s ease, color 0.4s ease;
   }
 
   ::selection {
     background: var(--yellow);
-    color: var(--black);
+    color: var(--bg);
   }
 
   /* NAV */
@@ -39,8 +63,11 @@
     position: sticky;
     top: 0;
     z-index: 100;
-    background: var(--cream);
-    border-bottom: 1px solid var(--light-rule);
+    background: var(--nav-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: background 0.4s ease, border-color 0.4s ease;
+    border-bottom: 1px solid var(--rule);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -52,6 +79,12 @@
     font-weight: 700;
     letter-spacing: 0.15em;
     text-transform: uppercase;
+    text-decoration: none;
+  }
+  nav .nav-logo {
+    height: 2.25rem;
+    width: auto;
+    display: block;
   }
   nav .nav-links {
     display: flex;
@@ -63,43 +96,89 @@
   }
   nav .nav-links a {
     text-decoration: none;
-    color: var(--gray);
+    color: var(--text-muted);
     transition: color 0.2s;
   }
-  nav .nav-links a:hover { color: var(--black); }
-  nav .edition {
+  nav .nav-links a:hover { color: var(--white); }
+  .theme-toggle {
+    background: none;
+    border: 1px solid var(--rule);
+    border-radius: 20px;
+    padding: 0.35rem 0.75rem;
+    cursor: pointer;
     font-family: var(--mono);
     font-size: 0.7rem;
     color: var(--gray);
     letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: color 0.3s, border-color 0.3s;
+  }
+  .theme-toggle:hover {
+    color: var(--white);
+    border-color: var(--gray);
+  }
+  .theme-toggle .toggle-icon {
+    font-size: 0.85rem;
+    line-height: 1;
+    transition: transform 0.4s ease;
+  }
+  .theme-toggle:hover .toggle-icon {
+    transform: rotate(30deg);
   }
 
-  /* HERO */
-  .hero {
+  /* HERO CAROUSEL */
+  .hero-slideshow {
     position: relative;
     width: 100%;
     height: 85vh;
+    scroll-snap-align: start;
     overflow: hidden;
   }
-  .hero img {
+  .slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 1.5s ease;
+  }
+  .slide.active { opacity: 1; }
+  .slide .slide-bg {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    animation: kenBurns 15s ease-in-out alternate infinite;
+  }
+  .slide .slide-bg img {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    display: block;
-    animation: slowZoom 20s ease-in-out alternate infinite;
   }
-  @keyframes slowZoom {
+
+  @keyframes kenBurns {
     from { transform: scale(1); }
-    to { transform: scale(1.06); }
+    to { transform: scale(1.08); }
   }
+
   .hero-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to top, rgba(26,26,26,0.7) 0%, rgba(26,26,26,0.1) 40%, transparent 70%);
+    background: linear-gradient(to top, rgba(10,10,10,0.75) 0%, rgba(10,10,10,0.15) 40%, transparent 70%);
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    padding: 4rem 3rem;
+    padding: 5rem 3rem;
+    z-index: 5;
+  }
+  .hero-subtitle {
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
   }
   .hero-title {
     font-family: var(--serif);
@@ -109,23 +188,44 @@
     line-height: 1;
     letter-spacing: -0.02em;
     max-width: 700px;
-  }
-  .hero-subtitle {
-    font-family: var(--sans);
-    font-size: 0.85rem;
-    color: rgba(255,255,255,0.6);
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    margin-top: 1rem;
+    margin-top: 0.75rem;
   }
   .hero-rule {
     width: 60px;
     height: 3px;
-    background: var(--yellow);
+    background: var(--hero-track);
     margin-top: 1.5rem;
+    overflow: hidden;
+  }
+  .hero-rule-fill {
+    width: 100%;
+    height: 100%;
+    background: var(--yellow);
+    transform-origin: left;
+    transform: scaleX(0);
+  }
+  .hero-rule-fill.animating {
+    animation: ruleFill 5s ease-in-out forwards;
+  }
+  @keyframes ruleFill {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+  }
+
+  .slide-counter {
+    position: absolute;
+    bottom: 5rem;
+    right: 3rem;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.4);
+    z-index: 10;
   }
 
   /* 3-COLUMN SECTION */
+  .three-col-section {
+    scroll-snap-align: start;
+  }
   .three-col {
     display: grid;
     grid-template-columns: 240px 1fr 240px;
@@ -147,14 +247,14 @@
     color: var(--gray);
     margin-bottom: 1.5rem;
     padding-bottom: 0.75rem;
-    border-bottom: 1px solid var(--light-rule);
+    border-bottom: 1px solid var(--rule);
   }
   .toc-item {
     display: block;
     text-decoration: none;
-    color: var(--black);
+    color: var(--white);
     padding: 0.75rem 0;
-    border-bottom: 1px solid var(--light-rule);
+    border-bottom: 1px solid var(--rule);
     transition: all 0.2s;
   }
   .toc-item:hover { padding-left: 0.5rem; }
@@ -172,8 +272,8 @@
   }
 
   .center-feature {
-    border-left: 1px solid var(--light-rule);
-    border-right: 1px solid var(--light-rule);
+    border-left: 1px solid var(--rule);
+    border-right: 1px solid var(--rule);
     padding: 0 2.5rem;
   }
   .center-feature .label {
@@ -195,7 +295,7 @@
   .center-feature .blurb {
     font-size: 1.1rem;
     line-height: 1.8;
-    color: #444;
+    color: var(--text-body);
     margin-bottom: 2rem;
   }
   .feature-image {
@@ -224,17 +324,17 @@
     color: var(--gray);
     margin-bottom: 1.5rem;
     padding-bottom: 0.75rem;
-    border-bottom: 1px solid var(--light-rule);
+    border-bottom: 1px solid var(--rule);
   }
   .sidebar-item {
     font-size: 0.85rem;
-    color: #555;
+    color: var(--text-body);
     margin-bottom: 0.75rem;
     line-height: 1.5;
   }
   .sidebar-item strong {
     display: block;
-    color: var(--black);
+    color: var(--white);
     font-family: var(--sans);
     font-size: 0.75rem;
     font-weight: 700;
@@ -244,14 +344,15 @@
   }
   .sidebar-divider {
     height: 1px;
-    background: var(--light-rule);
+    background: var(--rule);
     margin: 1.5rem 0;
   }
 
   /* PHOTO STRIP */
   .photo-strip-section {
+    scroll-snap-align: start;
     padding: 4rem 0 0;
-    border-top: 1px solid var(--light-rule);
+    border-top: 1px solid var(--rule);
   }
   .photo-strip-header {
     max-width: 1200px;
@@ -304,7 +405,7 @@
     left: 0;
     right: 0;
     padding: 2rem;
-    background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+    background: linear-gradient(to top, var(--caption-gradient), transparent);
     color: white;
   }
   .photo-strip-item .caption h4 {
@@ -322,6 +423,7 @@
 
   /* BLOG EDITORIAL */
   .blog-editorial {
+    scroll-snap-align: start;
     max-width: 1200px;
     margin: 0 auto;
     padding: 5rem 2.5rem;
@@ -332,7 +434,7 @@
     align-items: flex-end;
     margin-bottom: 3rem;
     padding-bottom: 1.5rem;
-    border-bottom: 2px solid var(--black);
+    border-bottom: 2px solid var(--white);
   }
   .blog-editorial-header h2 {
     font-family: var(--serif);
@@ -348,7 +450,7 @@
     letter-spacing: 0.15em;
     transition: color 0.2s;
   }
-  .blog-editorial-header a:hover { color: var(--black); }
+  .blog-editorial-header a:hover { color: var(--white); }
 
   .editorial-grid {
     display: grid;
@@ -360,7 +462,7 @@
   }
   .editorial-card {
     text-decoration: none;
-    color: var(--black);
+    color: var(--white);
     display: block;
     transition: transform 0.3s;
   }
@@ -379,7 +481,7 @@
     text-transform: uppercase;
     letter-spacing: 0.2em;
     color: var(--yellow);
-    background: var(--black);
+    background: var(--card-badge-bg);
     display: inline-block;
     padding: 0.25rem 0.75rem;
     margin-bottom: 0.75rem;
@@ -399,13 +501,14 @@
   .editorial-card .excerpt {
     margin-top: 0.75rem;
     font-size: 0.95rem;
-    color: #555;
+    color: var(--text-body);
     line-height: 1.7;
   }
 
   /* FOOTER */
   footer {
-    border-top: 1px solid var(--light-rule);
+    scroll-snap-align: end;
+    border-top: 1px solid var(--rule);
     padding: 2rem 2.5rem;
     display: flex;
     justify-content: space-between;
@@ -415,24 +518,15 @@
     text-transform: uppercase;
     letter-spacing: 0.1em;
   }
-
-  /* Placeholder images */
-  .placeholder {
-    background: linear-gradient(135deg, #2a2a2a 0%, #3d3d3d 50%, #2a2a2a 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: rgba(255,255,255,0.3);
-    font-family: var(--mono);
-    font-size: 0.75rem;
-  }
 </style>
 </head>
 <body>
 
 <!-- NAV -->
 <nav>
-  <div class="masthead">drdimg</div>
+  <a href="#" class="masthead">
+    <img src="../public/logo.png" alt="drdimg" class="nav-logo">
+  </a>
   <div class="nav-links">
     <a href="#">Home</a>
     <a href="#">Photos</a>
@@ -440,20 +534,34 @@
     <a href="#">Labs</a>
     <a href="#">About</a>
   </div>
-  <div class="edition">Issue No. 04 — Feb 2026</div>
+  <button class="theme-toggle" id="themeToggle" aria-label="Toggle light/dark mode">
+    <span class="toggle-icon">&#9790;</span> Dark
+  </button>
 </nav>
 
-<!-- HERO: Full-bleed featured photograph -->
-<div class="hero">
-  <img src="../public/photos/Faves/DSCF3535.jpg" alt="Featured photograph">
+<!-- HERO CAROUSEL -->
+<div class="hero-slideshow">
+  <div class="slide active">
+    <div class="slide-bg"><img src="../public/photos/Faves/DSCF3535.jpg" alt="Favourites"></div>
+  </div>
+  <div class="slide">
+    <div class="slide-bg"><img src="../public/photos/BnW/000226840017.jpg" alt="Black & White"></div>
+  </div>
+  <div class="slide">
+    <div class="slide-bg"><img src="../public/photos/Mountains/DSCF1182.jpg" alt="Mountains"></div>
+  </div>
+
   <div class="hero-overlay">
     <div class="hero-subtitle">Photography &amp; Data — A Visual Journal</div>
     <h1 class="hero-title">Putting Data in the Frame</h1>
-    <div class="hero-rule"></div>
+    <div class="hero-rule"><div class="hero-rule-fill animating"></div></div>
   </div>
+
+  <div class="slide-counter">01 / 03</div>
 </div>
 
 <!-- 3-COLUMN LAYOUT -->
+<div class="three-col-section">
 <div class="three-col">
 
   <!-- Left: Table of Contents -->
@@ -481,7 +589,7 @@
   <div class="center-feature">
     <div class="label">Featured Essay</div>
     <h2>Calling Dunbar's Number: Number Not in Service</h2>
-    <img src="../public/photos/BnW/000226840017.jpg" alt="Dunbar's Number" class="feature-image" style="aspect-ratio:3/2;width:100%;object-fit:cover;">
+    <img src="../public/photos/BnW/000226840017.jpg" alt="Dunbar's Number" class="feature-image">
     <p class="blurb dropcap">
       Is the cognitive limit on social relationships a real biological constraint or a statistical artifact? It's been several years since a colleague shared an intriguing paper with me. Having previously worked in telecom data analysis, I was immediately drawn to their approach of using mobile phone call data to investigate Dunbar's social layers theory. But as I read through their methodology, something didn't quite add up.
     </p>
@@ -516,41 +624,42 @@
     </div>
   </div>
 </div>
+</div>
 
 <!-- PHOTO STRIP -->
 <div class="photo-strip-section">
   <div class="photo-strip-header">
     <h2>Photography</h2>
-    <span>Scroll to browse →</span>
+    <span>Scroll to browse &rarr;</span>
   </div>
   <div class="photo-strip">
     <div class="photo-strip-item">
-      <img src="../public/photos/Faves/DSCF3535.jpg" alt="Favourites" style="width:100%;height:100%;object-fit:cover;">
+      <img src="../public/photos/Faves/DSCF3535.jpg" alt="Favourites">
       <div class="caption"><h4>Favourites</h4><span>Curated selection</span></div>
     </div>
     <div class="photo-strip-item">
-      <img src="../public/photos/Portraits/DSCF4666.jpg" alt="Portraits" style="width:100%;height:100%;object-fit:cover;">
-      <div class="caption"><h4>Portraits</h4><span>Faces & figures</span></div>
+      <img src="../public/photos/Portraits/DSCF4666.jpg" alt="Portraits">
+      <div class="caption"><h4>Portraits</h4><span>Faces &amp; figures</span></div>
     </div>
     <div class="photo-strip-item">
-      <img src="../public/photos/BnW/000226840017.jpg" alt="Black & White" style="width:100%;height:100%;object-fit:cover;">
+      <img src="../public/photos/BnW/000226840017.jpg" alt="Black & White">
       <div class="caption"><h4>Black &amp; White</h4><span>Light, shadow, form</span></div>
     </div>
     <div class="photo-strip-item">
-      <img src="../public/photos/Film/000361140009.jpg" alt="Film" style="width:100%;height:100%;object-fit:cover;">
-      <div class="caption"><h4>Film</h4><span>Analog grain & texture</span></div>
+      <img src="../public/photos/Film/000361140009.jpg" alt="Film">
+      <div class="caption"><h4>Film</h4><span>Analog grain &amp; texture</span></div>
     </div>
     <div class="photo-strip-item">
-      <img src="../public/photos/Buildings/DSCF9580.jpg" alt="Architecture" style="width:100%;height:100%;object-fit:cover;">
+      <img src="../public/photos/Buildings/DSCF9580.jpg" alt="Architecture">
       <div class="caption"><h4>Architecture</h4><span>Geometry of the built</span></div>
     </div>
     <div class="photo-strip-item">
-      <img src="../public/photos/Minimal/DSCF3070.jpg" alt="Minimal" style="width:100%;height:100%;object-fit:cover;">
+      <img src="../public/photos/Minimal/DSCF3070.jpg" alt="Minimal">
       <div class="caption"><h4>Minimal</h4><span>Less is more</span></div>
     </div>
     <div class="photo-strip-item">
-      <img src="../public/photos/Mountains/DSCF1182.jpg" alt="Mountains" style="width:100%;height:100%;object-fit:cover;">
-      <div class="caption"><h4>Mountains</h4><span>Peaks & valleys</span></div>
+      <img src="../public/photos/Mountains/DSCF1182.jpg" alt="Mountains">
+      <div class="caption"><h4>Mountains</h4><span>Peaks &amp; valleys</span></div>
     </div>
   </div>
 </div>
@@ -559,32 +668,32 @@
 <div class="blog-editorial">
   <div class="blog-editorial-header">
     <h2>Writing</h2>
-    <a href="#">View all posts →</a>
+    <a href="#">View all posts &rarr;</a>
   </div>
   <div class="editorial-grid">
     <a class="editorial-card" href="#">
-      <img src="../public/photos/Minimal/DSCF3070.jpg" alt="Software Costs" class="editorial-card-img" style="width:100%;aspect-ratio:3/2;object-fit:cover;">
+      <img src="../public/photos/Minimal/DSCF3070.jpg" alt="Software Costs" class="editorial-card-img">
       <div class="cat">AI &amp; Product</div>
       <h3>Software Costs Approach Zero</h3>
       <div class="date">November 28, 2025</div>
       <p class="excerpt">LLMs are collapsing development costs and inviting domain experts to become technical founders.</p>
     </a>
     <a class="editorial-card" href="#">
-      <img src="../public/photos/BnW/000226840017.jpg" alt="Dunbar's Number" class="editorial-card-img" style="width:100%;aspect-ratio:3/2;object-fit:cover;">
+      <img src="../public/photos/BnW/000226840017.jpg" alt="Dunbar's Number" class="editorial-card-img">
       <div class="cat">Data Science</div>
       <h3>Calling Dunbar's Number: Number not in service</h3>
       <div class="date">November 20, 2025</div>
       <p class="excerpt">Is the cognitive limit on social relationships a real biological constraint or a statistical artifact?</p>
     </a>
     <a class="editorial-card" href="#">
-      <img src="../public/blog/ireland-housing-market/cover.svg" alt="Housing Market" class="editorial-card-img" style="width:100%;aspect-ratio:3/2;object-fit:cover;">
+      <img src="../public/blog/ireland-housing-market/cover.svg" alt="Housing Market" class="editorial-card-img">
       <div class="cat">Data</div>
       <h3>Ireland Housing Market Visuals</h3>
       <div class="date">November 14, 2025</div>
       <p class="excerpt">Interactive charts exploring affordability, inflation, and wages in the Irish housing market.</p>
     </a>
     <a class="editorial-card" href="#">
-      <img src="../public/blog/hello-world/cover.svg" alt="Hello World" class="editorial-card-img" style="width:100%;aspect-ratio:3/2;object-fit:cover;">
+      <img src="../public/blog/hello-world/cover.svg" alt="Hello World" class="editorial-card-img">
       <div class="cat">Intro</div>
       <h3>Hello World</h3>
       <div class="date">November 13, 2025</div>
@@ -598,6 +707,56 @@
   <span>&copy; 2026 drdimg</span>
   <span>Photography &amp; Data — Dublin, Ireland</span>
 </footer>
+
+<!-- Slideshow JS -->
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const counter = document.querySelector('.slide-counter');
+  const progressFill = document.querySelector('.hero-rule-fill');
+  let current = 0;
+  const INTERVAL = 5000;
+
+  function restartProgress() {
+    progressFill.classList.remove('animating');
+    void progressFill.offsetWidth;
+    progressFill.classList.add('animating');
+  }
+
+  restartProgress();
+
+  setInterval(() => {
+    slides[current].classList.remove('active');
+    current = (current + 1) % slides.length;
+    slides[current].classList.add('active');
+    counter.textContent =
+      String(current + 1).padStart(2, '0') + ' / ' +
+      String(slides.length).padStart(2, '0');
+    restartProgress();
+  }, INTERVAL);
+
+  const toggle = document.getElementById('themeToggle');
+  const icon = toggle.querySelector('.toggle-icon');
+
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    if (theme === 'light') {
+      icon.innerHTML = '&#9788;';
+      toggle.lastChild.textContent = ' Light';
+    } else {
+      icon.innerHTML = '&#9790;';
+      toggle.lastChild.textContent = ' Dark';
+    }
+    localStorage.setItem('theme', theme);
+  }
+
+  toggle.addEventListener('click', () => {
+    const current = document.documentElement.getAttribute('data-theme');
+    applyTheme(current === 'light' ? 'dark' : 'light');
+  });
+
+  const saved = localStorage.getItem('theme');
+  if (saved) applyTheme(saved);
+</script>
 
 </body>
 </html>
