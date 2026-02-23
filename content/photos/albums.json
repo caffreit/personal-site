@@ -4,14 +4,30 @@
     "title": "Favourites",
     "description": "A curated selection of my best shots across all locations and themes",
     "cover": "DSCF3535.jpg",
-    "order": 1
+    "order": 1,
+    "excludeImages": [
+      "000160980038.jpg",
+      "DSCF8237.jpg",
+      "DSCF2454.jpg"
+    ]
   },
   {
     "id": "Portraits",
     "title": "Portraits",
     "description": "Faces and figures, captured in candid and composed moments",
     "cover": "DSCF4666.jpg",
-    "order": 2
+    "order": 2,
+    "excludeImages": [
+      "000160990028.jpg",
+      "000226830035.jpg",
+      "009168860027.jpg",
+      "DSCF0039.jpg",
+      "DSCF0818.jpg",
+      "DSCF5837.jpg",
+      "DSCF8229.jpg",
+      "DSCF9448.jpg",
+      "DSCF8237.jpg"
+    ]
   },
   {
     "id": "BnW",
@@ -25,14 +41,31 @@
     "title": "Film",
     "description": "Shot on analog film — grain, texture, and the joy of waiting",
     "cover": "000361140009.jpg",
-    "order": 4
+    "order": 4,
+    "excludeImages": [
+      "009190440020.jpg",
+      "009190440025.jpg",
+      "000226830026.jpg",
+      "000160990007.jpg",
+      "000160990028.jpg",
+      "000160980004.jpg",
+      "000226830035.jpg",
+      "000393120012.jpg",
+      "009190440013.jpg"
+    ]
   },
   {
     "id": "People",
     "title": "People",
     "description": "Street life and human moments from around the world",
     "cover": "DSCF6615.jpg",
-    "order": 5
+    "order": 5,
+    "excludeImages": [
+      "DSCF0027.jpg",
+      "DSCF0039.jpg",
+      "DSCF8231.jpg",
+      "DSCF8229.jpg"
+    ]
   },
   {
     "id": "Buildings",
@@ -69,17 +102,28 @@
     "cover": "DSCF8969.jpg",
     "order": 10,
     "imageOrder": [
-      "DSCF8969.jpg", "DSCF9219.jpg",
-      "DSCF7842.jpg", "DSCF7827.jpg",
-      "000226830010.jpg", "000226830035.jpg",
-      "DSCF3604.jpg", "DSCF3597.jpg",
-      "DSCF5866.jpg", "DSCF5871.jpg",
-      "000393120003.jpg", "000393120002.jpg",
-      "DSCF7968.jpg", "DSCF8303.jpg",
-      "DSCF8219.jpg", "DSCF8312.jpg",
-      "DSCF8621.jpg", "DSCF9241.jpg",
-      "DSCF1576.jpg", "DSCF1539.jpg",
-      "DSCF0032.jpg", "DSCF9995.jpg"
+      "DSCF8969.jpg",
+      "DSCF9219.jpg",
+      "DSCF7842.jpg",
+      "DSCF7827.jpg",
+      "000226830010.jpg",
+      "000226830035.jpg",
+      "DSCF3604.jpg",
+      "DSCF3597.jpg",
+      "DSCF5866.jpg",
+      "DSCF5871.jpg",
+      "000393120003.jpg",
+      "000393120002.jpg",
+      "DSCF7968.jpg",
+      "DSCF8303.jpg",
+      "DSCF8219.jpg",
+      "DSCF8312.jpg",
+      "DSCF8621.jpg",
+      "DSCF9241.jpg",
+      "DSCF1576.jpg",
+      "DSCF1539.jpg",
+      "DSCF0032.jpg",
+      "DSCF9995.jpg"
     ]
   }
 ]

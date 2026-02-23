@@ -10,6 +10,7 @@ type CuratedAlbum = {
   order?: number;
   featuredImages?: string[];
   imageOrder?: string[];
+  excludeImages?: string[];
 };
 
 type PhotoMeta = {
@@ -147,8 +148,10 @@ async function main() {
 
     const curatedAlbum = curated[albumId] ?? {};
     const featuredSet = new Set(curatedAlbum.featuredImages || []);
+    const excludeSet = new Set(curatedAlbum.excludeImages || []);
 
     for (const filename of files) {
+      if (excludeSet.has(filename)) continue;
       const abs = path.join(albumDir, filename);
       const { width, height } = imageSize(fs.readFileSync(abs));
       if (!width || !height) continue;

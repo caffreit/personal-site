@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import DemoCounter from "../tools/DemoCounter";
 import HousingMarketAnalysis from "../tools/HousingMarketAnalysis";
+import IrelandPropertyStoryCharts from "../tools/IrelandPropertyStoryCharts";
 import LongTailChart from "../tools/LongTailChart";
 import TaskChart from "../tools/TaskChart";
 
@@ -41,6 +42,10 @@ const DunbarLayers = () => {
 const components = {
   DemoCounter,
   HousingMarketAnalysis,
+  IrelandPropertyStoryCharts,
+  IrelandPropertyStoryChartsOne: () => <IrelandPropertyStoryCharts section={1} />,
+  IrelandPropertyStoryChartsTwo: () => <IrelandPropertyStoryCharts section={2} />,
+  IrelandPropertyStoryChartsThree: () => <IrelandPropertyStoryCharts section={3} />,
   LongTailChart,
   TaskChart,
   blockquote: Blockquote,

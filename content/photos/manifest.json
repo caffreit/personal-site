@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-01-02T18:57:39.821Z",
+  "generatedAt": "2026-02-23T23:07:02.580Z",
   "albums": [
     {
       "id": "Faves",
@@ -23,13 +23,6 @@
         },
         {
           "filename": "000160980013.jpg",
-          "width": 1358,
-          "height": 2048,
-          "isFeatured": false,
-          "location": "Home"
-        },
-        {
-          "filename": "000160980038.jpg",
           "width": 1358,
           "height": 2048,
           "isFeatured": false,
@@ -111,13 +104,6 @@
           "height": 1638,
           "isFeatured": false,
           "location": "Chengdu"
-        },
-        {
-          "filename": "DSCF2454.jpg",
-          "width": 1365,
-          "height": 2048,
-          "isFeatured": false,
-          "location": "Home"
         },
         {
           "filename": "DSCF2458.jpg",
@@ -267,13 +253,6 @@
           "location": "Dublin"
         },
         {
-          "filename": "DSCF8237.jpg",
-          "width": 2048,
-          "height": 1365,
-          "isFeatured": false,
-          "location": "Dublin"
-        },
-        {
           "filename": "DSCF8286.jpg",
           "width": 2048,
           "height": 1365,
@@ -407,13 +386,6 @@
           "location": "Home"
         },
         {
-          "filename": "000160990028.jpg",
-          "width": 2048,
-          "height": 1358,
-          "isFeatured": false,
-          "location": "Home"
-        },
-        {
           "filename": "000184140002.jpg",
           "width": 1358,
           "height": 2048,
@@ -421,23 +393,9 @@
           "location": "Lecce"
         },
         {
-          "filename": "000226830035.jpg",
-          "width": 2048,
-          "height": 1358,
-          "isFeatured": false,
-          "location": "Home"
-        },
-        {
           "filename": "000226840003.jpg",
           "width": 1358,
           "height": 2048,
-          "isFeatured": false,
-          "location": "Home"
-        },
-        {
-          "filename": "009168860027.jpg",
-          "width": 2048,
-          "height": 1358,
           "isFeatured": false,
           "location": "Home"
         },
@@ -463,13 +421,6 @@
           "location": "Chengdu"
         },
         {
-          "filename": "DSCF0039.jpg",
-          "width": 1365,
-          "height": 2048,
-          "isFeatured": false,
-          "location": "Tokyo"
-        },
-        {
           "filename": "DSCF0064.jpg",
           "width": 1365,
           "height": 2048,
@@ -486,13 +437,6 @@
         {
           "filename": "DSCF0578.jpg",
           "width": 1638,
-          "height": 2048,
-          "isFeatured": false,
-          "location": "Kyoto"
-        },
-        {
-          "filename": "DSCF0818.jpg",
-          "width": 1366,
           "height": 2048,
           "isFeatured": false,
           "location": "Kyoto"
@@ -582,13 +526,6 @@
           "location": "Lisbon"
         },
         {
-          "filename": "DSCF5837.jpg",
-          "width": 1365,
-          "height": 2048,
-          "isFeatured": false,
-          "location": "Lisbon"
-        },
-        {
           "filename": "DSCF5866.jpg",
           "width": 2048,
           "height": 864,
@@ -652,14 +589,7 @@
           "location": "Dublin"
         },
         {
-          "filename": "DSCF8229.jpg",
-          "width": 1366,
-          "height": 2048,
-          "isFeatured": false,
-          "location": "Dublin"
-        },
-        {
-          "filename": "DSCF8237.jpg",
+          "filename": "DSCF8232.jpg",
           "width": 2048,
           "height": 1365,
           "isFeatured": false,
@@ -692,13 +622,6 @@
           "height": 1024,
           "isFeatured": false,
           "location": "Hong Kong"
-        },
-        {
-          "filename": "DSCF9448.jpg",
-          "width": 1536,
-          "height": 2048,
-          "isFeatured": false,
-          "location": "Tokyo"
         },
         {
           "filename": "DSCF9554.jpg",
@@ -1003,13 +926,6 @@
           "location": "Malahide"
         },
         {
-          "filename": "000160980004.jpg",
-          "width": 1358,
-          "height": 2048,
-          "isFeatured": false,
-          "location": "Home"
-        },
-        {
           "filename": "000160980007.jpg",
           "width": 1358,
           "height": 2048,
@@ -1031,28 +947,7 @@
           "location": "Home"
         },
         {
-          "filename": "000160980028.jpg",
-          "width": 1358,
-          "height": 2048,
-          "isFeatured": false,
-          "location": "Malahide"
-        },
-        {
-          "filename": "000160990007.jpg",
-          "width": 2048,
-          "height": 1358,
-          "isFeatured": false,
-          "location": "Malahide"
-        },
-        {
           "filename": "000160990012.jpg",
-          "width": 2048,
-          "height": 1358,
-          "isFeatured": false,
-          "location": "Home"
-        },
-        {
-          "filename": "000160990028.jpg",
           "width": 2048,
           "height": 1358,
           "isFeatured": false,
@@ -1115,20 +1010,6 @@
           "location": "Home"
         },
         {
-          "filename": "000226830026.jpg",
-          "width": 2048,
-          "height": 1358,
-          "isFeatured": false,
-          "location": "Malahide"
-        },
-        {
-          "filename": "000226830035.jpg",
-          "width": 2048,
-          "height": 1358,
-          "isFeatured": false,
-          "location": "Home"
-        },
-        {
           "filename": "000226840003.jpg",
           "width": 1358,
           "height": 2048,
@@ -1185,13 +1066,6 @@
           "location": "Dublin"
         },
         {
-          "filename": "000393120012.jpg",
-          "width": 2048,
-          "height": 1358,
-          "isFeatured": false,
-          "location": "Dublin"
-        },
-        {
           "filename": "000393120030.jpg",
           "width": 2048,
           "height": 1358,
@@ -1227,32 +1101,11 @@
           "location": "Lecce"
         },
         {
-          "filename": "009190440013.jpg",
-          "width": 1358,
-          "height": 2048,
-          "isFeatured": false,
-          "location": "Lecce"
-        },
-        {
           "filename": "009190440014.jpg",
           "width": 1358,
           "height": 2048,
           "isFeatured": false,
           "location": "Lecce"
-        },
-        {
-          "filename": "009190440020.jpg",
-          "width": 2048,
-          "height": 1358,
-          "isFeatured": false,
-          "location": "Home"
-        },
-        {
-          "filename": "009190440025.jpg",
-          "width": 2048,
-          "height": 1358,
-          "isFeatured": false,
-          "location": "Home"
         }
       ]
     },
@@ -1277,25 +1130,11 @@
           "location": "Malahide"
         },
         {
-          "filename": "DSCF0027.jpg",
-          "width": 1365,
-          "height": 2048,
-          "isFeatured": false,
-          "location": "Tokyo"
-        },
-        {
           "filename": "DSCF0032.jpg",
           "width": 2048,
           "height": 1638,
           "isFeatured": false,
           "location": "Chengdu"
-        },
-        {
-          "filename": "DSCF0039.jpg",
-          "width": 1365,
-          "height": 2048,
-          "isFeatured": false,
-          "location": "Tokyo"
         },
         {
           "filename": "DSCF0064.jpg",
@@ -1555,20 +1394,6 @@
           "height": 2048,
           "isFeatured": false,
           "location": "Beijing"
-        },
-        {
-          "filename": "DSCF8229.jpg",
-          "width": 1366,
-          "height": 2048,
-          "isFeatured": false,
-          "location": "Dublin"
-        },
-        {
-          "filename": "DSCF8231.jpg",
-          "width": 2048,
-          "height": 1365,
-          "isFeatured": false,
-          "location": "Dublin"
         },
         {
           "filename": "DSCF8232.jpg",
@@ -2092,6 +1917,13 @@
           "location": "Home"
         },
         {
+          "filename": "000160980028.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Malahide"
+        },
+        {
           "filename": "000160980038.jpg",
           "width": 1358,
           "height": 2048,
@@ -2603,7 +2435,7 @@
     {
       "id": "Dublin",
       "name": "Dublin",
-      "photoCount": 39,
+      "photoCount": 34,
       "cover": "000230820004.jpg",
       "coverAlbum": "BnW"
     },
@@ -2617,7 +2449,7 @@
     {
       "id": "Home",
       "name": "Home",
-      "photoCount": 52,
+      "photoCount": 42,
       "cover": "000160980004.jpg",
       "coverAlbum": "Animals"
     },
@@ -2638,7 +2470,7 @@
     {
       "id": "Kyoto",
       "name": "Kyoto",
-      "photoCount": 12,
+      "photoCount": 11,
       "cover": "DSCF0578.jpg",
       "coverAlbum": "Faves"
     },
@@ -2652,14 +2484,14 @@
     {
       "id": "Lecce",
       "name": "Lecce",
-      "photoCount": 21,
+      "photoCount": 20,
       "cover": "000184140002.jpg",
       "coverAlbum": "BnW"
     },
     {
       "id": "Lisbon",
       "name": "Lisbon",
-      "photoCount": 21,
+      "photoCount": 20,
       "cover": "DSCF5076.jpg",
       "coverAlbum": "BnW"
     },
@@ -2673,9 +2505,9 @@
     {
       "id": "Malahide",
       "name": "Malahide",
-      "photoCount": 18,
-      "cover": "DSCF2424.jpg",
-      "coverAlbum": "BnW"
+      "photoCount": 16,
+      "cover": "000160980028.jpg",
+      "coverAlbum": "Animals"
     },
     {
       "id": "Milan",
@@ -2701,7 +2533,7 @@
     {
       "id": "Tokyo",
       "name": "Tokyo",
-      "photoCount": 27,
+      "photoCount": 23,
       "cover": "DSCF9749.jpg",
       "coverAlbum": "Animals"
     },
