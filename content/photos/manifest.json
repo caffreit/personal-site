@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-23T23:07:02.580Z",
+  "generatedAt": "2026-02-24T13:33:42.906Z",
   "albums": [
     {
       "id": "Faves",
@@ -9,13 +9,6 @@
       "images": [
         {
           "filename": "000160980007.jpg",
-          "width": 1358,
-          "height": 2048,
-          "isFeatured": false,
-          "location": "Home"
-        },
-        {
-          "filename": "000160980009.jpg",
           "width": 1358,
           "height": 2048,
           "isFeatured": false,
@@ -267,20 +260,6 @@
           "location": "Dublin"
         },
         {
-          "filename": "DSCF8363.jpg",
-          "width": 2048,
-          "height": 1638,
-          "isFeatured": false,
-          "location": "Dublin"
-        },
-        {
-          "filename": "DSCF8381.jpg",
-          "width": 2048,
-          "height": 1638,
-          "isFeatured": false,
-          "location": "Dublin"
-        },
-        {
           "filename": "DSCF8848.jpg",
           "width": 1638,
           "height": 2048,
@@ -295,13 +274,6 @@
           "location": "Hong Kong"
         },
         {
-          "filename": "DSCF9561.jpg",
-          "width": 1365,
-          "height": 2048,
-          "isFeatured": false,
-          "location": "Tokyo"
-        },
-        {
           "filename": "DSCF9580.jpg",
           "width": 1365,
           "height": 2048,
@@ -314,13 +286,6 @@
           "height": 1024,
           "isFeatured": false,
           "location": "Tokyo"
-        },
-        {
-          "filename": "img007.jpg",
-          "width": 1381,
-          "height": 2048,
-          "isFeatured": false,
-          "location": "Lisbon on film"
         },
         {
           "filename": "img022.jpg",
@@ -647,6 +612,13 @@
         {
           "filename": "img003.jpg",
           "width": 1398,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lisbon on film"
+        },
+        {
+          "filename": "img007.jpg",
+          "width": 1381,
           "height": 2048,
           "isFeatured": false,
           "location": "Lisbon on film"
@@ -1404,6 +1376,13 @@
         },
         {
           "filename": "DSCF8237.jpg",
+          "width": 2048,
+          "height": 1638,
+          "isFeatured": false,
+          "location": "Dublin"
+        },
+        {
+          "filename": "DSCF8381.jpg",
           "width": 2048,
           "height": 1638,
           "isFeatured": false,
@@ -2435,7 +2414,7 @@
     {
       "id": "Dublin",
       "name": "Dublin",
-      "photoCount": 34,
+      "photoCount": 33,
       "cover": "000230820004.jpg",
       "coverAlbum": "BnW"
     },
@@ -2449,7 +2428,7 @@
     {
       "id": "Home",
       "name": "Home",
-      "photoCount": 42,
+      "photoCount": 41,
       "cover": "000160980004.jpg",
       "coverAlbum": "Animals"
     },
@@ -2533,7 +2512,7 @@
     {
       "id": "Tokyo",
       "name": "Tokyo",
-      "photoCount": 23,
+      "photoCount": 22,
       "cover": "DSCF9749.jpg",
       "coverAlbum": "Animals"
     },
