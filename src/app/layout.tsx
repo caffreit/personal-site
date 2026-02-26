@@ -30,7 +30,7 @@ const mono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Playful Photos & Interactive Blogs",
+  title: "Portraits, Pattrens, Opinions",
   description: "Photo stories and interactive explainers about vibrant cities and complex ideas.",
   icons: {
     icon: "/logo.png",

@@ -87,7 +87,7 @@ export function SelectedWorks({ posts, featuredPost }: EditorialThreeColProps) {
             Colophon
           </h3>
           <p className="mb-5 text-[0.85rem] italic leading-relaxed text-[var(--text-muted)]">
-            Patterns &amp; Portraits — Occasional Opinion
+            Portraits, Pattrens, Opinions
           </p>
           <SidebarItem label="Photographs" value="205 selected from over 30,000 taken" />
           <SidebarItem label="Cameras" value="Fujifilm X100F, Beirette, Nikon FL2" />
