@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react";
 import {
+  Area,
   Bar,
   BarChart,
   Cell,
   CartesianGrid,
+  ComposedChart,
   Legend,
   Line,
   LineChart,
@@ -82,6 +84,54 @@ const indexed: IndexedDatum[] = dataset
     idxSpending: Number(((d.spending / baseIndex.spending) * 100).toFixed(1)),
   }));
 
+// Stacked-area layers: base (floor) + transparent band below spending + gradient fill from spending to sales
+const indexedV2 = indexed.map((d) => ({
+  ...d,
+  base: 100,
+  spendFloor: Number((d.idxSpending - 100).toFixed(1)),
+  shaded: Number((d.idxSales - d.idxSpending).toFixed(1)),
+}));
+
+const lastPoint = indexed[indexed.length - 1];
+
+function makeEndDot(label: string, color: string) {
+  return function EndDot({ cx, cy, index }: { cx?: number; cy?: number; index?: number }) {
+    if (index !== indexed.length - 1) return <g />;
+    return (
+      <g>
+        <circle cx={cx} cy={cy} r={3.5} fill={color} />
+        <text x={(cx ?? 0) + 8} y={cy} fill={color} fontSize={11} fontWeight="600" dominantBaseline="middle">
+          {label}
+        </text>
+      </g>
+    );
+  };
+}
+
+const salesEndDot = makeEndDot(`Property (${Math.round(lastPoint.idxSales)})`, "#f97316");
+const gniEndDot = makeEndDot(`GNI (${Math.round(lastPoint.idxGni)})`, "#64748b");
+const spendEndDot = makeEndDot(`Spending (${Math.round(lastPoint.idxSpending)})`, "#7c3aed");
+
+function makePercentEndDot(label: string, color: string, dataLength: number) {
+  return function EndDot({ cx, cy, index, value }: any) {
+    if (index !== dataLength - 1) return <g />;
+    const numericValue = typeof value === "number" ? value : Number(value);
+    const formattedValue = Number.isFinite(numericValue) ? numericValue.toFixed(1) : value;
+
+    return (
+      <g>
+        <circle cx={cx} cy={cy} r={4} fill={color} />
+        <text x={(cx ?? 0) + 8} y={cy} fill={color} fontSize={11} fontWeight="700" dominantBaseline="middle">
+          {`${label} ${formattedValue}%`}
+        </text>
+      </g>
+    );
+  };
+}
+
+const spendShareEndDot = makePercentEndDot("Spending", "#d97706", dataset.length);
+const gniShareEndDot = makePercentEndDot("GNI*", "#16a34a", dataset.length);
+
 const chartCard =
   "rounded-2xl border border-stone-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/70 md:p-6";
 
@@ -122,7 +172,7 @@ export default function IrelandPropertyStoryCharts({ section }: IrelandPropertyS
     <div className="my-12 space-y-6 md:my-16 md:space-y-8">
       {showOne && (
         <div className="grid grid-cols-1 gap-6">
-          <section className={chartCard}>
+          <section className={`${chartCard} hidden md:block`}>
             <h3 className={headingClass}>Indexed Growth from 2014 Baseline</h3>
             <div className="mt-5 h-[340px]">
               <ResponsiveContainer width="100%" height="100%" minWidth={280}>
@@ -149,7 +199,38 @@ export default function IrelandPropertyStoryCharts({ section }: IrelandPropertyS
             </p>
           </section>
 
-          <section className={chartCard}>
+          {/* Static V2 chart — no tooltip, gradient fill between spending and sales lines */}
+          <section className={`${chartCard} md:hidden`}>
+            <h3 className={headingClass}>Property vs. Real Economy</h3>
+            <div className="pointer-events-none mt-5 h-[360px]">
+              <ResponsiveContainer width="100%" height="100%" minWidth={280}>
+                <ComposedChart data={indexedV2} margin={{ top: 20, right: 120, bottom: 8, left: 6 }}>
+                  <defs>
+                    <linearGradient id="wealthGap" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#f97316" stopOpacity={0.7} />
+                      <stop offset="100%" stopColor="#7c3aed" stopOpacity={0.45} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#d6d3d1" opacity={0.45} vertical={false} />
+                  <XAxis dataKey="year" tick={axisTick} />
+                  <YAxis tick={axisTick} width={compactYAxisWidth} domain={[100, 315]} ticks={[100, 150, 200, 250, 300]} allowDataOverflow={true} />
+                  <ReferenceLine y={100} stroke="#a8a29e" strokeDasharray="4 4" />
+                  {/* Transparent base anchors the stack at 100; spendFloor is invisible; shaded gets the gradient */}
+                  <Area type="monotone" stackId="gap" dataKey="base" fill="transparent" stroke="none" isAnimationActive={false} />
+                  <Area type="monotone" stackId="gap" dataKey="spendFloor" fill="transparent" stroke="none" isAnimationActive={false} />
+                  <Area type="monotone" stackId="gap" dataKey="shaded" fill="url(#wealthGap)" stroke="none" isAnimationActive={false} />
+                  <Line type="monotone" dataKey="idxSales" stroke="#f97316" strokeWidth={2.5} dot={salesEndDot} isAnimationActive={false} />
+                  <Line type="monotone" dataKey="idxGni" stroke="#64748b" strokeWidth={2} dot={gniEndDot} isAnimationActive={false} />
+                  <Line type="monotone" dataKey="idxSpending" stroke="#7c3aed" strokeWidth={2} dot={spendEndDot} isAnimationActive={false} />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </div>
+            <p className={noteClass}>
+              Indexed to 2014 = 100. Sources: CSO Institutional Sector Accounts, CSO National Accounts, Property Price Register.
+            </p>
+          </section>
+
+          <section className={`${chartCard} hidden md:block`}>
             <h3 className={headingClass}>Property Sales as Share of GNI* and Spending</h3>
             <div className="mt-5 h-[340px]">
               <ResponsiveContainer width="100%" height="100%" minWidth={280}>
@@ -173,81 +254,155 @@ export default function IrelandPropertyStoryCharts({ section }: IrelandPropertyS
               Sales values are compared against consumer spending and modified GNI* to show transaction scale relative to household activity and domestic output.
             </p>
           </section>
+
+          <section className={`${chartCard} md:hidden`}>
+            <h3 className={headingClass}>Property Sales as Share of GNI* and Spending</h3>
+            <div className="pointer-events-none mt-5 h-[340px]">
+              <ResponsiveContainer width="100%" height="100%" minWidth={280}>
+                <LineChart data={dataset} margin={{ top: 20, right: 90, bottom: 8, left: 6 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#d6d3d1" opacity={0.45} />
+                  <XAxis dataKey="year" tick={axisTick} />
+                  <YAxis tick={axisTick} width={compactYAxisWidth} tickFormatter={percentTick} />
+                  <ReferenceLine y={8} stroke="#16a34a" strokeDasharray="4 4" label={{ value: "8% floor", fill: "#16a34a", position: "insideTopRight", fontSize: 11 }} />
+                  <Line
+                    type="monotone"
+                    dataKey="salesPctSpend"
+                    stroke="#d97706"
+                    strokeWidth={2.6}
+                    dot={spendShareEndDot}
+                    isAnimationActive={false}
+                  />
+                  <Line type="monotone" dataKey="salesPctGni" stroke="#16a34a" strokeWidth={2.4} dot={gniShareEndDot} isAnimationActive={false} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+            <p className={noteClass}>
+              Mobile view is static for readability; desktop keeps full tooltip interaction. Sales values are compared against consumer spending and modified GNI*.
+            </p>
+          </section>
         </div>
       )}
 
       {showTwo && (
-        <section className={chartCard}>
-        <h3 className={headingClass}>Total Property Sales vs Annual Household Savings</h3>
-        <p className="mt-3 inline-flex rounded-full border border-red-300/70 bg-red-50 px-3 py-1 text-xs font-semibold text-red-700 dark:border-red-900/70 dark:bg-red-950/40 dark:text-red-300">
-          Crossover begins in 2022
-        </p>
-        <div className="mt-5 h-[360px]">
-          <ResponsiveContainer width="100%" height="100%" minWidth={280}>
-            <BarChart data={dataset} margin={barChartMargin} barGap={2}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#d6d3d1" opacity={0.45} />
-              <XAxis dataKey="year" tick={axisTick} />
-              <YAxis tick={axisTick} width={currencyYAxisWidth} tickFormatter={moneyTick} />
-              <Tooltip
-                formatter={(value: number, name: string, item) => {
-                  if (name === "Property Sales Value") {
-                    const row = item.payload as YearDatum;
-                    const pct = ((row.salesBn / row.savingsBn) * 100).toFixed(0);
-                    return [`€${value.toFixed(1)}bn (=${pct}% of savings)`, name];
-                  }
-                  return [`€${value.toFixed(1)}bn`, name];
-                }}
-                labelFormatter={(label) => `Year: ${label}`}
-                contentStyle={{ borderRadius: "12px", borderColor: "#d6d3d1" }}
-              />
-              <Legend wrapperStyle={{ fontSize: 12 }} />
-              <ReferenceLine x={2022} stroke="#ef4444" strokeDasharray="4 4" label={{ value: "2022", position: "insideTopRight", fill: "#ef4444", fontSize: 10 }} />
-              <Bar dataKey="salesBn" name="Property Sales Value" radius={[4, 4, 0, 0]}>
-                {dataset.map((d) => (
-                  <Cell key={`sales-${d.year}`} fill={d.year >= 2022 ? "#ef4444" : "#16a34a"} />
-                ))}
-              </Bar>
-              <Bar dataKey="savingsBn" name="Annual Household Savings" fill="#94a3b8" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-        <p className={noteClass}>
-          Household savings include the pandemic spike in 2020-2021; despite that, transaction values still move above savings from 2022 onward.
-        </p>
-      </section>
+        <>
+          <section className={`${chartCard} hidden md:block`}>
+            <h3 className={headingClass}>Total Property Sales vs Annual Household Savings</h3>
+            <p className="mt-3 inline-flex rounded-full border border-red-300/70 bg-red-50 px-3 py-1 text-xs font-semibold text-red-700 dark:border-red-900/70 dark:bg-red-950/40 dark:text-red-300">
+              Crossover begins in 2022
+            </p>
+            <div className="mt-5 h-[360px]">
+              <ResponsiveContainer width="100%" height="100%" minWidth={280}>
+                <BarChart data={dataset} margin={barChartMargin} barGap={2}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#d6d3d1" opacity={0.45} />
+                  <XAxis dataKey="year" tick={axisTick} />
+                  <YAxis tick={axisTick} width={currencyYAxisWidth} tickFormatter={moneyTick} />
+                  <Tooltip
+                    formatter={(value: number, name: string, item) => {
+                      if (name === "Property Sales Value") {
+                        const row = item.payload as YearDatum;
+                        const pct = ((row.salesBn / row.savingsBn) * 100).toFixed(0);
+                        return [`€${value.toFixed(1)}bn (=${pct}% of savings)`, name];
+                      }
+                      return [`€${value.toFixed(1)}bn`, name];
+                    }}
+                    labelFormatter={(label) => `Year: ${label}`}
+                    contentStyle={{ borderRadius: "12px", borderColor: "#d6d3d1" }}
+                  />
+                  <Legend wrapperStyle={{ fontSize: 12 }} />
+                  <ReferenceLine x={2022} stroke="#ef4444" strokeDasharray="4 4" label={{ value: "2022", position: "insideTopRight", fill: "#ef4444", fontSize: 10 }} />
+                  <Bar dataKey="salesBn" name="Property Sales Value" radius={[4, 4, 0, 0]}>
+                    {dataset.map((d) => (
+                      <Cell key={`sales-${d.year}`} fill={d.year >= 2022 ? "#ef4444" : "#16a34a"} />
+                    ))}
+                  </Bar>
+                  <Bar dataKey="savingsBn" name="Annual Household Savings" fill="#94a3b8" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <p className={noteClass}>
+              Household savings include the pandemic spike in 2020-2021; despite that, transaction values still move above savings from 2022 onward.
+            </p>
+          </section>
+
+          <section className={`${chartCard} md:hidden`}>
+            <h3 className={headingClass}>Total Property Sales vs Annual Household Savings</h3>
+            <p className="mt-3 inline-flex rounded-full border border-red-300/70 bg-red-50 px-3 py-1 text-xs font-semibold text-red-700 dark:border-red-900/70 dark:bg-red-950/40 dark:text-red-300">
+              Mobile static view (no tooltip)
+            </p>
+            <div className="pointer-events-none mt-5 h-[360px]">
+              <ResponsiveContainer width="100%" height="100%" minWidth={280}>
+                <BarChart data={dataset} margin={barChartMargin} barGap={2}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#d6d3d1" opacity={0.45} />
+                  <XAxis dataKey="year" tick={axisTick} />
+                  <YAxis tick={axisTick} width={currencyYAxisWidth} tickFormatter={moneyTick} />
+                  <ReferenceLine x={2022} stroke="#ef4444" strokeDasharray="4 4" label={{ value: "2022 crossover", position: "insideTopRight", fill: "#ef4444", fontSize: 11 }} />
+                  <Bar dataKey="salesBn" radius={[4, 4, 0, 0]} isAnimationActive={false}>
+                    {dataset.map((d) => (
+                      <Cell key={`sales-mobile-${d.year}`} fill={d.year >= 2022 ? "#ef4444" : "#16a34a"} />
+                    ))}
+                  </Bar>
+                  <Bar dataKey="savingsBn" fill="#94a3b8" radius={[4, 4, 0, 0]} isAnimationActive={false} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <p className={noteClass}>
+              Green/red bars show property sales, grey bars show annual savings. Crossover starts in 2022 and persists through the latest data.
+            </p>
+          </section>
+        </>
       )}
 
       {showThree && (
-        <section className={chartCard}>
-        <h3 className={headingClass}>Housing vs Non-Housing Net Wealth</h3>
-        <div className="mt-5 h-[360px]">
-          <ResponsiveContainer width="100%" height="100%" minWidth={280}>
-            <BarChart data={dataset} margin={barChartMargin}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#d6d3d1" opacity={0.45} />
-              <XAxis dataKey="year" tick={axisTick} />
-              <YAxis tick={axisTick} width={currencyYAxisWidth} tickFormatter={moneyTick} />
-              <Tooltip
-                formatter={(value: number, name: string, item) => {
-                  if (name === "Housing Wealth") {
-                    const row = item.payload as YearDatum;
-                    const share = ((row.housingWealth / row.netWealth) * 100).toFixed(1);
-                    return [`€${value.toFixed(1)}bn (${share}% share)`, name];
-                  }
-                  return [`€${value.toFixed(1)}bn`, name];
-                }}
-                labelFormatter={(label) => `Year: ${label}`}
-                contentStyle={{ borderRadius: "12px", borderColor: "#d6d3d1" }}
-              />
-              <Legend wrapperStyle={{ fontSize: 12 }} />
-              <Bar dataKey="housingWealth" name="Housing Wealth" stackId="wealth" fill="#16a34a" />
-              <Bar dataKey="nonHousing" name="Other Wealth" stackId="wealth" fill="#60a5fa" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-        <p className={noteClass}>
-          Housing share stays near two-thirds across the period, even as total household net wealth rises strongly.
-        </p>
-      </section>
+        <>
+          <section className={`${chartCard} hidden md:block`}>
+            <h3 className={headingClass}>Housing vs Non-Housing Net Wealth</h3>
+            <div className="mt-5 h-[360px]">
+              <ResponsiveContainer width="100%" height="100%" minWidth={280}>
+                <BarChart data={dataset} margin={barChartMargin}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#d6d3d1" opacity={0.45} />
+                  <XAxis dataKey="year" tick={axisTick} />
+                  <YAxis tick={axisTick} width={currencyYAxisWidth} tickFormatter={moneyTick} />
+                  <Tooltip
+                    formatter={(value: number, name: string, item) => {
+                      if (name === "Housing Wealth") {
+                        const row = item.payload as YearDatum;
+                        const share = ((row.housingWealth / row.netWealth) * 100).toFixed(1);
+                        return [`€${value.toFixed(1)}bn (${share}% share)`, name];
+                      }
+                      return [`€${value.toFixed(1)}bn`, name];
+                    }}
+                    labelFormatter={(label) => `Year: ${label}`}
+                    contentStyle={{ borderRadius: "12px", borderColor: "#d6d3d1" }}
+                  />
+                  <Legend wrapperStyle={{ fontSize: 12 }} />
+                  <Bar dataKey="housingWealth" name="Housing Wealth" stackId="wealth" fill="#16a34a" />
+                  <Bar dataKey="nonHousing" name="Other Wealth" stackId="wealth" fill="#60a5fa" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <p className={noteClass}>
+              Housing share stays near two-thirds across the period, even as total household net wealth rises strongly.
+            </p>
+          </section>
+
+          <section className={`${chartCard} md:hidden`}>
+            <h3 className={headingClass}>Housing vs Non-Housing Net Wealth</h3>
+            <div className="pointer-events-none mt-5 h-[360px]">
+              <ResponsiveContainer width="100%" height="100%" minWidth={280}>
+                <BarChart data={dataset} margin={barChartMargin}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#d6d3d1" opacity={0.45} />
+                  <XAxis dataKey="year" tick={axisTick} />
+                  <YAxis tick={axisTick} width={currencyYAxisWidth} tickFormatter={moneyTick} />
+                  <Bar dataKey="housingWealth" stackId="wealth" fill="#16a34a" isAnimationActive={false} />
+                  <Bar dataKey="nonHousing" stackId="wealth" fill="#60a5fa" isAnimationActive={false} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <p className={noteClass}>
+              Mobile static view (no tooltip): green is housing wealth and blue is non-housing wealth. Housing remains near two-thirds of net wealth.
+            </p>
+          </section>
+        </>
       )}
     </div>
   );
