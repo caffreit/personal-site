@@ -13,12 +13,6 @@ function getPlaceholderImage(slug: string): string {
   return `https://picsum.photos/seed/${slug}/400/400`;
 }
 
-function estimateReadingTime(text?: string): string {
-  const words = text?.split(/\s+/).filter(Boolean).length ?? 250;
-  const minutes = Math.max(2, Math.round(words / 200));
-  return `${minutes} min read`;
-}
-
 interface BlogListingProps {
   posts: PostListItem[];
 }
@@ -172,7 +166,7 @@ function FilterPill({
 function BlogPostCard({ post }: { post: PostListItem }) {
   const imageUrl = post.image || getPlaceholderImage(post.slug);
   const category = post.category || post.tags[0] || "Post";
-  const readingTime = estimateReadingTime(post.summary);
+  const readingTime = post.readTime;
 
   return (
     <Link

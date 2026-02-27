@@ -21,6 +21,7 @@ export type PostListItem = {
   draft: boolean;
   image?: string;
   category?: string;
+  readTime: string; // e.g. "5 min read" - calculated from content (200 words/min)
 };
 
 const BLOG_DIR = path.join(process.cwd(), "content", "blog");
@@ -57,7 +58,11 @@ export function readPostMdx(slug: string): { content: string; data: PostFrontmat
 export function getAllPosts(): PostListItem[] {
   return getPostSlugs()
     .map((slug) => {
-      const { data } = readPostMdx(slug);
+      const { content, data } = readPostMdx(slug);
+      // Same read time calculation as article pages: 200 words per minute
+      const wordCount = content.split(/\s+/g).filter(Boolean).length;
+      const readTimeMinutes = Math.max(1, Math.ceil(wordCount / 200));
+      const readTime = `${readTimeMinutes} min read`;
       return {
         slug,
         title: data.title,
@@ -67,6 +72,7 @@ export function getAllPosts(): PostListItem[] {
         draft: Boolean(data.draft),
         image: data.image,
         category: data.category,
+        readTime,
       } as PostListItem;
     })
     .filter((p) => !p.draft)
