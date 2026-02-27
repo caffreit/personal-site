@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-24T13:33:42.906Z",
+  "generatedAt": "2026-02-27T14:53:44.335Z",
   "albums": [
     {
       "id": "Faves",
@@ -330,13 +330,6 @@
           "location": "Home"
         },
         {
-          "filename": "000160980009.jpg",
-          "width": 1358,
-          "height": 2048,
-          "isFeatured": false,
-          "location": "Home"
-        },
-        {
           "filename": "000160980013.jpg",
           "width": 1358,
           "height": 2048,
@@ -349,13 +342,6 @@
           "height": 2048,
           "isFeatured": false,
           "location": "Home"
-        },
-        {
-          "filename": "000184140002.jpg",
-          "width": 1358,
-          "height": 2048,
-          "isFeatured": false,
-          "location": "Lecce"
         },
         {
           "filename": "000226840003.jpg",
@@ -682,13 +668,6 @@
         },
         {
           "filename": "000184140026.jpg",
-          "width": 2048,
-          "height": 1358,
-          "isFeatured": false,
-          "location": "Lecce"
-        },
-        {
-          "filename": "000184140032.jpg",
           "width": 2048,
           "height": 1358,
           "isFeatured": false,
@@ -2428,7 +2407,7 @@
     {
       "id": "Home",
       "name": "Home",
-      "photoCount": 41,
+      "photoCount": 40,
       "cover": "000160980004.jpg",
       "coverAlbum": "Animals"
     },
@@ -2463,7 +2442,7 @@
     {
       "id": "Lecce",
       "name": "Lecce",
-      "photoCount": 20,
+      "photoCount": 18,
       "cover": "000184140002.jpg",
       "coverAlbum": "BnW"
     },

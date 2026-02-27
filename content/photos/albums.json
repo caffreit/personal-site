@@ -22,7 +22,9 @@
     "cover": "DSCF4666.jpg",
     "order": 2,
     "excludeImages": [
+      "000160980009.jpg",
       "000160990028.jpg",
+      "000184140002.jpg",
       "000226830035.jpg",
       "009168860027.jpg",
       "DSCF0039.jpg",
@@ -38,7 +40,10 @@
     "title": "Black & White",
     "description": "Stripped of color, focused on light, shadow, and form",
     "cover": "000226840017.jpg",
-    "order": 3
+    "order": 3,
+    "excludeImages": [
+      "000184140032.jpg"
+    ]
   },
   {
     "id": "Film",
