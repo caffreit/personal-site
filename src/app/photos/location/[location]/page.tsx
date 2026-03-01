@@ -16,9 +16,13 @@ export async function generateMetadata({ params }: { params: Promise<LocationPar
   const decodedId = decodeURIComponent(locationId);
   const location = findLocationById(decodedId);
   if (!location) return {};
+  const coverUrl = `/photos/${encodeURIComponent(location.coverAlbum)}/${encodeURIComponent(location.cover)}`;
+  const images = [{ url: coverUrl, width: 1200, height: 630, alt: location.name }];
   return {
     title: `${location.name} • Photos`,
     description: `Photos from ${location.name}`,
+    openGraph: { images },
+    twitter: { card: "summary_large_image" as const, images },
   };
 }
 

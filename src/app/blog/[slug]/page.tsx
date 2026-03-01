@@ -18,9 +18,14 @@ export async function generateMetadata({ params }: { params: Promise<PostParams>
   const slugs = getPostSlugs();
   if (!slugs.includes(slug)) return {};
   const { data } = readPostMdx(slug);
+  const images = data.image
+    ? [{ url: data.image, width: 1200, height: 630, alt: data.title }]
+    : undefined;
   return {
     title: data.title,
     description: data.summary ?? undefined,
+    openGraph: { images },
+    twitter: { card: "summary_large_image" as const, images },
   };
 }
 

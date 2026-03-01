@@ -16,9 +16,13 @@ export async function generateMetadata({ params }: { params: Promise<AlbumParams
   const decodedId = decodeURIComponent(albumId);
   const album = findAlbumById(decodedId);
   if (!album) return {};
+  const coverUrl = `/photos/${encodeURIComponent(album.id)}/${encodeURIComponent(album.cover)}`;
+  const images = [{ url: coverUrl, width: 1200, height: 630, alt: album.title }];
   return {
     title: `${album.title} • Photos`,
     description: album.description ?? undefined,
+    openGraph: { images },
+    twitter: { card: "summary_large_image" as const, images },
   };
 }
 
