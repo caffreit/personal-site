@@ -2,6 +2,8 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { HERO_SLIDES } from "@/lib/hero";
 
+export const runtime = "nodejs";
+
 export const alt = "Portraits, Patterns, Opinions — Photo stories and interactive explainers";
 export const size = { width: 2048, height: 1638 };
 export const contentType = "image/jpeg";
