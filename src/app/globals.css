@@ -212,6 +212,64 @@ button:focus-visible {
   border-bottom-color: #27272a;
 }
 
+/* ---- Photo gallery: carousel ---- */
+.photo-carousel {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.photo-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.photo-strip-card {
+  position: relative;
+  flex: none;
+  width: 80vw;
+  min-width: 300px;
+  height: 60vh;
+  min-height: 400px;
+  scroll-snap-align: start;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+@media (min-width: 640px) {
+  .photo-strip-card {
+    width: 45vw;
+    min-width: 320px;
+  }
+}
+
+/* ---- Photo gallery: view toggle ---- */
+.photo-toggle-btn {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 3.5vw, 3rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  padding-bottom: 0.35rem;
+  border: none;
+  border-bottom: 3px solid transparent;
+  background: none;
+  cursor: pointer;
+  transition: color 0.35s ease, border-color 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.photo-toggle-active {
+  color: var(--foreground);
+  border-bottom-color: var(--color-yellow);
+}
+
+.photo-toggle-inactive {
+  color: var(--text-muted);
+  opacity: 0.7;
+}
+
+.photo-toggle-inactive:hover {
+  color: var(--foreground);
+  opacity: 0.6;
+}
+
 /* Animations from AlbumView */
 .animate-spin-slow {
   animation: spin 3s linear infinite;

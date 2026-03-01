@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concept 1: The Editorial Gallery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --color-yellow: #F4CA16;
+    --color-black: #0A0A0A;
+    --color-white: #FFFFFF;
+    --background: #FAF9F6;
+    --foreground: #0A0A0A;
+    --rule-color: #d4d0c8;
+    --text-muted: rgba(0,0,0,0.45);
+    --text-body: #555;
+    --nav-bg: rgba(250,249,246,0.92);
+    --caption-gradient: rgba(0,0,0,0.7);
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-serif: 'Newsreader', Georgia, serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --font-inter: 'Inter', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font-serif);
+    background: var(--background);
+    color: var(--foreground);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background: var(--color-yellow);
+    color: var(--color-black);
+  }
+
+  /* ---- NAV (simulated) ---- */
+  .nav {
+    position: sticky; top: 0; z-index: 50;
+    display: flex; align-items: center; justify-content: space-between;
+    max-width: 1200px; margin: 0 auto;
+    padding: 1.25rem 1.5rem;
+    font-family: var(--font-display);
+    background: var(--nav-bg);
+    backdrop-filter: blur(12px);
+  }
+  .nav-logo { font-weight: 700; font-size: 1.1rem; letter-spacing: -0.02em; }
+  .nav-links { display: flex; gap: 2rem; }
+  .nav-links a {
+    font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--text-muted); text-decoration: none; font-weight: 500;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover, .nav-links a.active { color: var(--foreground); }
+
+  /* ---- CONCEPT BADGE ---- */
+  .concept-badge {
+    position: fixed; top: 1rem; right: 1rem; z-index: 100;
+    background: var(--color-yellow); color: var(--color-black);
+    font-family: var(--font-mono); font-size: 0.7rem; font-weight: 500;
+    padding: 0.4rem 0.75rem; letter-spacing: 0.05em;
+  }
+
+  /* ---- PAGE ---- */
+  .page { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+
+  @media (min-width: 1024px) {
+    .page { padding: 0 2.5rem; }
+  }
+
+  /* ---- HEADER ---- */
+  .page-header {
+    border-top: 1px solid var(--rule-color);
+    padding-top: 4rem;
+    padding-bottom: 3rem;
+  }
+  .page-header h1 {
+    font-family: var(--font-serif);
+    font-size: clamp(2.5rem, 5vw, 3.5rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+  }
+  .page-header h1:hover { color: var(--color-yellow); transition: color 0.3s; }
+  .page-header p {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 1.15rem;
+    color: var(--text-body);
+    max-width: 38rem;
+    line-height: 1.7;
+  }
+
+  /* ---- VIEW TOGGLE ---- */
+  .view-toggle {
+    display: flex; align-items: center; gap: 1.5rem;
+    padding-bottom: 2rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+  .view-toggle a {
+    color: var(--text-muted);
+    text-decoration: none;
+    padding-bottom: 0.25rem;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+  .view-toggle a.active {
+    color: var(--foreground);
+    border-bottom-color: var(--color-yellow);
+  }
+  .view-toggle a:hover { color: var(--foreground); }
+  .view-toggle-divider { color: var(--rule-color); }
+
+  /* ---- FEATURED HERO ---- */
+  .featured-album {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 21 / 9;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+  .featured-album img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform 8s ease-out;
+  }
+  .featured-album:hover img { transform: scale(1.04); }
+  .featured-caption {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, var(--caption-gradient) 0%, transparent 60%);
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 2.5rem;
+  }
+  .featured-caption h3 {
+    font-family: var(--font-serif);
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+    font-weight: 600;
+    color: white;
+    margin-bottom: 0.25rem;
+  }
+  .featured-caption span {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: rgba(255,255,255,0.6);
+  }
+
+  /* ---- ALBUM GRID ---- */
+  .album-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    padding-bottom: 6rem;
+  }
+  @media (max-width: 768px) {
+    .album-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 500px) {
+    .album-grid { grid-template-columns: 1fr; }
+  }
+
+  .album-card {
+    position: relative;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    cursor: pointer;
+    border-radius: 3px;
+  }
+  .album-card img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform 6s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+  .album-card:hover img { transform: scale(1.08); }
+  .album-card-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, var(--caption-gradient) 0%, transparent 50%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 1.5rem;
+  }
+  .album-card:hover .album-card-overlay { opacity: 1; }
+  .album-card-overlay h4 {
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 0.2rem;
+    transform: translateY(8px);
+    transition: transform 0.35s ease;
+  }
+  .album-card:hover .album-card-overlay h4 { transform: translateY(0); }
+  .album-card-overlay span {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: rgba(255,255,255,0.55);
+    transform: translateY(8px);
+    transition: transform 0.4s ease;
+  }
+  .album-card:hover .album-card-overlay span { transform: translateY(0); }
+
+  /* ---- FOOTER ---- */
+  .footer {
+    border-top: 1px solid var(--rule-color);
+    max-width: 1200px; margin: 0 auto;
+    padding: 2rem 1.5rem;
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+  }
+</style>
+</head>
+<body>
+
+<div class="concept-badge">Concept 1 — Editorial Gallery</div>
+
+<!-- Nav -->
+<nav class="nav">
+  <div class="nav-logo">Site Logo</div>
+  <div class="nav-links">
+    <a href="#">Home</a>
+    <a href="#" class="active">Photos</a>
+    <a href="#">Writing</a>
+    <a href="#">About</a>
+  </div>
+</nav>
+
+<!-- Page -->
+<div class="page">
+
+  <!-- Header -->
+  <header class="page-header">
+    <h1>Photography</h1>
+    <p>A curated selection of moments and stories, reflecting a love for simplicity, restraint, and purposeful observation.</p>
+  </header>
+
+  <!-- View Toggle -->
+  <div class="view-toggle">
+    <a class="active">Themes</a>
+    <span class="view-toggle-divider">/</span>
+    <a>Locations</a>
+  </div>
+
+  <!-- Featured Album -->
+  <div class="featured-album">
+    <img src="https://picsum.photos/seed/feat1/1400/600" alt="Featured album">
+    <div class="featured-caption">
+      <h3>Coastal Stillness</h3>
+      <span>24 Photographs</span>
+    </div>
+  </div>
+
+  <!-- Grid -->
+  <div class="album-grid">
+    <div class="album-card">
+      <img src="https://picsum.photos/seed/a1/500/667" alt="">
+      <div class="album-card-overlay">
+        <h4>Urban Textures</h4>
+        <span>18 Photographs</span>
+      </div>
+    </div>
+    <div class="album-card">
+      <img src="https://picsum.photos/seed/a2/500/667" alt="">
+      <div class="album-card-overlay">
+        <h4>Morning Light</h4>
+        <span>12 Photographs</span>
+      </div>
+    </div>
+    <div class="album-card">
+      <img src="https://picsum.photos/seed/a3/500/667" alt="">
+      <div class="album-card-overlay">
+        <h4>Quiet Interiors</h4>
+        <span>9 Photographs</span>
+      </div>
+    </div>
+    <div class="album-card">
+      <img src="https://picsum.photos/seed/a4/500/667" alt="">
+      <div class="album-card-overlay">
+        <h4>Mountain Fog</h4>
+        <span>15 Photographs</span>
+      </div>
+    </div>
+    <div class="album-card">
+      <img src="https://picsum.photos/seed/a5/500/667" alt="">
+      <div class="album-card-overlay">
+        <h4>Market Mornings</h4>
+        <span>21 Photographs</span>
+      </div>
+    </div>
+    <div class="album-card">
+      <img src="https://picsum.photos/seed/a6/500/667" alt="">
+      <div class="album-card-overlay">
+        <h4>Harbour Walks</h4>
+        <span>16 Photographs</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">&copy; 2026 — All rights reserved</footer>
+
+</body>
+</html>

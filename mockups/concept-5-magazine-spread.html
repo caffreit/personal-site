@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concept 5: Magazine Spread</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --color-yellow: #F4CA16;
+    --color-black: #0A0A0A;
+    --color-white: #FFFFFF;
+    --background: #FAF9F6;
+    --foreground: #0A0A0A;
+    --rule-color: #d4d0c8;
+    --text-muted: rgba(0,0,0,0.45);
+    --text-body: #555;
+    --nav-bg: rgba(250,249,246,0.92);
+    --caption-gradient: rgba(0,0,0,0.7);
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-serif: 'Newsreader', Georgia, serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --font-inter: 'Inter', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font-serif);
+    background: var(--background);
+    color: var(--foreground);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection { background: var(--color-yellow); color: var(--color-black); }
+
+  .nav {
+    position: sticky; top: 0; z-index: 50;
+    display: flex; align-items: center; justify-content: space-between;
+    max-width: 1200px; margin: 0 auto;
+    padding: 1.25rem 1.5rem;
+    font-family: var(--font-display);
+    background: var(--nav-bg);
+    backdrop-filter: blur(12px);
+  }
+  .nav-logo { font-weight: 700; font-size: 1.1rem; letter-spacing: -0.02em; }
+  .nav-links { display: flex; gap: 2rem; }
+  .nav-links a {
+    font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--text-muted); text-decoration: none; font-weight: 500;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover, .nav-links a.active { color: var(--foreground); }
+
+  .concept-badge {
+    position: fixed; top: 1rem; right: 1rem; z-index: 100;
+    background: var(--color-yellow); color: var(--color-black);
+    font-family: var(--font-mono); font-size: 0.7rem; font-weight: 500;
+    padding: 0.4rem 0.75rem; letter-spacing: 0.05em;
+  }
+
+  .page { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+  @media (min-width: 1024px) { .page { padding: 0 2.5rem; } }
+
+  /* ---- PAGE HEADER ---- */
+  .page-header {
+    padding-top: 4rem;
+    padding-bottom: 2rem;
+  }
+  .page-header h1 {
+    font-family: var(--font-serif);
+    font-size: clamp(2.5rem, 5vw, 3.5rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+  }
+  .page-header p {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 1.15rem;
+    color: var(--text-body);
+    max-width: 36rem;
+    line-height: 1.7;
+  }
+
+  /* ---- SPREAD ROWS ---- */
+
+  /* Row Type A: Large image + text */
+  .spread-row {
+    border-top: 1px solid var(--rule-color);
+    padding: 4rem 0;
+  }
+
+  .row-a {
+    display: grid;
+    grid-template-columns: 8fr 4fr;
+    gap: 3rem;
+    align-items: center;
+  }
+  .row-a.reverse { grid-template-columns: 4fr 8fr; }
+  .row-a.reverse .row-a-image { order: 2; }
+  .row-a.reverse .row-a-text { order: 1; }
+
+  .row-a-image {
+    position: relative;
+    aspect-ratio: 3 / 2;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .row-a-image img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform 8s ease-out;
+  }
+  .row-a-image:hover img { transform: scale(1.04); }
+  .row-a-image-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, var(--caption-gradient) 0%, transparent 40%);
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  .row-a-image:hover .row-a-image-overlay { opacity: 1; }
+
+  .row-a-text { padding: 1rem 0; }
+  .row-a-num {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--color-yellow);
+    margin-bottom: 1rem;
+    letter-spacing: 0.05em;
+  }
+  .row-a-title {
+    font-family: var(--font-serif);
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 0.75rem;
+  }
+  .row-a-desc {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--text-body);
+    line-height: 1.7;
+    margin-bottom: 1rem;
+  }
+  .row-a-meta {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--text-muted);
+  }
+
+  /* Row Type B: Two equal cards */
+  .row-b {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+  .row-b-card {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .row-b-card img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform 0.6s ease-out;
+  }
+  .row-b-card:hover img { transform: scale(1.03); }
+  .row-b-caption {
+    position: absolute; inset-x: 0; bottom: 0;
+    background: linear-gradient(to top, var(--caption-gradient), transparent);
+    padding: 2rem;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+  }
+  .row-b-card:hover .row-b-caption { opacity: 1; }
+  .row-b-caption .num {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--color-yellow);
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+  .row-b-caption h4 {
+    font-family: var(--font-serif);
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 0.2rem;
+  }
+  .row-b-caption span {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: rgba(255,255,255,0.5);
+  }
+
+  /* Row Type C: Three cards */
+  .row-c {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+  .row-c-card {
+    position: relative;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .row-c-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+  }
+  .row-c-card img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform 0.6s ease-out;
+  }
+  .row-c-card:hover img { transform: scale(1.03); }
+  .row-c-caption {
+    position: absolute; inset-x: 0; bottom: 0;
+    background: linear-gradient(to top, var(--caption-gradient), transparent);
+    padding: 1.5rem;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+  }
+  .row-c-card:hover .row-c-caption { opacity: 1; }
+  .row-c-caption .num {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--color-yellow);
+    margin-bottom: 0.4rem;
+    display: block;
+  }
+  .row-c-caption h4 {
+    font-family: var(--font-serif);
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 0.15rem;
+  }
+  .row-c-caption span {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: rgba(255,255,255,0.5);
+  }
+
+  /* ---- RESPONSIVE ---- */
+  @media (max-width: 768px) {
+    .row-a, .row-a.reverse {
+      grid-template-columns: 1fr;
+    }
+    .row-a.reverse .row-a-image { order: 1; }
+    .row-a.reverse .row-a-text { order: 2; }
+    .row-b { grid-template-columns: 1fr; }
+    .row-c { grid-template-columns: 1fr; }
+    .row-b-caption, .row-c-caption { opacity: 1; }
+  }
+
+  .footer {
+    border-top: 1px solid var(--rule-color);
+    max-width: 1200px; margin: 0 auto;
+    padding: 2rem 1.5rem;
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-top: 2rem;
+  }
+</style>
+</head>
+<body>
+
+<div class="concept-badge">Concept 5 — Magazine Spread</div>
+
+<nav class="nav">
+  <div class="nav-logo">Site Logo</div>
+  <div class="nav-links">
+    <a href="#">Home</a>
+    <a href="#" class="active">Photos</a>
+    <a href="#">Writing</a>
+    <a href="#">About</a>
+  </div>
+</nav>
+
+<div class="page">
+
+  <header class="page-header">
+    <h1>Photography</h1>
+    <p>A curated selection of moments and stories, reflecting a love for simplicity, restraint, and purposeful observation.</p>
+  </header>
+
+  <!-- ROW A: Large image + text (image left) -->
+  <div class="spread-row">
+    <div class="row-a">
+      <div class="row-a-image">
+        <img src="https://picsum.photos/seed/m1/1200/800" alt="">
+        <div class="row-a-image-overlay"></div>
+      </div>
+      <div class="row-a-text">
+        <div class="row-a-num">01</div>
+        <h3 class="row-a-title">Coastal Stillness</h3>
+        <p class="row-a-desc">The quiet edge where land meets the Atlantic. Salt-worn stone, retreating tides, and the kind of silence that has weight to it.</p>
+        <span class="row-a-meta">24 Photographs &mdash; West Ireland</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW B: Two equal cards -->
+  <div class="spread-row">
+    <div class="row-b">
+      <div class="row-b-card">
+        <img src="https://picsum.photos/seed/m2/700/875" alt="">
+        <div class="row-b-caption">
+          <span class="num">02</span>
+          <h4>Urban Textures</h4>
+          <span>18 Photographs</span>
+        </div>
+      </div>
+      <div class="row-b-card">
+        <img src="https://picsum.photos/seed/m3/700/875" alt="">
+        <div class="row-b-caption">
+          <span class="num">03</span>
+          <h4>Morning Light</h4>
+          <span>12 Photographs</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW A reverse: text left, image right -->
+  <div class="spread-row">
+    <div class="row-a reverse">
+      <div class="row-a-image">
+        <img src="https://picsum.photos/seed/m4/1200/800" alt="">
+        <div class="row-a-image-overlay"></div>
+      </div>
+      <div class="row-a-text">
+        <div class="row-a-num">04</div>
+        <h3 class="row-a-title">Quiet Interiors</h3>
+        <p class="row-a-desc">The unnoticed beauty of lived-in spaces. Cracked plaster, afternoon light through curtains, a chair that holds its shape from years of use.</p>
+        <span class="row-a-meta">9 Photographs &mdash; Various</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW C: Three cards -->
+  <div class="spread-row">
+    <div class="row-c">
+      <div class="row-c-card">
+        <img src="https://picsum.photos/seed/m5/600/800" alt="">
+        <div class="row-c-caption">
+          <span class="num">05</span>
+          <h4>Mountain Fog</h4>
+          <span>15 Photographs</span>
+        </div>
+      </div>
+      <div class="row-c-card">
+        <img src="https://picsum.photos/seed/m6/600/800" alt="">
+        <div class="row-c-caption">
+          <span class="num">06</span>
+          <h4>Market Mornings</h4>
+          <span>21 Photographs</span>
+        </div>
+      </div>
+      <div class="row-c-card">
+        <img src="https://picsum.photos/seed/m7/600/800" alt="">
+        <div class="row-c-caption">
+          <span class="num">07</span>
+          <h4>Harbour Walks</h4>
+          <span>16 Photographs</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW A: Large image + text -->
+  <div class="spread-row">
+    <div class="row-a">
+      <div class="row-a-image">
+        <img src="https://picsum.photos/seed/m8/1200/800" alt="">
+        <div class="row-a-image-overlay"></div>
+      </div>
+      <div class="row-a-text">
+        <div class="row-a-num">08</div>
+        <h3 class="row-a-title">Night Architecture</h3>
+        <p class="row-a-desc">The geometry of buildings after dark. Lit windows, long shadows, and the way a city speaks differently when no one is looking.</p>
+        <span class="row-a-meta">19 Photographs &mdash; Copenhagen</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer class="footer">&copy; 2026 — All rights reserved</footer>
+
+</body>
+</html>

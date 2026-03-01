@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Merged Concept: Immersive + Toggle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --color-yellow: #F4CA16;
+    --color-black: #0A0A0A;
+    --color-white: #FFFFFF;
+    --background: #FAF9F6;
+    --foreground: #0A0A0A;
+    --rule-color: #d4d0c8;
+    --text-muted: rgba(0,0,0,0.28);
+    --text-body: #555;
+    --caption-gradient: rgba(0,0,0,0.7);
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-serif: 'Newsreader', Georgia, serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --font-inter: 'Inter', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font-serif);
+    background: var(--background);
+    color: var(--foreground);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  ::selection { background: var(--color-yellow); color: var(--color-black); }
+
+  /* ---- NAV ---- */
+  .nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+    display: flex; align-items: center; justify-content: space-between;
+    max-width: 1200px; margin: 0 auto;
+    padding: 1.25rem 1.5rem;
+    font-family: var(--font-display);
+  }
+  .nav-logo { font-weight: 700; font-size: 1.1rem; letter-spacing: -0.02em; color: white; }
+  .nav-links { display: flex; gap: 2rem; }
+  .nav-links a {
+    font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.6); text-decoration: none; font-weight: 500;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover, .nav-links a.active { color: white; }
+
+  .concept-badge {
+    position: fixed; top: 1rem; right: 1rem; z-index: 100;
+    background: var(--color-yellow); color: var(--color-black);
+    font-family: var(--font-mono); font-size: 0.7rem; font-weight: 500;
+    padding: 0.4rem 0.75rem; letter-spacing: 0.05em;
+  }
+
+  /* ---- HERO ---- */
+  .hero {
+    position: relative;
+    width: 100vw;
+    height: 85vh;
+    overflow: hidden;
+  }
+  .hero img {
+    width: 100%; height: 100%; object-fit: cover;
+    animation: kenBurns 14s ease-in-out infinite alternate;
+  }
+  @keyframes kenBurns {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.06); }
+  }
+  .hero-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.1) 40%, transparent 70%);
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 4rem;
+  }
+  .hero-label {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--color-yellow);
+    margin-bottom: 1rem;
+  }
+  .hero-title {
+    font-family: var(--font-serif);
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 600;
+    color: white;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 0.5rem;
+  }
+  .hero-meta {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: rgba(255,255,255,0.5);
+  }
+  .hero-counter {
+    position: absolute;
+    bottom: 2rem; right: 4rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 0.05em;
+  }
+
+  /* ---- BROWSE SECTION ---- */
+  .browse-section {
+    border-top: 1px solid var(--rule-color);
+    padding-top: 4rem;
+    margin-bottom: 2rem;
+  }
+
+  .browse-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem 2rem;
+  }
+  @media (min-width: 1024px) {
+    .browse-header { padding: 0 2.5rem 2rem; }
+  }
+
+  /* ---- VIEW TOGGLE ---- */
+  .view-toggle {
+    display: flex;
+    align-items: baseline;
+    gap: 2rem;
+    position: relative;
+  }
+
+  .view-toggle-option {
+    font-family: var(--font-serif);
+    font-size: clamp(2rem, 3.5vw, 3rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0 0 0.35rem;
+    position: relative;
+    transition: color 0.35s ease;
+    color: var(--text-muted);
+    line-height: 1.1;
+  }
+
+  .view-toggle-option.active {
+    color: var(--foreground);
+  }
+
+  .view-toggle-option:hover:not(.active) {
+    color: rgba(0,0,0,0.5);
+  }
+
+  .view-toggle-option::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--color-yellow);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
+  .view-toggle-option.active::after {
+    transform: scaleX(1);
+  }
+
+  .browse-hint {
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  /* ---- CAROUSEL ---- */
+  .carousel-viewport {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .carousel-track {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-bottom: 4rem;
+    transition: opacity 0.35s ease, transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+  .carousel-track::-webkit-scrollbar { display: none; }
+
+  .carousel-track.exiting {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  .carousel-track.entering {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  .strip-card {
+    position: relative;
+    flex: none;
+    width: 45vw;
+    min-width: 320px;
+    height: 60vh;
+    scroll-snap-align: start;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .strip-card img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform 0.6s ease-out;
+  }
+  .strip-card:hover img { transform: scale(1.03); }
+  .strip-card-caption {
+    position: absolute; inset-x: 0; bottom: 0;
+    background: linear-gradient(to top, var(--caption-gradient), transparent);
+    padding: 2.5rem;
+    color: white;
+  }
+  .strip-card-caption h4 {
+    font-family: var(--font-serif);
+    font-size: clamp(1.25rem, 2.2vw, 1.75rem);
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+  .strip-card-caption span {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: rgba(255,255,255,0.55);
+  }
+
+  /* ---- FOOTER ---- */
+  .footer {
+    border-top: 1px solid var(--rule-color);
+    max-width: 1200px; margin: 0 auto;
+    padding: 2rem 1.5rem;
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+  }
+
+  /* ---- RESPONSIVE ---- */
+  @media (max-width: 768px) {
+    .hero-overlay { padding: 2rem; }
+    .hero-counter { right: 2rem; }
+    .browse-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+    .view-toggle { gap: 1.25rem; }
+    .strip-card { width: 80vw; min-width: 280px; height: 50vh; }
+  }
+</style>
+</head>
+<body>
+
+<div class="concept-badge">Merged — Immersive + Toggle</div>
+
+<nav class="nav">
+  <div class="nav-logo">Site Logo</div>
+  <div class="nav-links">
+    <a href="#">Home</a>
+    <a href="#" class="active">Photos</a>
+    <a href="#">Writing</a>
+    <a href="#">About</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <img src="https://picsum.photos/seed/hero2/1800/900" alt="Featured album">
+  <div class="hero-overlay">
+    <span class="hero-label">Featured Album</span>
+    <h1 class="hero-title">Coastal Stillness</h1>
+    <span class="hero-meta">24 Photographs &mdash; West of Ireland</span>
+  </div>
+  <span class="hero-counter">01 / 08</span>
+</section>
+
+<!-- Browse Section -->
+<section class="browse-section">
+  <div class="browse-header">
+    <div class="view-toggle">
+      <button class="view-toggle-option active" data-view="theme">By Theme</button>
+      <button class="view-toggle-option" data-view="location">By Location</button>
+    </div>
+    <span class="browse-hint">Scroll to browse &rarr;</span>
+  </div>
+
+  <div class="carousel-viewport">
+    <!-- Theme cards -->
+    <div class="carousel-track" id="carousel-track">
+      <div class="strip-card">
+        <img src="https://picsum.photos/seed/t1/900/1200" alt="">
+        <div class="strip-card-caption">
+          <h4>Urban Textures</h4>
+          <span>18 Photographs</span>
+        </div>
+      </div>
+      <div class="strip-card">
+        <img src="https://picsum.photos/seed/t2/900/1200" alt="">
+        <div class="strip-card-caption">
+          <h4>Morning Light</h4>
+          <span>12 Photographs</span>
+        </div>
+      </div>
+      <div class="strip-card">
+        <img src="https://picsum.photos/seed/t3/900/1200" alt="">
+        <div class="strip-card-caption">
+          <h4>Quiet Interiors</h4>
+          <span>9 Photographs</span>
+        </div>
+      </div>
+      <div class="strip-card">
+        <img src="https://picsum.photos/seed/t4/900/1200" alt="">
+        <div class="strip-card-caption">
+          <h4>Mountain Fog</h4>
+          <span>15 Photographs</span>
+        </div>
+      </div>
+      <div class="strip-card">
+        <img src="https://picsum.photos/seed/t5/900/1200" alt="">
+        <div class="strip-card-caption">
+          <h4>Market Mornings</h4>
+          <span>21 Photographs</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">&copy; 2026 — All rights reserved</footer>
+
+<script>
+  const themeCards = [
+    { img: 'https://picsum.photos/seed/t1/900/1200', title: 'Urban Textures', count: '18 Photographs' },
+    { img: 'https://picsum.photos/seed/t2/900/1200', title: 'Morning Light', count: '12 Photographs' },
+    { img: 'https://picsum.photos/seed/t3/900/1200', title: 'Quiet Interiors', count: '9 Photographs' },
+    { img: 'https://picsum.photos/seed/t4/900/1200', title: 'Mountain Fog', count: '15 Photographs' },
+    { img: 'https://picsum.photos/seed/t5/900/1200', title: 'Market Mornings', count: '21 Photographs' },
+  ];
+
+  const locationCards = [
+    { img: 'https://picsum.photos/seed/l1/900/1200', title: 'Dublin', count: '32 Photographs' },
+    { img: 'https://picsum.photos/seed/l2/900/1200', title: 'Galway', count: '18 Photographs' },
+    { img: 'https://picsum.photos/seed/l3/900/1200', title: 'Lisbon', count: '14 Photographs' },
+    { img: 'https://picsum.photos/seed/l4/900/1200', title: 'Copenhagen', count: '11 Photographs' },
+    { img: 'https://picsum.photos/seed/l5/900/1200', title: 'Edinburgh', count: '8 Photographs' },
+  ];
+
+  const track = document.getElementById('carousel-track');
+  const buttons = document.querySelectorAll('.view-toggle-option');
+  let currentView = 'theme';
+  let switching = false;
+
+  function buildCards(data) {
+    return data.map(card => `
+      <div class="strip-card">
+        <img src="${card.img}" alt="">
+        <div class="strip-card-caption">
+          <h4>${card.title}</h4>
+          <span>${card.count}</span>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function switchView(view) {
+    if (view === currentView || switching) return;
+    switching = true;
+    currentView = view;
+
+    buttons.forEach(btn => btn.classList.toggle('active', btn.dataset.view === view));
+
+    track.classList.add('exiting');
+
+    setTimeout(() => {
+      const cards = view === 'theme' ? themeCards : locationCards;
+      track.innerHTML = buildCards(cards);
+      track.scrollLeft = 0;
+      track.classList.remove('exiting');
+      track.classList.add('entering');
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          track.classList.remove('entering');
+          switching = false;
+        });
+      });
+    }, 350);
+  }
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => switchView(btn.dataset.view));
+  });
+</script>
+
+</body>
+</html>

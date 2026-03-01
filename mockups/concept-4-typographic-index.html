@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concept 4: The Typographic Index</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --color-yellow: #F4CA16;
+    --color-black: #0A0A0A;
+    --color-white: #FFFFFF;
+    --background: #FAF9F6;
+    --foreground: #0A0A0A;
+    --rule-color: #d4d0c8;
+    --text-muted: rgba(0,0,0,0.45);
+    --text-body: #555;
+    --nav-bg: rgba(250,249,246,0.92);
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-serif: 'Newsreader', Georgia, serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --font-inter: 'Inter', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font-serif);
+    background: var(--background);
+    color: var(--foreground);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection { background: var(--color-yellow); color: var(--color-black); }
+
+  .nav {
+    position: sticky; top: 0; z-index: 50;
+    display: flex; align-items: center; justify-content: space-between;
+    max-width: 1200px; margin: 0 auto;
+    padding: 1.25rem 1.5rem;
+    font-family: var(--font-display);
+    background: var(--nav-bg);
+    backdrop-filter: blur(12px);
+  }
+  .nav-logo { font-weight: 700; font-size: 1.1rem; letter-spacing: -0.02em; }
+  .nav-links { display: flex; gap: 2rem; }
+  .nav-links a {
+    font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--text-muted); text-decoration: none; font-weight: 500;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover, .nav-links a.active { color: var(--foreground); }
+
+  .concept-badge {
+    position: fixed; top: 1rem; right: 1rem; z-index: 100;
+    background: var(--color-yellow); color: var(--color-black);
+    font-family: var(--font-mono); font-size: 0.7rem; font-weight: 500;
+    padding: 0.4rem 0.75rem; letter-spacing: 0.05em;
+  }
+
+  .page { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+  @media (min-width: 1024px) { .page { padding: 0 2.5rem; } }
+
+  /* ---- PAGE HEADER ---- */
+  .page-header {
+    padding-top: 4rem;
+    padding-bottom: 2rem;
+  }
+  .page-header h1 {
+    font-family: var(--font-serif);
+    font-size: clamp(2.5rem, 5vw, 3.5rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+  }
+  .page-header p {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 1.15rem;
+    color: var(--text-body);
+    max-width: 36rem;
+    line-height: 1.7;
+  }
+
+  /* ---- SECTION LABEL ---- */
+  .section-label {
+    border-top: 1px solid var(--rule-color);
+    padding-top: 3rem;
+    margin-bottom: 0;
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--text-muted);
+  }
+
+  /* ---- INDEX LIST ---- */
+  .index-list { padding-bottom: 2rem; }
+
+  .index-row {
+    display: grid;
+    grid-template-columns: 4rem 1fr auto;
+    align-items: center;
+    gap: 2rem;
+    padding: 1.75rem 0;
+    border-bottom: 1px solid var(--rule-color);
+    cursor: pointer;
+    position: relative;
+    text-decoration: none;
+    color: inherit;
+    transition: padding-left 0.3s ease;
+  }
+  .index-row:hover { padding-left: 0.5rem; }
+
+  .index-num {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    transition: color 0.3s;
+  }
+  .index-row:hover .index-num { color: var(--color-yellow); }
+
+  .index-content { min-width: 0; }
+  .index-title {
+    font-family: var(--font-serif);
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    transition: color 0.3s;
+  }
+  .index-row:hover .index-title { color: var(--color-yellow); }
+  .index-subtitle {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 0.95rem;
+    color: var(--text-body);
+    margin-top: 0.25rem;
+  }
+
+  .index-meta {
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .index-meta .count {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+  .index-meta .location {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 0.85rem;
+    color: var(--text-body);
+    margin-top: 0.15rem;
+  }
+
+  /* ---- HOVER IMAGE PREVIEW ---- */
+  .index-row .preview-img {
+    position: absolute;
+    right: -2rem;
+    top: 50%;
+    transform: translateY(-50%) scale(0.9);
+    width: 280px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 3px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    z-index: 10;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  }
+  .index-row:hover .preview-img {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+  }
+
+  @media (max-width: 768px) {
+    .index-row { grid-template-columns: 3rem 1fr; gap: 1rem; }
+    .index-meta { display: none; }
+    .index-row .preview-img { display: none; }
+    .index-title { font-size: 1.25rem; }
+  }
+
+  /* ---- MOBILE THUMBNAILS ---- */
+  @media (max-width: 768px) {
+    .index-row {
+      grid-template-columns: 3rem 3.5rem 1fr;
+    }
+    .mobile-thumb {
+      display: block;
+      width: 3.5rem; height: 3.5rem;
+      object-fit: cover;
+      border-radius: 3px;
+    }
+  }
+  @media (min-width: 769px) {
+    .mobile-thumb { display: none; }
+  }
+
+  .footer {
+    border-top: 1px solid var(--rule-color);
+    max-width: 1200px; margin: 0 auto;
+    padding: 2rem 1.5rem;
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-top: 2rem;
+  }
+</style>
+</head>
+<body>
+
+<div class="concept-badge">Concept 4 — Typographic Index</div>
+
+<nav class="nav">
+  <div class="nav-logo">Site Logo</div>
+  <div class="nav-links">
+    <a href="#">Home</a>
+    <a href="#" class="active">Photos</a>
+    <a href="#">Writing</a>
+    <a href="#">About</a>
+  </div>
+</nav>
+
+<div class="page">
+
+  <header class="page-header">
+    <h1>Photography</h1>
+    <p>A curated selection of moments and stories, reflecting a love for simplicity, restraint, and purposeful observation.</p>
+  </header>
+
+  <!-- THEMES -->
+  <div class="section-label">Themes</div>
+  <div class="index-list">
+    <a class="index-row" href="#">
+      <span class="index-num">01</span>
+      <img class="mobile-thumb" src="https://picsum.photos/seed/i1/100/100" alt="">
+      <div class="index-content">
+        <div class="index-title">Coastal Stillness</div>
+        <div class="index-subtitle">The quiet edge where land meets Atlantic</div>
+      </div>
+      <div class="index-meta">
+        <div class="count">24 Photos</div>
+        <div class="location">West Ireland</div>
+      </div>
+      <img class="preview-img" src="https://picsum.photos/seed/i1/560/400" alt="">
+    </a>
+
+    <a class="index-row" href="#">
+      <span class="index-num">02</span>
+      <img class="mobile-thumb" src="https://picsum.photos/seed/i2/100/100" alt="">
+      <div class="index-content">
+        <div class="index-title">Urban Textures</div>
+        <div class="index-subtitle">Concrete, steel, and the patterns of city life</div>
+      </div>
+      <div class="index-meta">
+        <div class="count">18 Photos</div>
+        <div class="location">Dublin</div>
+      </div>
+      <img class="preview-img" src="https://picsum.photos/seed/i2/560/400" alt="">
+    </a>
+
+    <a class="index-row" href="#">
+      <span class="index-num">03</span>
+      <img class="mobile-thumb" src="https://picsum.photos/seed/i3/100/100" alt="">
+      <div class="index-content">
+        <div class="index-title">Morning Light</div>
+        <div class="index-subtitle">Golden hours and the warmth before the day begins</div>
+      </div>
+      <div class="index-meta">
+        <div class="count">12 Photos</div>
+        <div class="location">Various</div>
+      </div>
+      <img class="preview-img" src="https://picsum.photos/seed/i3/560/400" alt="">
+    </a>
+
+    <a class="index-row" href="#">
+      <span class="index-num">04</span>
+      <img class="mobile-thumb" src="https://picsum.photos/seed/i4/100/100" alt="">
+      <div class="index-content">
+        <div class="index-title">Quiet Interiors</div>
+        <div class="index-subtitle">The unnoticed beauty of lived-in spaces</div>
+      </div>
+      <div class="index-meta">
+        <div class="count">9 Photos</div>
+        <div class="location">Various</div>
+      </div>
+      <img class="preview-img" src="https://picsum.photos/seed/i4/560/400" alt="">
+    </a>
+
+    <a class="index-row" href="#">
+      <span class="index-num">05</span>
+      <img class="mobile-thumb" src="https://picsum.photos/seed/i5/100/100" alt="">
+      <div class="index-content">
+        <div class="index-title">Mountain Fog</div>
+        <div class="index-subtitle">Elevation, silence, and the dissolving horizon</div>
+      </div>
+      <div class="index-meta">
+        <div class="count">15 Photos</div>
+        <div class="location">Connemara</div>
+      </div>
+      <img class="preview-img" src="https://picsum.photos/seed/i5/560/400" alt="">
+    </a>
+
+    <a class="index-row" href="#">
+      <span class="index-num">06</span>
+      <img class="mobile-thumb" src="https://picsum.photos/seed/i6/100/100" alt="">
+      <div class="index-content">
+        <div class="index-title">Market Mornings</div>
+        <div class="index-subtitle">Colour, texture, and the theatre of commerce</div>
+      </div>
+      <div class="index-meta">
+        <div class="count">21 Photos</div>
+        <div class="location">Lisbon</div>
+      </div>
+      <img class="preview-img" src="https://picsum.photos/seed/i6/560/400" alt="">
+    </a>
+  </div>
+
+  <!-- LOCATIONS -->
+  <div class="section-label">Locations</div>
+  <div class="index-list">
+    <a class="index-row" href="#">
+      <span class="index-num">01</span>
+      <img class="mobile-thumb" src="https://picsum.photos/seed/il1/100/100" alt="">
+      <div class="index-content">
+        <div class="index-title">Dublin</div>
+        <div class="index-subtitle">Georgian doors, river walks, and overcast skies</div>
+      </div>
+      <div class="index-meta">
+        <div class="count">32 Photos</div>
+      </div>
+      <img class="preview-img" src="https://picsum.photos/seed/il1/560/400" alt="">
+    </a>
+
+    <a class="index-row" href="#">
+      <span class="index-num">02</span>
+      <img class="mobile-thumb" src="https://picsum.photos/seed/il2/100/100" alt="">
+      <div class="index-content">
+        <div class="index-title">Galway</div>
+        <div class="index-subtitle">Buskers, stone, and the scent of salt air</div>
+      </div>
+      <div class="index-meta">
+        <div class="count">18 Photos</div>
+      </div>
+      <img class="preview-img" src="https://picsum.photos/seed/il2/560/400" alt="">
+    </a>
+
+    <a class="index-row" href="#">
+      <span class="index-num">03</span>
+      <img class="mobile-thumb" src="https://picsum.photos/seed/il3/100/100" alt="">
+      <div class="index-content">
+        <div class="index-title">Lisbon</div>
+        <div class="index-subtitle">Tiled facades, steep hills, and endless light</div>
+      </div>
+      <div class="index-meta">
+        <div class="count">14 Photos</div>
+      </div>
+      <img class="preview-img" src="https://picsum.photos/seed/il3/560/400" alt="">
+    </a>
+
+    <a class="index-row" href="#">
+      <span class="index-num">04</span>
+      <img class="mobile-thumb" src="https://picsum.photos/seed/il4/100/100" alt="">
+      <div class="index-content">
+        <div class="index-title">Copenhagen</div>
+        <div class="index-subtitle">Bicycles, canals, and Nordic restraint</div>
+      </div>
+      <div class="index-meta">
+        <div class="count">11 Photos</div>
+      </div>
+      <img class="preview-img" src="https://picsum.photos/seed/il4/560/400" alt="">
+    </a>
+  </div>
+
+</div>
+
+<footer class="footer">&copy; 2026 — All rights reserved</footer>
+
+</body>
+</html>
