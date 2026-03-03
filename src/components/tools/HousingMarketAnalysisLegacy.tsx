@@ -15,7 +15,6 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import type { TooltipProps } from "recharts";
 
 type ChartRow = {
   year: number;
@@ -312,7 +311,16 @@ const CustomTooltipScatter = ({
   payload,
   xLabel,
   yLabel,
-}: TooltipProps<number, string> & { xLabel: string; yLabel: string }) => {
+}: {
+  active?: boolean;
+  payload?: Array<{
+    payload?: ChartRow;
+    dataKey?: string;
+    color?: string;
+  }>;
+  xLabel: string;
+  yLabel: string;
+}) => {
   if (active && payload && payload.length) {
     const dataPayload = payload.find((p) => p && p.dataKey !== "y") ?? payload[0];
     const data = dataPayload?.payload as ChartRow | undefined;
@@ -348,7 +356,12 @@ const CustomTooltipScatter = ({
 const CustomTooltipBurden = ({
   active,
   payload,
-}: TooltipProps<number, string>) => {
+}: {
+  active?: boolean;
+  payload?: Array<{
+    payload?: ChartRow;
+  }>;
+}) => {
   if (active && payload && payload.length) {
     const data = payload[0]?.payload as ChartRow | undefined;
     if (!data) return null;
