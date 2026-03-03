@@ -8,6 +8,6 @@ export const metadata: Metadata = {
 };
 
 export default function IrelandHousingMarketLabPage() {
-  return <HousingMarketAnalysis mode="interactive" />;
+  return <HousingMarketAnalysis />;
 }
 
