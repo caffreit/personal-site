@@ -1012,10 +1012,12 @@ const HousingMarketAnalysis = () => {
                     if (pointIndex !== cohortChartData.pivotedData.length - 1) {
                       return null;
                     }
+                    const xPosition = (typeof x === "number" ? x : Number(x ?? 0)) + 6;
+                    const yPosition = (typeof y === "number" ? y : Number(y ?? 0)) + 3;
                     return (
                       <text
-                        x={(x ?? 0) + 6}
-                        y={(y ?? 0) + 3}
+                        x={xPosition}
+                        y={yPosition}
                         fill={
                           cohortChartData.colors[index % cohortChartData.colors.length]
                         }
@@ -1097,7 +1099,6 @@ const HousingMarketAnalysis = () => {
               type="monotone"
               data={dashedLineData}
               dataKey="y"
-              xKey="x"
               stroke="#888"
               strokeWidth={2}
               strokeDasharray="5 5"
@@ -1177,7 +1178,6 @@ const HousingMarketAnalysis = () => {
               type="monotone"
               data={dashedLineData}
               dataKey="y"
-              xKey="x"
               stroke="#888"
               strokeWidth={2}
               strokeDasharray="5 5"
