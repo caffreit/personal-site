@@ -10,6 +10,15 @@ const LABS = [
     status: "Live",
     meta: "Transit • Experiment",
   },
+  {
+    title: "Ireland Housing Market",
+    description:
+      "Explore interactive mortgage affordability simulations across historical prices, wages, rates, and inflation.",
+    href: "/labs/ireland-housing-market",
+    badge: "Data Viz",
+    status: "Live",
+    meta: "Housing • Simulation",
+  },
 ];
 
 export const metadata = {
