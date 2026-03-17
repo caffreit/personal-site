@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-27T14:53:44.335Z",
+  "generatedAt": "2026-03-17T18:29:11.612Z",
   "albums": [
     {
       "id": "Faves",
@@ -19,7 +19,24 @@
           "width": 1358,
           "height": 2048,
           "isFeatured": false,
-          "location": "Home"
+          "location": "Home",
+          "print": {
+            "available": true,
+            "editionSize": 5,
+            "sold": 1,
+            "status": "available",
+            "price": 180,
+            "currency": "EUR",
+            "sizes": [
+              "30x40cm"
+            ],
+            "paper": "Hahnemuhle Photo Rag",
+            "signed": true,
+            "leadTime": "2-3 weeks",
+            "requestUrl": "mailto:ivan.caffrey@gmail.com?subject=Print%20request%3A%20000160980013",
+            "quote": "They meet your gaze without pretence — no performance, just presence.",
+            "description": "Shot on film, this portrait carries a warmth and grain that digital cannot replicate. The Photo Rag paper preserves the subtle tonal range of the analogue negative, with deep blacks that hold detail rather than simply going dark."
+          }
         },
         {
           "filename": "000160990012.jpg",
@@ -40,7 +57,25 @@
           "width": 1358,
           "height": 2048,
           "isFeatured": false,
-          "location": "Dublin"
+          "location": "Dublin",
+          "print": {
+            "available": true,
+            "editionSize": 5,
+            "sold": 2,
+            "status": "available",
+            "price": 230,
+            "currency": "EUR",
+            "sizes": [
+              "30x40cm",
+              "40x60cm"
+            ],
+            "paper": "Canson Platine Fibre Rag",
+            "signed": true,
+            "leadTime": "2-3 weeks",
+            "requestUrl": "mailto:ivan.caffrey@gmail.com?subject=Print%20request%3A%20000361140009",
+            "quote": "Dublin doesn't perform for the camera — you have to catch it unaware.",
+            "description": "Shot on 35mm film through the streets of Dublin's north side. The Canson Platine Fibre Rag gives this image a pearl-like lustre that suits the soft Irish light, with a fibre base that lends the print a weight and presence."
+          }
         },
         {
           "filename": "DSCF0032.jpg",
@@ -110,7 +145,25 @@
           "width": 2048,
           "height": 1638,
           "isFeatured": false,
-          "location": "Amsterdam"
+          "location": "Amsterdam",
+          "print": {
+            "available": true,
+            "editionSize": 5,
+            "sold": 4,
+            "status": "available",
+            "price": 280,
+            "currency": "EUR",
+            "sizes": [
+              "40x60cm",
+              "50x70cm"
+            ],
+            "paper": "Hahnemuhle Photo Rag Baryta",
+            "signed": true,
+            "leadTime": "2-3 weeks",
+            "requestUrl": "mailto:ivan.caffrey@gmail.com?subject=Print%20request%3A%20DSCF3535",
+            "quote": "Some moments refuse to be ordinary. This was one of them — fleeting, luminous, almost defiant in its beauty.",
+            "description": "With only one edition remaining, this has become one of the most sought-after prints in the collection. The Baryta paper's semi-gloss finish brings a luminous quality to the highlights that pulls the viewer deeper into the scene."
+          }
         },
         {
           "filename": "DSCF4457.jpg",
@@ -131,7 +184,25 @@
           "width": 1365,
           "height": 2048,
           "isFeatured": false,
-          "location": "Bordeaux"
+          "location": "Bordeaux",
+          "print": {
+            "available": true,
+            "editionSize": 5,
+            "sold": 0,
+            "status": "available",
+            "price": 240,
+            "currency": "EUR",
+            "sizes": [
+              "30x40cm",
+              "40x60cm"
+            ],
+            "paper": "Hahnemuhle Photo Rag",
+            "signed": true,
+            "leadTime": "2-3 weeks",
+            "requestUrl": "mailto:ivan.caffrey@gmail.com?subject=Print%20request%3A%20DSCF4666",
+            "quote": "Bordeaux at dusk feels like stepping into a painting that hasn't dried yet.",
+            "description": "The city's golden limestone takes on an almost amber glow as the sun drops behind the Garonne. This first edition print captures that transient warmth on Photo Rag's matte cotton surface, where every tone feels considered and permanent."
+          }
         },
         {
           "filename": "DSCF4846.jpg",
@@ -215,7 +286,25 @@
           "width": 2048,
           "height": 1638,
           "isFeatured": false,
-          "location": "Venice"
+          "location": "Venice",
+          "print": {
+            "available": true,
+            "editionSize": 5,
+            "sold": 1,
+            "status": "available",
+            "price": 250,
+            "currency": "EUR",
+            "sizes": [
+              "40x60cm",
+              "50x70cm"
+            ],
+            "paper": "Hahnemuhle Photo Rag",
+            "signed": true,
+            "leadTime": "2-3 weeks",
+            "requestUrl": "mailto:ivan.caffrey@gmail.com?subject=Print%20request%3A%20DSCF6615",
+            "quote": "Venice exists in a state of perpetual becoming — always dissolving, always reforming in the light.",
+            "description": "Captured in the early morning before the crowds arrived, when Venice belongs only to itself. The Photo Rag paper preserves the interplay of stone, water, and reflected light with a warmth and subtlety that does justice to the city's impossible beauty."
+          }
         },
         {
           "filename": "DSCF7793.jpg",
@@ -278,7 +367,23 @@
           "width": 1365,
           "height": 2048,
           "isFeatured": false,
-          "location": "Tokyo"
+          "location": "Tokyo",
+          "print": {
+            "available": false,
+            "editionSize": 5,
+            "sold": 5,
+            "status": "sold_out",
+            "price": 260,
+            "currency": "EUR",
+            "sizes": [
+              "40x60cm",
+              "50x70cm"
+            ],
+            "paper": "Hahnemuhle Photo Rag Baryta",
+            "signed": true,
+            "leadTime": "3-4 weeks",
+            "requestUrl": "mailto:ivan.caffrey@gmail.com?subject=Print%20waitlist%3A%20DSCF9580"
+          }
         },
         {
           "filename": "DSCF9708.jpg",
@@ -334,7 +439,24 @@
           "width": 1358,
           "height": 2048,
           "isFeatured": false,
-          "location": "Home"
+          "location": "Home",
+          "print": {
+            "available": true,
+            "editionSize": 5,
+            "sold": 1,
+            "status": "available",
+            "price": 180,
+            "currency": "EUR",
+            "sizes": [
+              "30x40cm"
+            ],
+            "paper": "Hahnemuhle Photo Rag",
+            "signed": true,
+            "leadTime": "2-3 weeks",
+            "requestUrl": "mailto:ivan.caffrey@gmail.com?subject=Print%20request%3A%20000160980013",
+            "quote": "They meet your gaze without pretence — no performance, just presence.",
+            "description": "Shot on film, this portrait carries a warmth and grain that digital cannot replicate. The Photo Rag paper preserves the subtle tonal range of the analogue negative, with deep blacks that hold detail rather than simply going dark."
+          }
         },
         {
           "filename": "000160980038.jpg",
@@ -432,7 +554,25 @@
           "width": 2048,
           "height": 1638,
           "isFeatured": false,
-          "location": "Amsterdam"
+          "location": "Amsterdam",
+          "print": {
+            "available": true,
+            "editionSize": 5,
+            "sold": 4,
+            "status": "available",
+            "price": 280,
+            "currency": "EUR",
+            "sizes": [
+              "40x60cm",
+              "50x70cm"
+            ],
+            "paper": "Hahnemuhle Photo Rag Baryta",
+            "signed": true,
+            "leadTime": "2-3 weeks",
+            "requestUrl": "mailto:ivan.caffrey@gmail.com?subject=Print%20request%3A%20DSCF3535",
+            "quote": "Some moments refuse to be ordinary. This was one of them — fleeting, luminous, almost defiant in its beauty.",
+            "description": "With only one edition remaining, this has become one of the most sought-after prints in the collection. The Baryta paper's semi-gloss finish brings a luminous quality to the highlights that pulls the viewer deeper into the scene."
+          }
         },
         {
           "filename": "DSCF3604.jpg",
@@ -446,7 +586,25 @@
           "width": 1365,
           "height": 2048,
           "isFeatured": false,
-          "location": "Bordeaux"
+          "location": "Bordeaux",
+          "print": {
+            "available": true,
+            "editionSize": 5,
+            "sold": 0,
+            "status": "available",
+            "price": 240,
+            "currency": "EUR",
+            "sizes": [
+              "30x40cm",
+              "40x60cm"
+            ],
+            "paper": "Hahnemuhle Photo Rag",
+            "signed": true,
+            "leadTime": "2-3 weeks",
+            "requestUrl": "mailto:ivan.caffrey@gmail.com?subject=Print%20request%3A%20DSCF4666",
+            "quote": "Bordeaux at dusk feels like stepping into a painting that hasn't dried yet.",
+            "description": "The city's golden limestone takes on an almost amber glow as the sun drops behind the Garonne. This first edition print captures that transient warmth on Photo Rag's matte cotton surface, where every tone feels considered and permanent."
+          }
         },
         {
           "filename": "DSCF5109.jpg",
@@ -699,7 +857,25 @@
           "width": 1358,
           "height": 2048,
           "isFeatured": false,
-          "location": "Lambay"
+          "location": "Lambay",
+          "print": {
+            "available": true,
+            "editionSize": 5,
+            "sold": 3,
+            "status": "available",
+            "price": 210,
+            "currency": "EUR",
+            "sizes": [
+              "30x40cm",
+              "40x50cm"
+            ],
+            "paper": "Baryta FineArt",
+            "signed": true,
+            "leadTime": "2-3 weeks",
+            "requestUrl": "mailto:ivan.caffrey@gmail.com?subject=Print%20request%3A%20000226840017",
+            "quote": "Lambay revealed itself in monochrome — all contrast, no compromise.",
+            "description": "The island's stark landscape demands black and white. The Baryta FineArt paper was chosen for its ability to render the full tonal spectrum from deep shadow to brilliant highlight, giving the print a silvery quality reminiscent of traditional darkroom prints."
+          }
         },
         {
           "filename": "000230820004.jpg",
@@ -895,7 +1071,24 @@
           "width": 1358,
           "height": 2048,
           "isFeatured": false,
-          "location": "Home"
+          "location": "Home",
+          "print": {
+            "available": true,
+            "editionSize": 5,
+            "sold": 1,
+            "status": "available",
+            "price": 180,
+            "currency": "EUR",
+            "sizes": [
+              "30x40cm"
+            ],
+            "paper": "Hahnemuhle Photo Rag",
+            "signed": true,
+            "leadTime": "2-3 weeks",
+            "requestUrl": "mailto:ivan.caffrey@gmail.com?subject=Print%20request%3A%20000160980013",
+            "quote": "They meet your gaze without pretence — no performance, just presence.",
+            "description": "Shot on film, this portrait carries a warmth and grain that digital cannot replicate. The Photo Rag paper preserves the subtle tonal range of the analogue negative, with deep blacks that hold detail rather than simply going dark."
+          }
         },
         {
           "filename": "000160990012.jpg",
@@ -979,7 +1172,25 @@
           "width": 1358,
           "height": 2048,
           "isFeatured": false,
-          "location": "Lambay"
+          "location": "Lambay",
+          "print": {
+            "available": true,
+            "editionSize": 5,
+            "sold": 3,
+            "status": "available",
+            "price": 210,
+            "currency": "EUR",
+            "sizes": [
+              "30x40cm",
+              "40x50cm"
+            ],
+            "paper": "Baryta FineArt",
+            "signed": true,
+            "leadTime": "2-3 weeks",
+            "requestUrl": "mailto:ivan.caffrey@gmail.com?subject=Print%20request%3A%20000226840017",
+            "quote": "Lambay revealed itself in monochrome — all contrast, no compromise.",
+            "description": "The island's stark landscape demands black and white. The Baryta FineArt paper was chosen for its ability to render the full tonal spectrum from deep shadow to brilliant highlight, giving the print a silvery quality reminiscent of traditional darkroom prints."
+          }
         },
         {
           "filename": "000230820004.jpg",
@@ -993,7 +1204,25 @@
           "width": 1358,
           "height": 2048,
           "isFeatured": false,
-          "location": "Dublin"
+          "location": "Dublin",
+          "print": {
+            "available": true,
+            "editionSize": 5,
+            "sold": 2,
+            "status": "available",
+            "price": 230,
+            "currency": "EUR",
+            "sizes": [
+              "30x40cm",
+              "40x60cm"
+            ],
+            "paper": "Canson Platine Fibre Rag",
+            "signed": true,
+            "leadTime": "2-3 weeks",
+            "requestUrl": "mailto:ivan.caffrey@gmail.com?subject=Print%20request%3A%20000361140009",
+            "quote": "Dublin doesn't perform for the camera — you have to catch it unaware.",
+            "description": "Shot on 35mm film through the streets of Dublin's north side. The Canson Platine Fibre Rag gives this image a pearl-like lustre that suits the soft Irish light, with a fibre base that lends the print a weight and presence."
+          }
         },
         {
           "filename": "000393120002.jpg",
@@ -1211,7 +1440,25 @@
           "width": 2048,
           "height": 1638,
           "isFeatured": false,
-          "location": "Amsterdam"
+          "location": "Amsterdam",
+          "print": {
+            "available": true,
+            "editionSize": 5,
+            "sold": 4,
+            "status": "available",
+            "price": 280,
+            "currency": "EUR",
+            "sizes": [
+              "40x60cm",
+              "50x70cm"
+            ],
+            "paper": "Hahnemuhle Photo Rag Baryta",
+            "signed": true,
+            "leadTime": "2-3 weeks",
+            "requestUrl": "mailto:ivan.caffrey@gmail.com?subject=Print%20request%3A%20DSCF3535",
+            "quote": "Some moments refuse to be ordinary. This was one of them — fleeting, luminous, almost defiant in its beauty.",
+            "description": "With only one edition remaining, this has become one of the most sought-after prints in the collection. The Baryta paper's semi-gloss finish brings a luminous quality to the highlights that pulls the viewer deeper into the scene."
+          }
         },
         {
           "filename": "DSCF4457.jpg",
@@ -1239,7 +1486,25 @@
           "width": 1365,
           "height": 2048,
           "isFeatured": false,
-          "location": "Bordeaux"
+          "location": "Bordeaux",
+          "print": {
+            "available": true,
+            "editionSize": 5,
+            "sold": 0,
+            "status": "available",
+            "price": 240,
+            "currency": "EUR",
+            "sizes": [
+              "30x40cm",
+              "40x60cm"
+            ],
+            "paper": "Hahnemuhle Photo Rag",
+            "signed": true,
+            "leadTime": "2-3 weeks",
+            "requestUrl": "mailto:ivan.caffrey@gmail.com?subject=Print%20request%3A%20DSCF4666",
+            "quote": "Bordeaux at dusk feels like stepping into a painting that hasn't dried yet.",
+            "description": "The city's golden limestone takes on an almost amber glow as the sun drops behind the Garonne. This first edition print captures that transient warmth on Photo Rag's matte cotton surface, where every tone feels considered and permanent."
+          }
         },
         {
           "filename": "DSCF4718.jpg",
@@ -1302,7 +1567,25 @@
           "width": 2048,
           "height": 1638,
           "isFeatured": false,
-          "location": "Venice"
+          "location": "Venice",
+          "print": {
+            "available": true,
+            "editionSize": 5,
+            "sold": 1,
+            "status": "available",
+            "price": 250,
+            "currency": "EUR",
+            "sizes": [
+              "40x60cm",
+              "50x70cm"
+            ],
+            "paper": "Hahnemuhle Photo Rag",
+            "signed": true,
+            "leadTime": "2-3 weeks",
+            "requestUrl": "mailto:ivan.caffrey@gmail.com?subject=Print%20request%3A%20DSCF6615",
+            "quote": "Venice exists in a state of perpetual becoming — always dissolving, always reforming in the light.",
+            "description": "Captured in the early morning before the crowds arrived, when Venice belongs only to itself. The Photo Rag paper preserves the interplay of stone, water, and reflected light with a warmth and subtlety that does justice to the city's impossible beauty."
+          }
         },
         {
           "filename": "DSCF7812.jpg",
@@ -1449,7 +1732,23 @@
           "width": 1365,
           "height": 2048,
           "isFeatured": false,
-          "location": "Tokyo"
+          "location": "Tokyo",
+          "print": {
+            "available": false,
+            "editionSize": 5,
+            "sold": 5,
+            "status": "sold_out",
+            "price": 260,
+            "currency": "EUR",
+            "sizes": [
+              "40x60cm",
+              "50x70cm"
+            ],
+            "paper": "Hahnemuhle Photo Rag Baryta",
+            "signed": true,
+            "leadTime": "3-4 weeks",
+            "requestUrl": "mailto:ivan.caffrey@gmail.com?subject=Print%20waitlist%3A%20DSCF9580"
+          }
         },
         {
           "filename": "DSCF9708.jpg",
@@ -1653,7 +1952,23 @@
           "width": 1365,
           "height": 2048,
           "isFeatured": false,
-          "location": "Tokyo"
+          "location": "Tokyo",
+          "print": {
+            "available": false,
+            "editionSize": 5,
+            "sold": 5,
+            "status": "sold_out",
+            "price": 260,
+            "currency": "EUR",
+            "sizes": [
+              "40x60cm",
+              "50x70cm"
+            ],
+            "paper": "Hahnemuhle Photo Rag Baryta",
+            "signed": true,
+            "leadTime": "3-4 weeks",
+            "requestUrl": "mailto:ivan.caffrey@gmail.com?subject=Print%20waitlist%3A%20DSCF9580"
+          }
         },
         {
           "filename": "DSCF9890.jpg",
@@ -1872,7 +2187,24 @@
           "width": 1358,
           "height": 2048,
           "isFeatured": false,
-          "location": "Home"
+          "location": "Home",
+          "print": {
+            "available": true,
+            "editionSize": 5,
+            "sold": 1,
+            "status": "available",
+            "price": 180,
+            "currency": "EUR",
+            "sizes": [
+              "30x40cm"
+            ],
+            "paper": "Hahnemuhle Photo Rag",
+            "signed": true,
+            "leadTime": "2-3 weeks",
+            "requestUrl": "mailto:ivan.caffrey@gmail.com?subject=Print%20request%3A%20000160980013",
+            "quote": "They meet your gaze without pretence — no performance, just presence.",
+            "description": "Shot on film, this portrait carries a warmth and grain that digital cannot replicate. The Photo Rag paper preserves the subtle tonal range of the analogue negative, with deep blacks that hold detail rather than simply going dark."
+          }
         },
         {
           "filename": "000160980028.jpg",

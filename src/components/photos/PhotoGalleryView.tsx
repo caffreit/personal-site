@@ -23,6 +23,10 @@ export function PhotoGalleryView({ albums, locations }: PhotoGalleryViewProps) {
   const [viewMode, setViewMode] = useState<ViewMode>("themes");
 
   const featured = albums[0];
+  const availablePrintCount = albums.reduce(
+    (count, album) => count + album.images.filter((image) => image.print?.available).length,
+    0,
+  );
 
   return (
     <div>
@@ -80,9 +84,19 @@ export function PhotoGalleryView({ albums, locations }: PhotoGalleryViewProps) {
               </button>
             )}
           </div>
-          <span className="hidden sm:block font-[family-name:var(--font-display)] text-[0.8rem] uppercase tracking-[0.15em] text-[var(--text-muted)] whitespace-nowrap">
-            Scroll to browse &rarr;
-          </span>
+          <div className="flex items-center gap-4">
+            {availablePrintCount > 0 && (
+              <Link
+                href="/photos/prints"
+                className="inline-flex items-center rounded-full border border-[var(--rule-color)] px-4 py-2 font-[family-name:var(--font-mono)] text-[0.62rem] uppercase tracking-[0.17em] text-[var(--foreground)] transition-colors hover:border-[var(--color-yellow)] hover:text-[var(--color-yellow)]"
+              >
+                Available Prints ({availablePrintCount})
+              </Link>
+            )}
+            <span className="hidden sm:block font-[family-name:var(--font-display)] text-[0.8rem] uppercase tracking-[0.15em] text-[var(--text-muted)] whitespace-nowrap">
+              Scroll to browse &rarr;
+            </span>
+          </div>
         </div>
 
         {/* Carousel */}
@@ -117,6 +131,11 @@ export function PhotoGalleryView({ albums, locations }: PhotoGalleryViewProps) {
                         <span className="font-[family-name:var(--font-mono)] text-[0.65rem] uppercase tracking-[0.15em] text-white/55">
                           {album.images.length} Photographs
                         </span>
+                        {album.images.some((image) => image.print?.available) && (
+                          <div className="mt-2 font-[family-name:var(--font-mono)] text-[0.6rem] uppercase tracking-[0.16em] text-[var(--color-yellow)]">
+                            Limited prints available
+                          </div>
+                        )}
                       </div>
                     </Link>
                   ))

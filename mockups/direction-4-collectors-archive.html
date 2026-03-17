@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Direction 4: Collector's Archive — Print Archive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --yellow:#F4CA16;
+  --bg:#FAFAF7;
+  --fg:#0A0A0A;
+  --border:#d4d0c8;
+  --serif:'Newsreader',Georgia,serif;
+  --mono:'Space Mono',monospace;
+  --green:#2d8a4e;
+  --red:#c0392b;
+}
+html{font-size:15px}
+body{background:var(--bg);color:var(--fg);font-family:var(--serif);line-height:1.5;-webkit-font-smoothing:antialiased}
+
+/* Direction Banner */
+.direction-banner{
+  background:var(--fg);color:var(--bg);
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;
+  padding:6px 32px;text-align:center;
+}
+
+/* Page Header */
+.page-header{
+  border-bottom:1px solid var(--border);
+  padding:20px 48px;display:flex;align-items:center;justify-content:space-between;
+}
+.page-header .logo{font-family:var(--serif);font-size:1.1rem;font-weight:500;letter-spacing:-.01em}
+.page-header .logo span{color:var(--yellow)}
+.page-header nav{display:flex;gap:28px;font-family:var(--mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.06em}
+.page-header nav a{text-decoration:none;color:var(--fg);opacity:.6;transition:opacity .2s}
+.page-header nav a:hover,.page-header nav a.active{opacity:1}
+
+/* View Tabs */
+.view-tabs{
+  display:flex;border-bottom:1px solid var(--border);padding:0 48px;
+  font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;
+}
+.view-tabs button{
+  background:none;border:none;border-bottom:2px solid transparent;
+  padding:14px 24px 12px;cursor:pointer;color:var(--fg);opacity:.5;
+  font-family:inherit;font-size:inherit;letter-spacing:inherit;text-transform:inherit;
+  transition:all .2s;
+}
+.view-tabs button.active{opacity:1;border-bottom-color:var(--yellow)}
+.view-tabs button:hover{opacity:.8}
+
+/* Catalog Page */
+.catalog-page,.detail-page{display:none}
+.catalog-page.visible,.detail-page.visible{display:block}
+
+/* Catalog Header */
+.catalog-header{
+  padding:40px 48px 0;
+}
+.catalog-header h1{font-family:var(--serif);font-size:2.4rem;font-weight:400;letter-spacing:-.02em;margin-bottom:6px}
+.catalog-stats{
+  font-family:var(--mono);font-size:.72rem;color:var(--fg);opacity:.55;
+  letter-spacing:.03em;margin-bottom:28px;
+}
+.catalog-stats span{margin:0 6px;opacity:.3}
+
+/* Toolbar */
+.toolbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 48px 20px;gap:16px;flex-wrap:wrap;
+}
+.toolbar-left{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.toolbar-right{display:flex;gap:10px;align-items:center}
+
+.filter-select,.sort-select{
+  font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.04em;
+  border:1px solid var(--border);background:var(--bg);color:var(--fg);
+  padding:7px 12px;border-radius:0;cursor:pointer;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%230A0A0A' stroke-width='1.2'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;
+  padding-right:28px;
+}
+
+.view-toggle{
+  display:flex;border:1px solid var(--border);
+}
+.view-toggle button{
+  background:none;border:none;padding:7px 14px;
+  font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.04em;
+  cursor:pointer;color:var(--fg);opacity:.5;transition:all .15s;
+}
+.view-toggle button.active{background:var(--fg);color:var(--bg);opacity:1}
+.view-toggle button:not(.active):hover{opacity:.8}
+
+/* Table View */
+.table-container{padding:0 48px 60px}
+.print-table{width:100%;border-collapse:collapse}
+.print-table thead th{
+  font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;
+  text-align:left;padding:10px 12px;border-bottom:2px solid var(--fg);
+  opacity:.5;font-weight:400;white-space:nowrap;
+}
+.print-table tbody tr{
+  border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;
+}
+.print-table tbody tr:hover{background:rgba(244,202,22,.06)}
+.print-table td{padding:14px 12px;vertical-align:middle}
+
+.td-thumb{width:80px}
+.td-thumb img{width:80px;height:100px;object-fit:cover;display:block;filter:grayscale(.05)}
+
+.td-catalog{
+  font-family:var(--mono);font-size:.72rem;letter-spacing:.04em;white-space:nowrap;
+}
+.td-title{font-family:var(--serif);font-size:1rem;font-weight:400}
+.td-title .subtitle{font-family:var(--mono);font-size:.62rem;opacity:.45;margin-top:2px;text-transform:uppercase;letter-spacing:.04em}
+
+.edition-bar{display:flex;align-items:center;gap:8px;white-space:nowrap}
+.edition-bar-visual{
+  display:flex;gap:2px;
+}
+.edition-bar-visual .seg{
+  width:14px;height:6px;border-radius:1px;
+}
+.seg.filled{background:var(--yellow)}
+.seg.empty{background:var(--border)}
+.edition-bar .edition-text{font-family:var(--mono);font-size:.68rem;opacity:.6}
+
+.td-sizes{font-family:var(--mono);font-size:.62rem;opacity:.6;letter-spacing:.02em}
+.td-paper{font-family:var(--mono);font-size:.62rem;opacity:.6}
+.td-price{font-family:var(--mono);font-size:.78rem;font-weight:700;white-space:nowrap}
+
+.status-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.06em;
+  white-space:nowrap;
+}
+.status-dot{width:6px;height:6px;border-radius:50%;display:inline-block}
+.status-dot.green{background:var(--green)}
+.status-dot.yellow{background:var(--yellow)}
+.status-dot.red{background:var(--red)}
+
+/* Grid View */
+.grid-container{
+  display:none;
+  grid-template-columns:repeat(3,1fr);
+  gap:24px;padding:0 48px 60px;
+}
+.grid-container.visible{display:grid}
+.table-container.hidden{display:none}
+
+.grid-card{
+  border:1px solid var(--border);cursor:pointer;transition:all .2s;overflow:hidden;
+}
+.grid-card:hover{border-color:var(--fg);box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.grid-card img{width:100%;height:220px;object-fit:cover;display:block}
+.grid-card-body{padding:16px}
+.grid-card-body .gc-catalog{font-family:var(--mono);font-size:.62rem;opacity:.5;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
+.grid-card-body .gc-title{font-family:var(--serif);font-size:1rem;margin-bottom:10px}
+.grid-card-body .gc-price{font-family:var(--mono);font-size:.78rem;font-weight:700;margin-top:10px}
+.grid-card-body .edition-bar{margin-top:0}
+
+/* Detail Page */
+.detail-page{padding:0 48px 80px}
+.detail-back{
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;
+  padding:20px 0;cursor:pointer;border:none;background:none;color:var(--fg);opacity:.5;
+  transition:opacity .2s;
+}
+.detail-back:hover{opacity:1}
+
+.detail-layout{display:flex;gap:48px;align-items:flex-start}
+.detail-image{flex:0 0 55%;position:sticky;top:20px}
+.detail-image img{width:100%;display:block;filter:grayscale(.05)}
+
+.detail-meta{flex:1;min-width:0}
+
+.meta-section{margin-bottom:28px}
+.meta-label{
+  font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.1em;
+  opacity:.45;margin-bottom:4px;
+}
+.meta-value{font-family:var(--serif);font-size:1rem}
+.meta-value.large{font-size:1.8rem;font-weight:400;letter-spacing:-.02em}
+.meta-value.mono{font-family:var(--mono);font-size:1.2rem;letter-spacing:.04em}
+.meta-value.mono-sm{font-family:var(--mono);font-size:.78rem}
+
+.meta-divider{border:none;border-top:1px solid var(--border);margin:28px 0}
+
+/* Spec Tables */
+.spec-table{width:100%;border-collapse:collapse;margin-top:8px}
+.spec-table th{
+  font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.08em;
+  text-align:left;padding:8px 10px;border-bottom:2px solid var(--fg);opacity:.5;font-weight:400;
+}
+.spec-table td{
+  font-family:var(--mono);font-size:.7rem;padding:10px;
+  border-bottom:1px solid var(--border);cursor:pointer;transition:all .15s;
+}
+.spec-table tr.selectable:hover td{background:rgba(244,202,22,.08)}
+.spec-table tr.selectable.selected td{background:rgba(244,202,22,.15);border-bottom-color:var(--yellow)}
+.spec-table tr.selectable.selected td:first-child{box-shadow:inset 3px 0 0 var(--yellow)}
+.spec-table .price-col{text-align:right;font-weight:700}
+
+/* Edition Box */
+.edition-box{
+  border:1px solid var(--border);padding:20px;margin-top:8px;
+}
+.edition-box .edition-bar{margin-top:10px}
+.edition-box .edition-bar .seg{width:22px;height:10px}
+.edition-box-entries{
+  font-family:var(--mono);font-size:.62rem;opacity:.5;margin-top:12px;
+  display:flex;flex-wrap:wrap;gap:4px 16px;
+}
+
+/* Provenance Section */
+.provenance-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:16px 32px;margin-top:8px;
+}
+
+/* Room Mockup */
+.room-mockup{
+  margin-top:28px;border:1px solid var(--border);padding:24px;position:relative;
+}
+.room-mockup-label{
+  font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.1em;
+  opacity:.45;margin-bottom:16px;
+}
+.room-svg-container{width:100%;display:flex;justify-content:center}
+.room-svg-container svg{max-width:100%;height:auto}
+
+/* Timeline */
+.timeline{
+  margin-top:28px;border-top:1px solid var(--border);padding-top:20px;
+}
+.timeline-label{
+  font-family:var(--mono);font-size:.58rem;text-transform:uppercase;letter-spacing:.1em;
+  opacity:.45;margin-bottom:14px;
+}
+.timeline-track{display:flex;align-items:center;position:relative;padding:8px 0}
+.timeline-line{position:absolute;top:50%;left:0;right:0;height:1px;background:var(--border)}
+.timeline-node{
+  position:relative;display:flex;flex-direction:column;align-items:center;
+  flex:1;
+}
+.timeline-dot{
+  width:10px;height:10px;border-radius:50%;border:2px solid var(--fg);background:var(--bg);
+  position:relative;z-index:1;
+}
+.timeline-dot.filled{background:var(--yellow);border-color:var(--yellow)}
+.timeline-node-label{
+  font-family:var(--mono);font-size:.56rem;text-align:center;margin-top:10px;
+  line-height:1.4;opacity:.6;max-width:90px;
+}
+
+/* CTA */
+.cta-section{margin-top:32px;display:flex;gap:12px;align-items:center}
+.cta-button{
+  font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;
+  background:var(--fg);color:var(--bg);border:none;padding:14px 32px;
+  cursor:pointer;transition:all .2s;
+}
+.cta-button:hover{background:var(--yellow);color:var(--fg)}
+.cta-secondary{
+  font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;
+  border:1px solid var(--border);background:none;color:var(--fg);padding:13px 24px;
+  cursor:pointer;opacity:.6;transition:all .2s;
+}
+.cta-secondary:hover{opacity:1;border-color:var(--fg)}
+
+.total-price{
+  font-family:var(--mono);font-size:1.1rem;font-weight:700;margin-top:20px;
+}
+.total-price .tp-label{font-size:.58rem;font-weight:400;text-transform:uppercase;letter-spacing:.1em;opacity:.45;display:block;margin-bottom:2px}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+</style>
+</head>
+<body>
+
+<div class="direction-banner">Direction 4: Collector's Archive — Data-Driven Catalog</div>
+
+<header class="page-header">
+  <div class="logo">Daragh O'Connell <span>·</span> Photography &amp; Data</div>
+  <nav>
+    <a href="#">Work</a>
+    <a href="#">Albums</a>
+    <a href="#" class="active">Prints</a>
+    <a href="#">About</a>
+  </nav>
+</header>
+
+<div class="view-tabs">
+  <button class="active" data-view="catalog">Catalog</button>
+  <button data-view="detail">Detail — Acquisition Record</button>
+</div>
+
+<!-- ===================== CATALOG PAGE ===================== -->
+<div class="catalog-page visible" id="catalogPage">
+  <div class="catalog-header">
+    <h1>Print Archive</h1>
+    <div class="catalog-stats">
+      <span class="stat-editions">6 editions</span>
+      <span>—</span>
+      <span class="stat-claimed">18 of 60 claimed</span>
+      <span>—</span>
+      <span class="stat-available">42 available</span>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <select class="filter-select" id="filterPaper">
+        <option value="all">All Papers</option>
+        <option value="photo-rag">Hahnemühle Photo Rag</option>
+        <option value="baryta">Hahnemühle Baryta</option>
+        <option value="platine">Canson Platine Fibre</option>
+      </select>
+      <select class="filter-select" id="filterPrice">
+        <option value="all">All Prices</option>
+        <option value="under-200">Under €200</option>
+        <option value="200-400">€200 – €400</option>
+        <option value="over-400">Over €400</option>
+      </select>
+      <select class="filter-select" id="filterStatus">
+        <option value="all">All Status</option>
+        <option value="available">Available</option>
+        <option value="low-stock">Low Stock</option>
+        <option value="last-one">Last One</option>
+      </select>
+    </div>
+    <div class="toolbar-right">
+      <select class="sort-select" id="sortSelect">
+        <option value="catalog">Sort: Catalog #</option>
+        <option value="price-asc">Sort: Price ↑</option>
+        <option value="price-desc">Sort: Price ↓</option>
+        <option value="edition">Sort: Edition Remaining</option>
+        <option value="newest">Sort: Newest</option>
+      </select>
+      <div class="view-toggle">
+        <button class="active" data-mode="table">Table</button>
+        <button data-mode="grid">Grid</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-container" id="tableContainer">
+    <table class="print-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Catalog #</th>
+          <th>Title</th>
+          <th>Edition</th>
+          <th>Sizes</th>
+          <th>Paper</th>
+          <th>From</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+  <div class="grid-container" id="gridContainer"></div>
+</div>
+
+<!-- ===================== DETAIL PAGE ===================== -->
+<div class="detail-page" id="detailPage">
+  <button class="detail-back" onclick="showView('catalog')">← Back to Archive</button>
+
+  <div class="detail-layout">
+    <div class="detail-image">
+      <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800" alt="Mountain Dawn" id="detailImg">
+    </div>
+
+    <div class="detail-meta">
+      <div class="meta-section">
+        <div class="meta-label">Catalog Number</div>
+        <div class="meta-value mono">DRD-001</div>
+      </div>
+
+      <div class="meta-section">
+        <div class="meta-label">Title</div>
+        <div class="meta-value large">Mountain Dawn</div>
+      </div>
+
+      <div style="display:flex;gap:40px">
+        <div class="meta-section">
+          <div class="meta-label">Date</div>
+          <div class="meta-value mono-sm">Captured March 2024</div>
+        </div>
+        <div class="meta-section">
+          <div class="meta-label">Location</div>
+          <div class="meta-value mono-sm">Connemara, Ireland</div>
+        </div>
+      </div>
+
+      <div class="meta-section">
+        <div class="meta-label">Medium</div>
+        <div class="meta-value mono-sm">Archival pigment print on Hahnemühle Photo Rag</div>
+      </div>
+
+      <hr class="meta-divider">
+
+      <div class="meta-section">
+        <div class="meta-label">Size — Select</div>
+        <table class="spec-table" id="sizeTable">
+          <thead>
+            <tr><th>Size</th><th>Dimensions (mm)</th><th>Dimensions (in)</th><th class="price-col">Price</th></tr>
+          </thead>
+          <tbody>
+            <tr class="selectable selected" data-price="145">
+              <td>A4</td><td>210 × 297</td><td>8.3 × 11.7</td><td class="price-col">€145</td>
+            </tr>
+            <tr class="selectable" data-price="245">
+              <td>A3</td><td>297 × 420</td><td>11.7 × 16.5</td><td class="price-col">€245</td>
+            </tr>
+            <tr class="selectable" data-price="395">
+              <td>A2</td><td>420 × 594</td><td>16.5 × 23.4</td><td class="price-col">€395</td>
+            </tr>
+            <tr class="selectable" data-price="595">
+              <td>A1</td><td>594 × 841</td><td>23.4 × 33.1</td><td class="price-col">€595</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="meta-section">
+        <div class="meta-label">Paper — Select</div>
+        <table class="spec-table" id="paperTable">
+          <thead>
+            <tr><th>Paper</th><th>Weight</th><th>Finish</th><th>Archival</th><th class="price-col">Delta</th></tr>
+          </thead>
+          <tbody>
+            <tr class="selectable selected" data-delta="0">
+              <td>Hahnemühle Photo Rag</td><td>308 gsm</td><td>Matte</td><td>100+ yrs</td><td class="price-col">—</td>
+            </tr>
+            <tr class="selectable" data-delta="25">
+              <td>Hahnemühle Baryta</td><td>325 gsm</td><td>Glossy</td><td>100+ yrs</td><td class="price-col">+€25</td>
+            </tr>
+            <tr class="selectable" data-delta="15">
+              <td>Canson Platine Fibre</td><td>310 gsm</td><td>Satin</td><td>100+ yrs</td><td class="price-col">+€15</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <hr class="meta-divider">
+
+      <div class="meta-section">
+        <div class="meta-label">Edition Details</div>
+        <div class="edition-box">
+          <div style="font-family:var(--mono);font-size:.78rem">Edition of 10 — 3 claimed — 7 available</div>
+          <div class="edition-bar">
+            <div class="edition-bar-visual">
+              <div class="seg filled"></div><div class="seg filled"></div><div class="seg filled"></div>
+              <div class="seg empty"></div><div class="seg empty"></div><div class="seg empty"></div>
+              <div class="seg empty"></div><div class="seg empty"></div><div class="seg empty"></div>
+              <div class="seg empty"></div>
+            </div>
+            <span class="edition-text">3 / 10</span>
+          </div>
+          <div class="edition-box-entries">
+            <span>#1 — Claimed</span><span>#2 — Claimed</span><span>#3 — Claimed</span>
+            <span>#4 — Available</span><span>#5 — Available</span><span>#6 — Available</span>
+            <span>#7 — Available</span><span>#8 — Available</span><span>#9 — Available</span>
+            <span>#10 — Available</span>
+          </div>
+        </div>
+      </div>
+
+      <hr class="meta-divider">
+
+      <div class="meta-section">
+        <div class="meta-label">Provenance &amp; Authentication</div>
+        <div class="provenance-grid">
+          <div>
+            <div class="meta-label" style="margin-top:8px">Provenance</div>
+            <div class="meta-value mono-sm">Studio of the artist, Dublin, Ireland</div>
+          </div>
+          <div>
+            <div class="meta-label" style="margin-top:8px">Signed</div>
+            <div class="meta-value mono-sm">Yes, recto, pencil</div>
+          </div>
+          <div>
+            <div class="meta-label" style="margin-top:8px">Certificate</div>
+            <div class="meta-value mono-sm">Includes signed certificate of authenticity</div>
+          </div>
+          <div>
+            <div class="meta-label" style="margin-top:8px">Shipping</div>
+            <div class="meta-value mono-sm">Flat, archival packaging worldwide</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="total-price">
+        <span class="tp-label">Total</span>
+        <span id="totalPrice">€145</span>
+      </div>
+
+      <div class="cta-section">
+        <button class="cta-button">Request Print</button>
+        <button class="cta-secondary">Save to Shortlist</button>
+      </div>
+
+      <!-- Room Mockup -->
+      <div class="room-mockup">
+        <div class="room-mockup-label">Scale Reference — Typical Installation</div>
+        <div class="room-svg-container">
+          <svg viewBox="0 0 500 320" width="500" height="320" xmlns="http://www.w3.org/2000/svg">
+            <!-- Wall -->
+            <rect x="40" y="20" width="420" height="250" fill="none" stroke="#0A0A0A" stroke-width="1"/>
+            <!-- Floor line -->
+            <line x1="20" y1="270" x2="480" y2="270" stroke="#0A0A0A" stroke-width="1.5"/>
+            <!-- Floor perspective lines -->
+            <line x1="40" y1="270" x2="60" y2="310" stroke="#d4d0c8" stroke-width=".5"/>
+            <line x1="460" y1="270" x2="440" y2="310" stroke="#d4d0c8" stroke-width=".5"/>
+            <line x1="20" y1="270" x2="20" y2="310" stroke="#d4d0c8" stroke-width=".5"/>
+            <line x1="480" y1="270" x2="480" y2="310" stroke="#d4d0c8" stroke-width=".5"/>
+            <!-- Print on wall -->
+            <rect x="195" y="85" width="110" height="82" fill="#e8e5de" stroke="#0A0A0A" stroke-width="1.2" id="roomPrint"/>
+            <!-- Image suggestion inside print -->
+            <line x1="200" y1="90" x2="230" y2="120" stroke="#d4d0c8" stroke-width=".5"/>
+            <line x1="230" y1="120" x2="250" y2="105" stroke="#d4d0c8" stroke-width=".5"/>
+            <line x1="250" y1="105" x2="300" y2="130" stroke="#d4d0c8" stroke-width=".5"/>
+            <!-- Width dimension -->
+            <line x1="195" y1="60" x2="305" y2="60" stroke="#0A0A0A" stroke-width=".6"/>
+            <line x1="195" y1="55" x2="195" y2="65" stroke="#0A0A0A" stroke-width=".6"/>
+            <line x1="305" y1="55" x2="305" y2="65" stroke="#0A0A0A" stroke-width=".6"/>
+            <text x="250" y="55" text-anchor="middle" font-family="Space Mono,monospace" font-size="8" fill="#0A0A0A" id="dimWidth">297 mm</text>
+            <!-- Height dimension -->
+            <line x1="330" y1="85" x2="330" y2="167" stroke="#0A0A0A" stroke-width=".6"/>
+            <line x1="325" y1="85" x2="335" y2="85" stroke="#0A0A0A" stroke-width=".6"/>
+            <line x1="325" y1="167" x2="335" y2="167" stroke="#0A0A0A" stroke-width=".6"/>
+            <text x="350" y="130" text-anchor="start" font-family="Space Mono,monospace" font-size="8" fill="#0A0A0A" id="dimHeight">210 mm</text>
+            <!-- Floor to print dimension -->
+            <line x1="170" y1="167" x2="170" y2="270" stroke="#d4d0c8" stroke-width=".6" stroke-dasharray="3,3"/>
+            <line x1="165" y1="167" x2="175" y2="167" stroke="#d4d0c8" stroke-width=".6"/>
+            <line x1="165" y1="270" x2="175" y2="270" stroke="#d4d0c8" stroke-width=".6"/>
+            <text x="155" y="222" text-anchor="end" font-family="Space Mono,monospace" font-size="7" fill="#d4d0c8">1450mm from floor</text>
+            <!-- Person silhouette for scale -->
+            <line x1="410" y1="120" x2="410" y2="270" stroke="#d4d0c8" stroke-width=".8"/>
+            <circle cx="410" cy="115" r="8" fill="none" stroke="#d4d0c8" stroke-width=".8"/>
+            <text x="420" y="200" font-family="Space Mono,monospace" font-size="7" fill="#d4d0c8">1.7m ref</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Timeline -->
+      <div class="timeline">
+        <div class="timeline-label">Edition History</div>
+        <div class="timeline-track">
+          <div class="timeline-line"></div>
+          <div class="timeline-node">
+            <div class="timeline-dot filled"></div>
+            <div class="timeline-node-label">Mar 2024<br>Edition opened</div>
+          </div>
+          <div class="timeline-node">
+            <div class="timeline-dot filled"></div>
+            <div class="timeline-node-label">Jun 2024<br>#1 claimed</div>
+          </div>
+          <div class="timeline-node">
+            <div class="timeline-dot filled"></div>
+            <div class="timeline-node-label">Sep 2024<br>#2 claimed</div>
+          </div>
+          <div class="timeline-node">
+            <div class="timeline-dot filled"></div>
+            <div class="timeline-node-label">Dec 2024<br>#3 claimed</div>
+          </div>
+          <div class="timeline-node">
+            <div class="timeline-dot"></div>
+            <div class="timeline-node-label">Now<br>7 available</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const PRINTS = [
+  {
+    id:'DRD-001', title:'Mountain Dawn', subtitle:'Alpine Series',
+    img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400',
+    edition:10, claimed:3, sizes:['A4','A3','A2','A1'], paper:'photo-rag', paperLabel:'Hahnemühle Photo Rag',
+    price:145, status:'available', date:'2024-03',
+    location:'Connemara, Ireland'
+  },
+  {
+    id:'DRD-002', title:'Forest Canopy', subtitle:'Woodland Series',
+    img:'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400',
+    edition:10, claimed:7, sizes:['A4','A3','A2'], paper:'baryta', paperLabel:'Hahnemühle Baryta',
+    price:165, status:'low-stock', date:'2024-01',
+    location:'Glendalough, Ireland'
+  },
+  {
+    id:'DRD-003', title:'Lakeside Calm', subtitle:'Water Series',
+    img:'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=400',
+    edition:10, claimed:2, sizes:['A4','A3','A2','A1'], paper:'platine', paperLabel:'Canson Platine Fibre',
+    price:155, status:'available', date:'2024-05',
+    location:'Killarney, Ireland'
+  },
+  {
+    id:'DRD-004', title:'Deep Woodland', subtitle:'Woodland Series',
+    img:'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400',
+    edition:10, claimed:4, sizes:['A3','A2','A1'], paper:'photo-rag', paperLabel:'Hahnemühle Photo Rag',
+    price:195, status:'available', date:'2023-11',
+    location:'Wicklow, Ireland'
+  },
+  {
+    id:'DRD-005', title:'Golden Valley', subtitle:'Landscape Series',
+    img:'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=400',
+    edition:10, claimed:9, sizes:['A4','A3'], paper:'baryta', paperLabel:'Hahnemühle Baryta',
+    price:175, status:'last-one', date:'2023-09',
+    location:'Ring of Kerry, Ireland'
+  },
+  {
+    id:'DRD-006', title:'Sunlit Path', subtitle:'Light Series',
+    img:'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400',
+    edition:10, claimed:2, sizes:['A4','A3','A2'], paper:'platine', paperLabel:'Canson Platine Fibre',
+    price:150, status:'available', date:'2024-07',
+    location:'Burren, Ireland'
+  }
+];
+
+const paperMap = {'photo-rag':'Hahnemühle Photo Rag','baryta':'Hahnemühle Baryta','platine':'Canson Platine Fibre'};
+const statusLabel = {available:'Available','low-stock':'Low Stock','last-one':'Last One'};
+const statusDot = {available:'green','low-stock':'yellow','last-one':'red'};
+
+function editionBarHTML(claimed, total, segW) {
+  const w = segW || 14;
+  let h = '<div class="edition-bar"><div class="edition-bar-visual">';
+  for(let i=0;i<total;i++) h += `<div class="seg ${i<claimed?'filled':'empty'}" style="width:${w}px"></div>`;
+  h += `</div><span class="edition-text">${claimed} / ${total}</span></div>`;
+  return h;
+}
+
+function getFiltered() {
+  let list = [...PRINTS];
+  const fp = document.getElementById('filterPaper').value;
+  const fprice = document.getElementById('filterPrice').value;
+  const fs = document.getElementById('filterStatus').value;
+  if(fp!=='all') list = list.filter(p=>p.paper===fp);
+  if(fprice==='under-200') list = list.filter(p=>p.price<200);
+  else if(fprice==='200-400') list = list.filter(p=>p.price>=200&&p.price<=400);
+  else if(fprice==='over-400') list = list.filter(p=>p.price>400);
+  if(fs==='available') list = list.filter(p=>p.status==='available');
+  else if(fs==='low-stock') list = list.filter(p=>p.status==='low-stock');
+  else if(fs==='last-one') list = list.filter(p=>p.status==='last-one');
+  const sort = document.getElementById('sortSelect').value;
+  if(sort==='catalog') list.sort((a,b)=>a.id.localeCompare(b.id));
+  else if(sort==='price-asc') list.sort((a,b)=>a.price-b.price);
+  else if(sort==='price-desc') list.sort((a,b)=>b.price-a.price);
+  else if(sort==='edition') list.sort((a,b)=>(a.edition-a.claimed)-(b.edition-b.claimed));
+  else if(sort==='newest') list.sort((a,b)=>b.date.localeCompare(a.date));
+  return list;
+}
+
+function renderTable() {
+  const list = getFiltered();
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = list.map(p => `
+    <tr onclick="showView('detail')">
+      <td class="td-thumb"><img src="${p.img}" alt="${p.title}"></td>
+      <td class="td-catalog">${p.id}</td>
+      <td class="td-title">${p.title}<div class="subtitle">${p.subtitle}</div></td>
+      <td>${editionBarHTML(p.claimed, p.edition)}</td>
+      <td class="td-sizes">${p.sizes.join(' · ')}</td>
+      <td class="td-paper">${p.paperLabel}</td>
+      <td class="td-price">€${p.price}</td>
+      <td><span class="status-badge"><span class="status-dot ${statusDot[p.status]}"></span>${statusLabel[p.status]}</span></td>
+    </tr>
+  `).join('');
+  updateStats(list);
+}
+
+function renderGrid() {
+  const list = getFiltered();
+  const container = document.getElementById('gridContainer');
+  container.innerHTML = list.map(p => `
+    <div class="grid-card" onclick="showView('detail')">
+      <img src="${p.img}" alt="${p.title}">
+      <div class="grid-card-body">
+        <div class="gc-catalog">${p.id}</div>
+        <div class="gc-title">${p.title}</div>
+        ${editionBarHTML(p.claimed, p.edition, 18)}
+        <div class="gc-price">From €${p.price}</div>
+      </div>
+    </div>
+  `).join('');
+  updateStats(list);
+}
+
+function updateStats(list) {
+  const totalEditions = list.length;
+  const totalClaimed = list.reduce((s,p)=>s+p.claimed,0);
+  const totalSlots = list.reduce((s,p)=>s+p.edition,0);
+  document.querySelector('.stat-editions').textContent = `${totalEditions} editions`;
+  document.querySelector('.stat-claimed').textContent = `${totalClaimed} of ${totalSlots} claimed`;
+  document.querySelector('.stat-available').textContent = `${totalSlots - totalClaimed} available`;
+}
+
+function showView(view) {
+  document.querySelectorAll('.view-tabs button').forEach(b => b.classList.toggle('active', b.dataset.view === view));
+  document.getElementById('catalogPage').classList.toggle('visible', view === 'catalog');
+  document.getElementById('detailPage').classList.toggle('visible', view === 'detail');
+}
+
+// View tabs
+document.querySelectorAll('.view-tabs button').forEach(btn => {
+  btn.addEventListener('click', () => showView(btn.dataset.view));
+});
+
+// Table/Grid toggle
+document.querySelectorAll('.view-toggle button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.view-toggle button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const mode = btn.dataset.mode;
+    document.getElementById('tableContainer').classList.toggle('hidden', mode === 'grid');
+    document.getElementById('gridContainer').classList.toggle('visible', mode === 'grid');
+    if(mode === 'grid') renderGrid();
+  });
+});
+
+// Filters & Sort
+['filterPaper','filterPrice','filterStatus','sortSelect'].forEach(id => {
+  document.getElementById(id).addEventListener('change', () => {
+    renderTable();
+    renderGrid();
+  });
+});
+
+// Spec table selection
+function setupSpecTable(tableId) {
+  document.querySelectorAll(`#${tableId} tr.selectable`).forEach(row => {
+    row.addEventListener('click', () => {
+      document.querySelectorAll(`#${tableId} tr.selectable`).forEach(r => r.classList.remove('selected'));
+      row.classList.add('selected');
+      updateDetailPrice();
+      if(tableId === 'sizeTable') updateRoomDimensions(row);
+    });
+  });
+}
+
+function updateDetailPrice() {
+  const sizeRow = document.querySelector('#sizeTable tr.selected');
+  const paperRow = document.querySelector('#paperTable tr.selected');
+  const base = parseInt(sizeRow?.dataset.price || 145);
+  const delta = parseInt(paperRow?.dataset.delta || 0);
+  document.getElementById('totalPrice').textContent = `€${base + delta}`;
+}
+
+const sizeDimensions = {
+  'A4': {w:'297 mm', h:'210 mm', svgW:110, svgH:82},
+  'A3': {w:'420 mm', h:'297 mm', svgW:140, svgH:100},
+  'A2': {w:'594 mm', h:'420 mm', svgW:175, svgH:124},
+  'A1': {w:'841 mm', h:'594 mm', svgW:220, svgH:156}
+};
+
+function updateRoomDimensions(row) {
+  const size = row.cells[0].textContent.trim();
+  const dim = sizeDimensions[size];
+  if(!dim) return;
+  document.getElementById('dimWidth').textContent = dim.w;
+  document.getElementById('dimHeight').textContent = dim.h;
+  const print = document.getElementById('roomPrint');
+  const cx = 250, cy = 126;
+  print.setAttribute('x', cx - dim.svgW/2);
+  print.setAttribute('y', cy - dim.svgH/2);
+  print.setAttribute('width', dim.svgW);
+  print.setAttribute('height', dim.svgH);
+}
+
+setupSpecTable('sizeTable');
+setupSpecTable('paperTable');
+renderTable();
+</script>
+</body>
+</html>

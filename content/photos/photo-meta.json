@@ -1,11 +1,41 @@
 {
   "DSCF3230.jpg": {
     "location": "Amsterdam",
-    "sourceFolder": "Amsterdam"
+    "sourceFolder": "Amsterdam",
+    "print": {
+      "available": true,
+      "editionSize": 5,
+      "sold": 1,
+      "status": "available",
+      "price": 220,
+      "currency": "EUR",
+      "sizes": ["30x40cm", "40x60cm"],
+      "paper": "Hahnemuhle Photo Rag",
+      "signed": true,
+      "leadTime": "2-3 weeks",
+      "requestUrl": "mailto:ivan.caffrey@gmail.com?subject=Print%20request%3A%20DSCF3230",
+      "quote": "Amsterdam's canals hold the city's reflection like a second memory — one made of light and stone.",
+      "description": "Captured along the Prinsengracht on a still winter morning, the water became a mirror for the gabled facades above. The Hahnemühle Photo Rag renders the subtle gradations of reflected light with remarkable fidelity, each ripple a brushstroke of colour."
+    }
   },
   "DSCF3339.jpg": {
     "location": "Amsterdam",
-    "sourceFolder": "Amsterdam"
+    "sourceFolder": "Amsterdam",
+    "print": {
+      "available": true,
+      "editionSize": 5,
+      "sold": 2,
+      "status": "available",
+      "price": 220,
+      "currency": "EUR",
+      "sizes": ["30x40cm", "40x60cm"],
+      "paper": "Hahnemuhle Photo Rag",
+      "signed": true,
+      "leadTime": "2-3 weeks",
+      "requestUrl": "mailto:ivan.caffrey@gmail.com?subject=Print%20request%3A%20DSCF3339",
+      "quote": "The light in Amsterdam is borrowed from the water below and the sky above — an impossible, gentle collision.",
+      "description": "Taken during the golden hour when Amsterdam's brick facades glow warmest. The matte cotton surface of the Photo Rag gives the warm tones a tactile depth that glossy paper cannot achieve, turning the print into something you want to reach into."
+    }
   },
   "DSCF3432.jpg": {
     "location": "Amsterdam",
@@ -13,7 +43,22 @@
   },
   "DSCF3535.jpg": {
     "location": "Amsterdam",
-    "sourceFolder": "Amsterdam"
+    "sourceFolder": "Amsterdam",
+    "print": {
+      "available": true,
+      "editionSize": 5,
+      "sold": 4,
+      "status": "available",
+      "price": 280,
+      "currency": "EUR",
+      "sizes": ["40x60cm", "50x70cm"],
+      "paper": "Hahnemuhle Photo Rag Baryta",
+      "signed": true,
+      "leadTime": "2-3 weeks",
+      "requestUrl": "mailto:ivan.caffrey@gmail.com?subject=Print%20request%3A%20DSCF3535",
+      "quote": "Some moments refuse to be ordinary. This was one of them — fleeting, luminous, almost defiant in its beauty.",
+      "description": "With only one edition remaining, this has become one of the most sought-after prints in the collection. The Baryta paper's semi-gloss finish brings a luminous quality to the highlights that pulls the viewer deeper into the scene."
+    }
   },
   "000160980004.jpg": {
     "location": "Home",
@@ -30,8 +75,24 @@
   "000160980009.jpg": {"location": "Home",
     "sourceFolder": "Animals"
   },
-  "000160980013.jpg": {"location": "Home",
-    "sourceFolder": "Animals"
+  "000160980013.jpg": {
+    "location": "Home",
+    "sourceFolder": "Animals",
+    "print": {
+      "available": true,
+      "editionSize": 5,
+      "sold": 1,
+      "status": "available",
+      "price": 180,
+      "currency": "EUR",
+      "sizes": ["30x40cm"],
+      "paper": "Hahnemuhle Photo Rag",
+      "signed": true,
+      "leadTime": "2-3 weeks",
+      "requestUrl": "mailto:ivan.caffrey@gmail.com?subject=Print%20request%3A%20000160980013",
+      "quote": "They meet your gaze without pretence — no performance, just presence.",
+      "description": "Shot on film, this portrait carries a warmth and grain that digital cannot replicate. The Photo Rag paper preserves the subtle tonal range of the analogue negative, with deep blacks that hold detail rather than simply going dark."
+    }
   },
   "000160980038.jpg": {"location": "Home",
     "sourceFolder": "Animals"
@@ -214,8 +275,24 @@
   "000226840012.jpg": {"location": "Lambay",
     "sourceFolder": "BnW"
   },
-  "000226840017.jpg": {"location": "Lambay",
-    "sourceFolder": "BnW"
+  "000226840017.jpg": {
+    "location": "Lambay",
+    "sourceFolder": "BnW",
+    "print": {
+      "available": true,
+      "editionSize": 5,
+      "sold": 3,
+      "status": "available",
+      "price": 210,
+      "currency": "EUR",
+      "sizes": ["30x40cm", "40x50cm"],
+      "paper": "Baryta FineArt",
+      "signed": true,
+      "leadTime": "2-3 weeks",
+      "requestUrl": "mailto:ivan.caffrey@gmail.com?subject=Print%20request%3A%20000226840017",
+      "quote": "Lambay revealed itself in monochrome — all contrast, no compromise.",
+      "description": "The island's stark landscape demands black and white. The Baryta FineArt paper was chosen for its ability to render the full tonal spectrum from deep shadow to brilliant highlight, giving the print a silvery quality reminiscent of traditional darkroom prints."
+    }
   },
   "000230820004.jpg": {"location": "Dublin",
     "sourceFolder": "BnW"
@@ -326,7 +403,22 @@
   },
   "DSCF4666.jpg": {
     "location": "Bordeaux",
-    "sourceFolder": "Bordeaux"
+    "sourceFolder": "Bordeaux",
+    "print": {
+      "available": true,
+      "editionSize": 5,
+      "sold": 0,
+      "status": "available",
+      "price": 240,
+      "currency": "EUR",
+      "sizes": ["30x40cm", "40x60cm"],
+      "paper": "Hahnemuhle Photo Rag",
+      "signed": true,
+      "leadTime": "2-3 weeks",
+      "requestUrl": "mailto:ivan.caffrey@gmail.com?subject=Print%20request%3A%20DSCF4666",
+      "quote": "Bordeaux at dusk feels like stepping into a painting that hasn't dried yet.",
+      "description": "The city's golden limestone takes on an almost amber glow as the sun drops behind the Garonne. This first edition print captures that transient warmth on Photo Rag's matte cotton surface, where every tone feels considered and permanent."
+    }
   },
   "000393120012.jpg": {
     "location": "Dublin",
@@ -410,7 +502,20 @@
   },
   "DSCF9580.jpg": {
     "location": "Tokyo",
-    "sourceFolder": "Buildings"
+    "sourceFolder": "Buildings",
+    "print": {
+      "available": true,
+      "editionSize": 5,
+      "sold": 5,
+      "status": "sold_out",
+      "price": 260,
+      "currency": "EUR",
+      "sizes": ["40x60cm", "50x70cm"],
+      "paper": "Hahnemuhle Photo Rag Baryta",
+      "signed": true,
+      "leadTime": "3-4 weeks",
+      "requestUrl": "mailto:ivan.caffrey@gmail.com?subject=Print%20waitlist%3A%20DSCF9580"
+    }
   },
   "DSCF9890.jpg": {
     "location": "Tokyo",
@@ -536,7 +641,22 @@
   },
   "000361140009.jpg": {
     "location": "Dublin",
-    "sourceFolder": "Dublin"
+    "sourceFolder": "Dublin",
+    "print": {
+      "available": true,
+      "editionSize": 5,
+      "sold": 2,
+      "status": "available",
+      "price": 230,
+      "currency": "EUR",
+      "sizes": ["30x40cm", "40x60cm"],
+      "paper": "Canson Platine Fibre Rag",
+      "signed": true,
+      "leadTime": "2-3 weeks",
+      "requestUrl": "mailto:ivan.caffrey@gmail.com?subject=Print%20request%3A%20000361140009",
+      "quote": "Dublin doesn't perform for the camera — you have to catch it unaware.",
+      "description": "Shot on 35mm film through the streets of Dublin's north side. The Canson Platine Fibre Rag gives this image a pearl-like lustre that suits the soft Irish light, with a fibre base that lends the print a weight and presence."
+    }
   },
   "000393120008.jpg": {
     "location": "Dublin",
@@ -682,7 +802,22 @@
   },
   "DSCF6615.jpg": {
     "location": "Venice",
-    "sourceFolder": "Faves"
+    "sourceFolder": "Faves",
+    "print": {
+      "available": true,
+      "editionSize": 5,
+      "sold": 1,
+      "status": "available",
+      "price": 250,
+      "currency": "EUR",
+      "sizes": ["40x60cm", "50x70cm"],
+      "paper": "Hahnemuhle Photo Rag",
+      "signed": true,
+      "leadTime": "2-3 weeks",
+      "requestUrl": "mailto:ivan.caffrey@gmail.com?subject=Print%20request%3A%20DSCF6615",
+      "quote": "Venice exists in a state of perpetual becoming — always dissolving, always reforming in the light.",
+      "description": "Captured in the early morning before the crowds arrived, when Venice belongs only to itself. The Photo Rag paper preserves the interplay of stone, water, and reflected light with a warmth and subtlety that does justice to the city's impossible beauty."
+    }
   },
   "DSCF8848.jpg": {
     "location": "Hong Kong",

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prints Page Redesign — 5 Directions</title>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  :root {
+    --yellow: #F4CA16;
+    --bg: #0A0A0A;
+    --fg: #FFFFFF;
+    --muted: rgba(255,255,255,0.5);
+    --rule: #222;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Newsreader', Georgia, serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .page {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 80px 40px;
+  }
+
+  .label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--yellow);
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-family: 'Newsreader', Georgia, serif;
+    font-size: clamp(2.4rem, 5vw, 4rem);
+    font-weight: 300;
+    line-height: 1.1;
+    margin-bottom: 20px;
+  }
+
+  .intro {
+    font-size: 1.1rem;
+    color: var(--muted);
+    max-width: 600px;
+    line-height: 1.7;
+    margin-bottom: 60px;
+    font-style: italic;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  @media (min-width: 640px) {
+    .grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  .card {
+    border: 1px solid var(--rule);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: border-color 0.3s, transform 0.3s;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    position: relative;
+  }
+
+  .card:hover {
+    border-color: var(--yellow);
+    transform: translateY(-4px);
+  }
+
+  .card-img {
+    width: 100%;
+    aspect-ratio: 16/9;
+    object-fit: cover;
+    display: block;
+    filter: brightness(0.7) saturate(0.8);
+    transition: filter 0.4s;
+  }
+
+  .card:hover .card-img {
+    filter: brightness(0.85) saturate(1);
+  }
+
+  .card-body {
+    padding: 24px;
+  }
+
+  .card-number {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--yellow);
+    margin-bottom: 10px;
+  }
+
+  .card-title {
+    font-family: 'Newsreader', Georgia, serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+    margin-bottom: 8px;
+  }
+
+  .card-desc {
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  .card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.55rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    padding: 4px 10px;
+    border: 1px solid var(--rule);
+    border-radius: 100px;
+    color: var(--muted);
+  }
+
+  .card:nth-child(5) {
+    grid-column: 1 / -1;
+  }
+
+  @media (min-width: 640px) {
+    .card:nth-child(5) .card-img {
+      aspect-ratio: 21/9;
+    }
+  }
+
+  .footer-note {
+    margin-top: 60px;
+    padding-top: 30px;
+    border-top: 1px solid var(--rule);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="label">Prints Page Redesign</div>
+  <h1>Five Directions</h1>
+  <p class="intro">
+    Each mockup presents a distinct approach to the prints buying experience
+    — from gallery minimalism to cinematic immersion. Click any card to open its
+    interactive prototype.
+  </p>
+
+  <div class="grid">
+    <a class="card" href="direction-1-gallery-wall.html">
+      <img class="card-img" src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=700&q=80" alt="">
+      <div class="card-body">
+        <div class="card-number">Direction 01</div>
+        <div class="card-title">Gallery Wall</div>
+        <div class="card-desc">Minimalist fine art presentation. Single-column scroll, floating images with exhibition labels, maximum white space. Like walking through a gallery.</div>
+        <div class="card-tags">
+          <span class="tag">Minimalist</span>
+          <span class="tag">White Space</span>
+          <span class="tag">Single Column</span>
+          <span class="tag">Light Theme</span>
+        </div>
+      </div>
+    </a>
+
+    <a class="card" href="direction-2-editorial-spread.html">
+      <img class="card-img" src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=700&q=80" alt="">
+      <div class="card-body">
+        <div class="card-number">Direction 02</div>
+        <div class="card-title">Editorial Spread</div>
+        <div class="card-desc">Magazine-feature treatment. Full-bleed heroes, dramatic typography, storytelling-first. Each print is a feature article. Buying feels like collecting.</div>
+        <div class="card-tags">
+          <span class="tag">Editorial</span>
+          <span class="tag">Storytelling</span>
+          <span class="tag">Typography</span>
+          <span class="tag">Full-Bleed</span>
+        </div>
+      </div>
+    </a>
+
+    <a class="card" href="direction-3-boutique-product.html">
+      <img class="card-img" src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=700&q=80" alt="">
+      <div class="card-body">
+        <div class="card-number">Direction 03</div>
+        <div class="card-title">Boutique Product</div>
+        <div class="card-desc">Premium e-commerce patterns. Product grid with hover quick-view, full configurator with size/paper selectors, room previews, trust accordions. Conversion-optimized.</div>
+        <div class="card-tags">
+          <span class="tag">E-Commerce</span>
+          <span class="tag">Configurator</span>
+          <span class="tag">Room Preview</span>
+          <span class="tag">Conversion</span>
+        </div>
+      </div>
+    </a>
+
+    <a class="card" href="direction-4-collectors-archive.html">
+      <img class="card-img" src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=700&q=80" alt="">
+      <div class="card-body">
+        <div class="card-number">Direction 04</div>
+        <div class="card-title">Collector's Archive</div>
+        <div class="card-desc">Data-driven catalog. Table/grid toggle, catalog numbers, edition progress bars, specification tables, museum acquisition record detail pages. Swiss design meets database.</div>
+        <div class="card-tags">
+          <span class="tag">Data-Driven</span>
+          <span class="tag">Catalog</span>
+          <span class="tag">Table View</span>
+          <span class="tag">Swiss Design</span>
+        </div>
+      </div>
+    </a>
+
+    <a class="card" href="direction-5-immersive-showcase.html">
+      <img class="card-img" src="https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=700&q=80" alt="">
+      <div class="card-body">
+        <div class="card-number">Direction 05</div>
+        <div class="card-title">Immersive Showcase</div>
+        <div class="card-desc">Cinematic full-screen scroll. Each print takes over the viewport with Ken Burns animation. Glass-morphism detail drawer, glowing edition rings, dark atmospheric theme. Every print feels like an event.</div>
+        <div class="card-tags">
+          <span class="tag">Cinematic</span>
+          <span class="tag">Dark Theme</span>
+          <span class="tag">Full-Screen</span>
+          <span class="tag">Immersive</span>
+        </div>
+      </div>
+    </a>
+  </div>
+
+  <div class="footer-note">
+    Each mockup is fully interactive — size selectors, paper pickers, room previews, and navigation all work.
+  </div>
+</div>
+</body>
+</html>

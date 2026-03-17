@@ -17,9 +17,28 @@ type PhotoMeta = {
   location?: string;
   tags?: string[];
   sourceFolder?: string;
+  print?: PrintMeta;
 };
 
 type PhotoMetaMap = Record<string, PhotoMeta>;
+
+type PrintStatus = "available" | "sold_out" | "inquiry_only";
+
+type PrintMeta = {
+  available: boolean;
+  editionSize: number;
+  sold: number;
+  status?: PrintStatus;
+  price?: number;
+  currency?: string;
+  sizes?: string[];
+  paper?: string;
+  signed?: boolean;
+  leadTime?: string;
+  requestUrl?: string;
+  quote?: string;
+  description?: string;
+};
 
 type ManifestImage = {
   filename: string;
@@ -29,6 +48,7 @@ type ManifestImage = {
   isFeatured?: boolean;
   location?: string;
   tags?: string[];
+  print?: PrintMeta;
 };
 
 type ManifestAlbum = {
@@ -96,6 +116,24 @@ function loadPhotoMeta(): PhotoMetaMap {
   }
 }
 
+function normalizePrintMeta(print?: PrintMeta): PrintMeta | undefined {
+  if (!print) return undefined;
+
+  const editionSize = Math.max(0, Number(print.editionSize ?? 0));
+  const sold = Math.max(0, Number(print.sold ?? 0));
+  const remaining = Math.max(0, editionSize - sold);
+  const status: PrintStatus =
+    remaining === 0 ? "sold_out" : (print.status ?? "available");
+
+  return {
+    ...print,
+    editionSize,
+    sold,
+    status,
+    available: print.available && status !== "sold_out",
+  };
+}
+
 async function main() {
   if (!fs.existsSync(PUBLIC_PHOTOS_DIR)) {
     console.warn(`No photos directory at ${PUBLIC_PHOTOS_DIR}. Skipping.`);
@@ -160,6 +198,7 @@ async function main() {
       const meta = photoMeta[filename] ?? {};
       const location = meta.location;
       const tags = meta.tags;
+      const print = normalizePrintMeta(meta.print);
 
       const existing = albumsById.get(albumId);
       const image: ManifestImage = {
@@ -170,6 +209,7 @@ async function main() {
         isFeatured: featuredSet.has(filename),
         location,
         tags,
+        print,
       };
 
       if (!existing) {
@@ -233,6 +273,7 @@ async function main() {
       const meta = photoMeta[filename] ?? {};
       // Use folder name as location if not in photo-meta
       const location = meta.location ?? folder;
+      const print = normalizePrintMeta(meta.print);
 
       const image: ManifestImage = {
         filename,
@@ -240,6 +281,7 @@ async function main() {
         height,
         location,
         tags: meta.tags,
+        print,
       };
 
       uncategorizedImages.push(image);

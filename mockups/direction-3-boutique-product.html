@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Direction 3: Boutique Product — Premium E-commerce</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --yellow: #F4CA16;
+  --bg: #FFFFFF;
+  --fg: #0A0A0A;
+  --border: #d4d0c8;
+  --serif: 'Newsreader', Georgia, serif;
+  --mono: 'Space Mono', monospace;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.06);
+  --shadow-md: 0 4px 16px rgba(0,0,0,.08);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,.12);
+}
+
+body {
+  font-family: var(--serif);
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── DIRECTION HEADER ── */
+.direction-header {
+  background: var(--fg);
+  color: var(--bg);
+  padding: 10px 32px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.direction-header .dot {
+  width: 8px; height: 8px;
+  background: var(--yellow);
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* ── VIEW TABS ── */
+.view-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  position: sticky;
+  top: 0;
+  background: var(--bg);
+  z-index: 100;
+}
+.view-tab {
+  padding: 16px 28px;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: var(--fg);
+  opacity: .5;
+  border-bottom: 2px solid transparent;
+  transition: all .2s;
+}
+.view-tab:hover { opacity: .8; }
+.view-tab.active {
+  opacity: 1;
+  border-bottom-color: var(--yellow);
+}
+
+/* ── LISTING PAGE ── */
+.listing-page { padding: 0 32px 80px; max-width: 1200px; margin: 0 auto; }
+
+.listing-header {
+  padding: 48px 0 32px;
+}
+.listing-header h1 {
+  font-family: var(--serif);
+  font-size: 36px;
+  font-weight: 400;
+  letter-spacing: -.02em;
+  margin-bottom: 24px;
+}
+
+.filter-bar {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 16px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.filter-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: #888;
+}
+.filter-btn {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--bg);
+  color: var(--fg);
+  cursor: pointer;
+  transition: all .15s;
+}
+.filter-btn:hover { border-color: var(--fg); }
+.filter-btn.active {
+  background: var(--fg);
+  color: var(--bg);
+  border-color: var(--fg);
+}
+
+/* ── PRODUCT GRID ── */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+  padding-top: 40px;
+}
+@media (max-width: 768px) {
+  .product-grid { grid-template-columns: 1fr; }
+  .listing-page { padding: 0 16px 60px; }
+}
+
+.product-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--bg);
+  transition: box-shadow .3s;
+  position: relative;
+}
+.product-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.card-image-wrap {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 4/3;
+  cursor: pointer;
+}
+.card-image-wrap img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform .5s cubic-bezier(.25,.46,.45,.94);
+}
+.product-card:hover .card-image-wrap img {
+  transform: scale(1.03);
+}
+
+.card-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(10,10,10,.55);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity .3s;
+  gap: 12px;
+}
+.product-card:hover .card-overlay { opacity: 1; }
+
+.overlay-info {
+  color: #fff;
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  text-align: center;
+  line-height: 1.8;
+}
+.quick-request-btn {
+  padding: 10px 28px;
+  background: var(--yellow);
+  color: var(--fg);
+  border: none;
+  border-radius: 24px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  cursor: pointer;
+  transition: transform .15s;
+}
+.quick-request-btn:hover { transform: scale(1.05); }
+
+.quick-view-float {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: var(--bg);
+  border: none;
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: all .25s;
+  box-shadow: var(--shadow-sm);
+  z-index: 2;
+}
+.product-card:hover .quick-view-float {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.card-info {
+  padding: 20px;
+}
+.card-title {
+  font-family: var(--serif);
+  font-size: 18px;
+  font-weight: 400;
+  margin-bottom: 8px;
+}
+.card-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.card-price {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 700;
+}
+.edition-badge {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  padding: 3px 10px;
+  border-radius: 12px;
+  background: rgba(244,202,22,.15);
+  border: 1px solid rgba(244,202,22,.4);
+  color: #8a7200;
+}
+.paper-icon {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.paper-icon svg {
+  width: 14px; height: 14px;
+  stroke: #999;
+  fill: none;
+  stroke-width: 1.5;
+}
+
+/* ── DETAIL PAGE ── */
+.detail-page {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 40px 32px 80px;
+}
+.detail-layout {
+  display: flex;
+  gap: 48px;
+  align-items: flex-start;
+}
+@media (max-width: 700px) {
+  .detail-layout { flex-direction: column; }
+  .detail-left, .detail-right { width: 100% !important; }
+}
+
+.detail-left {
+  width: 55%;
+  flex-shrink: 0;
+}
+.main-image {
+  width: 100%;
+  aspect-ratio: 4/3;
+  object-fit: cover;
+  border-radius: var(--radius);
+  display: block;
+}
+.thumb-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+.thumb-row img {
+  width: 72px; height: 54px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  border: 2px solid transparent;
+  cursor: pointer;
+  opacity: .6;
+  transition: all .2s;
+}
+.thumb-row img:hover { opacity: .9; }
+.thumb-row img.active {
+  border-color: var(--yellow);
+  opacity: 1;
+}
+
+.detail-right {
+  width: 45%;
+  position: sticky;
+  top: 80px;
+}
+
+.detail-album {
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--yellow);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.detail-album::before {
+  content: '';
+  width: 6px; height: 6px;
+  background: var(--yellow);
+  border-radius: 50%;
+}
+.detail-title {
+  font-family: var(--serif);
+  font-size: 32px;
+  font-weight: 400;
+  letter-spacing: -.01em;
+  margin-bottom: 28px;
+  line-height: 1.2;
+}
+
+.config-section { margin-bottom: 28px; }
+.config-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: #888;
+  margin-bottom: 10px;
+}
+
+/* Size selector */
+.size-options {
+  display: flex;
+  gap: 8px;
+}
+.size-card {
+  flex: 1;
+  padding: 12px 10px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  text-align: center;
+  cursor: pointer;
+  transition: all .2s;
+  background: var(--bg);
+}
+.size-card:hover { border-color: #aaa; }
+.size-card.active {
+  border-color: var(--yellow);
+  box-shadow: 0 0 0 1px var(--yellow);
+}
+.size-name {
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+.size-dims {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: #999;
+  letter-spacing: .02em;
+}
+.size-delta {
+  font-family: var(--mono);
+  font-size: 10px;
+  margin-top: 6px;
+  color: var(--fg);
+}
+
+/* Paper selector */
+.paper-options { display: flex; flex-direction: column; gap: 8px; }
+.paper-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  cursor: pointer;
+  transition: all .2s;
+  text-align: left;
+}
+.paper-btn:hover { border-color: #aaa; }
+.paper-btn.active {
+  border-color: var(--yellow);
+  box-shadow: 0 0 0 1px var(--yellow);
+}
+.paper-swatch {
+  width: 36px; height: 36px;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+.paper-name {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+}
+.paper-desc {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: #888;
+  margin-top: 2px;
+}
+
+/* Room preview */
+.room-select-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.room-select {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  cursor: pointer;
+  appearance: none;
+  padding-right: 32px;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+}
+
+.room-preview {
+  width: 100%;
+  aspect-ratio: 16/10;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+  background: #f5f3ef;
+}
+
+.room-wall {
+  position: absolute;
+  inset: 0;
+}
+
+.room-floor {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 30%;
+}
+
+.room-furniture {
+  position: absolute;
+  bottom: 30%;
+}
+
+.room-print-frame {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 4px 20px rgba(0,0,0,.15);
+  border: 3px solid #fff;
+  transition: all .4s cubic-bezier(.25,.46,.45,.94);
+  overflow: hidden;
+}
+.room-print-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Price & CTA */
+.price-block {
+  padding: 24px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+.price-amount {
+  font-family: var(--serif);
+  font-size: 36px;
+  font-weight: 500;
+  letter-spacing: -.02em;
+}
+.price-note {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  margin-top: 4px;
+}
+.cta-btn {
+  display: block;
+  width: 100%;
+  padding: 18px;
+  background: var(--fg);
+  color: var(--bg);
+  border: none;
+  border-radius: var(--radius);
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  cursor: pointer;
+  transition: all .2s;
+  text-align: center;
+}
+.cta-btn:hover {
+  background: #222;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+.wishlist-link {
+  display: block;
+  text-align: center;
+  margin-top: 14px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: #888;
+  text-decoration: none;
+  letter-spacing: .04em;
+  cursor: pointer;
+  transition: color .15s;
+}
+.wishlist-link:hover { color: var(--fg); }
+
+/* Accordions */
+.accordions {
+  margin-top: 40px;
+}
+.accordion-item {
+  border-top: 1px solid var(--border);
+}
+.accordion-item:last-child {
+  border-bottom: 1px solid var(--border);
+}
+.accordion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 0;
+  cursor: pointer;
+  user-select: none;
+}
+.accordion-header h3 {
+  font-family: var(--serif);
+  font-size: 16px;
+  font-weight: 400;
+}
+.accordion-icon {
+  width: 20px; height: 20px;
+  position: relative;
+  flex-shrink: 0;
+}
+.accordion-icon::before,
+.accordion-icon::after {
+  content: '';
+  position: absolute;
+  background: var(--fg);
+  transition: transform .25s;
+}
+.accordion-icon::before {
+  width: 12px; height: 1.5px;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+}
+.accordion-icon::after {
+  width: 1.5px; height: 12px;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+}
+.accordion-item.open .accordion-icon::after {
+  transform: translate(-50%,-50%) rotate(90deg);
+}
+.accordion-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height .35s ease;
+}
+.accordion-body-inner {
+  padding: 0 0 24px;
+  font-size: 14px;
+  line-height: 1.8;
+  color: #555;
+}
+.accordion-body-inner p {
+  margin-bottom: 8px;
+}
+
+.edition-bar-track {
+  width: 100%;
+  height: 6px;
+  background: #eee;
+  border-radius: 3px;
+  margin-top: 12px;
+  overflow: hidden;
+}
+.edition-bar-fill {
+  height: 100%;
+  background: var(--yellow);
+  border-radius: 3px;
+  transition: width .6s ease;
+}
+
+/* ── UTILITY ── */
+.hidden { display: none !important; }
+
+.view-container { min-height: calc(100vh - 90px); }
+</style>
+</head>
+<body>
+
+<!-- Direction Header -->
+<div class="direction-header">
+  <span class="dot"></span>
+  Direction 3: Boutique Product — Premium E-commerce
+</div>
+
+<!-- View Tabs -->
+<div class="view-tabs">
+  <button class="view-tab active" data-view="listing">Listing Page</button>
+  <button class="view-tab" data-view="detail">Product Detail Page</button>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- VIEW 1: LISTING PAGE                        -->
+<!-- ════════════════════════════════════════════ -->
+<div id="view-listing" class="view-container">
+  <div class="listing-page">
+    <div class="listing-header">
+      <h1>Available Prints</h1>
+      <div class="filter-bar">
+        <div class="filter-group">
+          <span class="filter-label">Sort by</span>
+          <button class="filter-btn active" data-sort="price">Price</button>
+          <button class="filter-btn" data-sort="edition">Edition Size</button>
+          <button class="filter-btn" data-sort="newest">Newest</button>
+        </div>
+        <div class="filter-group">
+          <span class="filter-label">Paper</span>
+          <button class="filter-btn filter-paper active" data-paper="all">All</button>
+          <button class="filter-btn filter-paper" data-paper="matte">Matte</button>
+          <button class="filter-btn filter-paper" data-paper="lustre">Lustre</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-grid" id="product-grid"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- VIEW 2: DETAIL / PRODUCT PAGE               -->
+<!-- ════════════════════════════════════════════ -->
+<div id="view-detail" class="view-container hidden">
+  <div class="detail-page">
+    <div class="detail-layout">
+
+      <!-- Left: images -->
+      <div class="detail-left">
+        <img class="main-image" id="main-image" src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=900" alt="Alpine Dawn">
+        <div class="thumb-row" id="thumb-row">
+          <img class="active" src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=200&h=150&fit=crop" data-full="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=900" alt="Thumb 1">
+          <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=200&h=150&fit=crop&crop=top" data-full="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=900&fit=crop&crop=top" alt="Thumb 2">
+          <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=200&h=150&fit=crop&crop=left" data-full="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=900&fit=crop&crop=left" alt="Thumb 3">
+          <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=200&h=150&fit=crop&crop=bottom" data-full="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=900&fit=crop&crop=bottom" alt="Thumb 4">
+        </div>
+
+        <!-- Accordions below image on desktop, below everything on mobile -->
+        <div class="accordions" id="accordions">
+          <div class="accordion-item">
+            <div class="accordion-header">
+              <h3>Shipping &amp; Packaging</h3>
+              <span class="accordion-icon"></span>
+            </div>
+            <div class="accordion-body">
+              <div class="accordion-body-inner">
+                <p>Every print is wrapped in acid-free tissue paper and shipped in a rigid, crush-proof tube or flat mailer depending on size.</p>
+                <p>Fully tracked shipping via DHL Express. Delivery within 5–10 business days worldwide. Shipping is included in the listed price — no hidden fees.</p>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <div class="accordion-header">
+              <h3>Certificate of Authenticity</h3>
+              <span class="accordion-icon"></span>
+            </div>
+            <div class="accordion-body">
+              <div class="accordion-body-inner">
+                <p>Each print ships with a signed and numbered Certificate of Authenticity on heavyweight cotton stock.</p>
+                <p>The certificate includes the edition number, print date, paper type, and a hand-signed artist verification. A digital certificate is also available upon request.</p>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <div class="accordion-header">
+              <h3>Edition Details</h3>
+              <span class="accordion-icon"></span>
+            </div>
+            <div class="accordion-body">
+              <div class="accordion-body-inner">
+                <p>Limited edition of <strong>10 prints</strong>. Each is individually numbered.</p>
+                <p><strong>3 sold</strong> · <strong>7 remaining</strong></p>
+                <div class="edition-bar-track">
+                  <div class="edition-bar-fill" style="width: 30%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <div class="accordion-header">
+              <h3>Returns &amp; Care</h3>
+              <span class="accordion-icon"></span>
+            </div>
+            <div class="accordion-body">
+              <div class="accordion-body-inner">
+                <p>14-day return policy for unopened, undamaged prints. Please contact us within 14 days of delivery to initiate a return.</p>
+                <p><strong>Care instructions:</strong> Handle prints with clean, dry hands or cotton gloves. Avoid direct sunlight for prolonged periods. For framing, use UV-protective glass and acid-free matting.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: configurator -->
+      <div class="detail-right">
+        <div class="detail-album">Alpine Collection</div>
+        <h2 class="detail-title">Alpine Dawn</h2>
+
+        <!-- Size selector -->
+        <div class="config-section">
+          <div class="config-label">Select Size</div>
+          <div class="size-options" id="size-options">
+            <div class="size-card active" data-size="a4" data-price="120" data-w="60" data-h="45">
+              <div class="size-name">A4</div>
+              <div class="size-dims">210 × 297mm</div>
+              <div class="size-delta">EUR 120</div>
+            </div>
+            <div class="size-card" data-size="a3" data-price="180" data-w="80" data-h="60">
+              <div class="size-name">A3</div>
+              <div class="size-dims">297 × 420mm</div>
+              <div class="size-delta">+EUR 60</div>
+            </div>
+            <div class="size-card" data-size="a2" data-price="280" data-w="105" data-h="78">
+              <div class="size-name">A2</div>
+              <div class="size-dims">420 × 594mm</div>
+              <div class="size-delta">+EUR 160</div>
+            </div>
+            <div class="size-card" data-size="a1" data-price="450" data-w="135" data-h="100">
+              <div class="size-name">A1</div>
+              <div class="size-dims">594 × 841mm</div>
+              <div class="size-delta">+EUR 330</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Paper selector -->
+        <div class="config-section">
+          <div class="config-label">Paper Type</div>
+          <div class="paper-options" id="paper-options">
+            <div class="paper-btn active" data-paper-type="rag">
+              <div class="paper-swatch" style="background: linear-gradient(135deg, #f5f2ed, #ede8df);border:1px solid var(--border);"></div>
+              <div>
+                <div class="paper-name">Hahnemühle Photo Rag</div>
+                <div class="paper-desc">Matte, 308gsm, museum-quality</div>
+              </div>
+            </div>
+            <div class="paper-btn" data-paper-type="crystal">
+              <div class="paper-swatch" style="background: linear-gradient(135deg, #fafafa, #eee);border:1px solid var(--border);"></div>
+              <div>
+                <div class="paper-name">Fuji Crystal Archive</div>
+                <div class="paper-desc">Lustre, traditional C-type</div>
+              </div>
+            </div>
+            <div class="paper-btn" data-paper-type="canson">
+              <div class="paper-swatch" style="background: linear-gradient(135deg, #f7f4ee, #ece6d9);border:1px solid var(--border);"></div>
+              <div>
+                <div class="paper-name">Canson Infinity Rag</div>
+                <div class="paper-desc">Matte, 310gsm, cotton</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Room preview -->
+        <div class="config-section">
+          <div class="config-label">Room Preview</div>
+          <div class="room-select-wrap">
+            <select class="room-select" id="room-select">
+              <option value="living">Living Room</option>
+              <option value="office">Office</option>
+              <option value="hallway">Hallway</option>
+            </select>
+          </div>
+          <div class="room-preview" id="room-preview">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+
+        <!-- Price -->
+        <div class="price-block">
+          <div class="price-amount" id="price-display">EUR 120</div>
+          <div class="price-note">Incl. worldwide tracked shipping</div>
+        </div>
+
+        <button class="cta-btn">Request This Print</button>
+        <a class="wishlist-link">♡ Add to Wishlist</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──
+const prints = [
+  { id:1, title:'Alpine Dawn', album:'Alpine Collection', img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500', price:120, edition:10, sold:3, paper:'matte', date:'2025-12-01' },
+  { id:2, title:'Forest Cathedral', album:'Woodland Series', img:'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=500', price:150, edition:8, sold:2, paper:'matte', date:'2025-11-15' },
+  { id:3, title:'Morning Mist', album:'Landscape Studies', img:'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=500', price:180, edition:10, sold:5, paper:'lustre', date:'2025-10-20' },
+  { id:4, title:'Golden Valley', album:'Alpine Collection', img:'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=500', price:200, edition:6, sold:1, paper:'matte', date:'2025-09-05' },
+  { id:5, title:'Emerald Meadow', album:'Landscape Studies', img:'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=500', price:140, edition:10, sold:4, paper:'lustre', date:'2025-08-10' },
+  { id:6, title:'Sun Through Trees', album:'Woodland Series', img:'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=500', price:160, edition:12, sold:7, paper:'matte', date:'2026-01-12' },
+];
+
+// ── VIEW SWITCHING ──
+document.querySelectorAll('.view-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.view-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    document.querySelectorAll('.view-container').forEach(v => v.classList.add('hidden'));
+    document.getElementById('view-' + tab.dataset.view).classList.remove('hidden');
+  });
+});
+
+// ── LISTING: RENDER GRID ──
+const grid = document.getElementById('product-grid');
+let currentSort = 'price';
+let currentPaper = 'all';
+
+function renderGrid() {
+  let filtered = currentPaper === 'all' ? [...prints] : prints.filter(p => p.paper === currentPaper);
+  if (currentSort === 'price') filtered.sort((a,b) => a.price - b.price);
+  else if (currentSort === 'edition') filtered.sort((a,b) => (a.edition - a.sold) - (b.edition - b.sold));
+  else if (currentSort === 'newest') filtered.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+  grid.innerHTML = filtered.map(p => `
+    <div class="product-card">
+      <div class="card-image-wrap">
+        <img src="${p.img}" alt="${p.title}" loading="lazy">
+        <button class="quick-view-float">Quick View</button>
+        <div class="card-overlay">
+          <div class="overlay-info">
+            A4 — A1 Available<br>
+            From EUR ${p.price}
+          </div>
+          <button class="quick-request-btn">Quick Request</button>
+        </div>
+      </div>
+      <div class="card-info">
+        <div class="card-title">${p.title}</div>
+        <div class="card-meta">
+          <span class="card-price">From EUR ${p.price}</span>
+          <span class="edition-badge">${p.edition - p.sold}/${p.edition} remaining</span>
+          <span class="paper-icon">
+            <svg viewBox="0 0 16 16"><rect x="2" y="1" width="12" height="14" rx="1.5"/><line x1="5" y1="5" x2="11" y2="5"/><line x1="5" y1="8" x2="11" y2="8"/></svg>
+            ${p.paper}
+          </span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+renderGrid();
+
+// Sort buttons
+document.querySelectorAll('.filter-btn[data-sort]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn[data-sort]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentSort = btn.dataset.sort;
+    renderGrid();
+  });
+});
+
+// Paper filter buttons
+document.querySelectorAll('.filter-paper').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-paper').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentPaper = btn.dataset.paper;
+    renderGrid();
+  });
+});
+
+// ── DETAIL: THUMBNAILS ──
+document.getElementById('thumb-row').addEventListener('click', e => {
+  if (e.target.tagName === 'IMG') {
+    document.querySelectorAll('#thumb-row img').forEach(i => i.classList.remove('active'));
+    e.target.classList.add('active');
+    document.getElementById('main-image').src = e.target.dataset.full;
+  }
+});
+
+// ── DETAIL: SIZE SELECTOR ──
+document.getElementById('size-options').addEventListener('click', e => {
+  const card = e.target.closest('.size-card');
+  if (!card) return;
+  document.querySelectorAll('.size-card').forEach(c => c.classList.remove('active'));
+  card.classList.add('active');
+  document.getElementById('price-display').textContent = 'EUR ' + card.dataset.price;
+  renderRoom();
+});
+
+// ── DETAIL: PAPER SELECTOR ──
+document.getElementById('paper-options').addEventListener('click', e => {
+  const btn = e.target.closest('.paper-btn');
+  if (!btn) return;
+  document.querySelectorAll('.paper-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+});
+
+// ── DETAIL: ROOM PREVIEW ──
+const roomConfigs = {
+  living: {
+    wall: '#f0ece4',
+    floor: 'linear-gradient(180deg, #c4a882 0%, #b89b72 100%)',
+    furniture: `
+      <div style="position:absolute;bottom:0;left:10%;width:35%;height:55%;background:#3a3a3a;border-radius:4px 4px 0 0;"></div>
+      <div style="position:absolute;bottom:0;left:12%;width:31%;height:8%;background:#2a2a2a;border-radius:0 0 2px 2px;"></div>
+      <div style="position:absolute;bottom:55%;left:10%;width:35%;height:6%;background:#4a4a4a;border-radius:4px 4px 0 0;"></div>
+      <!-- Cushions -->
+      <div style="position:absolute;bottom:38%;left:13%;width:10%;height:16%;background:#555;border-radius:3px;transform:rotate(-5deg);"></div>
+      <div style="position:absolute;bottom:38%;left:32%;width:10%;height:16%;background:#555;border-radius:3px;transform:rotate(5deg);"></div>
+      <!-- Plant -->
+      <div style="position:absolute;bottom:0;right:10%;width:8%;height:5%;background:#6b5b45;border-radius:2px;"></div>
+      <div style="position:absolute;bottom:5%;right:9%;width:10%;height:20%;display:flex;flex-direction:column;align-items:center;">
+        <div style="width:4px;height:12px;background:#5a7a4a;"></div>
+        <div style="width:20px;height:20px;background:#4a8a3a;border-radius:50%;margin-top:-6px;"></div>
+        <div style="width:16px;height:16px;background:#5a9a4a;border-radius:50%;margin-top:-10px;margin-left:-8px;"></div>
+        <div style="width:16px;height:16px;background:#3a7a2a;border-radius:50%;margin-top:-18px;margin-left:10px;"></div>
+      </div>
+    `,
+    printTop: '15%'
+  },
+  office: {
+    wall: '#e8e5df',
+    floor: 'linear-gradient(180deg, #8a8078 0%, #7a7068 100%)',
+    furniture: `
+      <!-- Desk -->
+      <div style="position:absolute;bottom:0;left:15%;width:50%;height:35%;background:#c4a872;border-radius:2px 2px 0 0;"></div>
+      <div style="position:absolute;bottom:0;left:17%;width:3%;height:35%;background:#b09060;"></div>
+      <div style="position:absolute;bottom:0;right:37%;width:3%;height:35%;background:#b09060;"></div>
+      <!-- Monitor -->
+      <div style="position:absolute;bottom:35%;left:30%;width:20%;height:22%;background:#222;border-radius:2px;border:2px solid #333;"></div>
+      <div style="position:absolute;bottom:35%;left:37%;width:6%;height:3%;background:#444;"></div>
+      <!-- Chair hint -->
+      <div style="position:absolute;bottom:0;right:12%;width:14%;height:28%;background:#3a3a3a;border-radius:3px 3px 0 0;"></div>
+    `,
+    printTop: '10%'
+  },
+  hallway: {
+    wall: '#f5f2ec',
+    floor: 'linear-gradient(180deg, #9a8a78 0%, #8a7a68 100%)',
+    furniture: `
+      <!-- Console table -->
+      <div style="position:absolute;bottom:0;left:25%;width:30%;height:22%;background:#c4a060;border-radius:2px 2px 0 0;"></div>
+      <div style="position:absolute;bottom:0;left:27%;width:2%;height:22%;background:#b09050;"></div>
+      <div style="position:absolute;bottom:0;left:51%;width:2%;height:22%;background:#b09050;"></div>
+      <!-- Vase -->
+      <div style="position:absolute;bottom:22%;left:35%;width:5%;height:10%;background:linear-gradient(#ddd,#bbb);border-radius:2px 2px 4px 4px;"></div>
+      <div style="position:absolute;bottom:32%;left:34%;width:7%;height:3%;display:flex;justify-content:center;">
+        <div style="width:3px;height:6px;background:#4a8a3a;transform:rotate(-15deg);position:absolute;bottom:0;left:30%;"></div>
+        <div style="width:3px;height:8px;background:#5a9a4a;position:absolute;bottom:0;"></div>
+        <div style="width:3px;height:6px;background:#4a8a3a;transform:rotate(15deg);position:absolute;bottom:0;right:30%;"></div>
+      </div>
+    `,
+    printTop: '12%'
+  }
+};
+
+function renderRoom() {
+  const room = document.getElementById('room-select').value;
+  const config = roomConfigs[room];
+  const activeSize = document.querySelector('.size-card.active');
+  const w = activeSize.dataset.w;
+  const h = activeSize.dataset.h;
+
+  document.getElementById('room-preview').innerHTML = `
+    <div class="room-wall" style="background:${config.wall};"></div>
+    <div class="room-floor" style="background:${config.floor};"></div>
+    <div class="room-furniture" style="left:0;right:0;height:70%;">
+      ${config.furniture}
+    </div>
+    <div class="room-print-frame" style="top:${config.printTop};width:${w}px;height:${h}px;">
+      <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400" alt="Preview">
+    </div>
+  `;
+}
+renderRoom();
+
+document.getElementById('room-select').addEventListener('change', renderRoom);
+
+// ── DETAIL: ACCORDIONS ──
+document.querySelectorAll('.accordion-header').forEach(header => {
+  header.addEventListener('click', () => {
+    const item = header.parentElement;
+    const body = item.querySelector('.accordion-body');
+    const inner = body.querySelector('.accordion-body-inner');
+    const isOpen = item.classList.contains('open');
+
+    document.querySelectorAll('.accordion-item').forEach(ai => {
+      ai.classList.remove('open');
+      ai.querySelector('.accordion-body').style.maxHeight = '0';
+    });
+
+    if (!isOpen) {
+      item.classList.add('open');
+      body.style.maxHeight = inner.scrollHeight + 'px';
+    }
+  });
+});
+</script>
+
+</body>
+</html>

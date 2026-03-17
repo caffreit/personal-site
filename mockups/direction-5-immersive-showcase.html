@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Direction 5: Immersive Showcase — Cinematic Scroll</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0A0A0A;--fg:#FFFFFF;--accent:#F4CA16;
+  --serif:'Newsreader',Georgia,serif;
+  --mono:'Space Mono',monospace;
+  --glass:rgba(14,14,14,0.78);
+  --glass-border:rgba(255,255,255,0.08);
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--serif);background:var(--bg);color:var(--fg);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+
+/* ─── VIEW TABS ─── */
+.view-tabs{position:fixed;top:0;left:0;right:0;z-index:900;display:flex;align-items:center;justify-content:space-between;padding:14px 28px;background:rgba(10,10,10,0.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--glass-border)}
+.view-tabs .label{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.4)}
+.view-tabs .tabs{display:flex;gap:4px}
+.view-tabs .tab{font-family:var(--mono);font-size:12px;letter-spacing:0.5px;padding:7px 18px;border:1px solid rgba(255,255,255,0.12);border-radius:6px;background:transparent;color:rgba(255,255,255,0.5);cursor:pointer;transition:all 0.3s}
+.view-tabs .tab:hover{color:var(--fg);border-color:rgba(255,255,255,0.25)}
+.view-tabs .tab.active{background:var(--accent);color:var(--bg);border-color:var(--accent);font-weight:700}
+.print-counter{font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:1px}
+
+/* ─── VIEW CONTAINERS ─── */
+.view{display:none}
+.view.active{display:block}
+
+/* ═══════════════════════════════════════
+   VIEW 1: LISTING — FULL-SCREEN SHOWCASE
+   ═══════════════════════════════════════ */
+#listing{height:100vh;overflow-y:scroll;scroll-snap-type:y mandatory;scroll-behavior:smooth}
+
+.print-section{
+  position:relative;width:100%;height:100vh;
+  scroll-snap-align:start;scroll-snap-stop:always;
+  overflow:hidden;
+}
+
+/* Ken Burns background */
+.print-section .bg{
+  position:absolute;inset:0;
+  background-size:cover;background-position:center;
+  animation:kenBurns 20s ease-in-out infinite alternate;
+  will-change:transform;
+}
+@keyframes kenBurns{
+  0%{transform:scale(1) translate(0,0)}
+  100%{transform:scale(1.08) translate(-0.5%,-0.5%)}
+}
+.print-section:nth-child(2) .bg{animation-delay:-5s;animation-direction:alternate-reverse}
+.print-section:nth-child(3) .bg{animation-delay:-10s}
+.print-section:nth-child(4) .bg{animation-delay:-15s;animation-direction:alternate-reverse}
+
+/* Gradient overlay */
+.print-section .overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(
+    180deg,
+    rgba(10,10,10,0.05) 0%,
+    rgba(10,10,10,0.15) 30%,
+    rgba(10,10,10,0.55) 65%,
+    rgba(10,10,10,0.92) 100%
+  );
+  z-index:1;
+}
+
+/* Content */
+.print-section .content{
+  position:absolute;bottom:0;left:0;right:0;
+  z-index:2;padding:60px 56px 72px;
+}
+.print-section .content .print-title{
+  font-family:var(--serif);font-size:clamp(36px,5.5vw,72px);
+  font-weight:300;line-height:1.1;letter-spacing:-0.02em;
+  color:var(--fg);
+  text-shadow:0 2px 30px rgba(0,0,0,0.6),0 1px 4px rgba(0,0,0,0.4);
+  margin-bottom:16px;
+}
+.print-section .content .edition{
+  font-family:var(--mono);font-size:13px;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--accent);margin-bottom:10px;
+}
+.print-section .content .price{
+  font-family:var(--mono);font-size:16px;color:rgba(255,255,255,0.75);
+  margin-bottom:28px;
+}
+.print-section .content .view-details{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--mono);font-size:13px;letter-spacing:1px;
+  text-transform:uppercase;color:var(--fg);text-decoration:none;
+  padding:10px 0;opacity:0.8;transition:opacity 0.3s;
+  animation:pulse 3s ease-in-out infinite;
+  cursor:pointer;background:none;border:none;
+}
+.view-details:hover{opacity:1}
+.view-details .arrow{display:inline-block;transition:transform 0.3s}
+.view-details:hover .arrow{transform:translateX(4px)}
+@keyframes pulse{
+  0%,100%{opacity:0.65}
+  50%{opacity:1}
+}
+
+/* Scroll indicator dots */
+.scroll-dots{
+  position:fixed;right:28px;top:50%;transform:translateY(-50%);
+  z-index:800;display:flex;flex-direction:column;gap:14px;
+}
+.scroll-dots .dot{
+  width:10px;height:10px;border-radius:50%;
+  border:1.5px solid rgba(255,255,255,0.35);background:transparent;
+  cursor:pointer;transition:all 0.4s;
+}
+.scroll-dots .dot.active{
+  background:var(--accent);border-color:var(--accent);
+  box-shadow:0 0 10px rgba(244,202,22,0.4);
+  transform:scale(1.25);
+}
+
+/* ═══════════════════════════════════════
+   VIEW 2: DETAIL — SLIDE-IN DRAWER
+   ═══════════════════════════════════════ */
+#detail{position:relative;min-height:100vh;overflow:hidden}
+.detail-bg{
+  position:fixed;inset:0;
+  background-size:cover;background-position:center;
+  opacity:0.25;filter:blur(2px);
+  z-index:0;
+}
+.detail-bg-overlay{
+  position:fixed;inset:0;
+  background:rgba(10,10,10,0.7);
+  z-index:1;
+}
+
+/* Drawer */
+.drawer-backdrop{
+  position:fixed;inset:0;z-index:10;
+  pointer-events:none;
+}
+.drawer{
+  position:fixed;top:0;right:0;bottom:0;width:65%;max-width:780px;
+  z-index:100;
+  background:var(--glass);
+  backdrop-filter:blur(32px) saturate(1.3);
+  -webkit-backdrop-filter:blur(32px) saturate(1.3);
+  border-left:1px solid var(--glass-border);
+  overflow-y:auto;overflow-x:hidden;
+  transform:translateX(0);opacity:1;
+  transition:transform 0.55s cubic-bezier(0.22,1,0.36,1),opacity 0.4s ease;
+  padding:0;
+}
+.drawer.closed{transform:translateX(100%);opacity:0;pointer-events:none}
+.drawer-inner{padding:28px 36px 60px}
+
+.drawer .close-btn{
+  position:sticky;top:0;z-index:10;display:flex;justify-content:flex-end;
+  padding:20px 28px 12px;background:linear-gradient(180deg,var(--glass) 60%,transparent);
+}
+.drawer .close-btn button{
+  width:40px;height:40px;border-radius:50%;
+  border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);
+  color:var(--fg);font-size:18px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.3s;
+}
+.drawer .close-btn button:hover{background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.3)}
+
+/* Detail image */
+.detail-image-wrap{
+  position:relative;width:100%;aspect-ratio:3/2;
+  border-radius:8px;overflow:hidden;cursor:zoom-in;margin-bottom:32px;
+  background:#111;
+}
+.detail-image-wrap.zoomed{cursor:zoom-out;overflow:auto}
+.detail-image-wrap img{
+  width:100%;height:100%;object-fit:cover;
+  transition:transform 0.4s cubic-bezier(0.22,1,0.36,1);
+}
+.detail-image-wrap.zoomed img{
+  width:200%;height:auto;object-fit:contain;
+  transform-origin:center center;
+}
+
+/* Detail typography */
+.detail-album{font-family:var(--mono);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.detail-title{font-family:var(--serif);font-size:clamp(28px,3.5vw,44px);font-weight:400;line-height:1.15;margin-bottom:32px;letter-spacing:-0.01em}
+
+/* Edition ring */
+.edition-ring-section{display:flex;align-items:center;gap:24px;margin-bottom:36px;padding:20px 0;border-top:1px solid var(--glass-border);border-bottom:1px solid var(--glass-border)}
+.edition-ring{
+  width:72px;height:72px;border-radius:50%;
+  position:relative;flex-shrink:0;
+}
+.edition-ring .ring{
+  width:100%;height:100%;border-radius:50%;
+  background:conic-gradient(var(--accent) 0deg,var(--accent) calc(var(--sold-pct)*3.6deg),rgba(255,255,255,0.08) calc(var(--sold-pct)*3.6deg),rgba(255,255,255,0.08) 360deg);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 18px rgba(244,202,22,0.15);
+}
+.edition-ring .ring-inner{
+  width:56px;height:56px;border-radius:50%;
+  background:var(--bg);display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:14px;font-weight:700;color:var(--fg);
+}
+.edition-ring-text .edition-label{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.45);margin-bottom:4px}
+.edition-ring-text .edition-value{font-family:var(--mono);font-size:14px;color:var(--fg)}
+.edition-ring-text .edition-note{font-family:var(--mono);font-size:11px;color:rgba(255,255,255,0.35);margin-top:3px}
+
+/* Size selector */
+.selector-label{font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.45);margin-bottom:12px}
+.size-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:32px}
+.size-card{
+  padding:16px 10px;border-radius:10px;
+  border:1.5px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.03);
+  text-align:center;cursor:pointer;transition:all 0.3s;
+}
+.size-card:hover{border-color:rgba(255,255,255,0.2);background:rgba(255,255,255,0.05)}
+.size-card.selected{border-color:var(--accent);background:rgba(244,202,22,0.06);box-shadow:0 0 20px rgba(244,202,22,0.08)}
+.size-card .size-name{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--fg);margin-bottom:4px}
+.size-card .size-dim{font-family:var(--mono);font-size:10px;color:rgba(255,255,255,0.4);letter-spacing:0.5px}
+.size-card.selected .size-name{color:var(--accent)}
+
+/* Paper selector */
+.paper-pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:36px}
+.paper-pill{
+  font-family:var(--mono);font-size:12px;letter-spacing:0.5px;
+  padding:9px 18px;border-radius:100px;
+  border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.03);
+  color:rgba(255,255,255,0.6);cursor:pointer;transition:all 0.3s;
+}
+.paper-pill:hover{border-color:rgba(255,255,255,0.25);color:var(--fg)}
+.paper-pill.selected{
+  border-color:var(--accent);color:var(--accent);
+  background:rgba(244,202,22,0.06);
+  box-shadow:0 0 16px rgba(244,202,22,0.1);
+}
+
+/* Room mockup */
+.room-mockup{
+  position:relative;width:100%;aspect-ratio:16/10;
+  background:linear-gradient(180deg,#0e0e0e 0%,#131313 60%,#0f0f0e 100%);
+  border-radius:10px;overflow:hidden;margin-bottom:36px;
+  border:1px solid var(--glass-border);
+}
+.room-wall{position:absolute;inset:0;background:linear-gradient(175deg,#161616 0%,#0f0f0f 100%)}
+.room-floor{position:absolute;bottom:0;left:0;right:0;height:32%;background:linear-gradient(180deg,#111 0%,#0a0a09 100%);border-top:1px solid rgba(255,255,255,0.03)}
+.room-sofa{
+  position:absolute;bottom:10%;left:50%;transform:translateX(-50%);
+  width:55%;height:18%;
+  background:linear-gradient(180deg,#1a1a1a 0%,#141414 100%);
+  border-radius:12px 12px 6px 6px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.5);
+  border:1px solid rgba(255,255,255,0.03);
+}
+.room-sofa::before{
+  content:'';position:absolute;top:-30%;left:5%;right:5%;height:35%;
+  background:linear-gradient(180deg,#1c1c1c,#181818);
+  border-radius:8px 8px 0 0;
+  border:1px solid rgba(255,255,255,0.03);border-bottom:none;
+}
+.room-print-frame{
+  position:absolute;top:12%;left:50%;transform:translateX(-50%);
+  transition:all 0.5s cubic-bezier(0.22,1,0.36,1);
+  box-shadow:
+    0 0 40px rgba(244,202,22,0.08),
+    0 0 80px rgba(244,202,22,0.04),
+    0 4px 24px rgba(0,0,0,0.6);
+  border:3px solid #1a1a1a;
+}
+.room-print-frame img{width:100%;height:100%;object-fit:cover;display:block}
+.room-spotlight{
+  position:absolute;top:-10%;left:50%;transform:translateX(-50%);
+  width:60%;height:50%;
+  background:radial-gradient(ellipse at center,rgba(244,202,22,0.06) 0%,transparent 70%);
+  pointer-events:none;
+}
+
+/* Price & CTA */
+.detail-price-row{display:flex;align-items:baseline;gap:12px;margin-bottom:24px}
+.detail-price{font-family:var(--serif);font-size:36px;font-weight:500;color:var(--fg)}
+.detail-price-note{font-family:var(--mono);font-size:11px;color:rgba(255,255,255,0.35)}
+.cta-btn{
+  display:block;width:100%;padding:18px;border:none;border-radius:10px;
+  background:var(--accent);color:var(--bg);
+  font-family:var(--mono);font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  cursor:pointer;transition:all 0.35s;
+  position:relative;overflow:hidden;
+}
+.cta-btn::before{
+  content:'';position:absolute;inset:0;border-radius:10px;
+  box-shadow:0 0 0 0 rgba(244,202,22,0);
+  transition:box-shadow 0.35s;
+}
+.cta-btn:hover{transform:translateY(-1px);filter:brightness(1.08)}
+.cta-btn:hover::before{box-shadow:0 0 30px rgba(244,202,22,0.3),0 0 60px rgba(244,202,22,0.1)}
+.detail-meta{font-family:var(--mono);font-size:11px;color:rgba(255,255,255,0.3);line-height:1.7;margin-top:20px;text-align:center}
+
+/* ─── SCROLLBAR ─── */
+#listing::-webkit-scrollbar{width:0;display:none}
+.drawer::-webkit-scrollbar{width:5px}
+.drawer::-webkit-scrollbar-track{background:transparent}
+.drawer::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:4px}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:860px){
+  .drawer{width:100%;max-width:100%}
+  .size-cards{grid-template-columns:repeat(2,1fr)}
+  .print-section .content{padding:40px 28px 56px}
+}
+@media(max-width:500px){
+  .view-tabs{padding:12px 16px}
+  .view-tabs .label{display:none}
+  .print-counter{font-size:10px}
+  .drawer-inner{padding:20px 20px 48px}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ TAB BAR ═══ -->
+<nav class="view-tabs">
+  <span class="label">Direction 5: Immersive Showcase</span>
+  <div class="tabs">
+    <button class="tab active" data-view="listing">Listing</button>
+    <button class="tab" data-view="detail">Detail</button>
+  </div>
+  <span class="print-counter">4 prints available</span>
+</nav>
+
+<!-- ═══════════════════════════════
+     VIEW 1: LISTING PAGE
+     ═══════════════════════════════ -->
+<div id="listing" class="view active">
+
+  <div class="print-section" data-index="0">
+    <div class="bg" style="background-image:url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600')"></div>
+    <div class="overlay"></div>
+    <div class="content">
+      <div class="edition">Limited Edition — 3 of 10 sold</div>
+      <h2 class="print-title">Alpine Solitude</h2>
+      <div class="price">From EUR 380</div>
+      <button class="view-details" onclick="openDetail(0)">View Details <span class="arrow">→</span></button>
+    </div>
+  </div>
+
+  <div class="print-section" data-index="1">
+    <div class="bg" style="background-image:url('https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1600')"></div>
+    <div class="overlay"></div>
+    <div class="content">
+      <div class="edition">Limited Edition — 1 of 10 sold</div>
+      <h2 class="print-title">Morning Veil</h2>
+      <div class="price">From EUR 420</div>
+      <button class="view-details" onclick="openDetail(1)">View Details <span class="arrow">→</span></button>
+    </div>
+  </div>
+
+  <div class="print-section" data-index="2">
+    <div class="bg" style="background-image:url('https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1600')"></div>
+    <div class="overlay"></div>
+    <div class="content">
+      <div class="edition">Limited Edition — 5 of 10 sold</div>
+      <h2 class="print-title">Golden Passage</h2>
+      <div class="price">From EUR 350</div>
+      <button class="view-details" onclick="openDetail(2)">View Details <span class="arrow">→</span></button>
+    </div>
+  </div>
+
+  <div class="print-section" data-index="3">
+    <div class="bg" style="background-image:url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1600')"></div>
+    <div class="overlay"></div>
+    <div class="content">
+      <div class="edition">Limited Edition — 7 of 10 sold</div>
+      <h2 class="print-title">Cathedral Light</h2>
+      <div class="price">From EUR 290</div>
+      <button class="view-details" onclick="openDetail(3)">View Details <span class="arrow">→</span></button>
+    </div>
+  </div>
+
+  <!-- Scroll indicator dots -->
+  <div class="scroll-dots" id="scrollDots">
+    <div class="dot active" data-index="0"></div>
+    <div class="dot" data-index="1"></div>
+    <div class="dot" data-index="2"></div>
+    <div class="dot" data-index="3"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════
+     VIEW 2: DETAIL PAGE
+     ═══════════════════════════════ -->
+<div id="detail" class="view">
+  <div class="detail-bg" id="detailBg"></div>
+  <div class="detail-bg-overlay"></div>
+
+  <div class="drawer" id="drawer">
+    <div class="close-btn"><button onclick="closeDrawer()" aria-label="Close">✕</button></div>
+    <div class="drawer-inner">
+
+      <!-- Image -->
+      <div class="detail-image-wrap" id="detailImageWrap" onclick="toggleZoom()">
+        <img id="detailImg" src="" alt="">
+      </div>
+
+      <!-- Title -->
+      <div class="detail-album" id="detailAlbum">Landscapes</div>
+      <h1 class="detail-title" id="detailTitle">Alpine Solitude</h1>
+
+      <!-- Edition Ring -->
+      <div class="edition-ring-section">
+        <div class="edition-ring">
+          <div class="ring" id="editionRing" style="--sold-pct:30">
+            <div class="ring-inner" id="editionRingLabel">3/10</div>
+          </div>
+        </div>
+        <div class="edition-ring-text">
+          <div class="edition-label">Edition Status</div>
+          <div class="edition-value" id="editionText">3 of 10 sold</div>
+          <div class="edition-note">Each print is signed &amp; numbered</div>
+        </div>
+      </div>
+
+      <!-- Size Selector -->
+      <div class="selector-label">Select Size</div>
+      <div class="size-cards" id="sizeCards">
+        <div class="size-card" data-size="A4" data-w="95" data-h="63" onclick="selectSize(this)">
+          <div class="size-name">A4</div>
+          <div class="size-dim">210 × 297 mm</div>
+        </div>
+        <div class="size-card selected" data-size="A3" data-w="120" data-h="80" onclick="selectSize(this)">
+          <div class="size-name">A3</div>
+          <div class="size-dim">297 × 420 mm</div>
+        </div>
+        <div class="size-card" data-size="A2" data-w="155" data-h="103" onclick="selectSize(this)">
+          <div class="size-name">A2</div>
+          <div class="size-dim">420 × 594 mm</div>
+        </div>
+        <div class="size-card" data-size="A1" data-w="195" data-h="130" onclick="selectSize(this)">
+          <div class="size-name">A1</div>
+          <div class="size-dim">594 × 841 mm</div>
+        </div>
+      </div>
+
+      <!-- Paper Selector -->
+      <div class="selector-label">Paper Type</div>
+      <div class="paper-pills" id="paperPills">
+        <div class="paper-pill selected" onclick="selectPaper(this)">Hahnemühle Photo Rag</div>
+        <div class="paper-pill" onclick="selectPaper(this)">Baryta Prestige</div>
+        <div class="paper-pill" onclick="selectPaper(this)">Canson Platine</div>
+      </div>
+
+      <!-- Room Mockup -->
+      <div class="room-mockup">
+        <div class="room-wall"></div>
+        <div class="room-spotlight"></div>
+        <div class="room-print-frame" id="roomFrame" style="width:120px;height:80px">
+          <img id="roomImg" src="" alt="">
+        </div>
+        <div class="room-floor"></div>
+        <div class="room-sofa"></div>
+      </div>
+
+      <!-- Price & CTA -->
+      <div class="detail-price-row">
+        <span class="detail-price" id="detailPrice">EUR 420</span>
+        <span class="detail-price-note">incl. certificate of authenticity</span>
+      </div>
+      <button class="cta-btn">Request This Print</button>
+      <div class="detail-meta">
+        Lead time: 10–14 business days &nbsp;·&nbsp; Worldwide shipping<br>
+        Printed in Berlin on archival paper &nbsp;·&nbsp; Free EU delivery
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const prints = [
+  {
+    title:'Alpine Solitude', album:'Landscapes', img:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600',
+    sold:3, total:10, prices:{A4:380,A3:420,A2:580,A1:780}
+  },
+  {
+    title:'Morning Veil', album:'Landscapes', img:'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1600',
+    sold:1, total:10, prices:{A4:420,A3:480,A2:640,A1:860}
+  },
+  {
+    title:'Golden Passage', album:'Wanderlust', img:'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1600',
+    sold:5, total:10, prices:{A4:350,A3:400,A2:540,A1:720}
+  },
+  {
+    title:'Cathedral Light', album:'Forests', img:'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1600',
+    sold:7, total:10, prices:{A4:290,A3:340,A2:480,A1:650}
+  }
+];
+
+let currentPrint = 0;
+let currentSize = 'A3';
+
+/* ─── VIEW SWITCHING ─── */
+document.querySelectorAll('.view-tabs .tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById(tab.dataset.view).classList.add('active');
+    if (tab.dataset.view === 'detail') populateDetail(currentPrint);
+  });
+});
+
+/* ─── SCROLL DOTS ─── */
+const listingEl = document.getElementById('listing');
+const dots = document.querySelectorAll('.scroll-dots .dot');
+const sections = document.querySelectorAll('.print-section');
+
+function updateDots() {
+  const scrollTop = listingEl.scrollTop;
+  const vh = window.innerHeight;
+  let idx = Math.round(scrollTop / vh);
+  idx = Math.max(0, Math.min(idx, sections.length - 1));
+  dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+  currentPrint = idx;
+}
+listingEl.addEventListener('scroll', updateDots, {passive: true});
+
+dots.forEach(dot => {
+  dot.addEventListener('click', () => {
+    const idx = parseInt(dot.dataset.index);
+    listingEl.scrollTo({top: idx * window.innerHeight, behavior:'smooth'});
+  });
+});
+
+/* ─── DETAIL POPULATION ─── */
+function populateDetail(idx) {
+  const p = prints[idx];
+  document.getElementById('detailBg').style.backgroundImage = `url('${p.img}')`;
+  document.getElementById('detailImg').src = p.img;
+  document.getElementById('detailTitle').textContent = p.title;
+  document.getElementById('detailAlbum').textContent = p.album;
+  const pct = (p.sold / p.total) * 100;
+  document.getElementById('editionRing').style.setProperty('--sold-pct', pct);
+  document.getElementById('editionRingLabel').textContent = `${p.sold}/${p.total}`;
+  document.getElementById('editionText').textContent = `${p.sold} of ${p.total} sold`;
+  document.getElementById('roomImg').src = p.img;
+  updatePrice(p);
+}
+
+function updatePrice(p) {
+  if (!p) p = prints[currentPrint];
+  document.getElementById('detailPrice').textContent = `EUR ${p.prices[currentSize]}`;
+}
+
+/* ─── OPEN DETAIL FROM LISTING ─── */
+function openDetail(idx) {
+  currentPrint = idx;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab')[1].classList.add('active');
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('detail').classList.add('active');
+  populateDetail(idx);
+  const drawer = document.getElementById('drawer');
+  drawer.classList.add('closed');
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => drawer.classList.remove('closed'));
+  });
+}
+
+function closeDrawer() {
+  document.getElementById('drawer').classList.add('closed');
+  setTimeout(() => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab')[0].classList.add('active');
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('listing').classList.add('active');
+  }, 500);
+}
+
+/* ─── SIZE SELECTOR ─── */
+function selectSize(card) {
+  document.querySelectorAll('.size-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  currentSize = card.dataset.size;
+  const w = parseInt(card.dataset.w);
+  const h = parseInt(card.dataset.h);
+  const frame = document.getElementById('roomFrame');
+  frame.style.width = w + 'px';
+  frame.style.height = h + 'px';
+  updatePrice();
+}
+
+/* ─── PAPER SELECTOR ─── */
+function selectPaper(pill) {
+  document.querySelectorAll('.paper-pill').forEach(p => p.classList.remove('selected'));
+  pill.classList.add('selected');
+}
+
+/* ─── IMAGE ZOOM ─── */
+function toggleZoom() {
+  document.getElementById('detailImageWrap').classList.toggle('zoomed');
+}
+
+/* ─── INIT ─── */
+populateDetail(0);
+</script>
+</body>
+</html>

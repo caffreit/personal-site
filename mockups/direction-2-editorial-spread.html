@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Direction 2: Editorial Spread — The Print Room</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,300;1,6..72,400;1,6..72,500;1,6..72,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --yellow: #F4CA16;
+    --bg: #FFFFFF;
+    --fg: #0A0A0A;
+    --rule: #d4d0c8;
+    --serif: 'Newsreader', Georgia, serif;
+    --mono: 'Space Mono', monospace;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--serif);
+    background: var(--bg);
+    color: var(--fg);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Direction Bar ── */
+  .direction-bar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    background: var(--fg);
+    color: var(--bg);
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 10px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .direction-bar span { color: var(--yellow); }
+
+  /* ── View Tabs ── */
+  .view-tabs {
+    position: fixed; top: 36px; left: 0; right: 0; z-index: 999;
+    background: var(--bg);
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    padding: 0 32px;
+  }
+  .view-tab {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 14px 28px;
+    cursor: pointer;
+    border: none;
+    background: none;
+    color: var(--fg);
+    opacity: 0.4;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+  }
+  .view-tab:hover { opacity: 0.7; }
+  .view-tab.active {
+    opacity: 1;
+    border-bottom-color: var(--yellow);
+  }
+
+  .view { display: none; }
+  .view.active { display: block; }
+
+  body { padding-top: 84px; }
+
+  /* ═══════════════════════════════════════
+     VIEW 1: LISTING PAGE
+  ═══════════════════════════════════════ */
+
+  .listing-header {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 80px 48px 0;
+  }
+  .listing-header h1 {
+    font-family: var(--serif);
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 300;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+  .listing-header .yellow-rule {
+    width: 120px;
+    height: 3px;
+    background: var(--yellow);
+    margin: 32px 0;
+  }
+  .listing-header .intro {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.15rem;
+    line-height: 1.7;
+    max-width: 640px;
+    color: #555;
+    margin-bottom: 24px;
+  }
+  .listing-header .label {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: 12px;
+  }
+
+  /* ── Print Entries ── */
+  .prints-list {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 48px;
+  }
+
+  .editorial-divider {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 64px 0;
+  }
+  .editorial-divider .line {
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+  }
+  .editorial-divider .diamond {
+    width: 8px; height: 8px;
+    background: var(--yellow);
+    transform: rotate(45deg);
+    flex-shrink: 0;
+  }
+
+  .print-entry {
+    display: grid;
+    gap: 48px;
+    align-items: center;
+    margin-bottom: 0;
+  }
+  .print-entry.odd {
+    grid-template-columns: 1.2fr 0.8fr;
+  }
+  .print-entry.even {
+    grid-template-columns: 0.8fr 1.2fr;
+  }
+
+  .print-entry .image-wrap {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .print-entry .image-wrap img {
+    width: 100%;
+    display: block;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.25, 0, 0.25, 1);
+  }
+  .print-entry .image-wrap:hover img {
+    transform: scale(1.03);
+  }
+  .print-entry .image-wrap .img-number {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #fff;
+    background: rgba(0,0,0,0.35);
+    backdrop-filter: blur(8px);
+    padding: 6px 12px;
+  }
+
+  .print-entry .text-content {
+    padding: 20px 0;
+  }
+  .print-entry .text-content .label {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--yellow);
+    margin-bottom: 16px;
+  }
+  .print-entry .text-content h2 {
+    font-family: var(--serif);
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    font-weight: 400;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin-bottom: 24px;
+  }
+  .print-entry .text-content .pull-quote {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(1.1rem, 2vw, 1.4rem);
+    line-height: 1.55;
+    color: #444;
+    border-left: 3px solid var(--yellow);
+    padding-left: 24px;
+    margin-bottom: 32px;
+  }
+  .print-entry .text-content .meta-row {
+    display: flex;
+    gap: 32px;
+    align-items: baseline;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+  .print-entry .text-content .meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .print-entry .text-content .meta-label {
+    font-family: var(--mono);
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #999;
+  }
+  .print-entry .text-content .meta-value {
+    font-family: var(--serif);
+    font-size: 1rem;
+    font-weight: 500;
+  }
+  .print-entry .text-content .meta-value.price {
+    font-size: 1.3rem;
+  }
+
+  .cta-link {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--fg);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--fg);
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  .cta-link:hover {
+    border-bottom-color: var(--yellow);
+    color: var(--yellow);
+  }
+  .cta-link .arrow {
+    transition: transform 0.3s ease;
+  }
+  .cta-link:hover .arrow {
+    transform: translateX(4px);
+  }
+
+  .even .text-content { order: -1; }
+
+  /* ═══════════════════════════════════════
+     VIEW 2: DETAIL PAGE
+  ═══════════════════════════════════════ */
+
+  .detail-hero {
+    position: relative;
+    height: 80vh;
+    min-height: 500px;
+    overflow: hidden;
+  }
+  .detail-hero img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .detail-hero .hero-overlay {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 60%);
+    padding: 60px 64px;
+  }
+  .detail-hero .hero-label {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--yellow);
+    margin-bottom: 16px;
+  }
+  .detail-hero .hero-title {
+    font-family: var(--serif);
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    font-weight: 300;
+    color: #fff;
+    text-shadow: 0 2px 40px rgba(0,0,0,0.4);
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+  .detail-hero .hero-edition {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.7);
+  }
+
+  .detail-body {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 80px 48px;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 80px;
+    align-items: start;
+  }
+
+  /* Left Column: Story */
+  .story-column .section-label {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--yellow);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+  }
+
+  .story-column .story-text p {
+    font-family: var(--serif);
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: #333;
+    margin-bottom: 24px;
+  }
+  .story-column .story-text p:first-child::first-letter {
+    font-family: var(--serif);
+    font-size: 4.5rem;
+    float: left;
+    line-height: 0.8;
+    margin-right: 12px;
+    margin-top: 6px;
+    font-weight: 600;
+    color: var(--fg);
+  }
+
+  .story-column .story-pullquote {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.5rem;
+    line-height: 1.5;
+    color: var(--fg);
+    border-left: 3px solid var(--yellow);
+    padding: 8px 0 8px 28px;
+    margin: 40px 0;
+  }
+
+  /* Right Column: Purchase Card */
+  .purchase-card {
+    background: #fafaf8;
+    border: 1px solid var(--rule);
+    padding: 40px;
+    position: sticky;
+    top: 104px;
+  }
+  .purchase-card .card-label {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--yellow);
+    margin-bottom: 32px;
+  }
+
+  .config-section {
+    margin-bottom: 36px;
+  }
+  .config-section .config-label {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: 14px;
+  }
+
+  /* Size Tabs */
+  .size-tabs {
+    display: flex;
+    border: 1px solid var(--rule);
+  }
+  .size-tab {
+    flex: 1;
+    padding: 14px 8px;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+    background: none;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    color: var(--fg);
+    border-right: 1px solid var(--rule);
+    transition: all 0.25s ease;
+  }
+  .size-tab:last-child { border-right: none; }
+  .size-tab:hover { background: #f0efe8; }
+  .size-tab.active {
+    background: var(--fg);
+    color: var(--bg);
+  }
+  .size-dimensions {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    color: #999;
+    text-align: center;
+    margin-top: 10px;
+    letter-spacing: 0.05em;
+    height: 16px;
+  }
+
+  /* Paper Selector */
+  .paper-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .paper-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px;
+    border: 1px solid var(--rule);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    background: transparent;
+    text-align: left;
+    width: 100%;
+  }
+  .paper-option:hover { border-color: #aaa; }
+  .paper-option.active {
+    border-color: var(--fg);
+    background: #fff;
+  }
+  .paper-radio {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    border: 1.5px solid var(--rule);
+    flex-shrink: 0;
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.25s ease;
+  }
+  .paper-option.active .paper-radio {
+    border-color: var(--fg);
+  }
+  .paper-radio::after {
+    content: '';
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--fg);
+    transform: scale(0);
+    transition: transform 0.2s ease;
+  }
+  .paper-option.active .paper-radio::after {
+    transform: scale(1);
+  }
+  .paper-info { flex: 1; }
+  .paper-name {
+    font-family: var(--serif);
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .paper-desc {
+    font-family: var(--mono);
+    font-size: 0.55rem;
+    letter-spacing: 0.05em;
+    color: #888;
+    line-height: 1.5;
+  }
+
+  /* Edition Progress */
+  .edition-bar-wrap {
+    margin-bottom: 36px;
+  }
+  .edition-bar-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .edition-bar-label span {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #999;
+  }
+  .edition-bar-label strong {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--fg);
+    font-weight: 700;
+  }
+  .edition-bar {
+    width: 100%;
+    height: 3px;
+    background: var(--rule);
+    position: relative;
+  }
+  .edition-bar .fill {
+    height: 100%;
+    background: var(--yellow);
+    transition: width 0.6s ease;
+  }
+
+  /* Price */
+  .detail-price {
+    font-family: var(--serif);
+    font-size: 2.2rem;
+    font-weight: 300;
+    margin-bottom: 8px;
+  }
+  .detail-price-note {
+    font-family: var(--mono);
+    font-size: 0.55rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: 32px;
+  }
+
+  /* CTA Banner */
+  .cta-banner {
+    display: block;
+    width: 100%;
+    padding: 20px;
+    background: var(--fg);
+    color: var(--bg);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    transition: all 0.35s ease;
+  }
+  .cta-banner:hover {
+    background: var(--yellow);
+    color: var(--fg);
+  }
+
+  /* ── Room Mockup ── */
+  .lifestyle-section {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 48px 100px;
+  }
+  .lifestyle-label {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--yellow);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .lifestyle-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+  }
+
+  .room-mockup {
+    background: #f5f3ee;
+    border: 1px solid var(--rule);
+    height: 520px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .room-wall {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, #f0ede5 0%, #e8e4da 100%);
+  }
+  .room-floor {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 35%;
+    background: linear-gradient(180deg, #d8cfc0 0%, #c8bfb0 100%);
+  }
+  .room-floor::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: #b8af9f;
+  }
+
+  .room-frame {
+    position: absolute;
+    top: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 260px;
+    height: 195px;
+    background: #fff;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.08);
+    padding: 14px;
+  }
+  .room-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .room-frame-shadow {
+    position: absolute;
+    top: 15%;
+    left: 50%;
+    transform: translateX(-50%) translateY(6px);
+    width: 260px;
+    height: 195px;
+    background: rgba(0,0,0,0.06);
+    filter: blur(12px);
+    z-index: 0;
+  }
+
+  .room-couch {
+    position: absolute;
+    bottom: 22%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 420px;
+    height: 90px;
+  }
+  .couch-back {
+    position: absolute;
+    bottom: 40px;
+    left: 20px; right: 20px;
+    height: 50px;
+    background: #8a7e6e;
+    border-radius: 4px 4px 0 0;
+  }
+  .couch-seat {
+    position: absolute;
+    bottom: 12px;
+    left: 0; right: 0;
+    height: 36px;
+    background: #9a8e7e;
+    border-radius: 3px;
+  }
+  .couch-leg {
+    position: absolute;
+    bottom: 0;
+    width: 4px;
+    height: 14px;
+    background: #665c4e;
+    border-radius: 0 0 2px 2px;
+  }
+  .couch-leg.l1 { left: 24px; }
+  .couch-leg.l2 { right: 24px; }
+  .couch-cushion {
+    position: absolute;
+    top: 8px;
+    width: 100px;
+    height: 32px;
+    background: #a89880;
+    border-radius: 3px;
+  }
+  .couch-cushion.c1 { left: 30px; }
+  .couch-cushion.c2 { left: 160px; }
+  .couch-cushion.c3 { left: 290px; }
+
+  .room-plant {
+    position: absolute;
+    bottom: 22%;
+    right: 14%;
+  }
+  .plant-pot {
+    width: 44px;
+    height: 48px;
+    background: #c4a882;
+    border-radius: 4px 4px 8px 8px;
+    position: relative;
+  }
+  .plant-pot::before {
+    content: '';
+    position: absolute;
+    top: -4px; left: -4px;
+    width: 52px;
+    height: 10px;
+    background: #b89a76;
+    border-radius: 4px;
+  }
+  .plant-stem {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    width: 3px;
+    height: 60px;
+    background: #6a8a5a;
+    transform: translateX(-50%);
+  }
+  .plant-leaf {
+    position: absolute;
+    width: 32px;
+    height: 52px;
+    border-radius: 50% 50% 50% 0;
+    background: #7aa866;
+  }
+  .plant-leaf.l1 { bottom: 30px; left: -24px; transform: rotate(-25deg); }
+  .plant-leaf.l2 { bottom: 50px; left: 10px; transform: rotate(15deg); }
+  .plant-leaf.l3 { bottom: 60px; left: -14px; transform: rotate(-10deg); background: #6a9858; }
+  .plant-leaf.l4 { bottom: 70px; left: 4px; transform: rotate(30deg); background: #8ab87a; }
+  .plant-leaf.l5 { bottom: 40px; left: -6px; transform: rotate(5deg); background: #7ea86a; }
+
+  .room-sidetable {
+    position: absolute;
+    bottom: 22%;
+    left: 12%;
+  }
+  .sidetable-top {
+    width: 48px; height: 6px;
+    background: #a09080;
+    border-radius: 2px;
+  }
+  .sidetable-leg {
+    position: absolute;
+    bottom: -44px;
+    width: 3px; height: 44px;
+    background: #887860;
+  }
+  .sidetable-leg.sl1 { left: 6px; }
+  .sidetable-leg.sl2 { right: 6px; }
+  .sidetable-book {
+    position: absolute;
+    top: -8px; left: 8px;
+    width: 32px; height: 8px;
+    background: var(--yellow);
+    border-radius: 1px;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 900px) {
+    .print-entry.odd,
+    .print-entry.even {
+      grid-template-columns: 1fr;
+    }
+    .even .text-content { order: 0; }
+    .detail-body {
+      grid-template-columns: 1fr;
+    }
+    .purchase-card {
+      position: static;
+    }
+    .listing-header, .prints-list, .detail-body, .lifestyle-section {
+      padding-left: 24px;
+      padding-right: 24px;
+    }
+    .detail-hero .hero-overlay {
+      padding: 40px 24px;
+    }
+  }
+
+  /* ── Fade-in animation ── */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+</style>
+</head>
+<body>
+
+<!-- Direction Bar -->
+<div class="direction-bar">
+  <div><span>●</span>&ensp;Direction 2: Editorial Spread — Magazine Feature</div>
+  <div>Mockup</div>
+</div>
+
+<!-- View Tabs -->
+<nav class="view-tabs">
+  <button class="view-tab active" data-view="listing">Listing Page — The Print Room</button>
+  <button class="view-tab" data-view="detail">Detail Page — Print View</button>
+</nav>
+
+<!-- ═══════════════════════════════════════════
+     VIEW 1: LISTING
+═══════════════════════════════════════════ -->
+<section id="listing" class="view active">
+
+  <header class="listing-header">
+    <p class="label">Limited Edition Fine Art Prints</p>
+    <h1>The Print Room</h1>
+    <div class="yellow-rule"></div>
+    <p class="intro">A curated selection of limited-edition prints, each one a singular moment rendered in archival pigment on museum-grade cotton rag. Collecting is an act of attention — these photographs reward it.</p>
+  </header>
+
+  <div class="prints-list">
+
+    <!-- Divider -->
+    <div class="editorial-divider"><div class="line"></div><div class="diamond"></div><div class="line"></div></div>
+
+    <!-- Print 1 — Odd -->
+    <article class="print-entry odd fade-up">
+      <div class="image-wrap" onclick="showDetail(0)">
+        <span class="img-number">No. 01 / 04</span>
+        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800" alt="Alpine Dawn">
+      </div>
+      <div class="text-content">
+        <p class="label">Landscape · Swiss Alps</p>
+        <h2>Alpine Dawn</h2>
+        <p class="pull-quote">"The mountains appeared to breathe that morning — drawing light from the valley in slow, golden inhalations."</p>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">Edition</span>
+            <span class="meta-value">7 of 25</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Sizes from</span>
+            <span class="meta-value">A4 — A1</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">From</span>
+            <span class="meta-value price">£185</span>
+          </div>
+        </div>
+        <a class="cta-link" onclick="showDetail(0)">View Print <span class="arrow">→</span></a>
+      </div>
+    </article>
+
+    <div class="editorial-divider"><div class="line"></div><div class="diamond"></div><div class="line"></div></div>
+
+    <!-- Print 2 — Even -->
+    <article class="print-entry even fade-up">
+      <div class="image-wrap" onclick="showDetail(1)">
+        <span class="img-number">No. 02 / 04</span>
+        <img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800" alt="Fog Valley">
+      </div>
+      <div class="text-content">
+        <p class="label">Landscape · Pacific Northwest</p>
+        <h2>Fog Valley</h2>
+        <p class="pull-quote">"Somewhere below the canopy the river was singing, though you'd never find it by looking — only by listening."</p>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">Edition</span>
+            <span class="meta-value">12 of 25</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Sizes from</span>
+            <span class="meta-value">A4 — A1</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">From</span>
+            <span class="meta-value price">£185</span>
+          </div>
+        </div>
+        <a class="cta-link" onclick="showDetail(1)">View Print <span class="arrow">→</span></a>
+      </div>
+    </article>
+
+    <div class="editorial-divider"><div class="line"></div><div class="diamond"></div><div class="line"></div></div>
+
+    <!-- Print 3 — Odd -->
+    <article class="print-entry odd fade-up">
+      <div class="image-wrap" onclick="showDetail(2)">
+        <span class="img-number">No. 03 / 04</span>
+        <img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800" alt="Golden Passage">
+      </div>
+      <div class="text-content">
+        <p class="label">Landscape · Italian Lakes</p>
+        <h2>Golden Passage</h2>
+        <p class="pull-quote">"The lake held the sky so perfectly still that the mountains couldn't tell which way was up."</p>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">Edition</span>
+            <span class="meta-value">3 of 25</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Sizes from</span>
+            <span class="meta-value">A4 — A1</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">From</span>
+            <span class="meta-value price">£185</span>
+          </div>
+        </div>
+        <a class="cta-link" onclick="showDetail(2)">View Print <span class="arrow">→</span></a>
+      </div>
+    </article>
+
+    <div class="editorial-divider"><div class="line"></div><div class="diamond"></div><div class="line"></div></div>
+
+    <!-- Print 4 — Even -->
+    <article class="print-entry even fade-up">
+      <div class="image-wrap" onclick="showDetail(3)">
+        <span class="img-number">No. 04 / 04</span>
+        <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800" alt="Cathedral Light">
+      </div>
+      <div class="text-content">
+        <p class="label">Forest · Olympic Peninsula</p>
+        <h2>Cathedral Light</h2>
+        <p class="pull-quote">"Every forest has a room like this — vaulted, gilded, unrepeatable — if you arrive at the precise hour."</p>
+        <div class="meta-row">
+          <div class="meta-item">
+            <span class="meta-label">Edition</span>
+            <span class="meta-value">18 of 25</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Sizes from</span>
+            <span class="meta-value">A4 — A1</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">From</span>
+            <span class="meta-value price">£185</span>
+          </div>
+        </div>
+        <a class="cta-link" onclick="showDetail(3)">View Print <span class="arrow">→</span></a>
+      </div>
+    </article>
+
+    <div class="editorial-divider"><div class="line"></div><div class="diamond"></div><div class="line"></div></div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     VIEW 2: DETAIL
+═══════════════════════════════════════════ -->
+<section id="detail" class="view">
+
+  <div class="detail-hero">
+    <img id="detail-hero-img" src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600" alt="">
+    <div class="hero-overlay">
+      <p class="hero-label" id="detail-hero-label">Landscape · Swiss Alps</p>
+      <h1 class="hero-title" id="detail-hero-title">Alpine Dawn</h1>
+      <p class="hero-edition" id="detail-hero-edition">Limited Edition — 7 of 25</p>
+    </div>
+  </div>
+
+  <div class="detail-body">
+    <!-- Left: The Story -->
+    <div class="story-column">
+      <p class="section-label">The Story</p>
+      <div class="story-text" id="detail-story">
+        <p>Standing at the ridge before sunrise, with the valley still wrapped in indigo, there is a particular silence that belongs only to altitude. The air is thin enough that you hear your own heartbeat. Then the sun arrives — not gradually, but with sudden conviction — and the peaks ignite one by one like a chain of signal fires lit along the spine of the continent.</p>
+        <p>This photograph was made in that narrow corridor of time between the first and second light. The exposure lasted eight seconds, which is exactly how long the warm tones clung to the eastern face before the whole scene shifted to cool, diffuse morning. It is a document of a moment that existed for less time than it takes to describe.</p>
+      </div>
+      <blockquote class="story-pullquote">"A photograph is not made by the person who presses the shutter — it is made by the person who decides to stand in a particular place and wait."</blockquote>
+      <div class="story-text">
+        <p>Printed on Hahnemühle Photo Rag, each edition is hand-inspected and signed. The cotton-rag surface absorbs pigment with a softness that feels closer to watercolour than photography — appropriate for an image that is, at its core, about the quality of light.</p>
+      </div>
+    </div>
+
+    <!-- Right: Purchase Card -->
+    <div class="purchase-card">
+      <p class="card-label">Configure Your Print</p>
+
+      <!-- Size Selector -->
+      <div class="config-section">
+        <p class="config-label">Print Size</p>
+        <div class="size-tabs">
+          <button class="size-tab active" data-size="a4" onclick="selectSize(this)">A4</button>
+          <button class="size-tab" data-size="a3" onclick="selectSize(this)">A3</button>
+          <button class="size-tab" data-size="a2" onclick="selectSize(this)">A2</button>
+          <button class="size-tab" data-size="a1" onclick="selectSize(this)">A1</button>
+        </div>
+        <p class="size-dimensions" id="size-dims">210 × 297 mm</p>
+      </div>
+
+      <!-- Paper Selector -->
+      <div class="config-section">
+        <p class="config-label">Paper</p>
+        <div class="paper-options">
+          <button class="paper-option active" data-paper="rag" onclick="selectPaper(this)">
+            <div class="paper-radio"></div>
+            <div class="paper-info">
+              <p class="paper-name">Hahnemühle Photo Rag</p>
+              <p class="paper-desc">Matte, 308gsm, museum-quality cotton rag</p>
+            </div>
+          </button>
+          <button class="paper-option" data-paper="baryta" onclick="selectPaper(this)">
+            <div class="paper-radio"></div>
+            <div class="paper-info">
+              <p class="paper-name">Hahnemühle Baryta</p>
+              <p class="paper-desc">Semi-gloss, 325gsm, barium-sulfate coated</p>
+            </div>
+          </button>
+          <button class="paper-option" data-paper="platine" onclick="selectPaper(this)">
+            <div class="paper-radio"></div>
+            <div class="paper-info">
+              <p class="paper-name">Canson Platine Fibre Rag</p>
+              <p class="paper-desc">High-gloss, 310gsm, polyester-cotton blend</p>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Edition Progress -->
+      <div class="edition-bar-wrap">
+        <div class="edition-bar-label">
+          <span>Edition Progress</span>
+          <strong id="edition-text">7 / 25 sold</strong>
+        </div>
+        <div class="edition-bar">
+          <div class="fill" id="edition-fill" style="width:28%"></div>
+        </div>
+      </div>
+
+      <!-- Price -->
+      <p class="detail-price" id="detail-price">£185</p>
+      <p class="detail-price-note">Includes certificate of authenticity</p>
+
+      <!-- CTA -->
+      <button class="cta-banner" onclick="this.textContent=this.textContent==='✓ Request Sent'?'Request Print':'✓ Request Sent'">Request Print</button>
+    </div>
+  </div>
+
+  <!-- Lifestyle Room Mockup -->
+  <div class="lifestyle-section">
+    <p class="lifestyle-label">In Situ</p>
+    <div class="room-mockup">
+      <div class="room-wall"></div>
+      <div class="room-floor"></div>
+      <div class="room-frame-shadow"></div>
+      <div class="room-frame">
+        <img id="room-img" src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400" alt="">
+      </div>
+      <div class="room-couch">
+        <div class="couch-back"></div>
+        <div class="couch-seat">
+          <div class="couch-cushion c1"></div>
+          <div class="couch-cushion c2"></div>
+          <div class="couch-cushion c3"></div>
+        </div>
+        <div class="couch-leg l1"></div>
+        <div class="couch-leg l2"></div>
+      </div>
+      <div class="room-plant">
+        <div class="plant-stem">
+          <div class="plant-leaf l1"></div>
+          <div class="plant-leaf l2"></div>
+          <div class="plant-leaf l3"></div>
+          <div class="plant-leaf l4"></div>
+          <div class="plant-leaf l5"></div>
+        </div>
+        <div class="plant-pot"></div>
+      </div>
+      <div class="room-sidetable">
+        <div class="sidetable-book"></div>
+        <div class="sidetable-top"></div>
+        <div class="sidetable-leg sl1"></div>
+        <div class="sidetable-leg sl2"></div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<script>
+const prints = [
+  {
+    title: 'Alpine Dawn',
+    label: 'Landscape · Swiss Alps',
+    img: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4',
+    sold: 7,
+    total: 25,
+    story: [
+      'Standing at the ridge before sunrise, with the valley still wrapped in indigo, there is a particular silence that belongs only to altitude. The air is thin enough that you hear your own heartbeat. Then the sun arrives — not gradually, but with sudden conviction — and the peaks ignite one by one like a chain of signal fires lit along the spine of the continent.',
+      'This photograph was made in that narrow corridor of time between the first and second light. The exposure lasted eight seconds, which is exactly how long the warm tones clung to the eastern face before the whole scene shifted to cool, diffuse morning. It is a document of a moment that existed for less time than it takes to describe.'
+    ],
+    quote: '"A photograph is not made by the person who presses the shutter — it is made by the person who decides to stand in a particular place and wait."'
+  },
+  {
+    title: 'Fog Valley',
+    label: 'Landscape · Pacific Northwest',
+    img: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05',
+    sold: 12,
+    total: 25,
+    story: [
+      'The fog arrived before dawn, filling the valley like water poured into a bowl. By the time I reached the ridge, the forest below had disappeared entirely — only the crowns of the tallest firs punctured the white surface, lonely islands in a suspended sea. Sound behaved strangely: a bird call from a hundred metres away arrived as though whispered directly into my ear.',
+      'I set up the tripod and waited for the first breach of light. When it came, the fog didn\'t dissipate so much as rearrange itself — pulling apart in slow curtains, revealing the valley in fragments. This frame captures the instant the river became visible, a silver thread stitching the landscape back together.'
+    ],
+    quote: '"The forest does not pose for the camera. It simply continues, and you must learn to match its patience."'
+  },
+  {
+    title: 'Golden Passage',
+    label: 'Landscape · Italian Lakes',
+    img: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470',
+    sold: 3,
+    total: 25,
+    story: [
+      'Lake Como at golden hour is a cliché for a reason — the light here has a physical quality, as though it could be poured like honey over the terraced hillsides and ochre villages. But this image was not about the spectacle. It was about the interval: the thirty seconds between the sun touching the western ridge and its light being swallowed by the water.',
+      'The villages along the shore were already in shadow when the last reflection skated across the lake surface toward me. The camera was set to capture exactly that transient moment — the passage of gold from one shore to another, a daily event witnessed by thousands but remembered by no one in particular.'
+    ],
+    quote: '"In photography, the golden hour is overrated. What matters is the golden second — the one that refuses to hold still."'
+  },
+  {
+    title: 'Cathedral Light',
+    label: 'Forest · Olympic Peninsula',
+    img: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e',
+    sold: 18,
+    total: 25,
+    story: [
+      'Old-growth forest on the Olympic Peninsula carries its own weather. The canopy is so dense that rain takes minutes to filter through, arriving at the forest floor in delayed, scattered drops long after the sky has cleared. Light behaves the same way — broken into columns, refracted through moss and moisture until it reaches the ground with the diffused warmth of stained glass.',
+      'I found this clearing by accident, following a game trail that petered out at the base of a nurse log the size of a bus. The light was arriving in a single shaft from a gap in the canopy — theatrical, unlikely, the kind of illumination that makes you understand why people once believed forests were sacred.'
+    ],
+    quote: '"Every forest has a room like this — vaulted, gilded, unrepeatable — if you arrive at the precise hour."'
+  }
+];
+
+const sizePrices = { a4: { rag: 185, baryta: 210, platine: 195 }, a3: { rag: 295, baryta: 335, platine: 310 }, a2: { rag: 475, baryta: 540, platine: 500 }, a1: { rag: 750, baryta: 850, platine: 795 } };
+const sizeDims = { a4: '210 × 297 mm', a3: '297 × 420 mm', a2: '420 × 594 mm', a1: '594 × 841 mm' };
+
+let currentSize = 'a4';
+let currentPaper = 'rag';
+let currentPrint = 0;
+
+// View switching
+document.querySelectorAll('.view-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.view-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.view).classList.add('active');
+    window.scrollTo(0, 0);
+  });
+});
+
+function showDetail(idx) {
+  currentPrint = idx;
+  const p = prints[idx];
+  document.getElementById('detail-hero-img').src = p.img + '?w=1600';
+  document.getElementById('detail-hero-title').textContent = p.title;
+  document.getElementById('detail-hero-label').textContent = p.label;
+  document.getElementById('detail-hero-edition').textContent = `Limited Edition — ${p.sold} of ${p.total}`;
+  document.getElementById('detail-story').innerHTML = p.story.map(s => `<p>${s}</p>`).join('');
+  document.querySelector('.story-pullquote').textContent = p.quote;
+  document.getElementById('edition-text').textContent = `${p.sold} / ${p.total} sold`;
+  document.getElementById('edition-fill').style.width = `${(p.sold / p.total) * 100}%`;
+  document.getElementById('room-img').src = p.img + '?w=400';
+
+  currentSize = 'a4';
+  currentPaper = 'rag';
+  document.querySelectorAll('.size-tab').forEach(t => t.classList.toggle('active', t.dataset.size === 'a4'));
+  document.querySelectorAll('.paper-option').forEach(o => o.classList.toggle('active', o.dataset.paper === 'rag'));
+  document.getElementById('size-dims').textContent = sizeDims.a4;
+  updatePrice();
+
+  document.querySelectorAll('.view-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelector('[data-view="detail"]').classList.add('active');
+  document.getElementById('detail').classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function selectSize(el) {
+  document.querySelectorAll('.size-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  currentSize = el.dataset.size;
+  document.getElementById('size-dims').textContent = sizeDims[currentSize];
+  updatePrice();
+}
+
+function selectPaper(el) {
+  document.querySelectorAll('.paper-option').forEach(o => o.classList.remove('active'));
+  el.classList.add('active');
+  currentPaper = el.dataset.paper;
+  updatePrice();
+}
+
+function updatePrice() {
+  const price = sizePrices[currentSize][currentPaper];
+  document.getElementById('detail-price').textContent = `£${price}`;
+}
+
+// Scroll animations
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.15 });
+
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

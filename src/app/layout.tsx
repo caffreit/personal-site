@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Space_Grotesk, Geist_Mono, Inter, Newsreader } from "next/font/google";
 import "./globals.css";
 import "@/styles/masonry.css";
+import "@/styles/prints.css";
 import ThemeProviders from "@/components/theme/ThemeProviders";
 import HeaderNav from "@/components/theme/HeaderNav";
 import { Analytics } from "@vercel/analytics/react";

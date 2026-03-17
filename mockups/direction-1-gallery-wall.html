@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Direction 1: Gallery Wall — Minimalist Fine Art</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,300;1,6..72,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --yellow: #F4CA16;
+  --bg: #FAFAF7;
+  --fg: #0A0A0A;
+  --white: #FFFFFF;
+  --border: #d4d0c8;
+  --serif: 'Newsreader', serif;
+  --mono: 'Space Mono', monospace;
+  --shadow-soft: 0 4px 24px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+  --shadow-frame: 0 8px 40px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+}
+
+html { font-size: 16px; }
+
+body {
+  font-family: var(--serif);
+  background: var(--bg);
+  color: var(--fg);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  z-index: 0;
+}
+
+/* ── Direction Header ── */
+.direction-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: var(--fg);
+  color: var(--bg);
+  padding: 10px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.direction-header .label {
+  color: var(--yellow);
+  margin-right: 12px;
+}
+
+/* ── View Tabs ── */
+.view-tabs {
+  display: flex;
+  gap: 2px;
+}
+
+.view-tab {
+  background: transparent;
+  color: rgba(250,250,247,0.5);
+  border: 1px solid rgba(250,250,247,0.15);
+  padding: 6px 20px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.view-tab:first-child { border-radius: 3px 0 0 3px; }
+.view-tab:last-child { border-radius: 0 3px 3px 0; }
+
+.view-tab.active {
+  background: var(--yellow);
+  color: var(--fg);
+  border-color: var(--yellow);
+}
+
+.view-tab:hover:not(.active) {
+  color: var(--bg);
+  border-color: rgba(250,250,247,0.4);
+}
+
+/* ── Views ── */
+.view { display: none; }
+.view.active { display: block; }
+
+/* ════════════════════════════════════════
+   VIEW 1: LISTING PAGE
+   ════════════════════════════════════════ */
+
+.listing-page {
+  padding-top: 80px;
+  padding-bottom: 160px;
+}
+
+.listing-intro {
+  text-align: center;
+  padding: 100px 32px 60px;
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.listing-intro h1 {
+  font-family: var(--serif);
+  font-weight: 300;
+  font-size: clamp(28px, 4vw, 42px);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  margin-bottom: 20px;
+}
+
+.listing-intro p {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(10,10,10,0.45);
+  line-height: 1.7;
+}
+
+.listing-divider {
+  width: 40px;
+  height: 1px;
+  background: var(--border);
+  margin: 0 auto;
+}
+
+/* ── Print Item ── */
+.print-item {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 100px 32px;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.print-item.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.print-image-wrapper {
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.print-image-wrapper:hover {
+  transform: scale(1.005);
+}
+
+.print-image-wrapper::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  box-shadow: var(--shadow-soft);
+  pointer-events: none;
+}
+
+.print-image-wrapper img {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #e8e6e1;
+}
+
+.print-label {
+  margin-top: 28px;
+  text-align: right;
+  padding-left: 40%;
+}
+
+.print-label .print-title {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 17px;
+  letter-spacing: -0.005em;
+  line-height: 1.35;
+  margin-bottom: 6px;
+}
+
+.print-label .print-meta {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: rgba(10,10,10,0.4);
+  line-height: 1.8;
+}
+
+.print-label .print-meta .edition {
+  color: rgba(10,10,10,0.6);
+}
+
+.print-label .print-medium {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 12.5px;
+  color: rgba(10,10,10,0.5);
+  margin-top: 4px;
+}
+
+.print-label .print-price {
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  margin-top: 10px;
+  color: var(--fg);
+}
+
+.print-label .view-detail-link {
+  display: inline-block;
+  margin-top: 14px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg);
+  text-decoration: none;
+  padding-bottom: 2px;
+  border-bottom: 1px solid var(--border);
+  transition: border-color 0.25s ease;
+}
+
+.view-detail-link:hover {
+  border-color: var(--fg);
+}
+
+.listing-spacer {
+  height: 40px;
+}
+
+/* ════════════════════════════════════════
+   VIEW 2: DETAIL PAGE
+   ════════════════════════════════════════ */
+
+.detail-page {
+  padding-top: 56px;
+  min-height: 100vh;
+}
+
+.detail-main {
+  display: flex;
+  min-height: calc(100vh - 56px);
+}
+
+.detail-image-col {
+  flex: 0 0 60%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px;
+  background: var(--bg);
+  position: relative;
+}
+
+.framed-print {
+  position: relative;
+  max-width: 85%;
+  max-height: calc(100vh - 172px);
+}
+
+.framed-print .mat {
+  background: var(--white);
+  padding: 32px;
+  box-shadow: var(--shadow-frame),
+              inset 0 0 0 1px rgba(0,0,0,0.04);
+}
+
+.framed-print .mat img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: calc(100vh - 280px);
+  object-fit: contain;
+}
+
+.detail-info-col {
+  flex: 0 0 40%;
+  padding: 80px 60px 60px 48px;
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  max-height: calc(100vh - 56px);
+}
+
+.detail-back {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(10,10,10,0.4);
+  text-decoration: none;
+  margin-bottom: 40px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.2s;
+  cursor: pointer;
+}
+
+.detail-back:hover { color: var(--fg); }
+
+.detail-back svg {
+  width: 14px;
+  height: 14px;
+}
+
+.detail-album {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--yellow);
+  margin-bottom: 12px;
+}
+
+.detail-title {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(26px, 3vw, 36px);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  margin-bottom: 8px;
+}
+
+.detail-subtitle {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 14px;
+  color: rgba(10,10,10,0.5);
+  margin-bottom: 32px;
+}
+
+/* Edition */
+.edition-block {
+  margin-bottom: 36px;
+  padding-bottom: 36px;
+  border-bottom: 1px solid var(--border);
+}
+
+.edition-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(10,10,10,0.4);
+  margin-bottom: 8px;
+}
+
+.edition-text {
+  font-family: var(--serif);
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.edition-bar {
+  width: 100%;
+  height: 2px;
+  background: var(--border);
+  border-radius: 1px;
+  position: relative;
+}
+
+.edition-bar-fill {
+  height: 100%;
+  background: var(--fg);
+  border-radius: 1px;
+  transition: width 0.4s ease;
+}
+
+.edition-remaining {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: rgba(10,10,10,0.4);
+  margin-top: 6px;
+}
+
+/* Selectors */
+.selector-group {
+  margin-bottom: 28px;
+}
+
+.selector-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(10,10,10,0.4);
+  margin-bottom: 10px;
+}
+
+.size-options {
+  display: flex;
+  gap: 6px;
+}
+
+.size-pill {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  padding: 8px 18px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: rgba(10,10,10,0.6);
+  cursor: pointer;
+  border-radius: 100px;
+  transition: all 0.2s ease;
+}
+
+.size-pill:hover {
+  border-color: rgba(10,10,10,0.3);
+  color: var(--fg);
+}
+
+.size-pill.active {
+  background: var(--fg);
+  color: var(--bg);
+  border-color: var(--fg);
+}
+
+.paper-options {
+  display: flex;
+  gap: 4px;
+}
+
+.paper-btn {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  color: rgba(10,10,10,0.4);
+  cursor: pointer;
+  border-bottom: 1.5px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.paper-btn:hover {
+  color: var(--fg);
+}
+
+.paper-btn.active {
+  color: var(--fg);
+  border-bottom-color: var(--fg);
+}
+
+/* Dimensions */
+.dimensions-line {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: rgba(10,10,10,0.4);
+  margin-top: 4px;
+  min-height: 18px;
+}
+
+/* Price */
+.price-block {
+  margin-top: 8px;
+  margin-bottom: 28px;
+  padding-top: 28px;
+  border-top: 1px solid var(--border);
+}
+
+.price-value {
+  font-family: var(--serif);
+  font-size: 32px;
+  font-weight: 300;
+  letter-spacing: -0.01em;
+  transition: opacity 0.15s ease;
+}
+
+.price-note {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: rgba(10,10,10,0.35);
+  margin-top: 4px;
+  letter-spacing: 0.02em;
+}
+
+/* Lead time */
+.lead-time {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: rgba(10,10,10,0.4);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lead-time svg {
+  width: 12px;
+  height: 12px;
+  opacity: 0.4;
+}
+
+/* CTA */
+.cta-btn {
+  display: block;
+  width: 100%;
+  padding: 18px 32px;
+  background: var(--fg);
+  color: var(--bg);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  transition: background 0.25s ease, transform 0.15s ease;
+  text-align: center;
+}
+
+.cta-btn:hover {
+  background: #1a1a1a;
+}
+
+.cta-btn:active {
+  transform: scale(0.995);
+}
+
+/* ── Below the fold ── */
+.detail-below {
+  border-top: 1px solid var(--border);
+}
+
+/* Room mockup */
+.room-section {
+  padding: 80px 60px;
+  text-align: center;
+}
+
+.room-section-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(10,10,10,0.35);
+  margin-bottom: 48px;
+}
+
+.room-mockup {
+  max-width: 700px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.room-mockup svg.room-drawing {
+  width: 100%;
+  height: auto;
+}
+
+.room-print-preview {
+  position: absolute;
+  top: 8%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  padding: 4px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+  transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              height 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.room-print-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Story */
+.story-section {
+  padding: 80px 60px;
+  max-width: 560px;
+  margin: 0 auto;
+  border-top: 1px solid var(--border);
+}
+
+.story-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(10,10,10,0.35);
+  margin-bottom: 24px;
+}
+
+.story-text {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 16px;
+  line-height: 1.8;
+  color: rgba(10,10,10,0.65);
+  font-weight: 300;
+}
+
+.story-text p + p {
+  margin-top: 1em;
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .detail-main {
+    flex-direction: column;
+  }
+  .detail-image-col {
+    flex: none;
+    padding: 32px;
+    min-height: 50vh;
+  }
+  .detail-info-col {
+    flex: none;
+    max-height: none;
+    padding: 40px 32px;
+    border-left: none;
+    border-top: 1px solid var(--border);
+  }
+  .framed-print { max-width: 90%; }
+}
+
+@media (max-width: 600px) {
+  .print-item { padding: 60px 24px; }
+  .print-label { padding-left: 20%; }
+  .listing-intro { padding: 60px 24px 40px; }
+  .detail-image-col { padding: 24px; }
+  .detail-info-col { padding: 32px 24px; }
+  .room-section, .story-section { padding: 48px 24px; }
+  .size-options { flex-wrap: wrap; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── Direction Header ── -->
+<header class="direction-header">
+  <div>
+    <span class="label">Mockup</span>
+    Direction 1: Gallery Wall
+  </div>
+  <div class="view-tabs">
+    <button class="view-tab active" data-view="listing">Listing</button>
+    <button class="view-tab" data-view="detail">Detail</button>
+  </div>
+</header>
+
+<!-- ════════════════════════════════════════
+     VIEW 1: LISTING PAGE
+     ════════════════════════════════════════ -->
+<section id="view-listing" class="view active listing-page">
+
+  <div class="listing-intro">
+    <h1>Limited Edition Prints</h1>
+    <p>Fine art photography, printed on archival paper.<br>Each edition limited to 10 signed prints.</p>
+  </div>
+
+  <div class="listing-divider"></div>
+
+  <article class="print-item" data-index="0">
+    <div class="print-image-wrapper" onclick="showDetail(0)">
+      <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600" alt="Alpine Silence" loading="lazy">
+    </div>
+    <div class="print-label">
+      <div class="print-title">Alpine Silence</div>
+      <div class="print-meta">
+        <span class="edition">3 / 10</span> — Archival pigment print
+      </div>
+      <div class="print-medium">Mountain peaks breaking through morning cloud</div>
+      <div class="print-price">From £180</div>
+      <a class="view-detail-link" href="#" onclick="event.preventDefault(); showDetail(0)">View print →</a>
+    </div>
+  </article>
+
+  <div class="listing-spacer"></div>
+  <div class="listing-divider"></div>
+
+  <article class="print-item" data-index="1">
+    <div class="print-image-wrapper" onclick="showDetail(1)">
+      <img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=600" alt="Morning Veils" loading="lazy">
+    </div>
+    <div class="print-label">
+      <div class="print-title">Morning Veils</div>
+      <div class="print-meta">
+        <span class="edition">5 / 10</span> — Archival pigment print
+      </div>
+      <div class="print-medium">Dawn mist rolling across forested valleys</div>
+      <div class="print-price">From £180</div>
+      <a class="view-detail-link" href="#" onclick="event.preventDefault(); showDetail(1)">View print →</a>
+    </div>
+  </article>
+
+  <div class="listing-spacer"></div>
+  <div class="listing-divider"></div>
+
+  <article class="print-item" data-index="2">
+    <div class="print-image-wrapper" onclick="showDetail(2)">
+      <img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=600" alt="Golden Hour, Lago" loading="lazy">
+    </div>
+    <div class="print-label">
+      <div class="print-title">Golden Hour, Lago</div>
+      <div class="print-meta">
+        <span class="edition">2 / 10</span> — Archival pigment print
+      </div>
+      <div class="print-medium">Last light over still water and distant peaks</div>
+      <div class="print-price">From £180</div>
+      <a class="view-detail-link" href="#" onclick="event.preventDefault(); showDetail(2)">View print →</a>
+    </div>
+  </article>
+
+  <div class="listing-spacer"></div>
+  <div class="listing-divider"></div>
+
+  <article class="print-item" data-index="3">
+    <div class="print-image-wrapper" onclick="showDetail(3)">
+      <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600" alt="Cathedral Light" loading="lazy">
+    </div>
+    <div class="print-label">
+      <div class="print-title">Cathedral Light</div>
+      <div class="print-meta">
+        <span class="edition">7 / 10</span> — Archival pigment print
+      </div>
+      <div class="print-medium">Sunlight filtering through ancient canopy</div>
+      <div class="print-price">From £180</div>
+      <a class="view-detail-link" href="#" onclick="event.preventDefault(); showDetail(3)">View print →</a>
+    </div>
+  </article>
+
+</section>
+
+<!-- ════════════════════════════════════════
+     VIEW 2: DETAIL PAGE
+     ════════════════════════════════════════ -->
+<section id="view-detail" class="view detail-page">
+
+  <div class="detail-main">
+
+    <div class="detail-image-col">
+      <div class="framed-print">
+        <div class="mat">
+          <img id="detail-img" src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=900" alt="">
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-info-col">
+
+      <a class="detail-back" onclick="switchView('listing')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 12H5m0 0l6 6m-6-6l6-6"/></svg>
+        Back to prints
+      </a>
+
+      <div class="detail-album" id="detail-album">Landscapes</div>
+      <h2 class="detail-title" id="detail-title">Alpine Silence</h2>
+      <p class="detail-subtitle" id="detail-subtitle">Mountain peaks breaking through morning cloud</p>
+
+      <!-- Edition -->
+      <div class="edition-block">
+        <div class="edition-label">Edition</div>
+        <div class="edition-text" id="edition-text">3 of 10</div>
+        <div class="edition-bar">
+          <div class="edition-bar-fill" id="edition-fill" style="width: 30%"></div>
+        </div>
+        <div class="edition-remaining" id="edition-remaining">7 remaining</div>
+      </div>
+
+      <!-- Size Selector -->
+      <div class="selector-group">
+        <div class="selector-label">Size</div>
+        <div class="size-options">
+          <button class="size-pill active" data-size="A4" onclick="selectSize(this)">A4</button>
+          <button class="size-pill" data-size="A3" onclick="selectSize(this)">A3</button>
+          <button class="size-pill" data-size="A2" onclick="selectSize(this)">A2</button>
+          <button class="size-pill" data-size="A1" onclick="selectSize(this)">A1</button>
+        </div>
+        <div class="dimensions-line" id="dimensions-line">210 × 297 mm</div>
+      </div>
+
+      <!-- Paper Selector -->
+      <div class="selector-group">
+        <div class="selector-label">Paper</div>
+        <div class="paper-options">
+          <button class="paper-btn active" data-paper="matte" onclick="selectPaper(this)">Matte</button>
+          <button class="paper-btn" data-paper="lustre" onclick="selectPaper(this)">Lustre</button>
+          <button class="paper-btn" data-paper="hahnemuhle" onclick="selectPaper(this)">Hahnemühle</button>
+        </div>
+      </div>
+
+      <!-- Price -->
+      <div class="price-block">
+        <div class="price-value" id="price-value">£180</div>
+        <div class="price-note">Includes certificate of authenticity</div>
+      </div>
+
+      <!-- Lead Time -->
+      <div class="lead-time">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        Ships in 5–7 business days
+      </div>
+
+      <!-- CTA -->
+      <button class="cta-btn" onclick="requestPrint()">Request This Print</button>
+
+    </div>
+
+  </div>
+
+  <!-- Below the fold -->
+  <div class="detail-below">
+
+    <!-- Room Mockup -->
+    <div class="room-section">
+      <div class="room-section-label">In situ preview</div>
+      <div class="room-mockup">
+        <svg class="room-drawing" viewBox="0 0 700 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Wall -->
+          <rect x="0" y="0" width="700" height="260" fill="#F2F0EB" stroke="#d4d0c8" stroke-width="0.5"/>
+          <!-- Floor -->
+          <rect x="0" y="260" width="700" height="100" fill="#E8E5DE" stroke="#d4d0c8" stroke-width="0.5"/>
+          <!-- Baseboard -->
+          <line x1="0" y1="260" x2="700" y2="260" stroke="#ccc8c0" stroke-width="1.5"/>
+          <!-- Sofa - clean line drawing -->
+          <g stroke="#b5b0a5" stroke-width="1.2" fill="none">
+            <!-- Sofa back -->
+            <path d="M200 290 Q200 250, 220 245 L480 245 Q500 250, 500 290"/>
+            <!-- Seat -->
+            <path d="M195 290 L505 290"/>
+            <!-- Arms -->
+            <path d="M195 290 Q185 290, 185 280 L185 258 Q185 248, 198 248"/>
+            <path d="M505 290 Q515 290, 515 280 L515 258 Q515 248, 502 248"/>
+            <!-- Cushion line -->
+            <line x1="350" y1="248" x2="350" y2="288" stroke-dasharray="2 4"/>
+            <!-- Legs -->
+            <line x1="200" y1="290" x2="195" y2="310"/>
+            <line x1="500" y1="290" x2="505" y2="310"/>
+          </g>
+          <!-- Side table -->
+          <g stroke="#b5b0a5" stroke-width="1" fill="none">
+            <rect x="540" y="265" width="45" height="40" rx="1"/>
+            <line x1="545" y1="305" x2="545" y2="320"/>
+            <line x1="580" y1="305" x2="580" y2="320"/>
+          </g>
+          <!-- Plant on side table -->
+          <g stroke="#b5b0a5" stroke-width="1" fill="none">
+            <path d="M558 265 Q555 250, 560 240 Q565 230, 558 220"/>
+            <path d="M565 265 Q568 248, 563 238 Q558 228, 570 218"/>
+            <path d="M562 265 Q560 255, 565 248 Q570 240, 566 230"/>
+          </g>
+        </svg>
+        <div class="room-print-preview" id="room-print">
+          <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400" alt="">
+        </div>
+      </div>
+    </div>
+
+    <!-- Story -->
+    <div class="story-section">
+      <div class="story-label">Story behind the shot</div>
+      <div class="story-text" id="story-text">
+        <p>Standing alone at 3,200 metres, the world below had dissolved into white. There was nothing but silence and the intermittent crack of ice settling in the early light. I waited forty minutes for the peaks to emerge — and when they did, it lasted only seconds before the cloud swallowed them again.</p>
+        <p>This image is from that brief window. A reminder that the most extraordinary moments are often the most fleeting.</p>
+      </div>
+    </div>
+
+  </div>
+
+</section>
+
+<script>
+const PRINTS = [
+  {
+    title: 'Alpine Silence',
+    album: 'Landscapes',
+    subtitle: 'Mountain peaks breaking through morning cloud',
+    edition: 3,
+    total: 10,
+    img600: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600',
+    img900: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=900',
+    img400: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400',
+    story: '<p>Standing alone at 3,200 metres, the world below had dissolved into white. There was nothing but silence and the intermittent crack of ice settling in the early light. I waited forty minutes for the peaks to emerge — and when they did, it lasted only seconds before the cloud swallowed them again.</p><p>This image is from that brief window. A reminder that the most extraordinary moments are often the most fleeting.</p>'
+  },
+  {
+    title: 'Morning Veils',
+    album: 'Landscapes',
+    subtitle: 'Dawn mist rolling across forested valleys',
+    edition: 5,
+    total: 10,
+    img600: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=600',
+    img900: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=900',
+    img400: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400',
+    story: '<p>The alarm went off at 4:15 a.m. — the kind of morning where you question every decision that led you to this ridge. But then the valley began to breathe. Layers of mist lifted and settled, lifted and settled, each pass revealing a slightly different version of the same landscape.</p><p>I shot for two hours. This frame, taken at 5:47, captured the exact moment when the mist separated the ridgeline into distinct planes of light.</p>'
+  },
+  {
+    title: 'Golden Hour, Lago',
+    album: 'Landscapes',
+    subtitle: 'Last light over still water and distant peaks',
+    edition: 2,
+    total: 10,
+    img600: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=600',
+    img900: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=900',
+    img400: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=400',
+    story: '<p>There\'s a ten-minute window at this lake where the mountains turn gold and the water becomes perfectly still. The locals call it "l\'ora d\'oro" — the golden hour — though it\'s really more like golden minutes.</p><p>I\'d visited this spot three evenings in a row before the conditions aligned. The silence was so complete I could hear my own shutter from across the shore.</p>'
+  },
+  {
+    title: 'Cathedral Light',
+    album: 'Forests',
+    subtitle: 'Sunlight filtering through ancient canopy',
+    edition: 7,
+    total: 10,
+    img600: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=600',
+    img900: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=900',
+    img400: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400',
+    story: '<p>Walking into this forest felt like entering a cathedral — the canopy so high and dense that light only reached the floor in thin, deliberate shafts. It was midday, but the atmosphere was closer to dusk.</p><p>I spent the afternoon moving slowly, watching how the light shifted with each passing cloud. This frame felt like the forest exhaling.</p>'
+  }
+];
+
+const PRICES = {
+  A4:  { matte: 180, lustre: 195, hahnemuhle: 240 },
+  A3:  { matte: 280, lustre: 300, hahnemuhle: 360 },
+  A2:  { matte: 420, lustre: 450, hahnemuhle: 540 },
+  A1:  { matte: 620, lustre: 660, hahnemuhle: 780 }
+};
+
+const DIMENSIONS = {
+  A4: '210 × 297 mm',
+  A3: '297 × 420 mm',
+  A2: '420 × 594 mm',
+  A1: '594 × 841 mm'
+};
+
+const ROOM_SCALE = { A4: 60, A3: 85, A2: 115, A1: 155 };
+
+let currentPrint = 0;
+let currentSize = 'A4';
+let currentPaper = 'matte';
+
+// View switching
+document.querySelectorAll('.view-tab').forEach(tab => {
+  tab.addEventListener('click', () => switchView(tab.dataset.view));
+});
+
+function switchView(view) {
+  document.querySelectorAll('.view-tab').forEach(t => t.classList.toggle('active', t.dataset.view === view));
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+  if (view === 'listing') window.scrollTo(0, 0);
+}
+
+function showDetail(index) {
+  currentPrint = index;
+  const p = PRINTS[index];
+
+  document.getElementById('detail-img').src = p.img900;
+  document.getElementById('detail-album').textContent = p.album;
+  document.getElementById('detail-title').textContent = p.title;
+  document.getElementById('detail-subtitle').textContent = p.subtitle;
+  document.getElementById('edition-text').textContent = p.edition + ' of ' + p.total;
+  document.getElementById('edition-fill').style.width = (p.edition / p.total * 100) + '%';
+  document.getElementById('edition-remaining').textContent = (p.total - p.edition) + ' remaining';
+  document.getElementById('story-text').innerHTML = p.story;
+
+  const roomImg = document.querySelector('#room-print img');
+  roomImg.src = p.img400;
+
+  currentSize = 'A4';
+  currentPaper = 'matte';
+  document.querySelectorAll('.size-pill').forEach(btn => btn.classList.toggle('active', btn.dataset.size === 'A4'));
+  document.querySelectorAll('.paper-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.paper === 'matte'));
+
+  updatePrice();
+  updateRoomPreview();
+  switchView('detail');
+  window.scrollTo(0, 0);
+}
+
+function selectSize(btn) {
+  document.querySelectorAll('.size-pill').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentSize = btn.dataset.size;
+  document.getElementById('dimensions-line').textContent = DIMENSIONS[currentSize];
+  updatePrice();
+  updateRoomPreview();
+}
+
+function selectPaper(btn) {
+  document.querySelectorAll('.paper-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentPaper = btn.dataset.paper;
+  updatePrice();
+}
+
+function updatePrice() {
+  const price = PRICES[currentSize][currentPaper];
+  const el = document.getElementById('price-value');
+  el.style.opacity = '0';
+  setTimeout(() => {
+    el.textContent = '£' + price;
+    el.style.opacity = '1';
+  }, 120);
+}
+
+function updateRoomPreview() {
+  const preview = document.getElementById('room-print');
+  const w = ROOM_SCALE[currentSize];
+  const ratio = 1.414; // A-series ratio
+  preview.style.width = w + 'px';
+  preview.style.height = Math.round(w / ratio) + 'px';
+}
+
+function requestPrint() {
+  const p = PRINTS[currentPrint];
+  const btn = document.querySelector('.cta-btn');
+  btn.textContent = 'Request sent ✓';
+  btn.style.background = '#1a5c1a';
+  setTimeout(() => {
+    btn.textContent = 'Request This Print';
+    btn.style.background = '';
+  }, 2000);
+}
+
+// Intersection Observer for fade-in
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+
+document.querySelectorAll('.print-item').forEach(item => observer.observe(item));
+
+// Init
+updateRoomPreview();
+</script>
+
+</body>
+</html>

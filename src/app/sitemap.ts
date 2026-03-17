@@ -1,6 +1,6 @@
 import { MetadataRoute } from "next";
 import { getAllPosts } from "@/lib/posts";
-import { readPhotoManifest } from "@/lib/photos";
+import { readPhotoManifest, getAvailablePrints } from "@/lib/photos";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
@@ -8,6 +8,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const routes: MetadataRoute.Sitemap = [
     { url: `${baseUrl}/`, lastModified: now },
     { url: `${baseUrl}/photos`, lastModified: now },
+    { url: `${baseUrl}/photos/prints`, lastModified: now },
     { url: `${baseUrl}/blog`, lastModified: now },
   ];
   const posts = getAllPosts();
@@ -21,6 +22,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
   for (const a of manifest.albums) {
     routes.push({
       url: `${baseUrl}/photos/${a.id}`,
+      lastModified: now,
+    });
+  }
+  for (const p of getAvailablePrints()) {
+    routes.push({
+      url: `${baseUrl}/photos/prints/${p.id}`,
       lastModified: now,
     });
   }

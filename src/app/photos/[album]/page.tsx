@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { findAlbumById, readPhotoManifest } from "@/lib/photos";
+import { findAlbumById, normalizePhotoPrint, readPhotoManifest } from "@/lib/photos";
 import { AlbumView } from "@/components/gallery/AlbumView";
 
 export const dynamicParams = true;
@@ -43,6 +43,7 @@ export default async function AlbumPage({ params }: { params: Promise<AlbumParam
     shutter: "1/125",
     width: img.width,
     height: img.height,
+    print: img.print ? normalizePhotoPrint(img.print) : undefined,
   }));
 
   return (

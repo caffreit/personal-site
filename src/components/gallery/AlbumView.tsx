@@ -20,6 +20,16 @@ export interface Photo {
     className?: string;
     width?: number;
     height?: number;
+    print?: {
+      available: boolean;
+      editionSize: number;
+      sold: number;
+      remaining: number;
+      status?: "available" | "sold_out" | "inquiry_only";
+      price?: number;
+      currency?: string;
+      requestUrl?: string;
+    };
 }
 
 interface AlbumViewProps {
@@ -85,6 +95,20 @@ export const AlbumView: React.FC<AlbumViewProps> = ({ album, albumId, descriptio
     1024: 2,
     640: 2,
     500: 1,
+  };
+
+  const defaultRequestBase = "mailto:ivan.caffrey@gmail.com";
+
+  const buildRequestUrl = (photo: Photo) => {
+    if (photo.print?.requestUrl) return photo.print.requestUrl;
+    const subject = encodeURIComponent(`Print request: ${photo.id}`);
+    return `${defaultRequestBase}?subject=${subject}`;
+  };
+
+  const formatPrice = (photo: Photo) => {
+    if (!photo.print?.price) return null;
+    const currency = photo.print.currency ?? "EUR";
+    return new Intl.NumberFormat("en-IE", { style: "currency", currency, maximumFractionDigits: 0 }).format(photo.print.price);
   };
 
   return (
@@ -170,6 +194,12 @@ export const AlbumView: React.FC<AlbumViewProps> = ({ album, albumId, descriptio
                           <div className="absolute inset-0 opacity-20 pointer-events-none mix-blend-overlay" 
                               style={{backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")'}}></div>
 
+                          {photo.print && (
+                            <div className="absolute top-4 left-4 z-10 rounded-full bg-black/65 px-3 py-1.5 text-[10px] font-mono uppercase tracking-[0.16em] text-[var(--color-yellow)] backdrop-blur-sm">
+                              {photo.print.sold}/{photo.print.editionSize} sold
+                            </div>
+                          )}
+
                           {/* Analysis Trigger - Always visible on mobile, hover on desktop */}
                           <div className="absolute top-4 right-4 z-10 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
                               <button 
@@ -183,6 +213,23 @@ export const AlbumView: React.FC<AlbumViewProps> = ({ album, albumId, descriptio
                                   <span className="font-serif italic text-lg">Analyse with Gemini</span>
                               </button>
                           </div>
+
+                          <a
+                            href={buildRequestUrl(photo)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="absolute bottom-4 left-4 z-10 rounded-full bg-black/60 px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-white backdrop-blur-sm transition hover:bg-black/75"
+                          >
+                            {photo.print?.available ? "Request this print" : "Request this as a print"}
+                          </a>
+
+                          {photo.print && (
+                            <div className="absolute bottom-16 left-4 z-10 rounded bg-black/65 px-3 py-2 text-[10px] font-mono uppercase tracking-[0.14em] text-white/90 backdrop-blur-sm">
+                              {photo.print.status === "sold_out" ? "Sold out" : `Edition of ${photo.print.editionSize}`}{" "}
+                              {formatPrice(photo) ? `• ${formatPrice(photo)}` : ""}
+                            </div>
+                          )}
 
                           {/* Analysis Popover (In-place at bottom) */}
                           {selectedPhoto === photo.id && (
@@ -206,7 +253,7 @@ export const AlbumView: React.FC<AlbumViewProps> = ({ album, albumId, descriptio
                                           </div>
                                       ) : (
                                           <p className="text-base md:text-lg font-serif text-stone-100 leading-relaxed italic drop-shadow-sm">
-                                              "{analysis}"
+                                              &quot;{analysis}&quot;
                                           </p>
                                       )}
                                   </div>
@@ -243,6 +290,12 @@ export const AlbumView: React.FC<AlbumViewProps> = ({ album, albumId, descriptio
                   <div className="absolute inset-0 opacity-20 pointer-events-none mix-blend-overlay" 
                       style={{backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")'}}></div>
 
+                  {photo.print && (
+                    <div className="absolute top-4 left-4 z-10 rounded-full bg-black/65 px-3 py-1.5 text-[10px] font-mono uppercase tracking-[0.16em] text-[var(--color-yellow)] backdrop-blur-sm">
+                      {photo.print.sold}/{photo.print.editionSize} sold
+                    </div>
+                  )}
+
                   {/* Analysis Trigger - Always visible on mobile, hover on desktop */}
                   <div className="absolute top-4 right-4 z-10 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
                       <button 
@@ -256,6 +309,23 @@ export const AlbumView: React.FC<AlbumViewProps> = ({ album, albumId, descriptio
                           <span className="font-serif italic text-lg">Analyse with Gemini</span>
                       </button>
                   </div>
+
+                  <a
+                    href={buildRequestUrl(photo)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="absolute bottom-4 left-4 z-10 rounded-full bg-black/60 px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-white backdrop-blur-sm transition hover:bg-black/75"
+                  >
+                    {photo.print?.available ? "Request this print" : "Request this as a print"}
+                  </a>
+
+                  {photo.print && (
+                    <div className="absolute bottom-16 left-4 z-10 rounded bg-black/65 px-3 py-2 text-[10px] font-mono uppercase tracking-[0.14em] text-white/90 backdrop-blur-sm">
+                      {photo.print.status === "sold_out" ? "Sold out" : `Edition of ${photo.print.editionSize}`}{" "}
+                      {formatPrice(photo) ? `• ${formatPrice(photo)}` : ""}
+                    </div>
+                  )}
 
                   {/* Analysis Popover (In-place at bottom) */}
                   {selectedPhoto === photo.id && (
@@ -279,7 +349,7 @@ export const AlbumView: React.FC<AlbumViewProps> = ({ album, albumId, descriptio
                                   </div>
                               ) : (
                                   <p className="text-base md:text-lg font-serif text-stone-100 leading-relaxed italic drop-shadow-sm">
-                                      "{analysis}"
+                                      &quot;{analysis}&quot;
                                   </p>
                               )}
                           </div>

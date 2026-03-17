@@ -1,0 +1,346 @@
+/* ═══════════════════════════════════════
+   PRINTS — Scroll-snap listing + Detail
+   ═══════════════════════════════════════ */
+
+/* ─── LISTING: scroll-snap container ─── */
+.prints-listing {
+  height: calc(100vh - 60px);
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+}
+
+.prints-snap-section {
+  position: relative;
+  height: calc(100vh - 60px);
+  min-height: calc(100vh - 60px);
+  scroll-snap-align: start;
+  overflow: hidden;
+}
+
+/* ─── LISTING: Ken Burns on background images ─── */
+@keyframes printsKenBurns {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.06); }
+}
+
+.prints-ken-burns {
+  animation: printsKenBurns 20s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+/* ─── LISTING: gradient overlay ─── */
+.prints-gradient-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60%;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.8) 0%,
+    rgba(0, 0, 0, 0.45) 40%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+/* ─── LISTING: fade-in for sections ─── */
+.prints-section-content {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+}
+
+.prints-section-content.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ─── LISTING: progress dots ─── */
+.prints-progress-dots {
+  position: fixed;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 30;
+}
+
+.prints-progress-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.6);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.35s ease;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+}
+
+.prints-progress-dot:hover {
+  border-color: #fff;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.prints-progress-dot.active {
+  background: var(--color-yellow, #F4CA16);
+  border-color: var(--color-yellow, #F4CA16);
+}
+
+/* ─── LISTING: scroll indicator ─── */
+@keyframes scrollBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
+}
+
+.prints-scroll-indicator {
+  animation: scrollBounce 2s ease-in-out infinite;
+}
+
+/* ─── LISTING: intro rule animation ─── */
+@keyframes printRuleFill {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+.prints-intro-rule {
+  transform-origin: center;
+  animation: printRuleFill 1.2s ease-out 0.3s both;
+}
+
+/* ─── DETAIL: full-width hero ─── */
+@keyframes printsHeroKenBurns {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.04); }
+}
+
+.prints-detail-hero-img {
+  animation: printsHeroKenBurns 22s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+.prints-detail-hero-gradient {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(
+    to top,
+    var(--background, #faf9f6) 0%,
+    color-mix(in srgb, var(--background, #faf9f6) 70%, transparent) 40%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+/* ─── DETAIL: edition progress bar ─── */
+.prints-edition-bar {
+  height: 3px;
+  background: var(--rule-color, #d4d0c8);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.prints-edition-bar-fill {
+  height: 100%;
+  background: var(--color-yellow, #F4CA16);
+  border-radius: 2px;
+  transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ─── DETAIL: size selector tabs ─── */
+.prints-size-tab {
+  flex: 1;
+  padding: 12px 8px;
+  text-align: center;
+  cursor: pointer;
+  border: none;
+  background: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all 0.3s ease;
+  color: var(--text-muted, rgba(0, 0, 0, 0.45));
+}
+
+.prints-size-tab:hover {
+  color: var(--foreground, #0A0A0A);
+}
+
+.prints-size-tab.active {
+  color: var(--foreground, #0A0A0A);
+  border-bottom-color: var(--color-yellow, #F4CA16);
+}
+
+/* ─── DETAIL: paper radio cards ─── */
+.prints-paper-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--rule-color, #d4d0c8);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: transparent;
+  text-align: left;
+  width: 100%;
+}
+
+.prints-paper-card:hover {
+  border-color: color-mix(in srgb, var(--foreground, #0A0A0A) 20%, transparent);
+}
+
+.prints-paper-card.active {
+  border-color: var(--color-yellow, #F4CA16);
+  background: color-mix(in srgb, var(--color-yellow, #F4CA16) 4%, transparent);
+}
+
+.prints-paper-radio {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid var(--rule-color, #d4d0c8);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.prints-paper-card.active .prints-paper-radio {
+  border-color: var(--color-yellow, #F4CA16);
+}
+
+.prints-paper-radio-inner {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-yellow, #F4CA16);
+  transform: scale(0);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.prints-paper-card.active .prints-paper-radio-inner {
+  transform: scale(1);
+}
+
+/* ─── DETAIL: drop-cap in story column ─── */
+.prints-dropcap::first-letter {
+  font-family: var(--font-serif, "Newsreader", serif);
+  font-size: 3.5rem;
+  font-style: italic;
+  float: left;
+  line-height: 0.85;
+  margin-right: 8px;
+  margin-top: 4px;
+  color: var(--foreground, #0A0A0A);
+}
+
+/* ─── DETAIL: room mockup ─── */
+.prints-room-mockup {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border: 1px solid var(--rule-color, #d4d0c8);
+}
+
+.prints-room-wall {
+  position: absolute;
+  inset: 0;
+  bottom: 35%;
+}
+
+.prints-room-floor {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 35%;
+  border-top: 1px solid rgba(128, 128, 128, 0.1);
+}
+
+.prints-room-sofa {
+  position: absolute;
+  bottom: 18%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50%;
+  height: 16%;
+  border-radius: 8px 8px 4px 4px;
+}
+
+.prints-room-sofa::before {
+  content: '';
+  position: absolute;
+  top: -28%;
+  left: 5%;
+  right: 5%;
+  height: 32%;
+  border-radius: 6px 6px 0 0;
+}
+
+.prints-room-frame {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.06);
+  border: 4px solid var(--background, #fff);
+  transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ─── DETAIL: CTA button ─── */
+.prints-cta-btn {
+  display: block;
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: 9999px;
+  background: var(--foreground, #0A0A0A);
+  color: var(--background, #fff);
+  cursor: pointer;
+  transition: all 0.35s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.prints-cta-btn:hover {
+  box-shadow:
+    0 0 24px color-mix(in srgb, var(--color-yellow, #F4CA16) 25%, transparent),
+    0 0 8px color-mix(in srgb, var(--color-yellow, #F4CA16) 15%, transparent);
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 768px) {
+  .prints-progress-dots {
+    display: none;
+  }
+
+  .prints-snap-section {
+    min-height: 100vh;
+    height: auto;
+  }
+
+  .prints-detail-body-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .prints-purchase-col {
+    position: static !important;
+  }
+
+  .prints-trust-grid {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .prints-size-tab {
+    padding: 10px 4px;
+  }
+}

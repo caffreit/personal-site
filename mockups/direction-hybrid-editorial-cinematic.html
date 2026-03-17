@@ -1,0 +1,1403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hybrid: Editorial Cinematic — The Print Room</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,300;1,6..72,400;1,6..72,500;1,6..72,600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --yellow: #F4CA16;
+  --bg: #FAFAF7;
+  --fg: #0A0A0A;
+  --rule: #d4d0c8;
+  --muted: rgba(10, 10, 10, 0.45);
+  --serif: 'Newsreader', Georgia, serif;
+  --mono: 'Space Mono', monospace;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--serif);
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ─── GRAIN TEXTURE ─── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.032;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px;
+}
+
+/* ─── DIRECTION BAR ─── */
+.direction-bar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  background: var(--fg);
+  color: #fff;
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 9px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.direction-bar .accent { color: var(--yellow); }
+
+/* ─── VIEW TABS ─── */
+.view-tabs {
+  position: fixed; top: 32px; left: 0; right: 0; z-index: 999;
+  background: rgba(250, 250, 247, 0.88);
+  backdrop-filter: blur(16px) saturate(1.6);
+  -webkit-backdrop-filter: blur(16px) saturate(1.6);
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+}
+.tab-group { display: flex; }
+.view-tab {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 13px 24px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: var(--fg);
+  opacity: 0.35;
+  border-bottom: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+.view-tab:hover { opacity: 0.65; }
+.view-tab.active { opacity: 1; border-bottom-color: var(--yellow); }
+.editions-badge {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--yellow);
+}
+
+.view { display: none; }
+.view.active { display: block; }
+
+/* ═══════════════════════════════════════
+   VIEW 1: LISTING — FULL-BLEED CINEMATIC
+   ═══════════════════════════════════════ */
+
+#listing {
+  height: 100vh;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  margin-top: 80px;
+}
+
+.snap-section {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  overflow: hidden;
+}
+
+/* ─── INTRO SECTION ─── */
+.intro-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 80px 48px;
+}
+.intro-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 40%, rgba(244, 202, 22, 0.04) 0%, transparent 70%);
+  pointer-events: none;
+}
+.intro-title {
+  font-family: var(--serif);
+  font-size: clamp(3rem, 7vw, 6rem);
+  font-weight: 300;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  margin-bottom: 0;
+  position: relative;
+}
+.intro-rule {
+  width: 120px;
+  height: 3px;
+  background: var(--yellow);
+  margin: 36px auto;
+}
+.intro-text {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(1rem, 1.8vw, 1.25rem);
+  line-height: 1.7;
+  max-width: 560px;
+  color: var(--muted);
+  margin: 0 auto 28px;
+}
+.intro-badge {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--yellow);
+  margin-bottom: 60px;
+}
+.scroll-indicator {
+  position: absolute;
+  bottom: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  opacity: 0.4;
+}
+.scroll-indicator span {
+  font-family: var(--mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+.scroll-line {
+  width: 1px;
+  height: 48px;
+  background: var(--fg);
+  animation: scrollPulse 2s ease-in-out infinite;
+  transform-origin: top;
+}
+@keyframes scrollPulse {
+  0%, 100% { opacity: 0.3; transform: scaleY(1); }
+  50% { opacity: 0.8; transform: scaleY(1.3); }
+}
+
+/* ─── PRINT SECTIONS — FULL-BLEED CINEMATIC ─── */
+.print-section {
+  padding: 0;
+}
+
+/* Full-bleed background image */
+.print-bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  z-index: 0;
+  will-change: transform, opacity;
+  animation: kenBurns 18s ease-in-out infinite alternate;
+  opacity: 0;
+  transition: opacity 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.print-section:nth-child(3) .print-bg-img { animation-delay: -4s; }
+.print-section:nth-child(4) .print-bg-img { animation-delay: -9s; animation-direction: alternate-reverse; }
+.print-section:nth-child(5) .print-bg-img { animation-delay: -13s; }
+
+@keyframes kenBurns {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.06); }
+}
+
+.snap-section.in-view .print-bg-img {
+  opacity: 1;
+}
+
+/* Ambient tints — slightly more visible on full-bleed */
+.print-section[data-tint="warm"]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(135deg, rgba(244, 202, 22, 0.06) 0%, rgba(200, 140, 60, 0.05) 50%, transparent 100%);
+  pointer-events: none;
+}
+.print-section[data-tint="cool"]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(135deg, rgba(120, 160, 200, 0.07) 0%, rgba(100, 140, 180, 0.04) 50%, transparent 100%);
+  pointer-events: none;
+}
+.print-section[data-tint="golden"]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(135deg, rgba(244, 180, 22, 0.08) 0%, rgba(220, 160, 40, 0.04) 50%, transparent 100%);
+  pointer-events: none;
+}
+.print-section[data-tint="forest"]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(135deg, rgba(60, 120, 60, 0.06) 0%, rgba(80, 100, 60, 0.04) 50%, transparent 100%);
+  pointer-events: none;
+}
+
+/* Gradient overlay — transparent → dark at bottom */
+.print-gradient {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.82) 0%,
+    rgba(0, 0, 0, 0.52) 25%,
+    rgba(0, 0, 0, 0.18) 50%,
+    rgba(0, 0, 0, 0.04) 70%,
+    transparent 85%
+  );
+  pointer-events: none;
+}
+
+/* Editorial overlay — positioned at the bottom */
+.editorial-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  z-index: 3;
+  padding: clamp(36px, 5vw, 80px);
+  max-width: 620px;
+}
+
+/* Even prints: text aligned right */
+.print-section.reverse .editorial-overlay {
+  left: auto;
+  right: 0;
+  text-align: right;
+}
+
+/* Title */
+.ed-title {
+  font-family: var(--serif);
+  font-size: clamp(2.8rem, 6vw, 5rem);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  margin-bottom: 16px;
+  color: #fff;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.5), 0 1px 4px rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s;
+}
+
+/* Pull-quote */
+.ed-quote {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(0.95rem, 1.4vw, 1.15rem);
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.65);
+  border-left: 3px solid var(--yellow);
+  padding-left: 20px;
+  margin-bottom: 24px;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: all 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.35s;
+}
+.print-section.reverse .ed-quote {
+  border-left: none;
+  border-right: 3px solid var(--yellow);
+  padding-left: 0;
+  padding-right: 20px;
+}
+
+/* Compact meta line */
+.ed-meta-line {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 20px;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: all 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.45s;
+}
+.ed-meta-line .sep {
+  margin: 0 10px;
+  color: rgba(255, 255, 255, 0.25);
+}
+.ed-meta-line strong {
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 700;
+}
+
+/* CTA */
+.ed-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  padding: 14px 0;
+  cursor: pointer;
+  background: none;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+  opacity: 0;
+  transform: translateY(16px);
+  transition: all 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.55s;
+}
+.ed-cta:hover {
+  border-bottom-color: var(--yellow);
+  color: var(--yellow);
+}
+.ed-cta .arrow { transition: transform 0.3s ease; }
+.ed-cta:hover .arrow { transform: translateX(4px); }
+
+/* Animation trigger — staggered fade-in */
+.snap-section.in-view .ed-title,
+.snap-section.in-view .ed-quote,
+.snap-section.in-view .ed-meta-line,
+.snap-section.in-view .ed-cta {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ─── PROGRESS DOTS ─── */
+.progress-dots {
+  position: fixed;
+  right: 28px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 800;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.progress-dots .dot {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
+}
+.progress-dots .dot.active {
+  background: var(--yellow);
+  border-color: var(--yellow);
+  box-shadow: 0 0 10px rgba(244, 202, 22, 0.4);
+  transform: scale(1.3);
+}
+.progress-dots .dot:hover:not(.active) {
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+/* ═══════════════════════════════════════
+   VIEW 2: DETAIL PAGE
+   ═══════════════════════════════════════ */
+
+#detail { padding-top: 80px; }
+
+/* Hero */
+.detail-hero {
+  position: relative;
+  padding: 0;
+  max-width: none;
+  margin: 0;
+}
+.detail-hero-img-wrap {
+  position: relative;
+  overflow: hidden;
+}
+.detail-hero-img-wrap img {
+  display: block;
+  width: 100%;
+  height: 80vh;
+  object-fit: cover;
+  animation: kenBurnsDetail 22s ease-in-out infinite alternate;
+}
+@keyframes kenBurnsDetail {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.04); }
+}
+.detail-hero-gradient {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 45%;
+  background: linear-gradient(to top, var(--bg) 0%, rgba(250, 250, 247, 0.7) 40%, transparent 100%);
+  pointer-events: none;
+}
+.detail-hero-text {
+  position: absolute;
+  bottom: clamp(40px, 5vw, 80px);
+  left: clamp(48px, 6vw, 96px);
+  z-index: 2;
+}
+.detail-hero-label {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--yellow);
+  margin-bottom: 12px;
+  text-shadow: 0 1px 8px rgba(0,0,0,0.15);
+}
+.detail-hero-title {
+  font-family: var(--serif);
+  font-size: clamp(2.5rem, 5.5vw, 4.5rem);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.1);
+}
+
+/* Editorial + Purchase grid */
+.detail-body {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 60px clamp(24px, 4vw, 64px) 80px;
+  display: grid;
+  grid-template-columns: 55% 1fr;
+  gap: clamp(40px, 5vw, 80px);
+  align-items: start;
+}
+
+/* Left: Story */
+.story-col h2 {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 28px;
+}
+.story-col .first-para {
+  font-family: var(--serif);
+  font-size: 1.1rem;
+  line-height: 1.75;
+  margin-bottom: 24px;
+}
+.story-col .first-para::first-letter {
+  font-family: var(--serif);
+  font-size: 3.5rem;
+  font-style: italic;
+  float: left;
+  line-height: 0.85;
+  margin-right: 8px;
+  margin-top: 4px;
+  color: var(--fg);
+}
+.story-col p {
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: rgba(10, 10, 10, 0.7);
+  margin-bottom: 20px;
+}
+.story-quote {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(1.15rem, 2vw, 1.4rem);
+  line-height: 1.6;
+  color: rgba(10, 10, 10, 0.6);
+  border-left: 3px solid var(--yellow);
+  padding: 16px 0 16px 28px;
+  margin: 36px 0;
+}
+
+/* Right: Purchase */
+.purchase-col {
+  position: sticky;
+  top: 100px;
+  padding: 36px;
+  background: #fff;
+  border: 1px solid var(--rule);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.04);
+}
+.purchase-album {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--yellow);
+  margin-bottom: 20px;
+}
+
+/* Edition bar */
+.edition-bar-wrap { margin-bottom: 28px; }
+.edition-bar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+.edition-bar-header .label {
+  font-family: var(--mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.edition-bar-header .value {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+}
+.edition-bar {
+  width: 100%;
+  height: 3px;
+  background: var(--rule);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.edition-bar-fill {
+  height: 100%;
+  background: var(--yellow);
+  border-radius: 2px;
+  transition: width 0.6s ease;
+}
+
+/* Size selector */
+.selector-label {
+  font-family: var(--mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+.size-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--rule);
+}
+.size-tab {
+  flex: 1;
+  padding: 12px 8px;
+  text-align: center;
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  border: none;
+  background: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all 0.3s;
+}
+.size-tab:hover { color: var(--fg); }
+.size-tab.active {
+  color: var(--fg);
+  border-bottom-color: var(--yellow);
+}
+.size-tab .dim {
+  display: block;
+  font-size: 0.5rem;
+  color: var(--muted);
+  margin-top: 2px;
+  letter-spacing: 0.05em;
+}
+.size-tab.active .dim { color: rgba(10,10,10,0.55); }
+
+/* Paper selector */
+.paper-cards { display: flex; flex-direction: column; gap: 8px; margin-bottom: 28px; }
+.paper-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--rule);
+  cursor: pointer;
+  transition: all 0.3s;
+  background: transparent;
+  text-align: left;
+  width: 100%;
+}
+.paper-card:hover { border-color: rgba(10,10,10,0.2); }
+.paper-card.active { border-color: var(--yellow); background: rgba(244, 202, 22, 0.04); }
+.paper-radio {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid var(--rule);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+.paper-card.active .paper-radio {
+  border-color: var(--yellow);
+}
+.paper-radio-inner {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--yellow);
+  transform: scale(0);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.paper-card.active .paper-radio-inner { transform: scale(1); }
+.paper-info { flex: 1; }
+.paper-name {
+  font-family: var(--serif);
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+.paper-desc {
+  font-family: var(--mono);
+  font-size: 0.5rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Price display */
+.detail-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 8px;
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
+}
+.detail-price {
+  font-family: var(--serif);
+  font-size: 2rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+.detail-price-note {
+  font-family: var(--mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+.lead-time {
+  font-family: var(--mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+
+/* CTA button */
+.cta-btn {
+  display: block;
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: 9999px;
+  background: var(--fg);
+  color: #fff;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.35s;
+  position: relative;
+  overflow: hidden;
+}
+.cta-btn:hover {
+  box-shadow: 0 0 24px rgba(244, 202, 22, 0.25), 0 0 8px rgba(244, 202, 22, 0.15);
+}
+.cta-secondary {
+  display: block;
+  text-align: center;
+  margin-top: 14px;
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.3s;
+  cursor: pointer;
+  background: none;
+  border: none;
+  width: 100%;
+}
+.cta-secondary:hover { color: var(--fg); }
+
+/* ─── ROOM MOCKUP ─── */
+.room-section {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 80px clamp(24px, 4vw, 64px);
+}
+.room-section h3 {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 32px;
+}
+.room-mockup {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: linear-gradient(180deg, #f0ede6 0%, #e8e5de 55%, #c8c3b8 100%);
+  border: 1px solid var(--rule);
+  overflow: hidden;
+}
+.room-wall {
+  position: absolute;
+  inset: 0;
+  bottom: 35%;
+  background: linear-gradient(180deg, #f2efe8 0%, #eae7e0 100%);
+}
+.room-floor {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 35%;
+  background: linear-gradient(180deg, #d6d1c7 0%, #c4bfb5 100%);
+  border-top: 1px solid rgba(0,0,0,0.06);
+}
+.room-sofa {
+  position: absolute;
+  bottom: 18%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50%;
+  height: 16%;
+  background: linear-gradient(180deg, #b0a89a 0%, #a09888 100%);
+  border-radius: 8px 8px 4px 4px;
+}
+.room-sofa::before {
+  content: '';
+  position: absolute;
+  top: -28%;
+  left: 5%;
+  right: 5%;
+  height: 32%;
+  background: linear-gradient(180deg, #b8b0a2 0%, #b0a89a 100%);
+  border-radius: 6px 6px 0 0;
+}
+.room-print-frame {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.06);
+  border: 4px solid #fff;
+  transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.room-print-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.room-dimensions {
+  position: absolute;
+  font-family: var(--mono);
+  font-size: 0.5rem;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+.room-dim-w {
+  bottom: calc(35% + 4px);
+  left: 50%;
+  transform: translateX(-50%) translateY(60px);
+}
+.room-dim-h {
+  top: 20%;
+  right: 15%;
+}
+
+/* ─── TRUST SECTION ─── */
+.trust-section {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 60px clamp(24px, 4vw, 64px);
+  border-top: 1px solid var(--rule);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  text-align: center;
+}
+.trust-item .trust-icon {
+  font-size: 1.5rem;
+  margin-bottom: 12px;
+  display: block;
+}
+.trust-item .trust-title {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.trust-item .trust-desc {
+  font-family: var(--serif);
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+/* ─── DETAIL FOOTER NAV ─── */
+.detail-footer-nav {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px clamp(24px, 4vw, 64px) 80px;
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid var(--rule);
+}
+.detail-footer-nav a,
+.detail-footer-nav button {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg);
+  text-decoration: none;
+  cursor: pointer;
+  background: none;
+  border: none;
+  transition: color 0.3s;
+}
+.detail-footer-nav a:hover,
+.detail-footer-nav button:hover { color: var(--yellow); }
+
+/* ═══════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════ */
+
+@media (max-width: 740px) {
+  .editorial-overlay {
+    max-width: 100%;
+    padding: 24px;
+  }
+  .print-section.reverse .editorial-overlay {
+    text-align: left;
+  }
+  .print-section.reverse .ed-quote {
+    border-right: none;
+    border-left: 3px solid var(--yellow);
+    padding-right: 0;
+    padding-left: 20px;
+  }
+  .ed-title {
+    font-size: clamp(2rem, 6vw, 3rem);
+  }
+  .ed-quote {
+    font-size: 0.9rem;
+  }
+  .snap-section { min-height: 100vh; height: auto; }
+  .print-section { scroll-snap-align: start; }
+  .detail-body {
+    grid-template-columns: 1fr;
+  }
+  .purchase-col { position: static; }
+  .trust-section { grid-template-columns: 1fr; gap: 32px; }
+  .progress-dots { display: none; }
+}
+
+@media (max-width: 600px) {
+  .direction-bar { font-size: 0.55rem; padding: 8px 16px; }
+  .view-tabs { padding: 0 16px; }
+  .view-tab { padding: 10px 14px; font-size: 0.55rem; }
+  .intro-title { font-size: clamp(2rem, 8vw, 3.5rem); }
+  .editorial-overlay { padding: 20px; }
+  .ed-meta-line { font-size: 0.55rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ DIRECTION BAR ═══ -->
+<div class="direction-bar">
+  <div>Direction 2+5 Hybrid: <span class="accent">Editorial Cinematic</span></div>
+  <div>Mockup</div>
+</div>
+
+<!-- ═══ VIEW TABS ═══ -->
+<div class="view-tabs">
+  <div class="tab-group">
+    <button class="view-tab active" data-view="listing">The Print Room</button>
+    <button class="view-tab" data-view="detail">Print Detail</button>
+  </div>
+  <div class="editions-badge">4 Editions</div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     VIEW 1: THE PRINT ROOM (LISTING)
+     ═══════════════════════════════════════ -->
+<div id="listing" class="view active">
+
+  <!-- Progress Dots -->
+  <div class="progress-dots" id="progressDots">
+    <div class="dot active" data-index="0"></div>
+    <div class="dot" data-index="1"></div>
+    <div class="dot" data-index="2"></div>
+    <div class="dot" data-index="3"></div>
+    <div class="dot" data-index="4"></div>
+  </div>
+
+  <!-- ─── INTRO ─── -->
+  <section class="snap-section intro-section in-view" data-section="0">
+    <h1 class="intro-title">The Print Room</h1>
+    <div class="intro-rule"></div>
+    <p class="intro-text">A curated selection of limited-edition prints, each one a moment distilled to its purest form. Archival materials, meticulous reproduction, enduring beauty.</p>
+    <div class="intro-badge">4 editions available</div>
+    <div class="scroll-indicator">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- ─── PRINT 01 — text left ─── -->
+  <section class="snap-section print-section" data-section="1" data-tint="cool" data-print="0">
+    <img class="print-bg-img" src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80" alt="Alpine Dawn" loading="lazy">
+    <div class="print-gradient"></div>
+    <div class="editorial-overlay">
+      <h2 class="ed-title">Alpine Dawn</h2>
+      <blockquote class="ed-quote">"The mountains appeared to breathe that morning, their peaks catching the first light like a whispered secret between earth and sky."</blockquote>
+      <div class="ed-meta-line">
+        Edition 7 / 25 <span class="sep">·</span> From <strong>£185</strong> <span class="sep">·</span> A4 — A1
+      </div>
+      <button class="ed-cta" onclick="showDetail(0)">View Print <span class="arrow">→</span></button>
+    </div>
+  </section>
+
+  <!-- ─── PRINT 02 — text right ─── -->
+  <section class="snap-section print-section reverse" data-section="2" data-tint="golden" data-print="1">
+    <img class="print-bg-img" src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1920&q=80" alt="Golden Passage" loading="lazy">
+    <div class="print-gradient"></div>
+    <div class="editorial-overlay">
+      <h2 class="ed-title">Golden Passage</h2>
+      <blockquote class="ed-quote">"Light poured through the valley like honey, thick and golden, transforming every ordinary thing it touched into something holy."</blockquote>
+      <div class="ed-meta-line">
+        Edition 12 / 25 <span class="sep">·</span> From <strong>£185</strong> <span class="sep">·</span> A4 — A1
+      </div>
+      <button class="ed-cta" onclick="showDetail(1)">View Print <span class="arrow">→</span></button>
+    </div>
+  </section>
+
+  <!-- ─── PRINT 03 — text left ─── -->
+  <section class="snap-section print-section" data-section="3" data-tint="warm" data-print="2">
+    <img class="print-bg-img" src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1920&q=80" alt="Still Water" loading="lazy">
+    <div class="print-gradient"></div>
+    <div class="editorial-overlay">
+      <h2 class="ed-title">Still Water</h2>
+      <blockquote class="ed-quote">"The lake held the mountains like a mirror holds a face — perfectly, reverently, with neither judgement nor distortion."</blockquote>
+      <div class="ed-meta-line">
+        Edition 3 / 25 <span class="sep">·</span> From <strong>£210</strong> <span class="sep">·</span> A4 — A1
+      </div>
+      <button class="ed-cta" onclick="showDetail(2)">View Print <span class="arrow">→</span></button>
+    </div>
+  </section>
+
+  <!-- ─── PRINT 04 — text right ─── -->
+  <section class="snap-section print-section reverse" data-section="4" data-tint="forest" data-print="3">
+    <img class="print-bg-img" src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1920&q=80" alt="Cathedral Green" loading="lazy">
+    <div class="print-gradient"></div>
+    <div class="editorial-overlay">
+      <h2 class="ed-title">Cathedral Green</h2>
+      <blockquote class="ed-quote">"The canopy formed a nave above me, shafts of light descending like organ notes through the ancient, breathing dark."</blockquote>
+      <div class="ed-meta-line">
+        Edition 18 / 25 <span class="sep">·</span> From <strong>£185</strong> <span class="sep">·</span> A4 — A1
+      </div>
+      <button class="ed-cta" onclick="showDetail(3)">View Print <span class="arrow">→</span></button>
+    </div>
+  </section>
+
+</div>
+
+<!-- ═══════════════════════════════════════
+     VIEW 2: PRINT DETAIL
+     ═══════════════════════════════════════ -->
+<div id="detail" class="view">
+
+  <!-- Hero -->
+  <div class="detail-hero">
+    <div class="detail-hero-img-wrap">
+      <img id="detailHeroImg" src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200" alt="">
+      <div class="detail-hero-gradient"></div>
+    </div>
+    <div class="detail-hero-text">
+      <div class="detail-hero-label" id="detailHeroLabel">Swiss Alps Collection</div>
+      <h1 class="detail-hero-title" id="detailHeroTitle">Alpine Dawn</h1>
+    </div>
+  </div>
+
+  <!-- Body: Story + Purchase -->
+  <div class="detail-body">
+
+    <!-- Story Column -->
+    <div class="story-col">
+      <h2>The Story</h2>
+      <p class="first-para" id="detailStoryFirst">Standing at the edge of the ridge before dawn, the world below was a sea of indigo shadows. Then the light came — not suddenly, but with the slow deliberation of something ancient and rehearsed. The peaks caught it first, turning rose and gold while the valleys still slept in blue.</p>
+      <p id="detailStorySecond">This photograph was made in a single exposure at 2,847 metres, where the air is thin enough to taste clarity itself. The Hahnemühle Photo Rag paper was chosen for its ability to hold the subtle gradations of pre-dawn light — the way blue becomes lavender becomes gold in a seamless gradient that most papers simply cannot render.</p>
+
+      <blockquote class="story-quote" id="detailPullQuote">"Every print is an edition of patience — the patience to wait for the right light, the patience to find the right paper, the patience to ensure every shadow holds its depth."</blockquote>
+
+      <p id="detailStoryThird">Each print is individually inspected, numbered, and signed. The certificate of authenticity includes the exact coordinates, time, and conditions of capture — a provenance as precise as the image itself.</p>
+    </div>
+
+    <!-- Purchase Column -->
+    <div class="purchase-col">
+      <div class="purchase-album" id="detailAlbum">Swiss Alps Collection</div>
+
+      <!-- Edition bar -->
+      <div class="edition-bar-wrap">
+        <div class="edition-bar-header">
+          <span class="label">Edition Progress</span>
+          <span class="value" id="editionText">7 of 25 sold</span>
+        </div>
+        <div class="edition-bar">
+          <div class="edition-bar-fill" id="editionFill" style="width: 28%"></div>
+        </div>
+      </div>
+
+      <!-- Size selector -->
+      <div class="selector-label">Select Size</div>
+      <div class="size-tabs" id="sizeTabs">
+        <button class="size-tab" data-size="A4" data-price-mod="0">
+          A4
+          <span class="dim">210 × 297mm</span>
+        </button>
+        <button class="size-tab active" data-size="A3" data-price-mod="60">
+          A3
+          <span class="dim">297 × 420mm</span>
+        </button>
+        <button class="size-tab" data-size="A2" data-price-mod="140">
+          A2
+          <span class="dim">420 × 594mm</span>
+        </button>
+        <button class="size-tab" data-size="A1" data-price-mod="280">
+          A1
+          <span class="dim">594 × 841mm</span>
+        </button>
+      </div>
+
+      <!-- Paper selector -->
+      <div class="selector-label">Paper</div>
+      <div class="paper-cards" id="paperCards">
+        <button class="paper-card active" data-paper="rag" data-price-add="0">
+          <div class="paper-radio"><div class="paper-radio-inner"></div></div>
+          <div class="paper-info">
+            <div class="paper-name">Hahnemühle Photo Rag</div>
+            <div class="paper-desc">308gsm · Matte · Cotton</div>
+          </div>
+        </button>
+        <button class="paper-card" data-paper="baryta" data-price-add="25">
+          <div class="paper-radio"><div class="paper-radio-inner"></div></div>
+          <div class="paper-info">
+            <div class="paper-name">Hahnemühle Baryta Satin</div>
+            <div class="paper-desc">330gsm · Semi-Gloss · Baryta</div>
+          </div>
+        </button>
+        <button class="paper-card" data-paper="pearl" data-price-add="15">
+          <div class="paper-radio"><div class="paper-radio-inner"></div></div>
+          <div class="paper-info">
+            <div class="paper-name">Canson Platine Fibre</div>
+            <div class="paper-desc">310gsm · Pearl · Fibre-based</div>
+          </div>
+        </button>
+      </div>
+
+      <!-- Price -->
+      <div class="detail-price-row">
+        <span class="detail-price" id="detailPrice">£245</span>
+        <span class="detail-price-note">incl. certificate</span>
+      </div>
+      <div class="lead-time">Ships in 5–7 working days</div>
+
+      <!-- CTA -->
+      <button class="cta-btn" id="ctaBtn">Request This Print</button>
+      <button class="cta-secondary">View in Album</button>
+    </div>
+
+  </div>
+
+  <!-- Room Mockup -->
+  <div class="room-section">
+    <h3>In Your Space</h3>
+    <div class="room-mockup" id="roomMockup">
+      <div class="room-wall"></div>
+      <div class="room-floor"></div>
+      <div class="room-sofa"></div>
+      <div class="room-print-frame" id="roomFrame" style="width: 160px; height: 107px;">
+        <img id="roomImg" src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400" alt="">
+      </div>
+      <div class="room-dimensions room-dim-w" id="roomDimW">297 × 420mm</div>
+    </div>
+  </div>
+
+  <!-- Trust -->
+  <div class="trust-section">
+    <div class="trust-item">
+      <span class="trust-icon">✦</span>
+      <div class="trust-title">Free Shipping</div>
+      <div class="trust-desc">Worldwide delivery, packaged flat between acid-free boards</div>
+    </div>
+    <div class="trust-item">
+      <span class="trust-icon">◈</span>
+      <div class="trust-title">Certificate of Authenticity</div>
+      <div class="trust-desc">Signed, numbered, with capture metadata and edition details</div>
+    </div>
+    <div class="trust-item">
+      <span class="trust-icon">↻</span>
+      <div class="trust-title">14-Day Returns</div>
+      <div class="trust-desc">Full refund if the print doesn't meet your expectations</div>
+    </div>
+  </div>
+
+  <!-- Footer Nav -->
+  <div class="detail-footer-nav">
+    <button onclick="switchView('listing')">← Back to The Print Room</button>
+    <button id="nextPrintBtn" onclick="showNextPrint()">Next Print: Golden Passage →</button>
+  </div>
+
+</div>
+
+<script>
+const PRINTS = [
+  {
+    title: 'Alpine Dawn',
+    category: 'Landscape · Swiss Alps',
+    album: 'Swiss Alps Collection',
+    quote: '"The mountains appeared to breathe that morning, their peaks catching the first light like a whispered secret between earth and sky."',
+    storyFirst: 'Standing at the edge of the ridge before dawn, the world below was a sea of indigo shadows. Then the light came — not suddenly, but with the slow deliberation of something ancient and rehearsed. The peaks caught it first, turning rose and gold while the valleys still slept in blue.',
+    storySecond: 'This photograph was made in a single exposure at 2,847 metres, where the air is thin enough to taste clarity itself. The Hahnemühle Photo Rag paper was chosen for its ability to hold the subtle gradations of pre-dawn light — the way blue becomes lavender becomes gold in a seamless gradient that most papers simply cannot render.',
+    pullQuote: '"Every print is an edition of patience — the patience to wait for the right light, the patience to find the right paper, the patience to ensure every shadow holds its depth."',
+    storyThird: 'Each print is individually inspected, numbered, and signed. The certificate of authenticity includes the exact coordinates, time, and conditions of capture — a provenance as precise as the image itself.',
+    edition: 7, editionTotal: 25,
+    basePrice: 185,
+    img: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4',
+  },
+  {
+    title: 'Golden Passage',
+    category: 'Valley · Scottish Highlands',
+    album: 'Highlands Collection',
+    quote: '"Light poured through the valley like honey, thick and golden, transforming every ordinary thing it touched into something holy."',
+    storyFirst: 'The Highlands possess a light found nowhere else on earth — a quality born of latitude, moisture, and the Atlantic\'s restless proximity. On this particular morning the glen was a cathedral of gold, every blade of grass an individual filament catching the low sun.',
+    storySecond: 'Printed on Hahnemühle Photo Rag, the warm tones of the golden hour are preserved with remarkable fidelity. The cotton fibre base gives a tactile quality that elevates the image from photograph to object — something you want to touch, to hold.',
+    pullQuote: '"The Highlands teach you that beauty is not a destination but a quality of attention. This print is an invitation to that attention."',
+    storyThird: 'Limited to 25 editions worldwide. Each print ships flat, protected between acid-free boards, with a signed certificate documenting the moment of capture.',
+    edition: 12, editionTotal: 25,
+    basePrice: 185,
+    img: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05',
+  },
+  {
+    title: 'Still Water',
+    category: 'Lake · Italian Dolomites',
+    album: 'Dolomites Collection',
+    quote: '"The lake held the mountains like a mirror holds a face — perfectly, reverently, with neither judgement nor distortion."',
+    storyFirst: 'Lago di Braies at dawn is a place of impossible symmetry. The water, undisturbed by wind, becomes a second sky — and in that doubling, reality takes on the quality of a dream. This was captured in the brief window between night\'s last breath and morning\'s first.',
+    storySecond: 'The Baryta Satin paper was selected specifically for this image. Its semi-gloss finish gives the water a luminous quality that matte paper cannot achieve — a subtle sheen that makes the reflection feel alive, almost liquid against the page.',
+    pullQuote: '"Some places exist at the edge of believability. The Dolomites at dawn are one. This print preserves that edge."',
+    storyThird: 'Only 3 of 25 editions remain. Each is a giclée print using archival pigment inks rated for 200+ years of colour stability under museum conditions.',
+    edition: 3, editionTotal: 25,
+    basePrice: 210,
+    img: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470',
+  },
+  {
+    title: 'Cathedral Green',
+    category: 'Forest · Black Forest, Germany',
+    album: 'Forest Collection',
+    quote: '"The canopy formed a nave above me, shafts of light descending like organ notes through the ancient, breathing dark."',
+    storyFirst: 'The Black Forest earns its name in winter, but in summer it becomes something else entirely — a vertical world of green upon green, where light filters down through layers of canopy like water through stained glass. This image was made looking straight up, surrendering to the forest\'s own perspective.',
+    storySecond: 'The vertical orientation of this print demands a paper that can handle deep shadows without blocking up. Photo Rag\'s open-pore structure ensures that even the darkest areas of the canopy retain detail and dimension, while the highlights of breaking light maintain their crystalline quality.',
+    pullQuote: '"A forest is the original cathedral. This print is a window into its nave."',
+    storyThird: 'With 18 of 25 editions sold, this is among our most sought-after prints. The vertical format makes it particularly striking in hallways, stairwells, and narrow wall spaces.',
+    edition: 18, editionTotal: 25,
+    basePrice: 185,
+    img: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e',
+  }
+];
+
+const SIZE_DATA = {
+  A4: { dims: '210 × 297mm', priceMod: 0, frameW: 100, frameH: 67 },
+  A3: { dims: '297 × 420mm', priceMod: 60, frameW: 140, frameH: 93 },
+  A2: { dims: '420 × 594mm', priceMod: 140, frameW: 180, frameH: 120 },
+  A1: { dims: '594 × 841mm', priceMod: 280, frameW: 220, frameH: 147 },
+};
+
+let currentPrintIndex = 0;
+let selectedSize = 'A3';
+let selectedPaperAdd = 0;
+
+// ─── VIEW SWITCHING ───
+function switchView(viewId) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.view-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(viewId).classList.add('active');
+  document.querySelector(`[data-view="${viewId}"]`).classList.add('active');
+
+  const dots = document.getElementById('progressDots');
+  dots.style.display = viewId === 'listing' ? 'flex' : 'none';
+
+  if (viewId === 'detail') {
+    window.scrollTo(0, 0);
+  }
+}
+
+document.querySelectorAll('.view-tab').forEach(tab => {
+  tab.addEventListener('click', () => switchView(tab.dataset.view));
+});
+
+// ─── SHOW DETAIL FOR A PRINT ───
+function showDetail(idx) {
+  currentPrintIndex = idx;
+  const p = PRINTS[idx];
+
+  document.getElementById('detailHeroImg').src = p.img + '?w=1200';
+  document.getElementById('detailHeroLabel').textContent = p.album;
+  document.getElementById('detailHeroTitle').textContent = p.title;
+  document.getElementById('detailAlbum').textContent = p.album;
+  document.getElementById('detailStoryFirst').textContent = p.storyFirst;
+  document.getElementById('detailStorySecond').textContent = p.storySecond;
+  document.getElementById('detailPullQuote').textContent = p.pullQuote;
+  document.getElementById('detailStoryThird').textContent = p.storyThird;
+
+  const soldPct = Math.round((p.edition / p.editionTotal) * 100);
+  document.getElementById('editionText').textContent = `${p.edition} of ${p.editionTotal} sold`;
+  document.getElementById('editionFill').style.width = soldPct + '%';
+
+  document.getElementById('roomImg').src = p.img + '?w=400';
+
+  selectedSize = 'A3';
+  selectedPaperAdd = 0;
+  document.querySelectorAll('.size-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.size === 'A3');
+  });
+  document.querySelectorAll('.paper-card').forEach((c, i) => {
+    c.classList.toggle('active', i === 0);
+  });
+
+  updatePrice(p.basePrice);
+  updateRoom();
+  updateNextPrint();
+  switchView('detail');
+}
+
+function showNextPrint() {
+  const next = (currentPrintIndex + 1) % PRINTS.length;
+  showDetail(next);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateNextPrint() {
+  const next = (currentPrintIndex + 1) % PRINTS.length;
+  document.getElementById('nextPrintBtn').textContent = `Next Print: ${PRINTS[next].title} →`;
+}
+
+// ─── PRICING ───
+function updatePrice(base) {
+  if (base === undefined) base = PRINTS[currentPrintIndex].basePrice;
+  const total = base + SIZE_DATA[selectedSize].priceMod + selectedPaperAdd;
+  document.getElementById('detailPrice').textContent = '£' + total;
+}
+
+// ─── SIZE SELECTOR ───
+document.getElementById('sizeTabs').addEventListener('click', (e) => {
+  const tab = e.target.closest('.size-tab');
+  if (!tab) return;
+  document.querySelectorAll('.size-tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  selectedSize = tab.dataset.size;
+  updatePrice();
+  updateRoom();
+});
+
+// ─── PAPER SELECTOR ───
+document.getElementById('paperCards').addEventListener('click', (e) => {
+  const card = e.target.closest('.paper-card');
+  if (!card) return;
+  document.querySelectorAll('.paper-card').forEach(c => c.classList.remove('active'));
+  card.classList.add('active');
+  selectedPaperAdd = parseInt(card.dataset.priceAdd) || 0;
+  updatePrice();
+});
+
+// ─── ROOM MOCKUP ───
+function updateRoom() {
+  const s = SIZE_DATA[selectedSize];
+  const frame = document.getElementById('roomFrame');
+  frame.style.width = s.frameW + 'px';
+  frame.style.height = s.frameH + 'px';
+  document.getElementById('roomDimW').textContent = s.dims;
+}
+
+// ─── SCROLL OBSERVER (LISTING) ───
+function initScrollObserver() {
+  const listing = document.getElementById('listing');
+  const sections = listing.querySelectorAll('.snap-section');
+  const dots = document.querySelectorAll('.progress-dots .dot');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in-view');
+        const idx = parseInt(entry.target.dataset.section);
+        dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+      }
+    });
+  }, {
+    root: listing,
+    threshold: 0.55
+  });
+
+  sections.forEach(s => observer.observe(s));
+
+  dots.forEach(dot => {
+    dot.addEventListener('click', () => {
+      const idx = parseInt(dot.dataset.index);
+      sections[idx].scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+}
+
+// ─── CTA BUTTON FEEDBACK ───
+document.getElementById('ctaBtn').addEventListener('click', function() {
+  const btn = this;
+  const orig = btn.textContent;
+  btn.textContent = 'Request Received ✓';
+  btn.style.background = 'var(--yellow)';
+  btn.style.color = 'var(--fg)';
+  setTimeout(() => {
+    btn.textContent = orig;
+    btn.style.background = '';
+    btn.style.color = '';
+  }, 2000);
+});
+
+// ─── INIT ───
+initScrollObserver();
+</script>
+
+</body>
+</html>
