@@ -1,0 +1,97 @@
+---
+title: House Prices Are Not the Whole Affordability Story
+date: 2026-06-02
+summary: A mortgage-first view of affordability across five decades of Irish housing data.
+tags: [ireland, housing, economics, mortgage, data]
+category: Data Story
+image: "/blog/ireland-property-economy/cover.png"
+---
+
+The usual housing affordability story is simple: house prices rise, wages fail to keep up, and price-to-wage ratios climb.
+
+That story is true, but incomplete.
+
+Most people do not buy a house with cash. They buy with a mortgage, and mortgage affordability depends on both loan size and interest rates. A house at 15% mortgage rates is a very different proposition from the same house at 3%.
+
+This article rebuilds that affordability story using a simple mortgage model over long-run Irish data. It focuses on four linked views: asset price burden, entry payment burden, burden over the life of the mortgage, and a compact mathematical fit using the present value annuity factor (PVAF).
+
+## 1) The Asset Price Story vs Payment Story
+
+Price-to-wage ratios have clearly risen over the long run. But that metric captures the asset-price problem, not the monthly-payment problem.
+
+A more direct entry affordability metric is the initial mortgage burden:
+
+- Initial burden = first-year mortgage payment / first-year annual wage
+
+When plotted beside price-to-wage, the shape changes. The latest years remain stretched, but the burden path has peaks and troughs that differ from the raw price ratio.
+
+<MortgageAffordabilityChartsOne />
+
+## 2) The Missing Variable: Interest Rates
+
+In high-rate periods, a fixed monthly budget can support a smaller loan. In lower-rate periods, the same budget supports a larger loan. That mechanical channel matters.
+
+As rates fell over decades, buyers could carry larger mortgages for the same initial payment burden. In a constrained market, that borrowing capacity can be capitalized into higher prices.
+
+This does not imply interest rates explain everything. Supply constraints, regulation, demographics, tax, lending rules, and expectations all matter. But interest rates strongly shape what payment-constrained buyers can bid.
+
+<MortgageAffordabilityChartsTwo />
+
+## 3) Burden After Purchase
+
+First-year burden is only one part of the story. Another key question is how quickly mortgage burden fades after purchase.
+
+If nominal wages grow while mortgage payments are fixed (or mostly fixed), mortgage burden can decline significantly over time. Earlier cohorts often saw this debt erosion happen quickly under higher inflation and wage growth regimes.
+
+Newer cohorts can face a different trade-off: lower rates at entry, but slower burden erosion if wage growth is weaker and the initial loan multiple is higher.
+
+<MortgageAffordabilityChartsThree />
+
+## 4) Lifetime Burden and the PVAF Fit
+
+Lifetime burden can be approximated as:
+
+- Lifetime burden = total mortgage payments over term / total earnings over same term
+
+This gives a broader life-cycle affordability measure than entry year alone.
+
+To connect rates and price-to-wage in one expression, use the annuity identity:
+
+- `PVAF(r, n) = (1 - (1 + r)^-n) / r`
+- `L = A * PVAF(r, n)`
+- `Q = d + m * PVAF(r, n)` where:
+  - `Q` is house-price-to-wage ratio,
+  - `d` is deposit as wage-multiple,
+  - `m` is mortgage-payment share of wage,
+  - `n` is term (years), `r` is annual mortgage rate.
+
+This fitted relationship captures the broad downward shape: high rates compress supportable price-to-wage multiples; low rates allow higher multiples.
+
+<MortgageAffordabilityChartsFour />
+
+## Caveats
+
+This is a deliberately simple model and should be read as directional, not definitive.
+
+- It uses gross earnings, not disposable income.
+- Average wages and average prices do not represent the same household at all times.
+- Household structure changed over time (single-income vs dual-income financing norms).
+- Deposit constraints can dominate even when monthly serviceability is acceptable.
+- Term assumptions matter materially (for example 25-year vs 35-year loans).
+- Recent cohort projections are inherently more uncertain than older completed periods.
+
+## Why This Matters
+
+Affordability is not only about how expensive houses look relative to annual pay. It is about the interaction of prices, rates, wages, inflation, and time.
+
+- Price-to-wage captures the asset-price side.
+- Initial burden captures the entry-payment side.
+- Cohort and lifetime burden capture the life-course debt side.
+
+Taken together, these views are more informative than any single ratio alone.
+
+## Data Sources and Notes
+
+- Mortgage and affordability table supplied in `mortgage data table.xlsx`.
+- Long-run series used: house prices, wages, inflation, mortgage rates, mortgage payments, and mortgage burden fields.
+- All chart rendering is native (Recharts), not image exports.

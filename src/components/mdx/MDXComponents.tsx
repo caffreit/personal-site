@@ -4,6 +4,7 @@ import HousingMarketAnalysis from "../tools/HousingMarketAnalysis";
 import HousingMarketAnalysisLegacy from "../tools/HousingMarketAnalysisLegacy";
 import IrelandPropertyStoryCharts from "../tools/IrelandPropertyStoryCharts";
 import LongTailChart from "../tools/LongTailChart";
+import MortgageAffordabilityCharts from "../tools/MortgageAffordabilityCharts";
 import TaskChart from "../tools/TaskChart";
 
 const Blockquote = ({ children }: { children: ReactNode }) => {
@@ -48,6 +49,11 @@ const components = {
   IrelandPropertyStoryChartsOne: () => <IrelandPropertyStoryCharts section={1} />,
   IrelandPropertyStoryChartsTwo: () => <IrelandPropertyStoryCharts section={2} />,
   IrelandPropertyStoryChartsThree: () => <IrelandPropertyStoryCharts section={3} />,
+  MortgageAffordabilityCharts,
+  MortgageAffordabilityChartsOne: () => <MortgageAffordabilityCharts section={1} />,
+  MortgageAffordabilityChartsTwo: () => <MortgageAffordabilityCharts section={2} />,
+  MortgageAffordabilityChartsThree: () => <MortgageAffordabilityCharts section={3} />,
+  MortgageAffordabilityChartsFour: () => <MortgageAffordabilityCharts section={4} />,
   LongTailChart,
   TaskChart,
   blockquote: Blockquote,
