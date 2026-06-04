@@ -13,17 +13,13 @@ That story is true, but incomplete.
 
 Most people do not buy a house with cash. They buy with a mortgage, and mortgage affordability depends on both loan size and interest rates. A house at 15% mortgage rates is a very different proposition from the same house at 3%.
 
-This article rebuilds that affordability story using a simple mortgage model over long-run Irish data. It focuses on four linked views: asset price burden, entry payment burden, burden over the life of the mortgage, and a compact mathematical fit using the present value annuity factor (PVAF).
+This article rebuilds that affordability story using a simple mortgage model over long-run Irish data. It focuses on four linked views: asset price burden, entry payment burden, burden over the life of the mortgage, and lifetime wage share absorbed by the mortgage. A compact PVAF-based model at the end ties interest rates to supportable price-to-wage ratios.
 
 ## 1) The Asset Price Story vs Payment Story
 
 Price-to-wage ratios have clearly risen over the long run. But that metric captures the asset-price problem, not the monthly-payment problem.
 
-A more direct entry affordability metric is the initial mortgage burden:
-
-- Initial burden = first-year mortgage payment / first-year annual wage
-
-When plotted beside price-to-wage, the shape changes. The latest years remain stretched, but the burden path has peaks and troughs that differ from the raw price ratio.
+The first thing to put beside that price-to-wage ratio is the mortgage interest rate. The price line rises over time, while rates move through a very different cycle: high in the 1970s and 1980s, much lower through the 2010s, and rising again more recently.
 
 <MortgageAffordabilityChartsOne />
 
@@ -34,6 +30,8 @@ In high-rate periods, a fixed monthly budget can support a smaller loan. In lowe
 As rates fell over decades, buyers could carry larger mortgages for the same initial payment burden. In a constrained market, that borrowing capacity can be capitalized into higher prices.
 
 This does not imply interest rates explain everything. Supply constraints, regulation, demographics, tax, lending rules, and expectations all matter. But interest rates strongly shape what payment-constrained buyers can bid.
+
+The first chart below puts price-to-wage beside the initial mortgage burden: the first-year mortgage payment as a share of annual wage. The second chart shows the fitted PVAF relationship. The maths behind that fit is set out at the end of the article.
 
 <MortgageAffordabilityChartsTwo />
 
@@ -47,25 +45,15 @@ Newer cohorts can face a different trade-off: lower rates at entry, but slower b
 
 <MortgageAffordabilityChartsThree />
 
-## 4) Lifetime Burden and the PVAF Fit
+## 4) Lifetime Mortgage Burden
 
-Lifetime burden can be approximated as:
+We can go further by comparing total mortgage payments over the life of the loan with total earnings over the same period.
 
 - Lifetime burden = total mortgage payments over term / total earnings over same term
 
-This gives a broader life-cycle affordability measure than entry year alone.
+This gives a rough measure of the lifetime wage share absorbed by the mortgage — a broader life-cycle affordability measure than the entry year alone.
 
-To connect rates and price-to-wage in one expression, use the annuity identity:
-
-- `PVAF(r, n) = (1 - (1 + r)^-n) / r`
-- `L = A * PVAF(r, n)`
-- `Q = d + m * PVAF(r, n)` where:
-  - `Q` is house-price-to-wage ratio,
-  - `d` is deposit as wage-multiple,
-  - `m` is mortgage-payment share of wage,
-  - `n` is term (years), `r` is annual mortgage rate.
-
-This fitted relationship captures the broad downward shape: high rates compress supportable price-to-wage multiples; low rates allow higher multiples.
+Again, the result is not a simple upward line. The late 1980s look favourable in this model. The 2000s look extremely expensive. Recent buyers sit in a more uncertain zone, because we do not yet know what future wage growth and interest rates will do. Any estimate for recent cohorts has to be extrapolated.
 
 <MortgageAffordabilityChartsFour />
 
@@ -88,10 +76,66 @@ Affordability is not only about how expensive houses look relative to annual pay
 - Initial burden captures the entry-payment side.
 - Cohort and lifetime burden capture the life-course debt side.
 
+There is also a wealth-accumulation side. The chart below shows, for each purchase year, the housing wealth gain by 2024 as a share of the buyer's cumulative earnings over the same period.
+
+<MortgageAffordabilityChartsFive />
+
 Taken together, these views are more informative than any single ratio alone.
+
+## The Maths: PVAF and Price-to-Wage
+
+A simple way to connect interest rates and house-price-to-wage ratios is through the present value annuity factor (PVAF). The PVAF tells us how much loan a given annual mortgage payment can support at a given interest rate over a fixed term. When rates are low, the same payment can support a much larger loan. When rates are high, the same payment supports a much smaller loan.
+
+The standard annuity formula is:
+
+<MathBlock>
+  L = A × <MathFraction numerator={<>1 - (1 + r)<sup>-n</sup></>} denominator={<>r</>} />
+</MathBlock>
+
+where `L` is the loan amount, `A` is the annual mortgage payment, `r` is the annual interest rate, and `n` is the mortgage term in years. The fraction is the PVAF:
+
+<MathBlock>
+  PVAF(r, n) = <MathFraction numerator={<>1 - (1 + r)<sup>-n</sup></>} denominator={<>r</>} />
+</MathBlock>
+
+So:
+
+<MathBlock>
+  L = A × PVAF(r, n)
+</MathBlock>
+
+Divide everything by annual wage `W`. If the buyer can afford to spend a fraction `m` of annual wage on mortgage payments, then `A = mW` and:
+
+<MathBlock>
+  <MathFraction numerator={<>L</>} denominator={<>W</>} /> = m × PVAF(r, n)
+</MathBlock>
+
+House price `P` is the deposit plus the loan: `P = D + L`. So the price-to-wage ratio is:
+
+<MathBlock>
+  <MathFraction numerator={<>P</>} denominator={<>W</>} /> = <MathFraction numerator={<>D</>} denominator={<>W</>} /> + <MathFraction numerator={<>L</>} denominator={<>W</>} />
+</MathBlock>
+
+Substituting the mortgage term gives:
+
+<MathBlock>
+  <MathFraction numerator={<>P</>} denominator={<>W</>} /> = <MathFraction numerator={<>D</>} denominator={<>W</>} /> + m × PVAF(r, n)
+</MathBlock>
+
+Or, more compactly:
+
+<MathBlock>
+  Q = d + m × PVAF(r, n)
+</MathBlock>
+
+where `Q = P / W` is the house-price-to-wage ratio and `d = D / W` is the deposit measured in years of wages.
+
+That is the fitted model in plain terms. The price-to-wage ratio is treated as the combination of two parts: the deposit a buyer can put down, plus the mortgage their income can service. The mortgage component is shaped by the PVAF. The model is not saying that interest rates explain everything in the housing market. It is saying something narrower: if buyers are constrained by what they can pay each month, then lower interest rates mechanically allow higher price-to-wage ratios.
+
+That gives the broad downward curve in the data. High-rate years tend to support lower price-to-wage ratios. Low-rate years can support much higher ratios. The relationship is not perfect — supply, planning, credit conditions, deposits, loan-to-value limits, demographics, tax, and expectations all matter. But the broad pattern is still useful: lower rates allow higher price-to-wage ratios to be sustained; higher rates compress what buyers can afford.
 
 ## Data Sources and Notes
 
-- Mortgage and affordability table supplied in `mortgage data table.xlsx`.
+- Mortgage and affordability table supplied in `mortgage data table.xlsx`. <a className="font-semibold underline decoration-stone-300 underline-offset-4 transition-colors hover:text-[var(--color-yellow)] hover:decoration-[var(--color-yellow)] dark:decoration-zinc-600" href="/api/mortgage-affordability-data" download>Download the mortgage data table (CSV)</a>.
 - Long-run series used: house prices, wages, inflation, mortgage rates, mortgage payments, and mortgage burden fields.
 - All chart rendering is native (Recharts), not image exports.
