@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   CartesianGrid,
   ComposedChart,
@@ -119,7 +119,11 @@ function InterestRateFitTooltip({ active, payload }: FitTooltipProps) {
 }
 
 export default function MortgageAffordabilityCharts({ section }: MortgageAffordabilityChartsProps) {
-  const isClient = typeof window !== "undefined";
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const series = useMemo(
     () =>
@@ -219,7 +223,7 @@ export default function MortgageAffordabilityCharts({ section }: MortgageAfforda
   const showFour = section === undefined || section === 4;
   const showFive = section === undefined || section === 5;
 
-  if (!isClient) {
+  if (!mounted) {
     return (
       <div className="my-12 rounded-2xl border border-stone-200 bg-white p-6 text-sm text-stone-500 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/70 dark:text-stone-400 md:my-16">
         Loading chart views...
