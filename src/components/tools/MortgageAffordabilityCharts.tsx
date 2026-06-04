@@ -57,6 +57,11 @@ const chartCard =
 const headingClass = "mt-2 font-sans text-xl font-bold text-stone-900 dark:text-stone-100";
 const noteClass = "mt-4 text-sm text-stone-500 dark:text-stone-400";
 const axisTick = { fill: "#78716c", fontSize: 13 };
+const euroFormatter = new Intl.NumberFormat("en-IE", {
+  style: "currency",
+  currency: "EUR",
+  maximumFractionDigits: 0,
+});
 
 function pvaf(rateDecimal: number, termYears: number) {
   if (rateDecimal <= 0) return termYears;
@@ -85,7 +90,12 @@ function fitPriceWageToPvaf(data: { priceToWage: number; initialRatePct: number 
 function InterestRateFitTooltip({ active, payload }: FitTooltipProps) {
   if (!active || !payload?.length) return null;
 
-  const observedPoint = payload.find((entry) => entry.name === "Observed Price/Wage")?.payload;
+  const observedPoint = payload.find(
+    (entry) =>
+      typeof entry.payload?.year === "number" &&
+      typeof entry.payload.ratePct === "number" &&
+      typeof entry.payload.priceToWage === "number"
+  )?.payload;
   if (
     !observedPoint ||
     typeof observedPoint.year !== "number" ||
@@ -197,6 +207,7 @@ export default function MortgageAffordabilityCharts({ section }: MortgageAfforda
 
       return {
         year: row.year,
+        housingWealthGain: latestHousePrice - row.housePrice,
         housingWealthGainPct: Number(housingWealthGainPct.toFixed(2)),
       };
     });
@@ -220,7 +231,7 @@ export default function MortgageAffordabilityCharts({ section }: MortgageAfforda
     <div className="my-12 space-y-6 md:my-16 md:space-y-8">
       {showOne && (
         <section className={chartCard}>
-          <h3 className={headingClass}>Price-to-Wage and Interest Rates Over Time</h3>
+          <h3 className={headingClass}>Price-to-Wage vs Initial Mortgage Burden</h3>
           <div className="mt-5 h-[360px]">
             <ResponsiveContainer width="100%" height="100%" minWidth={280}>
               <LineChart data={series} margin={{ top: 14, right: 20, left: 0, bottom: 8 }}>
@@ -249,18 +260,18 @@ export default function MortgageAffordabilityCharts({ section }: MortgageAfforda
                 />
                 <Legend wrapperStyle={{ fontSize: 12 }} />
                 <Line yAxisId="left" type="monotone" dataKey="priceToWage" name="Price / Wage" stroke="#7c3aed" strokeWidth={2.6} dot={false} />
-                <Line yAxisId="right" type="monotone" dataKey="initialRatePct" name="Mortgage Rate" stroke="#f97316" strokeWidth={2.3} dot={false} />
+                <Line yAxisId="right" type="monotone" dataKey="initialBurdenPct" name="Initial Burden (% wage)" stroke="#f97316" strokeWidth={2.3} dot={false} />
               </LineChart>
             </ResponsiveContainer>
           </div>
-          <p className={noteClass}>Price-to-wage uses the left axis; mortgage interest rates use the right axis.</p>
+          <p className={noteClass}>Initial burden is annualized first-year mortgage payment as a share of annual wage.</p>
         </section>
       )}
 
       {showTwo && (
         <>
           <section className={chartCard}>
-            <h3 className={headingClass}>Price-to-Wage vs Initial Mortgage Burden</h3>
+            <h3 className={headingClass}>Price-to-Wage and Interest Rates Over Time</h3>
             <div className="mt-5 h-[360px]">
               <ResponsiveContainer width="100%" height="100%" minWidth={280}>
                 <LineChart data={series} margin={{ top: 14, right: 20, left: 0, bottom: 8 }}>
@@ -289,11 +300,11 @@ export default function MortgageAffordabilityCharts({ section }: MortgageAfforda
                   />
                   <Legend wrapperStyle={{ fontSize: 12 }} />
                   <Line yAxisId="left" type="monotone" dataKey="priceToWage" name="Price / Wage" stroke="#7c3aed" strokeWidth={2.6} dot={false} />
-                  <Line yAxisId="right" type="monotone" dataKey="initialBurdenPct" name="Initial Burden (% wage)" stroke="#f97316" strokeWidth={2.3} dot={false} />
+                  <Line yAxisId="right" type="monotone" dataKey="initialRatePct" name="Mortgage Rate" stroke="#f97316" strokeWidth={2.3} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
-            <p className={noteClass}>Initial burden is annualized first-year mortgage payment as a share of annual wage.</p>
+            <p className={noteClass}>Price-to-wage uses the left axis; mortgage interest rates use the right axis.</p>
           </section>
 
           <section className={chartCard}>
@@ -387,17 +398,34 @@ export default function MortgageAffordabilityCharts({ section }: MortgageAfforda
               <LineChart data={housingWealthByCohort} margin={{ top: 14, right: 20, left: 0, bottom: 8 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#d6d3d1" opacity={0.45} />
                 <XAxis dataKey="year" tick={axisTick} />
-                <YAxis tick={axisTick} width={62} tickFormatter={(value: number) => `${value.toFixed(0)}%`} />
+                <YAxis
+                  yAxisId="left"
+                  tick={axisTick}
+                  width={62}
+                  tickFormatter={(value: number) => `${value.toFixed(0)}%`}
+                />
+                <YAxis
+                  yAxisId="right"
+                  orientation="right"
+                  tick={axisTick}
+                  width={86}
+                  tickFormatter={(value: number) => euroFormatter.format(value)}
+                />
                 <Tooltip
                   contentStyle={{ borderRadius: "12px", borderColor: "#d6d3d1" }}
-                  formatter={(value: number) => [`${value.toFixed(1)}%`, "Housing wealth gain / earnings"]}
+                  formatter={(value: number, name: string) => {
+                    if (name === "Housing wealth gain / earnings") return [`${value.toFixed(1)}%`, name];
+                    return [euroFormatter.format(value), name];
+                  }}
                 />
-                <ReferenceLine y={0} stroke="#a8a29e" strokeDasharray="4 4" />
-                <Line type="monotone" dataKey="housingWealthGainPct" name="Housing wealth gain / earnings" stroke="#2563eb" strokeWidth={2.4} dot={{ r: 2.3 }} activeDot={{ r: 5 }} />
+                <Legend wrapperStyle={{ fontSize: 12 }} />
+                <ReferenceLine yAxisId="left" y={0} stroke="#a8a29e" strokeDasharray="4 4" />
+                <Line yAxisId="left" type="monotone" dataKey="housingWealthGainPct" name="Housing wealth gain / earnings" stroke="#2563eb" strokeWidth={2.4} dot={{ r: 2.3 }} activeDot={{ r: 5 }} />
+                <Line yAxisId="right" type="monotone" dataKey="housingWealthGain" name="Housing wealth gain" stroke="#16a34a" strokeWidth={2.4} dot={{ r: 2.3 }} activeDot={{ r: 5 }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
-          <p className={noteClass}>Wealth gain is measured as the 2024 house price minus the purchase-year price, divided by cumulative earnings from purchase year to 2024.</p>
+          <p className={noteClass}>Wealth gain is measured as the 2024 house price minus the purchase-year price, shown both in nominal euros and as a share of cumulative earnings from purchase year to 2024.</p>
         </section>
       )}
     </div>
