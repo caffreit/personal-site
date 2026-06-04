@@ -4,6 +4,7 @@ import HousingMarketAnalysis from "../tools/HousingMarketAnalysis";
 import HousingMarketAnalysisLegacy from "../tools/HousingMarketAnalysisLegacy";
 import IrelandPropertyStoryCharts from "../tools/IrelandPropertyStoryCharts";
 import LongTailChart from "../tools/LongTailChart";
+import MortgageAffordabilityCharts from "../tools/MortgageAffordabilityCharts";
 import TaskChart from "../tools/TaskChart";
 
 const Blockquote = ({ children }: { children: ReactNode }) => {
@@ -13,6 +14,31 @@ const Blockquote = ({ children }: { children: ReactNode }) => {
         {children}
       </div>
     </div>
+  );
+};
+
+const MathBlock = ({ children }: { children: ReactNode }) => {
+  return (
+    <div className="my-8 overflow-x-auto rounded-2xl border border-stone-200 bg-stone-50 px-5 py-6 text-center shadow-sm dark:border-zinc-800 dark:bg-zinc-900/70">
+      <div className="inline-flex min-w-max items-center justify-center gap-2 font-serif text-2xl text-stone-950 dark:text-stone-50 md:text-3xl">
+        {children}
+      </div>
+    </div>
+  );
+};
+
+const MathFraction = ({
+  numerator,
+  denominator,
+}: {
+  numerator: ReactNode;
+  denominator: ReactNode;
+}) => {
+  return (
+    <span className="inline-flex translate-y-1 flex-col items-center px-1 align-middle leading-none">
+      <span className="border-b border-current px-2 pb-1">{numerator}</span>
+      <span className="px-2 pt-1">{denominator}</span>
+    </span>
   );
 };
 
@@ -48,10 +74,18 @@ const components = {
   IrelandPropertyStoryChartsOne: () => <IrelandPropertyStoryCharts section={1} />,
   IrelandPropertyStoryChartsTwo: () => <IrelandPropertyStoryCharts section={2} />,
   IrelandPropertyStoryChartsThree: () => <IrelandPropertyStoryCharts section={3} />,
+  MortgageAffordabilityCharts,
+  MortgageAffordabilityChartsOne: () => <MortgageAffordabilityCharts section={1} />,
+  MortgageAffordabilityChartsTwo: () => <MortgageAffordabilityCharts section={2} />,
+  MortgageAffordabilityChartsThree: () => <MortgageAffordabilityCharts section={3} />,
+  MortgageAffordabilityChartsFour: () => <MortgageAffordabilityCharts section={4} />,
+  MortgageAffordabilityChartsFive: () => <MortgageAffordabilityCharts section={5} />,
   LongTailChart,
   TaskChart,
   blockquote: Blockquote,
   DunbarLayers,
+  MathBlock,
+  MathFraction,
 };
 
 export default components;

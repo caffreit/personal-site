@@ -1,13 +1,329 @@
 ---
-title: Ireland Housing Market Visuals
-date: 2025-11-14
-summary: Interactive charts exploring affordability, inflation, and wages.
-tags: [housing, data, charts]
+title: House Prices Are Not the Whole Affordability Story
+date: 2026-06-02
+summary: A mortgage-first view of affordability across five decades of Irish housing data.
+tags: [ireland, housing, economics, mortgage, data]
+category: Data Story
 image: "/blog/ireland-housing-market/cover.png"
 ---
 
-I captured this data storytelling session from Gemini Vibe and still need to craft the essay around it. For now, enjoy playing with the visuals—narrative coming soon.
+The usual housing affordability story is simple: house prices rise, wages fail to keep up, and price-to-wage ratios climb.
 
-<HousingMarketAnalysisLegacy />
+That story is true, but incomplete.
 
+Most people do not buy a house with cash. They buy with a mortgage, and mortgage affordability depends on both loan size and interest rates. A house at 15% mortgage rates is a very different proposition from the same house at 3%.
+
+This article rebuilds that affordability story using a simple mortgage model over long-run Irish data. It focuses on four linked views: asset price burden, entry payment burden, burden over the life of the mortgage, and lifetime wage share absorbed by the mortgage. A compact PVAF-based model at the end ties interest rates to supportable price-to-wage ratios.
+
+## 1) The Asset Price Story vs Payment Story
+
+Price-to-wage ratios have clearly risen over the long run. But this is where the usual affordability story misleads us. A high house price relative to wages is an asset-price problem. It is not automatically a monthly-payment problem.
+
+It makes the crisis look like a simple story of houses outrunning wages, when the mortgage burden data tells a more complicated story.
+
+On this measure, the average affordability crisis is less obvious than the asset-price chart suggests. The deeper problem is not that recent buyers are always paying a historically unprecedented share of income each month. It’s that falling interest rates provided earlier buyers a huge wealth transfer by pushing up asset prices, while newer buyers are being asked to buy in after much of that transfer has already happened.
+
+The crisis is not just affordability. It is a wealth transfer.
+
+The chart below compares the long rise in price-to-wage ratios with the initial mortgage burden. House prices have clearly outrun wages as assets, but the first-year mortgage burden has not simply exploded in the same way. It has varied substantially over time, and today’s level sits much closer to historical experience than the price-to-wage ratio implies.
+
+<MortgageAffordabilityChartsOne />
+
+## 2) The Missing Variable: Interest Rates
+
+In high-rate periods, a fixed monthly budget can support a smaller loan. In lower-rate periods, the same budget supports a larger loan. That mechanical channel matters.
+
+As rates fell over decades, buyers could carry larger mortgages for the same initial payment burden. In a constrained market, that borrowing capacity can be capitalized into higher prices.
+
+This does not imply interest rates explain everything. Supply constraints, regulation, demographics, tax, lending rules, and expectations all matter. But interest rates strongly shape what payment-constrained buyers can bid.
+
+The first chart below shows the broad historical pattern: price-to-wage rises over time, while mortgage rates trend downward. The second chart shows the fitted PVAF relationship behind that pattern, linking lower interest rates to higher supportable price-to-wage ratios. The maths behind the fit is set out at the end of the article.
+
+<MortgageAffordabilityChartsTwo />
+
+## 3) Burden After Purchase
+
+First-year burden is only one part of the story. Most buyers face a painful initial mortgage burden. The question after that is how quickly the burden fades.
+
+For many earlier buyers, inflation and wage growth quickly reduced the weight of the mortgage. A payment that felt brutal in year one could feel much more manageable ten years later.
+
+The danger for newer buyers is that the painful phase lasts longer. Without the erosion provided by inflation and wage growth the burden will remain heavy for longer, claiming a larger share of lifetime earnings.
+
+The chart below follows selected buyer cohorts after purchase. Each line starts with the buyer’s first-year mortgage burden, then shows how quickly that burden faded as wages changed over time. Flatter lines mean the mortgage stayed heavy for longer.
+
+<MortgageAffordabilityChartsThree />
+
+## 4) Lifetime Mortgage Burden
+
+We can go further by comparing total mortgage payments over the life of the loan with total earnings over the same period.
+
+- Lifetime burden = total mortgage payments over term / total earnings over same term
+
+This gives a rough measure of the lifetime wage share absorbed by the mortgage — a broader life-cycle affordability measure than the entry year alone.
+
+Again, the result is not a simple upward line. The late 1980s look favourable in this model. The 2000s look extremely expensive. Recent buyers sit in a more uncertain zone, because we do not yet know what future wage growth and interest rates will do. Any estimate for recent cohorts has to be extrapolated.
+
+<MortgageAffordabilityChartsFour />
+
+## Why This Matters
+
+This is why the choice of metric matters.
+
+A price-to-wage chart makes the crisis look like one thing: houses outrunning wages. A mortgage-burden chart makes it more complicated: payments depend on rates, wages, inflation, and time. A wealth-gain chart adds the missing distributional question: who got the capital gains created by the low-rate era?
+
+The housing crisis is not just that homes became expensive. It is that the gains and burdens were distributed very unevenly across generations. Earlier buyers were not spared pain, but many were rewarded for carrying it. Newer buyers are asked to carry high prices after much of that reward has already been claimed.
+
+<MortgageAffordabilityChartsFive />
+
+## Caveats
+
+This is a deliberately simple model and should be read as directional, not definitive.
+
+- It uses gross earnings, not disposable income.
+- Average wages and average prices can be pulled around by different distributions. Median wages and median first-time-buyer prices would be better for matching the 50th percentile household to the 50th percentile home, but long-run consistent data are harder to obtain.
+- Household structure changed over time (single-income vs dual-income financing norms).
+- Deposit constraints can dominate even when monthly serviceability is acceptable.
+- Term assumptions matter materially (for example 25-year vs 35-year loans).
+- Recent cohort projections are inherently more uncertain than older completed periods.
+
+## Data Sources and Methodology
+
+The underlying table combines long-run Irish house prices, wages, mortgage rates, and inflation data from the following sources. <a className="font-semibold underline decoration-stone-300 underline-offset-4 transition-colors hover:text-[var(--color-yellow)] hover:decoration-[var(--color-yellow)] dark:decoration-zinc-600" href="/api/mortgage-affordability-data" download>Download the mortgage data table (CSV)</a>.
+
+- **House prices**: CSO Ireland residential property price data for 1970-2019. Values for 2020-2024 are estimates based on recent trends.
+- **Wages**: CSO Historical Earnings series, using weekly average industrial earnings for 1938-2015. Values for 2016-2024 are estimates.
+- **Mortgage interest rates**: Central Bank of Ireland data, via Money Guide Ireland's historical mortgage rate series.
+- **Inflation**: World Bank and CSO annual CPI data for Ireland.
+
+Mortgage payments are modelled over a 25-year term. The buyer starts with the mortgage rate prevailing in the purchase year, then moves with historical mortgage rates in each later year. This reflects the variable-rate structure common in Irish mortgages.
+
+The deposit is assumed to equal one year's wage, so the loan-to-value ratio varies by year. Wages are assumed to track the average wage series each year. Lifetime burden is calculated as total mortgage payments over the term divided by total earnings over the same period.
+
+## Maths: A Present-Value View of Mortgage Affordability
+
+A simple way to think about house prices is to ask: how much mortgage debt can a given income support?
+
+Suppose a household borrows principal `L`, pays a fixed annual mortgage payment `M`, faces an annual mortgage rate `r`, and repays over `n` years. The present value of the mortgage payments must equal the loan principal:
+
+<MathBlock>
+  L = Σ<sub>t=1</sub><sup>n</sup> <MathFraction numerator="M" denominator="(1 + r)^t" />
+</MathBlock>
+
+The term on the right is a finite geometric series. Factoring out `M`, we get:
+
+<MathBlock>
+  L = M × Σ<sub>t=1</sub><sup>n</sup> (1 + r)<sup>-t</sup>
+</MathBlock>
+
+The sum is the present value annuity factor, or PVAF:
+
+<MathBlock>
+  PVAF(r, n) = <MathFraction numerator="1 - (1 + r)^-n" denominator="r" />
+</MathBlock>
+
+So:
+
+<MathBlock>
+  L = M × PVAF(r, n)
+</MathBlock>
+
+and therefore:
+
+<MathBlock>
+  M = <MathFraction numerator="L" denominator="PVAF(r, n)" />
+</MathBlock>
+
+This is the standard mortgage affordability relationship. A higher interest rate reduces `PVAF(r, n)`, meaning the same annual payment supports a smaller loan. A longer mortgage term increases `PVAF(r, n)`, meaning the same annual payment supports a larger loan.
+
+Now define the house price-to-wage ratio as:
+
+<MathBlock>
+  Q = <MathFraction numerator="P" denominator="W" />
+</MathBlock>
+
+where `P` is the house price and `W` is annual wage. If the household has no deposit, the loan principal is simply `L = P`. If the household spends a fraction `α` of annual wage on mortgage repayments, then:
+
+<MathBlock>
+  M = αW
+</MathBlock>
+
+Substituting into the present-value relationship:
+
+<MathBlock>
+  P = αW × PVAF(r, n)
+</MathBlock>
+
+Dividing both sides by `W`:
+
+<MathBlock>
+  <MathFraction numerator="P" denominator="W" /> = α × PVAF(r, n)
+</MathBlock>
+
+or:
+
+<MathBlock>
+  Q = α × PVAF(r, n)
+</MathBlock>
+
+This gives a first-pass model of the price-wage ratio. It says that house prices relative to wages should rise when interest rates fall, because lower rates allow a given repayment burden to support a larger loan.
+
+But this version is incomplete. Buyers do not normally borrow the full house price. They save a deposit first, then borrow the remainder.
+
+Let `d` be the deposit fraction of the house price. Then the mortgage principal is:
+
+<MathBlock>
+  L = (1 - d)P
+</MathBlock>
+
+The mortgage payment is still:
+
+<MathBlock>
+  M = αW
+</MathBlock>
+
+So the present-value equation becomes:
+
+<MathBlock>
+  (1 - d)P = αW × PVAF(r, n)
+</MathBlock>
+
+Dividing by `W`:
+
+<MathBlock>
+  (1 - d)Q = α × PVAF(r, n)
+</MathBlock>
+
+and therefore:
+
+<MathBlock>
+  Q = <MathFraction numerator="α × PVAF(r, n)" denominator="1 - d" />
+</MathBlock>
+
+This is the deposit-adjusted affordability model. It says the price-wage ratio depends not only on the repayment share `α`, but also on the deposit fraction `d`. A larger deposit allows a given repayment burden to support a higher house price because less of the price needs to be financed by debt.
+
+However, this still treats `α` and `d` as external parameters. In reality they are related. A household that saves a larger deposit reduces the future mortgage burden, but only by accepting a larger saving burden upfront. There is a trade-off between the time spent saving and the repayment burden after purchase.
+
+To make this more endogenous, suppose the household saves for `T` years before buying. Ignore wage growth, house price growth, and interest on savings for now. If the target deposit is `dP`, then the annual saving required is:
+
+<MathBlock>
+  S = <MathFraction numerator="dP" denominator="T" />
+</MathBlock>
+
+As a fraction of annual wage, the saving burden is:
+
+<MathBlock>
+  s = <MathFraction numerator="S" denominator="W" /> = <MathFraction numerator="dP" denominator="TW" />
+</MathBlock>
+
+or:
+
+<MathBlock>
+  s = <MathFraction numerator="dQ" denominator="T" />
+</MathBlock>
+
+The mortgage repayment burden after purchase is:
+
+<MathBlock>
+  α = <MathFraction numerator="(1 - d)Q" denominator="PVAF(r, n)" />
+</MathBlock>
+
+A useful benchmark is the crossover point where the annual saving burden equals the annual mortgage repayment burden:
+
+<MathBlock>
+  s = α
+</MathBlock>
+
+So:
+
+<MathBlock>
+  <MathFraction numerator="dQ" denominator="T" /> = <MathFraction numerator="(1 - d)Q" denominator="PVAF(r, n)" />
+</MathBlock>
+
+The price-wage ratio `Q` cancels:
+
+<MathBlock>
+  <MathFraction numerator="d" denominator="T" /> = <MathFraction numerator="1 - d" denominator="PVAF(r, n)" />
+</MathBlock>
+
+Rearranging:
+
+<MathBlock>
+  d × PVAF(r, n) = T(1 - d)
+</MathBlock>
+
+<MathBlock>
+  d[T + PVAF(r, n)] = T
+</MathBlock>
+
+So the crossover deposit is:
+
+<MathBlock>
+  d<sup>*</sup> = <MathFraction numerator="T" denominator="T + PVAF(r, n)" />
+</MathBlock>
+
+At this deposit, the saving burden and the mortgage burden are equal. The common burden is:
+
+<MathBlock>
+  b<sup>*</sup> = <MathFraction numerator="Q" denominator="T + PVAF(r, n)" />
+</MathBlock>
+
+This gives a more endogenous version of the affordability model. Instead of assuming a fixed repayment share `α`, we imagine households allocating a housing-capacity share `b` of annual wage. They first save this amount for `T` years to build a deposit, then continue allocating the same share to mortgage repayments after purchase.
+
+The deposit accumulated over `T` years is:
+
+<MathBlock>
+  Deposit = bWT
+</MathBlock>
+
+The mortgage principal supported by future repayments is:
+
+<MathBlock>
+  Mortgage principal = bW × PVAF(r, n)
+</MathBlock>
+
+Therefore the total house price supported by income is:
+
+<MathBlock>
+  P = bWT + bW × PVAF(r, n)
+</MathBlock>
+
+Dividing by annual wage gives:
+
+<MathBlock>
+  Q = b[T + PVAF(r, n)]
+</MathBlock>
+
+or:
+
+<MathBlock>
+  <MathFraction numerator="P" denominator="W" /> = b × [T + <MathFraction numerator="1 - (1 + r)^-n" denominator="r" />]
+</MathBlock>
+
+This is the modified PVAF affordability model. It decomposes the price-wage ratio into two components:
+
+<MathBlock>
+  Q = bT + b × PVAF(r, n)
+</MathBlock>
+
+The first term is deposit capacity. The second term is mortgage capacity. The original model only measured mortgage capacity. The modified model adds deposit capacity.
+
+This matters because it changes the interpretation. In the basic PVAF model, the fitted parameter `α` is interpreted as the fraction of income spent on mortgage repayments. In the modified model, the fitted parameter `b` is broader: it is the effective fraction of annual wage that the household can mobilise for housing, first through saving and then through mortgage repayments.
+
+The model also gives a useful interest-rate implication. As interest rates rise, `PVAF(r, n)` falls. This reduces mortgage capacity. It also raises the crossover deposit:
+
+<MathBlock>
+  d<sup>*</sup> = <MathFraction numerator="T" denominator="T + PVAF(r, n)" />
+</MathBlock>
+
+because when debt becomes more expensive, a larger deposit is needed to bring the mortgage burden back into balance with the saving burden.
+
+At the same time, the wage burden at the crossover rises:
+
+<MathBlock>
+  b<sup>*</sup> = <MathFraction numerator="Q" denominator="T + PVAF(r, n)" />
+</MathBlock>
+
+So higher rates have a double effect: they reduce the amount of debt that income can support, and they increase the income burden associated with reaching a balanced deposit-and-mortgage position.
+
+This framework is still deliberately simple. It ignores rent while saving, tax, net versus gross income, credit rules, dual incomes, house price growth, and changes in mortgage terms. But it gives a compact way to separate two forces that are usually bundled together: the affordability of the mortgage and the difficulty of accumulating the deposit.
 
