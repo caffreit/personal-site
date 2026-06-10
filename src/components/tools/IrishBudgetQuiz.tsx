@@ -35,7 +35,6 @@ type BudgetNode = {
   children?: BudgetNode[];
 };
 
-const TOTAL_SPENDING_2024 = 96.663;
 const BEST_SCORE_KEY = "personal-site-irish-budget-quiz-best";
 const EMPTY_CHILDREN: BudgetNode[] = [];
 const SOURCES = {
@@ -50,182 +49,334 @@ const SOURCES = {
 };
 
 const chartHierarchy: BudgetNode = {
-  id: "total",
-  label: "Gross Government Expenditure 2024",
-  value: TOTAL_SPENDING_2024,
-  description:
-    "Government expenditure is shown as approximately €96.7bn in the 2024 Revised Estimates context.",
+  id: "total-expenditure",
+  label: "Total Expenditure",
+  value: 104.1,
   color: "#0f172a",
+  description: "Interactive breakdown of major 2024 expenditure categories.",
   children: [
     {
       id: "social-protection",
       label: "Social Protection",
-      value: 25.579,
-      color: "#0284c7",
+      value: 42.6,
+      color: "#45B7D1",
       description:
-        "Largest allocation in 2024, combining social protection department and Social Insurance Fund spending.",
+        "The largest area of spending, covering welfare payments like pensions, child benefit and unemployment support.",
       children: [
         {
           id: "pensions",
           label: "Pensions",
-          value: 10.685,
-          color: "#38bdf8",
-          description: "Largest Social Protection cost group in the PBO overview.",
+          value: 20.4,
+          color: "#5cb8d6",
+          description:
+            "Payments to retired citizens, including State Pension and public service pensions.",
+          children: [
+            {
+              id: "state-pension",
+              label: "State Pension",
+              value: 11.2,
+              color: "#7ac4dd",
+              description:
+                "Weekly payments to eligible older citizens based on social insurance contributions.",
+            },
+            {
+              id: "public-sector-pensions",
+              label: "Public Sector Pensions",
+              value: 4.2,
+              color: "#8cd0e3",
+              description:
+                "Pension payments to retired civil servants, teachers, Garda members and other public staff.",
+            },
+            {
+              id: "other-pensions",
+              label: "Other Pensions",
+              value: 5.0,
+              color: "#9ddcec",
+              description:
+                "Other pension-related schemes including widow/widower and invalidity pensions.",
+            },
+          ],
         },
         {
-          id: "illness-disability-carers",
-          label: "Illness, Disability & Carers",
-          value: 5.6,
-          color: "#7dd3fc",
+          id: "illness-disability",
+          label: "Illness & Disability",
+          value: 9.8,
+          color: "#6fc2da",
           description:
-            "Second largest Social Protection cost group in the PBO overview.",
+            "Income support for people unable to work due to illness/disability, including carer payments.",
         },
         {
-          id: "other-social-protection",
-          label: "Other Social Protection",
-          value: 9.294,
-          color: "#bae6fd",
+          id: "child-family",
+          label: "Child & Family",
+          value: 7.1,
+          color: "#82cce0",
           description:
-            "Remaining Social Protection spending (children, working-age supports, administration and other schemes).",
+            "Supports for children and families, including Child Benefit and TUSLA funding.",
+        },
+        {
+          id: "working-age-supports",
+          label: "Working Age Supports",
+          value: 5.3,
+          color: "#95d6e6",
+          description:
+            "Income supports for jobseekers, lone parents and supplementary welfare.",
         },
       ],
     },
     {
       id: "health",
       label: "Health",
-      value: 22.821,
-      color: "#ef4444",
-      description: "Second largest major department allocation in 2024.",
-      children: [
-        {
-          id: "health-pay",
-          label: "Pay Provision",
-          value: 9.624,
-          color: "#f87171",
-          description:
-            "2024 pay provision referenced in the PBO Health vote overview.",
-        },
-        {
-          id: "health-other",
-          label: "Other Health Spending",
-          value: 13.197,
-          color: "#fca5a5",
-          description:
-            "Non-pay and capital components grouped together for readability.",
-        },
-      ],
-    },
-    {
-      id: "education-sector",
-      label: "Education Sector",
-      value: 15.117,
-      color: "#14b8a6",
+      value: 24.1,
+      color: "#FF6B6B",
       description:
-        "Education + Further/Higher Education + National Training Fund.",
+        "Funding for the public health system, from hospitals to community care.",
       children: [
         {
-          id: "education-vote-26",
-          label: "Education",
-          value: 10.853,
-          color: "#2dd4bf",
-          description: "Primary and secondary education allocation in 2024.",
+          id: "acute-hospitals",
+          label: "Acute Hospitals",
+          value: 11.5,
+          color: "#ff8c8c",
+          description: "Day-to-day funding for the national hospital network.",
+          children: [
+            {
+              id: "hse-pay",
+              label: "HSE Pay",
+              value: 7.5,
+              color: "#ffabab",
+              description: "Salaries and wages for acute-hospital staff.",
+            },
+            {
+              id: "clinical-supplies-drugs",
+              label: "Clinical Supplies & Drugs",
+              value: 2.5,
+              color: "#ffcaca",
+              description:
+                "Medicines, medical equipment and clinical supplies for hospitals.",
+            },
+            {
+              id: "other-operating-costs",
+              label: "Other Operating Costs",
+              value: 1.5,
+              color: "#ffe9e9",
+              description:
+                "Non-clinical hospital costs such as energy, maintenance and administration.",
+            },
+          ],
         },
         {
-          id: "fheris-vote-45",
-          label: "Further & Higher Education",
-          value: 3.344,
-          color: "#5eead4",
+          id: "primary-care",
+          label: "Primary Care",
+          value: 5.2,
+          color: "#ffacac",
           description:
-            "Further and Higher Education, Research, Innovation and Science.",
+            "Funding for GPs, community health services and community drug schemes.",
         },
         {
-          id: "national-training-fund",
-          label: "National Training Fund",
-          value: 0.92,
-          color: "#99f6e4",
+          id: "targeted-health",
+          label: "Targeted Health",
+          value: 7.4,
+          color: "#ffcdcd",
           description:
-            "Non-voted training fund spending included in education sector total.",
+            "Specialized services including disability, older persons and mental health.",
         },
       ],
     },
     {
-      id: "cediy",
-      label: "Children, Equality, Disability, Integration & Youth",
-      value: 7.428,
-      color: "#8b5cf6",
-      description: "Department allocation in the 2024 overview.",
+      id: "education",
+      label: "Education",
+      value: 15.5,
+      color: "#4ECDC4",
+      description:
+        "Covers education from primary schools through third-level institutions.",
+      children: [
+        {
+          id: "schools",
+          label: "Schools",
+          value: 12.0,
+          color: "#6fd7d0",
+          description: "Funding for primary and secondary schools.",
+          children: [
+            {
+              id: "primary-education",
+              label: "Primary Education",
+              value: 5.5,
+              color: "#8fe1db",
+              description:
+                "Funding for primary school operations, including teacher pay.",
+            },
+            {
+              id: "secondary-education",
+              label: "Secondary Education",
+              value: 5.0,
+              color: "#afebf5",
+              description:
+                "Funding for secondary school operations, including teacher pay.",
+            },
+            {
+              id: "special-education",
+              label: "Special Education",
+              value: 1.5,
+              color: "#cff5ef",
+              description:
+                "Additional resources for students with special educational needs.",
+            },
+          ],
+        },
+        {
+          id: "higher-further-ed",
+          label: "Higher & Further Ed.",
+          value: 3.5,
+          color: "#8fe1db",
+          description:
+            "Funding for universities, colleges and skills training bodies such as SOLAS.",
+        },
+      ],
+    },
+    {
+      id: "other",
+      label: "Other",
+      value: 6.6,
+      color: "#9A9A9A",
+      description: "Core state functions grouped into one broader category.",
+      children: [
+        {
+          id: "justice-defence",
+          label: "Justice & Defence",
+          value: 3.8,
+          color: "#aeaeae",
+          description:
+            "Funding for Garda, Defence Forces, Courts Service and Irish Prison Service.",
+        },
+        {
+          id: "other-core-services",
+          label: "Other Core Services",
+          value: 2.8,
+          color: "#c1c1c1",
+          description:
+            "Includes agriculture, foreign affairs and general administration.",
+        },
+      ],
     },
     {
       id: "housing",
-      label: "Housing, Local Government & Heritage",
-      value: 6.906,
-      color: "#f59e0b",
-      description: "Department gross projected spend for 2024.",
+      label: "Housing",
+      value: 6.1,
+      color: "#F7B801",
+      description:
+        "Funding for social/affordable homes, rental supports and homeless services.",
       children: [
         {
-          id: "housing-capital",
-          label: "Capital Spending",
-          value: 3.888,
-          color: "#fbbf24",
-          description:
-            "Capital spending is a major component of the 2024 housing-related vote.",
+          id: "capital-build",
+          label: "Capital Build",
+          value: 2.7,
+          color: "#f8c534",
+          description: "Direct investment in building social and affordable homes.",
         },
         {
-          id: "housing-other",
-          label: "Current / Other",
-          value: 3.018,
-          color: "#fcd34d",
+          id: "current-supports",
+          label: "Current Supports",
+          value: 2.4,
+          color: "#f9d267",
+          description: "Rental supports, mainly HAP and RAS.",
+          children: [
+            {
+              id: "hap",
+              label: "HAP",
+              value: 1.2,
+              color: "#fadd9a",
+              description: "Housing Assistance Payment.",
+            },
+            {
+              id: "ras-other",
+              label: "RAS & Other",
+              value: 1.2,
+              color: "#fce8cd",
+              description:
+                "Rental Accommodation Scheme and other housing-related supports.",
+            },
+          ],
+        },
+        {
+          id: "water-planning",
+          label: "Water & Planning",
+          value: 1.0,
+          color: "#fadf9a",
           description:
-            "Remaining current and other spending after the capital component.",
+            "Funding for Uisce Eireann and the planning system.",
+        },
+      ],
+    },
+    {
+      id: "debt-eu-budget",
+      label: "Debt & EU Budget",
+      value: 4.7,
+      color: "#5A4D9B",
+      description:
+        "Non-discretionary spending on debt servicing and EU contributions.",
+      children: [
+        {
+          id: "debt-service",
+          label: "Debt Service",
+          value: 2.9,
+          color: "#776aae",
+          description: "Interest payments on the national debt.",
+        },
+        {
+          id: "eu-budget",
+          label: "EU Budget",
+          value: 1.5,
+          color: "#9487c1",
+          description: "Ireland's annual contribution to the EU budget.",
+        },
+        {
+          id: "other-debt-costs",
+          label: "Other Costs",
+          value: 0.3,
+          color: "#b1a4d4",
+          description: "Other costs associated with managing national debt.",
         },
       ],
     },
     {
       id: "transport",
       label: "Transport",
-      value: 3.574,
-      color: "#f97316",
-      description: "Department gross allocation in 2024.",
+      value: 4.5,
+      color: "#F18701",
+      description:
+        "Investment in public transport, roads and active travel.",
       children: [
         {
-          id: "transport-pay-pensions",
-          label: "Pay & Pensions",
-          value: 0.111,
-          color: "#fb923c",
+          id: "public-transport",
+          label: "Public Transport",
+          value: 1.6,
+          color: "#f39e34",
           description:
-            "Small share of transport vote allocation compared with programmes and projects.",
+            "Subsidies and investment for bus and rail services, including BusConnects.",
         },
         {
-          id: "transport-programmes",
-          label: "Programmes / Capital / Other",
-          value: 3.463,
-          color: "#fdba74",
-          description: "Remainder of transport spend grouped for readability.",
+          id: "road-networks",
+          label: "Road Networks",
+          value: 1.4,
+          color: "#f5b567",
+          description:
+            "Maintenance and development of national, regional and local roads.",
+        },
+        {
+          id: "active-travel",
+          label: "Active Travel",
+          value: 0.9,
+          color: "#f7cc9a",
+          description:
+            "Investment in walking and cycling infrastructure, including Greenways.",
+        },
+        {
+          id: "aviation-maritime",
+          label: "Aviation/Maritime",
+          value: 0.6,
+          color: "#f9e3cd",
+          description: "Funding for ports, airports and the Coast Guard.",
         },
       ],
-    },
-    {
-      id: "garda",
-      label: "Garda Siochana",
-      value: 2.356,
-      color: "#64748b",
-      description: "Gross allocation of just over €2.35bn in 2024.",
-    },
-    {
-      id: "other-votes",
-      label: "Other Public Services",
-      value: 12.506,
-      color: "#52525b",
-      description:
-        "Remaining services not singled out above, including justice, defence, agriculture and central administration.",
-    },
-    {
-      id: "unallocated",
-      label: "Unallocated",
-      value: 0.376,
-      color: "#a1a1aa",
-      description:
-        "Funding not allocated to a specific vote at publication time.",
     },
   ],
 };
@@ -240,7 +391,7 @@ const questions: QuizQuestion[] = [
     ],
     correctOptionId: "child-benefit",
     feedback:
-      "Child Benefit is larger. Using the quiz model (~4.3% vs ~2.4% of €96.663bn), Child Benefit is about €4.16bn and Jobseeker's Payments are about €2.32bn.",
+      "Child Benefit is larger: ~4.3% (~€4.16bn) vs Jobseeker's Payments at ~2.4% (~€2.32bn).",
     sources: [SOURCES.pboOverview],
   },
   {
@@ -254,7 +405,7 @@ const questions: QuizQuestion[] = [
     ],
     correctOptionId: "low",
     feedback:
-      "The best answer is < 1%. On a €96.663bn base, 1% would be about €0.97bn, and defence spending sits below that threshold in this quiz framing.",
+      "The best answer is < 1%. For reference, 1% is about €0.97bn, and defence spending is below that.",
     sources: [SOURCES.pboOverview, SOURCES.rev2024],
   },
   {
@@ -279,7 +430,7 @@ const questions: QuizQuestion[] = [
     ],
     correctOptionId: "pensions",
     feedback:
-      "All Pension Expenditure is higher. The quiz framing puts pensions near ~19.6% (~€18.95bn), compared with education near ~15.6% (~€15.12bn).",
+      "All Pension Expenditure is higher: ~19.6% (~€18.95bn) vs education at ~15.6% (~€15.12bn).",
     sources: [SOURCES.pboOverview],
   },
   {
@@ -305,7 +456,7 @@ const questions: QuizQuestion[] = [
     ],
     correctOptionId: "a",
     feedback:
-      "Approx. 1-2% is the closest range. On a €96.663bn base, that corresponds to roughly €0.97bn to €1.93bn.",
+      "Approx. 1-2% is the closest range, which is roughly €0.97bn to €1.93bn.",
     sources: [SOURCES.pboOverview, SOURCES.rev2024],
   },
   {
@@ -344,7 +495,7 @@ const questions: QuizQuestion[] = [
     ],
     correctOptionId: "b",
     feedback:
-      "Approx. 7% is the intended answer. On a €96.663bn base, 7% is about €6.77bn.",
+      "Approx. 7% is the intended answer, which is about €6.77bn.",
     sources: [SOURCES.pboOverview, SOURCES.rev2024],
   },
   {
@@ -359,7 +510,7 @@ const questions: QuizQuestion[] = [
     ],
     correctOptionId: "oda",
     feedback:
-      "Overseas Development Aid is larger in this quiz framing: ~1.1% (~€1.06bn) versus Active Travel at ~0.9% (~€0.87bn).",
+      "Overseas Development Aid is larger: ~1.1% (~€1.06bn) versus Active Travel at ~0.9% (~€0.87bn).",
     sources: [SOURCES.rev2024, SOURCES.pboOverview],
   },
   {
@@ -391,12 +542,8 @@ const questions: QuizQuestion[] = [
   },
 ];
 
-function formatBillions(value: number) {
-  return `EUR ${value.toFixed(3)}bn`;
-}
-
-function formatPercent(value: number) {
-  return `${((value / TOTAL_SPENDING_2024) * 100).toFixed(1)}%`;
+function formatShare(value: number) {
+  return `${value.toFixed(1)}%`;
 }
 
 function shuffle<T>(items: T[]) {
@@ -434,6 +581,8 @@ export default function IrishBudgetQuiz() {
   const chartNode = drilldownPath[drilldownPath.length - 1];
   const chartChildren = chartNode.children ?? EMPTY_CHILDREN;
   const currentLevel = drilldownPath.length;
+  const currentDetailLevel = Math.max(1, currentLevel - 1);
+  const maxDetailLevel = Math.max(1, MAX_DRILL_LEVEL - 1);
 
   const chartData = useMemo(
     () =>
@@ -643,12 +792,11 @@ export default function IrishBudgetQuiz() {
                 Budget Breakdown Explorer
               </h2>
               <span className="rounded-full border border-stone-300 bg-stone-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-stone-700">
-                Detail level {currentLevel} of {MAX_DRILL_LEVEL}
+                Detail level {currentDetailLevel} of {maxDetailLevel}
               </span>
             </div>
             <p className="mb-4 text-sm text-stone-600">
-              Total: <span className="font-semibold">{formatBillions(chartNode.value)}</span>{" "}
-              ({formatPercent(chartNode.value)} of gross)
+              Total: <span className="font-semibold">{formatShare(chartNode.value)}</span>
             </p>
             <div className="mb-6 rounded-xl border border-yellow-300 bg-yellow-50 p-3 text-sm font-medium text-stone-800">
               Tip: click a chart segment to drill into more detail. Use Back on
@@ -688,9 +836,8 @@ export default function IrishBudgetQuiz() {
               </Pie>
               <Tooltip
                 formatter={(value: number, _name, item) => {
-                  const amount = formatBillions(value);
-                  const pct = formatPercent(value);
-                  return [`${amount} (${pct})`, item.payload?.name ?? "Share"];
+                      const share = formatShare(value);
+                      return [share, item.payload?.name ?? "Share"];
                 }}
                 contentStyle={{
                   borderRadius: "12px",
