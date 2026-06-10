@@ -28,6 +28,15 @@ const LABS = [
     status: "Live",
     meta: "Budget • Quiz",
   },
+  {
+    title: "Irish Budget Block Game",
+    description:
+      "Allocate 20 budget blocks across major spending categories, then compare your guess to Ireland's rounded 2024 expenditure mix.",
+    href: "/labs/irish-budget-block-game",
+    badge: "Civics",
+    status: "Live",
+    meta: "Budget • Game",
+  },
 ];
 
 export const metadata = {
