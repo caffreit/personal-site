@@ -37,6 +37,15 @@ const LABS = [
     status: "Live",
     meta: "Budget • Game",
   },
+  {
+    title: "Ireland's Fiscal Flow",
+    description:
+      "Estimate your annual tax contribution and compare it with how Ireland's 2024 public spending is distributed.",
+    href: "/labs/irelands-fiscal-flow",
+    badge: "Civics",
+    status: "Live",
+    meta: "Budget • Explorer",
+  },
 ];
 
 export const metadata = {
