@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { ArrowLeft, RotateCcw } from "lucide-react";
 import {
@@ -36,6 +36,7 @@ type BudgetNode = {
 };
 
 const BEST_SCORE_KEY = "personal-site-irish-budget-quiz-best";
+const BEST_SCORE_EVENT = "personal-site-irish-budget-quiz-best-changed";
 const EMPTY_CHILDREN: BudgetNode[] = [];
 const SOURCES = {
   rev2024: {
@@ -546,6 +547,30 @@ function formatShare(value: number) {
   return `${value.toFixed(1)}%`;
 }
 
+function parseBestScore(value: string | null) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
+}
+
+function getBestScoreSnapshot() {
+  if (typeof window === "undefined") return 0;
+  return parseBestScore(window.localStorage.getItem(BEST_SCORE_KEY));
+}
+
+function subscribeToBestScore(onStoreChange: () => void) {
+  if (typeof window === "undefined") {
+    return () => undefined;
+  }
+
+  window.addEventListener("storage", onStoreChange);
+  window.addEventListener(BEST_SCORE_EVENT, onStoreChange);
+
+  return () => {
+    window.removeEventListener("storage", onStoreChange);
+    window.removeEventListener(BEST_SCORE_EVENT, onStoreChange);
+  };
+}
+
 function shuffle<T>(items: T[]) {
   const copy = [...items];
   for (let index = copy.length - 1; index > 0; index -= 1) {
@@ -566,12 +591,11 @@ export default function IrishBudgetQuiz() {
   const [quizData, setQuizData] = useState<QuizQuestion[]>(questions);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [score, setScore] = useState(0);
-  const [bestScore, setBestScore] = useState<number>(() => {
-    if (typeof window === "undefined") return 0;
-    const saved = window.localStorage.getItem(BEST_SCORE_KEY);
-    const parsed = Number(saved);
-    return Number.isNaN(parsed) ? 0 : parsed;
-  });
+  const bestScore = useSyncExternalStore(
+    subscribeToBestScore,
+    getBestScoreSnapshot,
+    () => 0,
+  );
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
   const [hasAnswered, setHasAnswered] = useState(false);
   const [drilldownPath, setDrilldownPath] = useState<BudgetNode[]>([chartHierarchy]);
@@ -619,9 +643,9 @@ export default function IrishBudgetQuiz() {
     if (nextIndex >= quizData.length) {
       const finalScore = score;
       if (finalScore > bestScore) {
-        setBestScore(finalScore);
         if (typeof window !== "undefined") {
           window.localStorage.setItem(BEST_SCORE_KEY, String(finalScore));
+          window.dispatchEvent(new Event(BEST_SCORE_EVENT));
         }
       }
     }
