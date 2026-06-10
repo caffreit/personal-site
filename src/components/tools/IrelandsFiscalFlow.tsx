@@ -568,9 +568,6 @@ export default function IrelandsFiscalFlow() {
     () =>
       chartChildren.map((category) => ({
         name: category.name,
-        displayName: category.children?.length
-          ? `${category.name} \u203a`
-          : category.name,
         color: category.color,
         percentageOfTotal: (category.value / TOTAL_REVENUE_MILLIONS) * 100,
         percentageOfParent: (category.value / currentSpendingNode.value) * 100,
@@ -1106,11 +1103,8 @@ export default function IrelandsFiscalFlow() {
             </div>
           </div>
 
-          <p className="mt-3 text-sm text-stone-600">
-            Compare overall public spending with your estimated personal share.
-          </p>
-          <p className="mt-1 text-xs text-stone-500">
-            Click a bar with a chevron to drill into further detail.
+          <p className="mt-3 text-base font-semibold text-stone-700 sm:text-lg">
+            Click a bar to drill into further detail.
           </p>
           <div className="mt-3 flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-stone-600">
             <span className="rounded-full border border-stone-300 bg-stone-100 px-3 py-1">
@@ -1142,12 +1136,7 @@ export default function IrelandsFiscalFlow() {
                     return `EUR ${Math.round(value).toLocaleString("en-IE")}`;
                   }}
                 />
-                <YAxis
-                  type="category"
-                  dataKey="displayName"
-                  width={210}
-                  tick={{ fontSize: 12 }}
-                />
+                <YAxis type="category" dataKey="name" width={210} tick={{ fontSize: 12 }} />
                 <Tooltip
                   formatter={(value: number, _name, item) => {
                     if (viewMode === "total") {
