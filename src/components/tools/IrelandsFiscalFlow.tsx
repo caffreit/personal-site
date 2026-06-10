@@ -14,7 +14,7 @@ import {
   YAxis,
 } from "recharts";
 
-type ViewMode = "absolute" | "percentage" | "personal";
+type ViewMode = "total" | "personal";
 type MaritalStatus =
   | "single"
   | "married-one-income"
@@ -50,10 +50,11 @@ type FiscalInputs = {
   catGroup: CatGroup;
 };
 
-type SpendingCategory = {
+type SpendingNode = {
   name: string;
   value: number;
   color: string;
+  children?: SpendingNode[];
 };
 
 type IncomeTaxResult = {
@@ -76,6 +77,7 @@ const CAT_THRESHOLDS: Record<Exclude<CatGroup, "none">, number> = {
   B: 32_500,
   C: 16_250,
 };
+const EMPTY_SPENDING_CHILDREN: SpendingNode[] = [];
 
 const DEFAULT_INPUTS: FiscalInputs = {
   maritalStatus: "single",
@@ -103,17 +105,274 @@ const DEFAULT_INPUTS: FiscalInputs = {
   catGroup: "none",
 };
 
-const SPENDING_CATEGORIES: SpendingCategory[] = [
-  { name: "Social Protection", value: 42_569, color: "#45B7D1" },
-  { name: "Health", value: 24_100, color: "#FF6B6B" },
-  { name: "Education", value: 15_500, color: "#4ECDC4" },
-  { name: "Housing", value: 6_100, color: "#F7B801" },
-  { name: "Debt & EU Budget", value: 4_715, color: "#5A4D9B" },
-  { name: "Transport", value: 4_531, color: "#F18701" },
-  { name: "Enterprise & Agriculture", value: 4_500, color: "#8ECAE6" },
-  { name: "Justice & Defence", value: 3_800, color: "#EF476F" },
-  { name: "Other Core Services", value: 2_785, color: "#9CA3AF" },
-];
+const ABOUT_YOU_DEFAULTS: Pick<
+  FiscalInputs,
+  "maritalStatus" | "employmentStatus" | "isMedicalCardHolder" | "isOver70" | "spouseSalary"
+> = {
+  maritalStatus: "single",
+  employmentStatus: "paye",
+  isMedicalCardHolder: false,
+  isOver70: false,
+  spouseSalary: 0,
+};
+
+const INCOME_DEFAULTS: Pick<
+  FiscalInputs,
+  "grossSalary" | "spouseSalary" | "selfEmployedIncome" | "rentalIncome"
+> = {
+  grossSalary: 60_000,
+  spouseSalary: 0,
+  selfEmployedIncome: 0,
+  rentalIncome: 5_000,
+};
+
+const SPENDING_DEFAULTS: Pick<
+  FiscalInputs,
+  | "spendingGroceries"
+  | "spendingEnergy"
+  | "spendingHospitality"
+  | "spendingFuel"
+  | "spendingAlcoholTobacco"
+  | "spendingGeneral"
+> = {
+  spendingGroceries: 600,
+  spendingEnergy: 150,
+  spendingHospitality: 200,
+  spendingFuel: 150,
+  spendingAlcoholTobacco: 100,
+  spendingGeneral: 400,
+};
+
+const OTHER_TAX_DEFAULTS: Pick<
+  FiscalInputs,
+  | "totalSavings"
+  | "interestRate"
+  | "cgtGain"
+  | "lpt"
+  | "motorTax"
+  | "vrtPrice"
+  | "vrtCo2"
+  | "catValue"
+  | "catGroup"
+> = {
+  totalSavings: 10_000,
+  interestRate: 3,
+  cgtGain: 5_000,
+  lpt: 450,
+  motorTax: 390,
+  vrtPrice: 30_000,
+  vrtCo2: 110,
+  catValue: 20_000,
+  catGroup: "B",
+};
+
+const SPENDING_HIERARCHY: SpendingNode = {
+  name: "Total Revenue",
+  value: TOTAL_REVENUE_MILLIONS,
+  color: "#0f172a",
+  children: [
+    {
+      name: "Social Protection",
+      value: 42_569,
+      color: "#45B7D1",
+      children: [
+        {
+          name: "Pensions",
+          value: 20_400,
+          color: "#5cb8d6",
+          children: [
+            { name: "State Pension", value: 11_200, color: "#7ac4dd" },
+            { name: "Public Sector Pensions", value: 4_200, color: "#8cd0e3" },
+            { name: "Other Pensions", value: 5_000, color: "#9ddcec" },
+          ],
+        },
+        {
+          name: "Illness & Disability",
+          value: 9_800,
+          color: "#6fc2da",
+          children: [
+            { name: "Disability Allowance", value: 3_500, color: "#85cde2" },
+            { name: "Invalidity Pension", value: 2_500, color: "#97d7ea" },
+            { name: "Carer's Allowance", value: 2_000, color: "#a9e2f2" },
+            { name: "Illness Benefit", value: 1_000, color: "#bbecfa" },
+            { name: "Other Illness Supports", value: 800, color: "#cdf6ff" },
+          ],
+        },
+        {
+          name: "Child & Family",
+          value: 7_069,
+          color: "#82cce0",
+          children: [
+            { name: "Child Benefit", value: 4_500, color: "#95d6e6" },
+            { name: "TUSLA", value: 2_569, color: "#a8dfec" },
+          ],
+        },
+        {
+          name: "Working Age",
+          value: 5_300,
+          color: "#95d6e6",
+          children: [
+            { name: "Jobseeker Payments", value: 2_500, color: "#a8dfec" },
+            { name: "One-Parent Family Payment", value: 1_200, color: "#bbe8f2" },
+            { name: "Supplementary Welfare", value: 600, color: "#cef1f8" },
+            { name: "Working Family Payment", value: 500, color: "#e1faff" },
+            { name: "Other Working Age", value: 500, color: "#ecfdff" },
+          ],
+        },
+      ],
+    },
+    {
+      name: "Health",
+      value: 24_100,
+      color: "#FF6B6B",
+      children: [
+        {
+          name: "Acute Hospitals",
+          value: 11_500,
+          color: "#ff8c8c",
+          children: [
+            { name: "HSE Pay", value: 7_500, color: "#ffabab" },
+            { name: "Clinical Supplies & Drugs", value: 2_500, color: "#ffcaca" },
+            { name: "Other Hospital Operating Costs", value: 1_500, color: "#ffe9e9" },
+          ],
+        },
+        {
+          name: "Primary Care",
+          value: 5_200,
+          color: "#ffacac",
+          children: [
+            { name: "Medical Cards (GMS)", value: 2_800, color: "#ffc5c5" },
+            { name: "Prescription Drug Schemes", value: 1_600, color: "#ffdddd" },
+            { name: "Community Health Services", value: 800, color: "#fff0f0" },
+          ],
+        },
+        {
+          name: "Targeted Health",
+          value: 7_400,
+          color: "#ffcdcd",
+          children: [
+            { name: "Disability Services", value: 3_000, color: "#ffe2e2" },
+            { name: "Older Persons", value: 2_100, color: "#ffeaea" },
+            { name: "Mental Health", value: 1_300, color: "#fff1f1" },
+            { name: "Other HSE", value: 1_000, color: "#fff7f7" },
+          ],
+        },
+      ],
+    },
+    {
+      name: "Education",
+      value: 15_500,
+      color: "#4ECDC4",
+      children: [
+        {
+          name: "Schools",
+          value: 12_000,
+          color: "#6fd7d0",
+          children: [
+            { name: "Primary Education", value: 5_500, color: "#8fe1db" },
+            { name: "Secondary Education", value: 5_000, color: "#afebf5" },
+            { name: "Special Education", value: 1_500, color: "#cff5ef" },
+          ],
+        },
+        {
+          name: "Higher & Further Ed.",
+          value: 3_500,
+          color: "#82e0d8",
+          children: [
+            { name: "University Grants", value: 2_500, color: "#9eebe3" },
+            { name: "Apprenticeships", value: 1_000, color: "#baf5ef" },
+          ],
+        },
+      ],
+    },
+    {
+      name: "Housing",
+      value: 6_100,
+      color: "#F7B801",
+      children: [
+        { name: "Capital Build", value: 2_650, color: "#f8c53b" },
+        {
+          name: "Current Supports",
+          value: 2_450,
+          color: "#fad165",
+          children: [
+            { name: "HAP", value: 1_250, color: "#fbde90" },
+            { name: "RAS", value: 600, color: "#fce9b1" },
+            { name: "Other Supports", value: 600, color: "#fdf3d2" },
+          ],
+        },
+        { name: "Water/Planning", value: 1_000, color: "#feeb9a" },
+      ],
+    },
+    {
+      name: "Debt & EU Budget",
+      value: 4_715,
+      color: "#5A4D9B",
+      children: [
+        { name: "Debt Service", value: 2_900, color: "#7264ad" },
+        { name: "EU Budget", value: 1_500, color: "#8a7bc0" },
+        { name: "Other Costs", value: 315, color: "#a294d2" },
+      ],
+    },
+    {
+      name: "Transport",
+      value: 4_531,
+      color: "#F18701",
+      children: [
+        {
+          name: "Public Transport",
+          value: 1_600,
+          color: "#f39d35",
+          children: [
+            { name: "Bus/Rail Subsidies", value: 950, color: "#f6b56a" },
+            { name: "NTA Investment", value: 650, color: "#f8cd9d" },
+          ],
+        },
+        {
+          name: "Road Networks",
+          value: 1_400,
+          color: "#f5af50",
+          children: [
+            { name: "National Roads", value: 600, color: "#f8c983" },
+            { name: "Regional/Local Roads", value: 550, color: "#fae0b2" },
+            { name: "TII Operations", value: 150, color: "#fcead1" },
+            { name: "Road Safety", value: 100, color: "#fef3ea" },
+          ],
+        },
+        { name: "Active Travel", value: 931, color: "#f7bf74" },
+        { name: "Aviation/Maritime", value: 600, color: "#f9d7a5" },
+      ],
+    },
+    {
+      name: "Enterprise & Agriculture",
+      value: 4_500,
+      color: "#8ECAE6",
+      children: [
+        { name: "Agri & Food", value: 2_500, color: "#a7d7ed" },
+        { name: "Enterprise/Trade", value: 2_000, color: "#bfE4f3" },
+      ],
+    },
+    {
+      name: "Justice & Defence",
+      value: 3_800,
+      color: "#EF476F",
+      children: [
+        { name: "Gardai", value: 2_355, color: "#f26b8c" },
+        { name: "Defence Forces", value: 933, color: "#f58eaa" },
+        { name: "Prisons/Courts", value: 512, color: "#f9b2c7" },
+      ],
+    },
+    {
+      name: "Other Core Services",
+      value: 2_785,
+      color: "#9CA3AF",
+      children: [
+        { name: "Foreign Affairs", value: 1_200, color: "#b2b8c2" },
+        { name: "Central Admin", value: 1_585, color: "#c8cdd5" },
+      ],
+    },
+  ],
+};
 
 function formatCurrency(value: number) {
   return `EUR ${value.toLocaleString("en-IE", {
@@ -266,7 +525,10 @@ function calculateVrt(inputs: FiscalInputs) {
 export default function IrelandsFiscalFlow() {
   const [inputs, setInputs] = useState<FiscalInputs>(DEFAULT_INPUTS);
   const [hasCalculated, setHasCalculated] = useState(false);
-  const [viewMode, setViewMode] = useState<ViewMode>("absolute");
+  const [viewMode, setViewMode] = useState<ViewMode>("total");
+  const [drilldownPath, setDrilldownPath] = useState<SpendingNode[]>([
+    SPENDING_HIERARCHY,
+  ]);
 
   const incomeTaxResult = useMemo(() => calculateIncomeTax(inputs), [inputs]);
   const consumptionTaxes = useMemo(() => calculateConsumptionTaxes(inputs), [inputs]);
@@ -299,35 +561,33 @@ export default function IrelandsFiscalFlow() {
       ? (totalEstimatedAnnualTax / incomeTaxResult.totalIncome) * 100
       : null;
 
+  const currentSpendingNode = drilldownPath[drilldownPath.length - 1];
+  const chartChildren = currentSpendingNode.children ?? EMPTY_SPENDING_CHILDREN;
+
   const chartData = useMemo(
     () =>
-      SPENDING_CATEGORIES.map((category) => {
-        if (viewMode === "absolute") {
-          return {
-            ...category,
-            displayValue: category.value,
-          };
-        }
-        if (viewMode === "percentage") {
-          return {
-            ...category,
-            displayValue: (category.value / TOTAL_REVENUE_MILLIONS) * 100,
-          };
-        }
-        return {
-          ...category,
-          displayValue:
-            (category.value / TOTAL_REVENUE_MILLIONS) * totalEstimatedAnnualTax,
-        };
-      }),
-    [viewMode, totalEstimatedAnnualTax],
+      chartChildren.map((category) => ({
+        name: category.name,
+        displayName: category.children?.length
+          ? `${category.name} \u203a`
+          : category.name,
+        color: category.color,
+        percentageOfTotal: (category.value / TOTAL_REVENUE_MILLIONS) * 100,
+        percentageOfParent: (category.value / currentSpendingNode.value) * 100,
+        displayValue:
+          viewMode === "total"
+            ? category.value
+            : (category.value / TOTAL_REVENUE_MILLIONS) * totalEstimatedAnnualTax,
+      })),
+    [chartChildren, currentSpendingNode.value, totalEstimatedAnnualTax, viewMode],
   );
 
-  const chartHeight = Math.max(420, chartData.length * 52);
+  const chartHeight = Math.max(360, chartData.length * 56);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setHasCalculated(true);
+    setDrilldownPath([SPENDING_HIERARCHY]);
   }
 
   function setNumberField<Key extends keyof FiscalInputs>(key: Key, value: string) {
@@ -343,6 +603,20 @@ export default function IrelandsFiscalFlow() {
 
   function setBooleanField<Key extends keyof FiscalInputs>(key: Key, value: boolean) {
     setInputs((prev) => ({ ...prev, [key]: value }));
+  }
+
+  function applyDefaults(defaults: Partial<FiscalInputs>) {
+    setInputs((prev) => ({ ...prev, ...defaults }));
+  }
+
+  function enterDrilldown(index: number) {
+    const next = chartChildren[index];
+    if (!next?.children?.length) return;
+    setDrilldownPath((prev) => [...prev, next]);
+  }
+
+  function goBackDrilldown() {
+    setDrilldownPath((prev) => (prev.length > 1 ? prev.slice(0, -1) : prev));
   }
 
   return (
@@ -377,10 +651,22 @@ export default function IrelandsFiscalFlow() {
         <p className="mt-2 text-stone-600">
           Enter your details to get an illustrative annual estimate.
         </p>
+        <p className="mt-1 text-sm text-stone-500">
+          Use the Fill Defaults buttons if you want quick sample values first.
+        </p>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-6">
           <div className="rounded-2xl border border-stone-200 bg-stone-50 p-5">
-            <h3 className="text-lg font-bold text-stone-900">1) About You</h3>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h3 className="text-lg font-bold text-stone-900">1) About You</h3>
+              <button
+                type="button"
+                onClick={() => applyDefaults(ABOUT_YOU_DEFAULTS)}
+                className="rounded-full border border-stone-300 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-stone-800 transition hover:border-stone-900"
+              >
+                Fill Defaults
+              </button>
+            </div>
             <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
               <label className="text-sm font-semibold text-stone-700">
                 Marital Status
@@ -446,7 +732,16 @@ export default function IrelandsFiscalFlow() {
           </div>
 
           <div className="rounded-2xl border border-stone-200 bg-stone-50 p-5">
-            <h3 className="text-lg font-bold text-stone-900">2) Annual Income</h3>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h3 className="text-lg font-bold text-stone-900">2) Annual Income</h3>
+              <button
+                type="button"
+                onClick={() => applyDefaults(INCOME_DEFAULTS)}
+                className="rounded-full border border-stone-300 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-stone-800 transition hover:border-stone-900"
+              >
+                Fill Defaults
+              </button>
+            </div>
             <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
               <label className="text-sm font-semibold text-stone-700">
                 Gross Salary (PAYE)
@@ -508,7 +803,16 @@ export default function IrelandsFiscalFlow() {
           </div>
 
           <div className="rounded-2xl border border-stone-200 bg-stone-50 p-5">
-            <h3 className="text-lg font-bold text-stone-900">3) Monthly Spending</h3>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h3 className="text-lg font-bold text-stone-900">3) Monthly Spending</h3>
+              <button
+                type="button"
+                onClick={() => applyDefaults(SPENDING_DEFAULTS)}
+                className="rounded-full border border-stone-300 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-stone-800 transition hover:border-stone-900"
+              >
+                Fill Defaults
+              </button>
+            </div>
             <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
               <label className="text-sm font-semibold text-stone-700">
                 Groceries (~4.6% VAT)
@@ -519,6 +823,7 @@ export default function IrelandsFiscalFlow() {
                     setNumberField("spendingGroceries", event.target.value)
                   }
                   className="mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-stone-900"
+                  placeholder="e.g. 600"
                 />
               </label>
               <label className="text-sm font-semibold text-stone-700">
@@ -528,6 +833,7 @@ export default function IrelandsFiscalFlow() {
                   value={inputs.spendingEnergy || ""}
                   onChange={(event) => setNumberField("spendingEnergy", event.target.value)}
                   className="mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-stone-900"
+                  placeholder="e.g. 150"
                 />
               </label>
               <label className="text-sm font-semibold text-stone-700">
@@ -539,6 +845,7 @@ export default function IrelandsFiscalFlow() {
                     setNumberField("spendingHospitality", event.target.value)
                   }
                   className="mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-stone-900"
+                  placeholder="e.g. 200"
                 />
               </label>
               <label className="text-sm font-semibold text-stone-700">
@@ -548,6 +855,7 @@ export default function IrelandsFiscalFlow() {
                   value={inputs.spendingFuel || ""}
                   onChange={(event) => setNumberField("spendingFuel", event.target.value)}
                   className="mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-stone-900"
+                  placeholder="e.g. 150"
                 />
               </label>
               <label className="text-sm font-semibold text-stone-700">
@@ -559,6 +867,7 @@ export default function IrelandsFiscalFlow() {
                     setNumberField("spendingAlcoholTobacco", event.target.value)
                   }
                   className="mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-stone-900"
+                  placeholder="e.g. 100"
                 />
               </label>
               <label className="text-sm font-semibold text-stone-700">
@@ -568,6 +877,7 @@ export default function IrelandsFiscalFlow() {
                   value={inputs.spendingGeneral || ""}
                   onChange={(event) => setNumberField("spendingGeneral", event.target.value)}
                   className="mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-stone-900"
+                  placeholder="e.g. 400"
                 />
               </label>
             </div>
@@ -583,9 +893,18 @@ export default function IrelandsFiscalFlow() {
           </div>
 
           <div className="rounded-2xl border border-stone-200 bg-stone-50 p-5">
-            <h3 className="text-lg font-bold text-stone-900">
-              4) Other Taxes (Optional)
-            </h3>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h3 className="text-lg font-bold text-stone-900">
+                4) Other Taxes (Optional)
+              </h3>
+              <button
+                type="button"
+                onClick={() => applyDefaults(OTHER_TAX_DEFAULTS)}
+                className="rounded-full border border-stone-300 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-stone-800 transition hover:border-stone-900"
+              >
+                Fill Defaults
+              </button>
+            </div>
             <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
               <label className="text-sm font-semibold text-stone-700">
                 Total Savings
@@ -594,6 +913,7 @@ export default function IrelandsFiscalFlow() {
                   value={inputs.totalSavings || ""}
                   onChange={(event) => setNumberField("totalSavings", event.target.value)}
                   className="mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-stone-900"
+                  placeholder="e.g. 10000"
                 />
               </label>
               <label className="text-sm font-semibold text-stone-700">
@@ -604,6 +924,7 @@ export default function IrelandsFiscalFlow() {
                   value={inputs.interestRate || ""}
                   onChange={(event) => setNumberField("interestRate", event.target.value)}
                   className="mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-stone-900"
+                  placeholder="e.g. 3.00"
                 />
               </label>
               <label className="text-sm font-semibold text-stone-700">
@@ -613,6 +934,7 @@ export default function IrelandsFiscalFlow() {
                   value={inputs.cgtGain || ""}
                   onChange={(event) => setNumberField("cgtGain", event.target.value)}
                   className="mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-stone-900"
+                  placeholder="e.g. 5000"
                 />
               </label>
               <label className="text-sm font-semibold text-stone-700">
@@ -622,6 +944,7 @@ export default function IrelandsFiscalFlow() {
                   value={inputs.lpt || ""}
                   onChange={(event) => setNumberField("lpt", event.target.value)}
                   className="mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-stone-900"
+                  placeholder="e.g. 450"
                 />
               </label>
               <label className="text-sm font-semibold text-stone-700">
@@ -631,6 +954,7 @@ export default function IrelandsFiscalFlow() {
                   value={inputs.motorTax || ""}
                   onChange={(event) => setNumberField("motorTax", event.target.value)}
                   className="mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-stone-900"
+                  placeholder="e.g. 390"
                 />
               </label>
               <label className="text-sm font-semibold text-stone-700">
@@ -640,6 +964,7 @@ export default function IrelandsFiscalFlow() {
                   value={inputs.vrtPrice || ""}
                   onChange={(event) => setNumberField("vrtPrice", event.target.value)}
                   className="mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-stone-900"
+                  placeholder="e.g. 30000"
                 />
               </label>
               <label className="text-sm font-semibold text-stone-700">
@@ -649,6 +974,7 @@ export default function IrelandsFiscalFlow() {
                   value={inputs.vrtCo2 || ""}
                   onChange={(event) => setNumberField("vrtCo2", event.target.value)}
                   className="mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-stone-900"
+                  placeholder="e.g. 110"
                 />
               </label>
               <label className="text-sm font-semibold text-stone-700">
@@ -658,6 +984,7 @@ export default function IrelandsFiscalFlow() {
                   value={inputs.catValue || ""}
                   onChange={(event) => setNumberField("catValue", event.target.value)}
                   className="mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-stone-900"
+                  placeholder="e.g. 20000"
                 />
               </label>
               <label className="text-sm font-semibold text-stone-700 md:col-span-2">
@@ -756,25 +1083,14 @@ export default function IrelandsFiscalFlow() {
             <div className="inline-flex rounded-xl border border-stone-300 bg-stone-100 p-1">
               <button
                 type="button"
-                onClick={() => setViewMode("absolute")}
+                onClick={() => setViewMode("total")}
                 className={`rounded-lg px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] transition ${
-                  viewMode === "absolute"
+                  viewMode === "total"
                     ? "bg-teal-500 text-white"
                     : "text-stone-700 hover:bg-stone-200"
                 }`}
               >
-                Total (M)
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode("percentage")}
-                className={`rounded-lg px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] transition ${
-                  viewMode === "percentage"
-                    ? "bg-teal-500 text-white"
-                    : "text-stone-700 hover:bg-stone-200"
-                }`}
-              >
-                % Breakdown
+                Total + %
               </button>
               <button
                 type="button"
@@ -791,41 +1107,70 @@ export default function IrelandsFiscalFlow() {
           </div>
 
           <p className="mt-3 text-sm text-stone-600">
-            Compare the public spending mix in total terms, as a percentage, or
-            as your estimated contribution.
+            Compare overall public spending with your estimated personal share.
           </p>
+          <p className="mt-1 text-xs text-stone-500">
+            Click a bar with a chevron to drill into further detail.
+          </p>
+          <div className="mt-3 flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-stone-600">
+            <span className="rounded-full border border-stone-300 bg-stone-100 px-3 py-1">
+              Viewing: {currentSpendingNode.name}
+            </span>
+            {drilldownPath.length > 1 && (
+              <button
+                type="button"
+                onClick={goBackDrilldown}
+                className="rounded-full border border-stone-300 bg-white px-3 py-1 text-stone-800 transition hover:border-stone-900"
+              >
+                Back One Level
+              </button>
+            )}
+          </div>
 
           <div className="mt-6" style={{ height: chartHeight }}>
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData} layout="vertical" margin={{ top: 8, right: 24, left: 16, bottom: 8 }}>
+              <BarChart
+                data={chartData}
+                layout="vertical"
+                margin={{ top: 8, right: 24, left: 16, bottom: 8 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" stroke="#d6d3d1" opacity={0.45} />
                 <XAxis
                   type="number"
                   tickFormatter={(value: number) => {
-                    if (viewMode === "absolute") return formatMillions(Math.round(value));
-                    if (viewMode === "percentage") return `${value.toFixed(0)}%`;
+                    if (viewMode === "total") return formatMillions(Math.round(value));
                     return `EUR ${Math.round(value).toLocaleString("en-IE")}`;
                   }}
                 />
                 <YAxis
                   type="category"
-                  dataKey="name"
-                  width={170}
+                  dataKey="displayName"
+                  width={210}
                   tick={{ fontSize: 12 }}
                 />
                 <Tooltip
                   formatter={(value: number, _name, item) => {
-                    if (viewMode === "absolute") {
-                      return [formatMillions(Math.round(value)), item.payload.name];
-                    }
-                    if (viewMode === "percentage") {
-                      return [`${value.toFixed(2)}%`, item.payload.name];
+                    if (viewMode === "total") {
+                      const percentageOfTotal = Number(item.payload.percentageOfTotal ?? 0);
+                      const percentageOfParent = Number(item.payload.percentageOfParent ?? 0);
+                      return [
+                        `${formatMillions(Math.round(value))} (${percentageOfTotal.toFixed(2)}% of total, ${percentageOfParent.toFixed(2)}% of ${currentSpendingNode.name})`,
+                        item.payload.name,
+                      ];
                     }
                     return [formatCurrency(value), item.payload.name];
                   }}
                   contentStyle={{ borderRadius: "12px", borderColor: "#d6d3d1" }}
                 />
-                <Bar dataKey="displayValue" radius={[0, 8, 8, 0]}>
+                <Bar
+                  dataKey="displayValue"
+                  radius={[0, 8, 8, 0]}
+                  onClick={(_entry, index) => {
+                    if (typeof index === "number") {
+                      enterDrilldown(index);
+                    }
+                  }}
+                >
                   {chartData.map((entry) => (
                     <Cell key={entry.name} fill={entry.color} />
                   ))}
