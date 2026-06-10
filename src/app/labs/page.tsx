@@ -19,6 +19,15 @@ const LABS = [
     status: "Live",
     meta: "Housing • Simulation",
   },
+  {
+    title: "Irish Budget Quiz",
+    description:
+      "Test your intuition on how Ireland's 2024 public spending is allocated, with score tracking and an interactive budget breakdown explorer.",
+    href: "/labs/irish-budget-quiz",
+    badge: "Civics",
+    status: "Live",
+    meta: "Budget • Quiz",
+  },
 ];
 
 export const metadata = {
