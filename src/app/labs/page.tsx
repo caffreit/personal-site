@@ -56,6 +56,15 @@ const LABS = [
     meta: "QMS • Interactive",
   },
   {
+    title: "BBT: Which ISO Standard Are You?",
+    description:
+      "A SaMD standards personality quiz to discover whether your default mode is QMS, risk, software lifecycle, usability, clinical evidence, or security governance.",
+    href: "/labs/samd-iso-standard-quiz",
+    badge: "SaMD",
+    status: "Live",
+    meta: "Standards • Quiz",
+  },
+  {
     title: "Irish Budget Block Game",
     description:
       "Allocate 20 budget blocks across major spending categories, then compare your guess to Ireland's rounded 2024 expenditure mix.",
