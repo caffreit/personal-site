@@ -42,6 +42,20 @@ type TaxBreakdownRow = {
   totalEuro: string;
 };
 
+type TaxInsight = {
+  title: string;
+  label: string;
+  description: string;
+};
+
+type LabourCostRow = {
+  grossSalary: string;
+  employerPrsi: string;
+  netPay: string;
+  totalCost: string;
+  taxPaidPerNetEuro: string;
+};
+
 const TAX_RULES_2026: TaxRules = {
   srcop: 44_000,
   personalCredit: 2_000,
@@ -65,6 +79,76 @@ function formatCurrency(value: number) {
     maximumFractionDigits: 0,
   });
 }
+
+const TAX_INSIGHTS: TaxInsight[] = [
+  {
+    title: "The Hidden Employer Charge",
+    label: "11.05% employer PRSI",
+    description:
+      "Before gross salary reaches the payslip, the employer may already be paying a substantial social-insurance charge. It behaves like a tax on jobs and helps explain why total labour cost can sit well above take-home pay.",
+  },
+  {
+    title: "The Narrow Tax Base",
+    label: "Bottom 40% pay little income tax",
+    description:
+      "Ireland protects lower earners by keeping many people out of meaningful income-tax liability. The trade-off is reliance on a smaller group of higher earners to fund a large share of public services.",
+  },
+  {
+    title: "The USC Entry Cliff",
+    label: "Threshold, not allowance",
+    description:
+      "USC is unusual because crossing the exemption threshold can trigger liability on the full amount, not just the extra euro. That is why the chart marks the sharp break around €13,000.",
+  },
+  {
+    title: "The 52% Wall",
+    label: "40% IT + 4% PRSI + 8% USC",
+    description:
+      "Above the higher USC band, new PAYE income can be cut by roughly half before it reaches the worker. This is the marginal rate, so it is felt most sharply on overtime, bonuses, and raises.",
+  },
+  {
+    title: "The Self-Employed Peak",
+    label: "55% above €100k",
+    description:
+      "Successful self-employment faces an extra 3% USC surcharge above €100,000, pushing the peak marginal rate above the ordinary employee rate in this simplified model.",
+  },
+  {
+    title: "The Pension Arbitrage",
+    label: "Income tax relief, not USC relief",
+    description:
+      "Pension contributions reduce the income-taxable base, but USC and PRSI still follow gross income. The state encourages long-term saving while keeping today's social charges in place.",
+  },
+];
+
+const LABOUR_COST_ROWS: LabourCostRow[] = [
+  {
+    grossSalary: "€25,000",
+    employerPrsi: "€2,205",
+    netPay: "€23,100",
+    totalCost: "€27,205",
+    taxPaidPerNetEuro: "€0.18",
+  },
+  {
+    grossSalary: "€50,000",
+    employerPrsi: "€5,525",
+    netPay: "€39,250",
+    totalCost: "€55,525",
+    taxPaidPerNetEuro: "€0.41",
+  },
+  {
+    grossSalary: "€100,000",
+    employerPrsi: "€11,050",
+    netPay: "€66,100",
+    totalCost: "€111,050",
+    taxPaidPerNetEuro: "€0.68",
+  },
+  {
+    grossSalary: "€150,000",
+    employerPrsi: "€16,575",
+    netPay: "€90,100",
+    totalCost: "€166,575",
+    taxPaidPerNetEuro: "€0.85",
+  },
+];
 
 export default function IrishTaxBreakdown2026() {
   const [isSelfEmployed, setIsSelfEmployed] = useState(false);
@@ -405,6 +489,112 @@ export default function IrishTaxBreakdown2026() {
             (bands, rates, and credits) and is not financial or tax advice.
           </p>
         </article>
+      </section>
+
+      <section className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-3">
+        <article className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)] sm:p-8 lg:col-span-2">
+          <p className="font-mono text-xs font-semibold uppercase tracking-[0.3em] text-stone-500">
+            Reading The Chart
+          </p>
+          <h2 className="mt-3 text-3xl font-black tracking-tight text-stone-900 sm:text-4xl">
+            Marginal pain, average calm
+          </h2>
+          <p className="mt-4 max-w-3xl text-base leading-relaxed text-stone-600">
+            The main illusion in the Irish tax system is the gap between marginal
+            and effective rates. The average rate stays relatively low for a long
+            time, but a raise, bonus, or extra contract can hit the high marginal
+            bands immediately.
+          </p>
+
+          <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2">
+            {TAX_INSIGHTS.map((insight) => (
+              <div
+                key={insight.title}
+                className="rounded-2xl border border-stone-200 bg-stone-50 p-5"
+              >
+                <p className="font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-stone-500">
+                  {insight.label}
+                </p>
+                <h3 className="mt-2 text-lg font-black tracking-tight text-stone-900">
+                  {insight.title}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-stone-600">
+                  {insight.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </article>
+
+        <aside className="space-y-6">
+          <article className="rounded-[2rem] border border-stone-200 bg-stone-900 p-6 text-white shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)] sm:p-8">
+            <p className="font-mono text-xs font-semibold uppercase tracking-[0.3em] text-stone-400">
+              The Salient Number
+            </p>
+            <p className="mt-4 text-4xl font-black tracking-tight sm:text-5xl">€1.85</p>
+            <p className="mt-3 text-sm leading-relaxed text-stone-300">
+              For a high earner around €150k+, the economy can spend about €1.85
+              in total labour cost to leave €1.00 of spending power. The remaining
+              €0.85 is the combined drag from employee tax and employer PRSI.
+            </p>
+          </article>
+
+          <article className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)]">
+            <h2 className="text-xl font-black tracking-tight text-stone-900">
+              Income Landscape
+            </h2>
+            <p className="mt-3 text-sm leading-relaxed text-stone-600">
+              CSO data puts median annual full-time earnings at roughly €44,816
+              in 2024. The distribution is skewed: the top 10% earn above about
+              €77,500 and pay around 61% of personal income tax, while the top 1%
+              earn over €200,000 and pay roughly 19-20%.
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-stone-600">
+              At the other end, the bottom 40% pay less than 5% of income tax
+              collected, which makes the system highly progressive but also
+              dependent on a narrow high-earner base.
+            </p>
+          </article>
+        </aside>
+      </section>
+
+      <section className="mt-8 rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)] sm:p-8">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="font-mono text-xs font-semibold uppercase tracking-[0.3em] text-stone-500">
+              Total Labour Cost
+            </p>
+            <h2 className="mt-3 text-3xl font-black tracking-tight text-stone-900 sm:text-4xl">
+              What it costs to deliver take-home pay
+            </h2>
+          </div>
+          <p className="max-w-xl text-sm leading-relaxed text-stone-600">
+            These rounded examples add employer PRSI to salary cost, then compare
+            the full economic cost with approximate net pay.
+          </p>
+        </div>
+
+        <div className="mt-8 overflow-hidden rounded-2xl border border-stone-200">
+          <div className="grid grid-cols-5 bg-stone-100 px-4 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-stone-500">
+            <span>Gross</span>
+            <span>Employer PRSI</span>
+            <span>Net Pay</span>
+            <span>Total Cost</span>
+            <span>Tax Per €1 Net</span>
+          </div>
+          {LABOUR_COST_ROWS.map((row) => (
+            <div
+              key={row.grossSalary}
+              className="grid grid-cols-1 gap-2 border-t border-stone-200 px-4 py-4 text-sm text-stone-700 sm:grid-cols-5 sm:gap-0"
+            >
+              <span className="font-bold text-stone-900">{row.grossSalary}</span>
+              <span>{row.employerPrsi}</span>
+              <span>{row.netPay}</span>
+              <span>{row.totalCost}</span>
+              <span className="font-bold text-stone-900">{row.taxPaidPerNetEuro}</span>
+            </div>
+          ))}
+        </div>
       </section>
     </div>
   );
