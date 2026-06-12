@@ -130,7 +130,7 @@ How did I pick the mean parameter values (20 for `a`, 0.65 for `b`)? I tweaked t
 </div>
 
 <em>
-  Fig 2a: [placeholder caption]. Fig 2b: [placeholder caption].
+  Fig 2a: Example call-frequency rank plots from the original data, showing the heavy-tailed pattern in which a small number of contacts receive most calls. Fig 2b: Synthetic call-frequency rank plots generated with the same broad distributional shape, used to check that the simulated data was a plausible stand-in before applying the clustering analysis.
 </em>
 
 <br />
@@ -159,12 +159,10 @@ After generating this synthetic data, I applied the same Jenks natural breaks cl
 </div>
 
 <em>
-  Fig 3a: [placeholder caption]. Fig 3b: [placeholder caption].
+  My replication showing the distribution of optimal number of clusters. Note that the majority of networks have 4-5 clusters, just as in the original paper's Figure 3.
 </em>
 
 <br />
-
-My replication showing the distribution of optimal number of clusters. Note that the majority of networks have 4-5 clusters, just as in the original paper's Figure 3.
 
 While my replication isn't a perfect match (which might be due to differences in the underlying raw data), the key pattern is clearly reproduced: the majority of networks are optimally divided into 4 or 5 clusters according to the Jenks natural breaks algorithm with a goodness-of-fit threshold of 0.85.
 
@@ -184,9 +182,13 @@ Not only did I reproduce the layer sizes, but my approach also reproduced other 
 
 <br />
 
-> "When you ask a clustering algorithm to carve structure out of noise, it will happily oblige—layered or not."
+<em>
+  My replication of the paper's Figure 4, showing the distribution of the number of contacts in each layer for networks with 4 clusters (left) and 5 clusters (right). Note the log-normal distribution of each layer, closely matching the original paper's findings.
+</em>
 
-My replication of the paper's Figure 4, showing the distribution of the number of contacts in each layer for networks with 4 clusters (left) and 5 clusters (right). Note the log-normal distribution of each layer, closely matching the original paper's findings.
+<br />
+
+> "When you ask a clustering algorithm to carve structure out of noise, it will happily oblige—layered or not."
 
 The fact that both the layer sizes and their internal distributions could be replicated so closely using a simple, continuous model deliberately lacking discrete layers strongly suggests the structures identified in the original paper are mathematical artifacts of the clustering method applied to noisy, skewed data, rather than evidence of genuine social organisation.
 
@@ -216,12 +218,10 @@ It's worth examining another aspect of the original paper: Figure 2, which shows
 </div>
 
 <em>
-  Fig 5a: [placeholder caption]. Fig 5b: [placeholder caption].
+  My replication of the paper's Figure 2, showing the histogram and kernel density estimate of normalized relationship strengths.
 </em>
 
 <br />
-
-My replication of the paper's Figure 2, showing the histogram and kernel density estimate of normalized relationship strengths.
 
 At first glance, this figure seems to provide compelling visual evidence for discrete layers in social relationships - the peaks might be interpreted as representing different relationship categories. However, I found that these peaks are actually mathematical artifacts resulting from the data processing rather than evidence of real structure.
 
