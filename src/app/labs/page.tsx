@@ -47,6 +47,15 @@ const LABS = [
     meta: "Startup • Quiz",
   },
   {
+    title: "BBT: 12 Stages of QMS",
+    description:
+      "A satirical but practical interactive journey through the 12 moments when a SaMD team realises quality management can no longer be postponed.",
+    href: "/labs/samd-qms-stages",
+    badge: "SaMD",
+    status: "Live",
+    meta: "QMS • Interactive",
+  },
+  {
     title: "Irish Budget Block Game",
     description:
       "Allocate 20 budget blocks across major spending categories, then compare your guess to Ireland's rounded 2024 expenditure mix.",
