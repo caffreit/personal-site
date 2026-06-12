@@ -29,6 +29,15 @@ const LABS = [
     meta: "Budget • Quiz",
   },
   {
+    title: "BBT: FDA Pre-Sub Quiz",
+    description:
+      "A tongue-in-cheek SaMD quiz on surviving FDA pre-sub meetings, while pressure-testing the quality of your validation story.",
+    href: "/labs/samd-fda-pre-sub-quiz",
+    badge: "SaMD",
+    status: "Live",
+    meta: "FDA • Quiz",
+  },
+  {
     title: "Irish Budget Block Game",
     description:
       "Allocate 20 budget blocks across major spending categories, then compare your guess to Ireland's rounded 2024 expenditure mix.",
