@@ -40,7 +40,7 @@ const QUESTIONS: QuizQuestion[] = [
       },
       {
         text: "It provides a segmentation used by radiologists to support measurement of X in population Y.",
-        score: 2,
+        score: 1,
         feedback:
           "Good. Specific output, specific user, specific clinical task. Everyone exhales slightly.",
       },
@@ -70,7 +70,7 @@ const QUESTIONS: QuizQuestion[] = [
       },
       {
         text: "Qualified independent readers, blinded to AI output, using predefined adjudication rules.",
-        score: 2,
+        score: 1,
         feedback:
           "Strong answer. This sounds like a reference standard, not just someone clicking things in a hurry.",
       },
@@ -105,7 +105,7 @@ const QUESTIONS: QuizQuestion[] = [
       },
       {
         text: "We predefined clinically relevant subgroups and assessed performance against acceptance criteria.",
-        score: 2,
+        score: 1,
         feedback:
           "Exactly. Define the subgroups before the meeting, not during the meeting.",
       },
@@ -129,7 +129,7 @@ const QUESTIONS: QuizQuestion[] = [
       },
       {
         text: "The locked release candidate, with code, model weights, data version, and test environment controlled.",
-        score: 2,
+        score: 1,
         feedback:
           "Yes. Validation evidence needs to point to a controlled thing, not a moving target.",
       },
@@ -160,7 +160,7 @@ const QUESTIONS: QuizQuestion[] = [
       },
       {
         text: "We mapped foreseeable failure modes to harms, risk controls, user information, and validation evidence.",
-        score: 2,
+        score: 1,
         feedback:
           "Good. This turns 'clinician-in-the-loop' from a magic phrase into an actual risk argument.",
       },
@@ -191,7 +191,7 @@ const QUESTIONS: QuizQuestion[] = [
       },
       {
         text: "They were derived from clinical use, comparator performance, reader variability, and the risk analysis.",
-        score: 2,
+        score: 1,
         feedback:
           "Good. Acceptance criteria should connect to use, not just model ambition.",
       },
@@ -221,7 +221,7 @@ const QUESTIONS: QuizQuestion[] = [
       },
       {
         text: "We have a workflow diagram showing AI output, downstream logic, user actions, and claim boundaries.",
-        score: 2,
+        score: 1,
         feedback:
           "Excellent. Boundaries make the claim, validation, and risk argument much easier to discuss.",
       },
@@ -252,7 +252,7 @@ const QUESTIONS: QuizQuestion[] = [
       },
       {
         text: "Do you agree that our proposed validation design, including population, reference standard, endpoints, and subgroup plan, is appropriate to support the intended use?",
-        score: 2,
+        score: 1,
         feedback:
           "Strong. Specific enough to get useful feedback, broad enough to cover the core evidence strategy.",
       },
@@ -284,7 +284,7 @@ const REFERENCE_LINKS = [
 ];
 
 function getResult(score: number): QuizResult {
-  if (score >= 13) {
+  if (score >= 7) {
     return {
       badge: "Pre-sub survivor",
       title: "You survived the meeting.",
@@ -299,7 +299,7 @@ function getResult(score: number): QuizResult {
     };
   }
 
-  if (score >= 8) {
+  if (score >= 4) {
     return {
       badge: "Meeting survived, plan wounded",
       title: "You made it out, but your validation plan needs a lie-down.",
@@ -314,7 +314,7 @@ function getResult(score: number): QuizResult {
     };
   }
 
-  if (score >= 3) {
+  if (score >= 2) {
     return {
       badge: "Traceability goblin alert",
       title: "You need a traceability matrix and a quiet room.",
@@ -353,7 +353,7 @@ export default function SamdFdaPreSubQuiz() {
   const isAnswered = selectedIndex !== null;
   const selectedAnswer = selectedIndex === null ? null : activeQuestion.answers[selectedIndex];
   const result = useMemo(() => getResult(score), [score]);
-  const maxScore = QUESTIONS.length * 2;
+  const maxScore = QUESTIONS.length;
 
   const progressPercent = showResult
     ? 100
@@ -363,7 +363,7 @@ export default function SamdFdaPreSubQuiz() {
     if (!selectedAnswer) {
       return "";
     }
-    if (selectedAnswer.score === 2) {
+    if (selectedAnswer.score === 1) {
       return "You may proceed. FDA has not yet deployed the eyebrow.";
     }
     if (selectedAnswer.score === 0) {
@@ -442,14 +442,14 @@ export default function SamdFdaPreSubQuiz() {
               />
             </div>
           </div>
-          <div className="inline-flex items-center rounded-full bg-stone-100 px-4 py-2 text-sm font-bold text-stone-700">
+          <div className="inline-flex shrink-0 items-center whitespace-nowrap rounded-full bg-stone-100 px-4 py-2 text-sm font-bold text-stone-700">
             Score: {score}
           </div>
         </div>
 
         {!showResult ? (
           <div>
-            <p className="mb-3 text-sm font-semibold tracking-wide text-stone-500">
+            <p className="mb-5 max-w-3xl rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 font-serif text-lg italic leading-relaxed text-stone-700 sm:text-xl">
               {activeQuestion.scenario}
             </p>
             <h2 className="mb-6 text-3xl font-black leading-tight tracking-tight text-stone-900 sm:text-4xl">
@@ -461,7 +461,7 @@ export default function SamdFdaPreSubQuiz() {
                 const isSelected = selectedIndex === answerIndex;
                 const stateClass = !isAnswered
                   ? "hover:border-yellow-500"
-                  : answer.score === 2
+                  : answer.score === 1
                     ? "border-emerald-300 bg-emerald-50"
                     : isSelected
                       ? "border-rose-300 bg-rose-50"
