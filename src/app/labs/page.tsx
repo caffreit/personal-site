@@ -29,6 +29,33 @@ const LABS = [
     meta: "Budget • Quiz",
   },
   {
+    title: "BBT: FDA Pre-Sub Quiz",
+    description:
+      "A tongue-in-cheek SaMD quiz on surviving FDA pre-sub meetings, while pressure-testing the quality of your validation story.",
+    href: "/labs/samd-fda-pre-sub-quiz",
+    badge: "SaMD",
+    status: "Live",
+    meta: "FDA • Quiz",
+  },
+  {
+    title: "BBT: SaMD Startup Quiz",
+    description:
+      "Find your SaMD startup archetype across intended use, QMS maturity, validation discipline, and claim strategy.",
+    href: "/labs/samd-startup-quiz",
+    badge: "SaMD",
+    status: "Live",
+    meta: "Startup • Quiz",
+  },
+  {
+    title: "BBT: 12 Stages of QMS",
+    description:
+      "A satirical but practical interactive journey through the 12 moments when a SaMD team realises quality management can no longer be postponed.",
+    href: "/labs/samd-qms-stages",
+    badge: "SaMD",
+    status: "Live",
+    meta: "QMS • Interactive",
+  },
+  {
     title: "Irish Budget Block Game",
     description:
       "Allocate 20 budget blocks across major spending categories, then compare your guess to Ireland's rounded 2024 expenditure mix.",

@@ -10,6 +10,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/photos`, lastModified: now },
     { url: `${baseUrl}/photos/prints`, lastModified: now },
     { url: `${baseUrl}/blog`, lastModified: now },
+    { url: `${baseUrl}/labs`, lastModified: now },
+    { url: `${baseUrl}/labs/samd-fda-pre-sub-quiz`, lastModified: now },
+    { url: `${baseUrl}/labs/samd-startup-quiz`, lastModified: now },
+    { url: `${baseUrl}/labs/samd-qms-stages`, lastModified: now },
   ];
   const posts = getAllPosts();
   for (const p of posts) {
