@@ -56,6 +56,15 @@ const LABS = [
     meta: "Tax • Explorer",
   },
   {
+    title: "Irish Tax Waterfall 2026",
+    description:
+      "Trace how illustrative 2026 taxes, spending, and return taxes convert gross pay into retained annual wealth.",
+    href: "/labs/irish-tax-waterfall-2026",
+    badge: "Data Viz",
+    status: "Live",
+    meta: "Tax • Waterfall",
+  },
+  {
     title: "Ireland's Finances Breakdown",
     description:
       "Explore Ireland's 2024 income and expenditure mix with interactive doughnut charts and clickable spending drilldowns.",
