@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Sparkles, X, ArrowLeft, MapPin } from 'lucide-react';
-import { analyzeImageAction } from '@/app/actions';
+import { ArrowLeft, MapPin } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Masonry from 'react-masonry-css';
@@ -28,10 +27,6 @@ interface LocationAlbumViewProps {
 
 export const LocationAlbumView: React.FC<LocationAlbumViewProps> = ({ location, images, onBack }) => {
   const router = useRouter();
-  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
-  const [analysis, setAnalysis] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
@@ -45,25 +40,6 @@ export const LocationAlbumView: React.FC<LocationAlbumViewProps> = ({ location, 
     window.scrollTo(0, 0);
   }, []);
 
-  const handleAnalyze = async (url: string, id: string) => {
-    setSelectedPhoto(id);
-    setLoading(true);
-    setAnalysis(null);
-    
-    try {
-        const result = await analyzeImageAction(url);
-        setAnalysis(result);
-    } catch {
-        setAnalysis("Failed to analyze image.");
-    }
-    setLoading(false);
-  };
-
-  const closeAnalysis = () => {
-    setSelectedPhoto(null);
-    setAnalysis(null);
-  };
-  
   const openLightbox = (index: number) => {
     setLightboxIndex(index);
     setLightboxOpen(true);
@@ -129,7 +105,7 @@ export const LocationAlbumView: React.FC<LocationAlbumViewProps> = ({ location, 
             {images.map((photo, index) => (
             <div 
                 key={photo.id} 
-                onClick={() => !selectedPhoto && openLightbox(index)}
+                onClick={() => openLightbox(index)}
                 className="mb-8 group relative overflow-hidden rounded-[16px] bg-stone-200 cursor-pointer transition-all duration-500 hover:shadow-2xl"
             >
                 <img 
@@ -156,54 +132,11 @@ export const LocationAlbumView: React.FC<LocationAlbumViewProps> = ({ location, 
                 </div>
 
                 {/* Hover Info Card */}
-                <div className="absolute inset-0 bg-gradient-to-tr from-stone-900/80 via-stone-900/20 to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-6">
-                    <div className="flex justify-end items-start w-full">
-                        <button 
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                handleAnalyze(photo.url, photo.id);
-                            }}
-                            className="bg-stone-900/40 backdrop-blur-sm border border-[var(--color-yellow)]/30 text-[var(--color-yellow)] px-4 py-2 rounded-full hover:bg-stone-900/60 transition-all shadow-lg flex items-center gap-2 group/btn"
-                        >
-                            <Sparkles className="w-4 h-4" />
-                            <span className="font-serif italic text-lg">Analyse with Gemini</span>
-                        </button>
-                    </div>
-
+                <div className="absolute inset-0 bg-gradient-to-tr from-stone-900/80 via-stone-900/20 to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
                     <div className="translate-y-0 md:translate-y-4 md:group-hover:translate-y-0 transition-transform duration-300">
                         <h3 className="text-white text-2xl font-bold leading-tight mb-2">{photo.title}</h3>
                     </div>
                 </div>
-
-                {/* Analysis Popover (In-place) */}
-                {selectedPhoto === photo.id && (
-                    <div 
-                        className="absolute inset-0 z-20 bg-stone-900/95 p-6 md:p-8 flex flex-col justify-center animate-in fade-in duration-300"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <button onClick={closeAnalysis} className="absolute top-6 right-6 text-stone-400 hover:text-white">
-                            <X className="w-6 h-6" />
-                        </button>
-                        
-                        <div className="space-y-4">
-                            <div className="flex items-center gap-2 text-[var(--color-yellow)] font-mono text-xs uppercase tracking-widest">
-                                <Sparkles className="w-4 h-4 animate-spin-slow" /> AI Analysis
-                            </div>
-                            
-                            {loading ? (
-                                <div className="space-y-3">
-                                    <div className="h-4 w-3/4 bg-stone-800 rounded animate-pulse"></div>
-                                    <div className="h-4 w-1/2 bg-stone-800 rounded animate-pulse"></div>
-                                    <div className="h-4 w-5/6 bg-stone-800 rounded animate-pulse"></div>
-                                </div>
-                            ) : (
-                                <p className="text-lg md:text-xl font-serif text-stone-200 leading-relaxed italic">
-                                    "{analysis}"
-                                </p>
-                            )}
-                        </div>
-                    </div>
-                )}
             </div>
             ))}
         </Masonry>
