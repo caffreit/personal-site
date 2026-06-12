@@ -46,6 +46,15 @@ const LABS = [
     status: "Live",
     meta: "Budget • Explorer",
   },
+  {
+    title: "Ireland's Finances Breakdown",
+    description:
+      "Explore Ireland's 2024 income and expenditure mix with interactive doughnut charts and clickable spending drilldowns.",
+    href: "/labs/irelands-finances-breakdown",
+    badge: "Civics",
+    status: "Live",
+    meta: "Budget • Data Viz",
+  },
 ];
 
 export const metadata = {
