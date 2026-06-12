@@ -12,6 +12,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/blog`, lastModified: now },
     { url: `${baseUrl}/labs`, lastModified: now },
     { url: `${baseUrl}/labs/samd-fda-pre-sub-quiz`, lastModified: now },
+    { url: `${baseUrl}/labs/samd-startup-quiz`, lastModified: now },
   ];
   const posts = getAllPosts();
   for (const p of posts) {

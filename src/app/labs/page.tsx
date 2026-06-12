@@ -38,6 +38,15 @@ const LABS = [
     meta: "FDA • Quiz",
   },
   {
+    title: "BBT: SaMD Startup Quiz",
+    description:
+      "Find your SaMD startup archetype across intended use, QMS maturity, validation discipline, and claim strategy.",
+    href: "/labs/samd-startup-quiz",
+    badge: "SaMD",
+    status: "Live",
+    meta: "Startup • Quiz",
+  },
+  {
     title: "Irish Budget Block Game",
     description:
       "Allocate 20 budget blocks across major spending categories, then compare your guess to Ireland's rounded 2024 expenditure mix.",
