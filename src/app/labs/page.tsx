@@ -47,6 +47,15 @@ const LABS = [
     meta: "Budget • Explorer",
   },
   {
+    title: "Irish Tax Breakdown 2026",
+    description:
+      "Explore effective and marginal income tax, USC, and PRSI rates across incomes with pension and employment controls.",
+    href: "/labs/irish-tax-breakdown-2026",
+    badge: "Data Viz",
+    status: "Live",
+    meta: "Tax • Explorer",
+  },
+  {
     title: "Ireland's Finances Breakdown",
     description:
       "Explore Ireland's 2024 income and expenditure mix with interactive doughnut charts and clickable spending drilldowns.",
