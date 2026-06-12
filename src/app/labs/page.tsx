@@ -1,14 +1,15 @@
 import Link from "next/link";
-import { ArrowLeft, ArrowUpRight } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import LabsListing, { type Lab } from "@/components/labs/LabsListing";
 
-const LABS = [
+const LABS: Lab[] = [
   {
     title: "Three Stations",
     description: "Tap anywhere on the Liffey corridor to compare real-time walking routes from Connolly, Tara Street, and Pearse using the Google Maps Directions API.",
     href: "/three-stations",
     badge: "Google Maps",
-    status: "Live",
     meta: "Transit • Experiment",
+    publishedAt: "2025-12-31",
   },
   {
     title: "Ireland Housing Market",
@@ -16,8 +17,8 @@ const LABS = [
       "Explore interactive mortgage affordability simulations across historical prices, wages, rates, and inflation.",
     href: "/labs/ireland-housing-market",
     badge: "Data Viz",
-    status: "Live",
     meta: "Housing • Simulation",
+    publishedAt: "2026-03-03",
   },
   {
     title: "Irish Budget Quiz",
@@ -25,44 +26,45 @@ const LABS = [
       "Test your intuition on how Ireland's 2024 public spending is allocated, with score tracking and an interactive budget breakdown explorer.",
     href: "/labs/irish-budget-quiz",
     badge: "Civics",
-    status: "Live",
     meta: "Budget • Quiz",
+    publishedAt: "2026-06-10",
+    isPinned: true,
   },
   {
-    title: "BBT: FDA Pre-Sub Quiz",
+    title: "FDA Pre-Sub Quiz",
     description:
       "A tongue-in-cheek SaMD quiz on surviving FDA pre-sub meetings, while pressure-testing the quality of your validation story.",
     href: "/labs/samd-fda-pre-sub-quiz",
     badge: "SaMD",
-    status: "Live",
     meta: "FDA • Quiz",
+    publishedAt: "2026-06-12",
   },
   {
-    title: "BBT: SaMD Startup Quiz",
+    title: "SaMD Startup Quiz",
     description:
       "Find your SaMD startup archetype across intended use, QMS maturity, validation discipline, and claim strategy.",
     href: "/labs/samd-startup-quiz",
     badge: "SaMD",
-    status: "Live",
     meta: "Startup • Quiz",
+    publishedAt: "2026-06-12",
   },
   {
-    title: "BBT: 12 Stages of QMS",
+    title: "12 Stages of QMS",
     description:
       "A satirical but practical interactive journey through the 12 moments when a SaMD team realises quality management can no longer be postponed.",
     href: "/labs/samd-qms-stages",
     badge: "SaMD",
-    status: "Live",
     meta: "QMS • Interactive",
+    publishedAt: "2026-06-12",
   },
   {
-    title: "BBT: Which ISO Standard Are You?",
+    title: "Which ISO Standard Are You?",
     description:
       "A SaMD standards personality quiz to discover whether your default mode is QMS, risk, software lifecycle, usability, clinical evidence, or security governance.",
     href: "/labs/samd-iso-standard-quiz",
     badge: "SaMD",
-    status: "Live",
     meta: "Standards • Quiz",
+    publishedAt: "2026-06-12",
   },
   {
     title: "Irish Budget Block Game",
@@ -70,8 +72,9 @@ const LABS = [
       "Allocate 20 budget blocks across major spending categories, then compare your guess to Ireland's rounded 2024 expenditure mix.",
     href: "/labs/irish-budget-block-game",
     badge: "Civics",
-    status: "Live",
     meta: "Budget • Game",
+    publishedAt: "2026-06-10",
+    isPinned: true,
   },
   {
     title: "Ireland's Fiscal Flow",
@@ -79,8 +82,9 @@ const LABS = [
       "Estimate your annual tax contribution and compare it with how Ireland's 2024 public spending is distributed.",
     href: "/labs/irelands-fiscal-flow",
     badge: "Civics",
-    status: "Live",
     meta: "Budget • Explorer",
+    publishedAt: "2026-06-10",
+    isPinned: true,
   },
   {
     title: "Irish Tax Breakdown 2026",
@@ -88,8 +92,8 @@ const LABS = [
       "Explore effective and marginal income tax, USC, and PRSI rates across incomes with pension and employment controls.",
     href: "/labs/irish-tax-breakdown-2026",
     badge: "Data Viz",
-    status: "Live",
     meta: "Tax • Explorer",
+    publishedAt: "2026-06-12",
   },
   {
     title: "Irish Tax Waterfall 2026",
@@ -97,8 +101,8 @@ const LABS = [
       "Trace how illustrative 2026 taxes, spending, and return taxes convert gross pay into retained annual wealth.",
     href: "/labs/irish-tax-waterfall-2026",
     badge: "Data Viz",
-    status: "Live",
     meta: "Tax • Waterfall",
+    publishedAt: "2026-06-12",
   },
   {
     title: "Ireland's Finances Breakdown",
@@ -106,8 +110,8 @@ const LABS = [
       "Explore Ireland's 2024 income and expenditure mix with interactive doughnut charts and clickable spending drilldowns.",
     href: "/labs/irelands-finances-breakdown",
     badge: "Civics",
-    status: "Live",
     meta: "Budget • Data Viz",
+    publishedAt: "2026-06-12",
   },
 ];
 
@@ -139,43 +143,7 @@ export default function LabsPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {LABS.map((lab) => (
-          <Link
-            key={lab.href}
-            href={lab.href}
-            className="group relative overflow-hidden rounded-[2.5rem] border border-stone-200 bg-white p-8 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)] transition-transform duration-500 hover:-translate-y-1 hover:shadow-[0_25px_60px_-35px_rgba(0,0,0,0.4)]"
-          >
-            <div className="mb-8 flex items-center gap-3 text-xs font-bold uppercase tracking-[0.3em] text-stone-400">
-              <span className="rounded-full border border-stone-200 px-3 py-1 text-[10px] font-black tracking-widest text-stone-600">
-                {lab.status}
-              </span>
-              <span className="rounded-full bg-lime-100 px-3 py-1 text-lime-700">
-                {lab.badge}
-              </span>
-            </div>
-
-            <div className="space-y-4">
-              <h2 className="text-3xl font-black tracking-tight text-stone-900 sm:text-4xl">
-                {lab.title}
-              </h2>
-              <p className="text-base leading-relaxed text-stone-600">
-                {lab.description}
-              </p>
-            </div>
-
-            <div className="mt-10 flex items-center justify-between text-sm text-stone-500">
-              <span className="font-mono uppercase tracking-[0.3em]">{lab.meta}</span>
-              <span className="flex items-center gap-2 font-semibold text-stone-900 transition-colors group-hover:text-yellow-600">
-                View Lab
-                <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
-              </span>
-            </div>
-
-            <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-10" style={{ backgroundImage: "linear-gradient(135deg, #bef264 0%, #0ea5e9 100%)" }} />
-          </Link>
-        ))}
-      </div>
+      <LabsListing labs={LABS} />
     </div>
   );
 }
