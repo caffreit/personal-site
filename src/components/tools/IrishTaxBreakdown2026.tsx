@@ -445,10 +445,12 @@ export default function IrishTaxBreakdown2026() {
                 <Tooltip
                   labelFormatter={(label) => `Gross income: €${Number(label).toLocaleString("en-IE")}`}
                   formatter={(value, name, props) => {
+                    const seriesName = String(name).toUpperCase();
+
                     if (name === "Total Rate") {
-                      return [`${value}% (${props.payload.totalEuro})`, name.toUpperCase()];
+                      return [`${value}% (${props.payload.totalEuro})`, seriesName];
                     }
-                    return [`${value}%`, name.toUpperCase()];
+                    return [`${value}%`, seriesName];
                   }}
                   contentStyle={{
                     borderRadius: "12px",
