@@ -127,7 +127,7 @@ function FilterChip({
           : "border-stone-200 text-stone-500 hover:border-stone-900 hover:text-stone-900"
       }`}
     >
-      {label}
+      <span className="chip-text">{label}</span>
     </button>
   );
 }
@@ -141,12 +141,12 @@ function LabCard({ lab }: { lab: Lab }) {
       <div className="mb-8 flex items-start justify-between gap-4 text-xs font-bold uppercase tracking-[0.3em] text-stone-400">
         <div className="flex flex-wrap items-center gap-3">
           <span className="rounded-full bg-lime-100 px-3 py-1 text-lime-700">
-            {lab.badge}
+            <span className="chip-text">{lab.badge}</span>
           </span>
           {lab.isPinned && (
             <span className="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-3 py-1 text-yellow-700">
               <Star className="h-3 w-3 fill-current" />
-              Pinned
+              <span className="chip-text">Pinned</span>
             </span>
           )}
         </div>

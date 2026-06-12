@@ -123,6 +123,13 @@ html {
   color: #1c1917;
 }
 
+/* Nudge chip label glyphs into the visual center of rounded pills. */
+.chip-text {
+  display: inline-block;
+  line-height: 1;
+  transform: translateY(0.12em);
+}
+
 /* Hero carousel keyframes */
 @keyframes kenBurns {
   from { transform: scale(1); }
