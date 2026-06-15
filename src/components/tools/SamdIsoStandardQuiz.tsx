@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ArrowUpRight, Copy, RotateCcw, Share2 } from "lucide-react";
 
@@ -39,6 +40,11 @@ type QuizQuestion = {
 type ScoreMap = Record<StandardKey, number>;
 
 const CONTACT_EMAIL = "hello@bluebridgetech.ie";
+const RESULT_IMAGE_BASE = "/labs/samd-iso-standard-quiz";
+
+function resultImageSrc(key: StandardKey) {
+  return `${RESULT_IMAGE_BASE}/${key}.png`;
+}
 
 const INITIAL_SCORES: ScoreMap = {
   qms: 0,
@@ -490,8 +496,6 @@ export default function SamdIsoStandardQuiz() {
 
   const dominantResult = STANDARDS[dominant];
   const totalAnswers = history.length;
-  const dominantPercent =
-    totalAnswers > 0 ? Math.round((scores[dominant] / totalAnswers) * 100) : 0;
 
   const shareText = useMemo(() => {
     return `${dominantResult.shareHook} Runner-up: ${STANDARDS[runnerUp].code}. Took the SaMD "Which ISO Standard Are You?" quiz.`;
@@ -685,8 +689,18 @@ export default function SamdIsoStandardQuiz() {
                 ([key, value]) => (
                   <article
                     key={key}
-                    className="rounded-2xl border border-stone-200 bg-stone-50 p-5"
+                    className="overflow-hidden rounded-2xl border border-stone-200 bg-stone-50"
                   >
+                    <div className="relative aspect-[4/3] bg-stone-200">
+                      <Image
+                        src={resultImageSrc(key)}
+                        alt={`${value.code}: ${value.title}`}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, 400px"
+                      />
+                    </div>
+                    <div className="p-5">
                     <p className="font-mono text-xs font-semibold uppercase tracking-[0.3em] text-stone-500">
                       {value.code}
                     </p>
@@ -694,6 +708,7 @@ export default function SamdIsoStandardQuiz() {
                       {value.title}
                     </h3>
                     <p className="mt-2 leading-relaxed text-stone-600">{value.subtitle}</p>
+                    </div>
                   </article>
                 ),
               )}
@@ -797,10 +812,7 @@ export default function SamdIsoStandardQuiz() {
           </div>
         ) : (
           <div>
-            <span className="inline-flex rounded-full bg-indigo-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-indigo-700">
-              {dominantResult.code}
-            </span>
-            <h2 className="mt-4 max-w-5xl text-4xl font-black uppercase leading-[0.95] tracking-tight text-stone-900 sm:text-6xl">
+            <h2 className="max-w-5xl text-4xl font-black uppercase leading-[0.95] tracking-tight text-stone-900 sm:text-6xl">
               You are {dominantResult.code}: {dominantResult.title}
             </h2>
             <p className="mt-4 max-w-4xl text-lg leading-relaxed text-stone-600">
@@ -808,9 +820,17 @@ export default function SamdIsoStandardQuiz() {
               {dominantResult.description}
             </p>
 
-            <div className="mt-5 inline-flex items-center rounded-full bg-stone-100 px-4 py-2 text-sm font-bold text-stone-700">
-              Dominant signal: {dominantPercent}% - Runner-up: {STANDARDS[runnerUp].code}
+            <div className="relative mt-6 aspect-[4/3] w-full max-w-3xl overflow-hidden rounded-2xl border border-stone-200 bg-stone-100">
+              <Image
+                src={resultImageSrc(dominant)}
+                alt={`${dominantResult.code}: ${dominantResult.title}`}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 768px"
+                priority
+              />
             </div>
+
 
             <div className="mt-6 grid gap-4 lg:grid-cols-2">
               <div className="rounded-2xl border border-stone-200 bg-stone-50 p-5">
@@ -883,18 +903,6 @@ export default function SamdIsoStandardQuiz() {
               {shareStatus ? (
                 <p className="mt-3 text-sm font-medium text-indigo-900">{shareStatus}</p>
               ) : null}
-            </div>
-
-            <div className="mt-6 rounded-2xl border border-stone-200 bg-stone-50 p-5">
-              <h3 className="text-xl font-black tracking-tight text-stone-900">
-                Image concept placeholder
-              </h3>
-              <p className="mt-2 text-sm uppercase tracking-[0.2em] text-stone-500">
-                Prompt for future generated artwork
-              </p>
-              <p className="mt-3 leading-relaxed text-stone-700">
-                {dominantResult.imagePrompt}
-              </p>
             </div>
 
             <div className="mt-6 rounded-2xl border border-stone-200 bg-stone-50 p-5">
