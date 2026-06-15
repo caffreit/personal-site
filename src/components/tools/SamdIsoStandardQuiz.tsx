@@ -651,9 +651,9 @@ export default function SamdIsoStandardQuiz() {
               ].map((tag) => (
                 <span
                   key={tag}
-                  className="inline-flex rounded-full border border-stone-200 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-stone-600 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-300"
+                  className="pill-control rounded-full border border-stone-200 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-stone-600 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-300"
                 >
-                  {tag}
+                  <span className="pill-label">{tag}</span>
                 </span>
               ))}
             </div>
@@ -668,23 +668,23 @@ export default function SamdIsoStandardQuiz() {
               <button
                 type="button"
                 onClick={startQuiz}
-                className="inline-flex items-center justify-center rounded-full bg-stone-900 px-6 py-2 text-sm font-semibold text-white transition hover:bg-stone-700"
+                className="pill-control rounded-full bg-stone-900 px-6 py-2 text-sm font-semibold text-white transition hover:bg-stone-700"
               >
-                Start the quiz
+                <span className="pill-label">Start the quiz</span>
               </button>
               <button
                 type="button"
                 onClick={openAllResults}
-                className="inline-flex items-center justify-center rounded-full border border-stone-300 bg-white px-6 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900 dark:border-stone-700 dark:bg-stone-900 dark:text-white dark:hover:border-stone-400"
+                className="pill-control rounded-full border border-stone-300 bg-white px-6 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900 dark:border-stone-700 dark:bg-stone-900 dark:text-white dark:hover:border-stone-400"
               >
-                Peek at all outcomes
+                <span className="pill-label">Peek at all outcomes</span>
               </button>
             </div>
           </div>
         ) : showAllResults ? (
           <div>
-            <span className="inline-flex rounded-full bg-indigo-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-indigo-700">
-              Result menu
+            <span className="pill-control rounded-full bg-indigo-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-indigo-700">
+              <span className="pill-label">Result menu</span>
             </span>
             <h2 className="mt-4 text-4xl font-black uppercase leading-[0.95] tracking-tight text-stone-900 sm:text-6xl dark:text-white">
               Possible quiz outcomes
@@ -728,16 +728,16 @@ export default function SamdIsoStandardQuiz() {
               <button
                 type="button"
                 onClick={startQuiz}
-                className="inline-flex items-center justify-center rounded-full bg-stone-900 px-6 py-2 text-sm font-semibold text-white transition hover:bg-stone-700"
+                className="pill-control rounded-full bg-stone-900 px-6 py-2 text-sm font-semibold text-white transition hover:bg-stone-700"
               >
-                Start the quiz
+                <span className="pill-label">Start the quiz</span>
               </button>
               <button
                 type="button"
                 onClick={resetToIntro}
-                className="inline-flex items-center justify-center rounded-full border border-stone-300 bg-white px-5 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900 dark:border-stone-700 dark:bg-stone-900 dark:text-white dark:hover:border-stone-400"
+                className="pill-control rounded-full border border-stone-300 bg-white px-5 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900 dark:border-stone-700 dark:bg-stone-900 dark:text-white dark:hover:border-stone-400"
               >
-                Back to intro
+                <span className="pill-label">Back to intro</span>
               </button>
             </div>
           </div>
@@ -755,8 +755,8 @@ export default function SamdIsoStandardQuiz() {
                   />
                 </div>
               </div>
-              <div className="inline-flex shrink-0 items-center whitespace-nowrap rounded-full bg-stone-100 px-4 py-2 text-sm font-bold text-stone-700 dark:bg-stone-800 dark:text-stone-200">
-                {current + 1} of {QUESTIONS.length}
+              <div className="pill-control shrink-0 whitespace-nowrap rounded-full bg-stone-100 px-4 py-2 text-sm font-bold text-stone-700 dark:bg-stone-800 dark:text-stone-200">
+                <span className="pill-label">{current + 1} of {QUESTIONS.length}</span>
               </div>
             </div>
 
@@ -805,18 +805,20 @@ export default function SamdIsoStandardQuiz() {
               <button
                 type="button"
                 onClick={resetToIntro}
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-stone-300 bg-white px-5 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900 dark:border-stone-700 dark:bg-stone-900 dark:text-white dark:hover:border-stone-400"
+                className="pill-control gap-2 rounded-full border border-stone-300 bg-white px-5 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900 dark:border-stone-700 dark:bg-stone-900 dark:text-white dark:hover:border-stone-400"
               >
                 <RotateCcw className="h-4 w-4" />
-                Restart
+                <span className="pill-label">Restart</span>
               </button>
               <button
                 type="button"
                 disabled={selectedIndex === null}
                 onClick={handleNext}
-                className="inline-flex items-center justify-center rounded-full bg-stone-900 px-6 py-2 text-sm font-semibold text-white transition hover:bg-stone-700 disabled:cursor-not-allowed disabled:bg-stone-400"
+                className="pill-control rounded-full bg-stone-900 px-6 py-2 text-sm font-semibold text-white transition hover:bg-stone-700 disabled:cursor-not-allowed disabled:bg-stone-400"
               >
-                {current === QUESTIONS.length - 1 ? "See my result" : "Next question"}
+                <span className="pill-label">
+                  {current === QUESTIONS.length - 1 ? "See my result" : "Next question"}
+                </span>
               </button>
             </div>
           </div>
@@ -851,9 +853,9 @@ export default function SamdIsoStandardQuiz() {
                   <p className="mt-3 leading-relaxed text-indigo-900 dark:text-indigo-100">{bbtCta}</p>
                   <Link
                     href={`mailto:${CONTACT_EMAIL}?subject=SaMD%20Standards%20Quiz%20Follow-up`}
-                    className="mt-4 inline-flex h-11 items-center justify-center gap-2 rounded-full bg-stone-900 px-5 text-sm font-semibold leading-none text-white transition hover:bg-stone-700"
+                    className="pill-control mt-4 h-11 gap-2 rounded-full bg-stone-900 px-5 text-sm font-semibold text-white transition hover:bg-stone-700"
                   >
-                    <span className="translate-y-px">Talk to someone who gets it</span>
+                    <span className="pill-label">Talk to someone who gets it</span>
                     <ArrowUpRight className="h-4 w-4 shrink-0" />
                   </Link>
                   <p className="mt-4 leading-relaxed text-indigo-900 dark:text-indigo-100">
@@ -866,10 +868,10 @@ export default function SamdIsoStandardQuiz() {
                     <button
                       type="button"
                       onClick={handleNativeShare}
-                      className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-stone-900 px-5 text-sm font-semibold leading-none text-white transition hover:bg-stone-700"
+                      className="pill-control h-11 gap-2 rounded-full bg-stone-900 px-5 text-sm font-semibold text-white transition hover:bg-stone-700"
                     >
                       <Share2 className="h-4 w-4 shrink-0" />
-                      <span className="translate-y-px">Share result</span>
+                      <span className="pill-label">Share result</span>
                     </button>
                   </div>
                   {shareStatus ? (
@@ -938,17 +940,17 @@ export default function SamdIsoStandardQuiz() {
               <button
                 type="button"
                 onClick={openAllResults}
-                className="inline-flex items-center justify-center rounded-full border border-stone-300 bg-white px-5 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900 dark:border-stone-700 dark:bg-stone-900 dark:text-white dark:hover:border-stone-400"
+                className="pill-control rounded-full border border-stone-300 bg-white px-5 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900 dark:border-stone-700 dark:bg-stone-900 dark:text-white dark:hover:border-stone-400"
               >
-                Show all result types
+                <span className="pill-label">Show all result types</span>
               </button>
               <button
                 type="button"
                 onClick={resetToIntro}
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-stone-300 bg-white px-5 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900 dark:border-stone-700 dark:bg-stone-900 dark:text-white dark:hover:border-stone-400"
+                className="pill-control gap-2 rounded-full border border-stone-300 bg-white px-5 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900 dark:border-stone-700 dark:bg-stone-900 dark:text-white dark:hover:border-stone-400"
               >
                 <RotateCcw className="h-4 w-4" />
-                Take again
+                <span className="pill-label">Take again</span>
               </button>
             </div>
           </div>

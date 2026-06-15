@@ -58,25 +58,25 @@ const TaskChart: React.FC = () => {
           type="button"
           onClick={() => setIsAnimating(true)}
           disabled={isAnimating}
-          className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
+          className={`pill-control rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
             isAnimating
               ? "bg-[#FCEFC0] text-stone-500 cursor-not-allowed"
               : "bg-stone-900 text-[#F4CA16] hover:bg-stone-800"
           }`}
         >
-          Automate Tasks
+          <span className="pill-label">Automate Tasks</span>
         </button>
         <button
           type="button"
           onClick={() => setIsAnimating(false)}
           disabled={!isAnimating}
-          className={`rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
+          className={`pill-control rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
             !isAnimating
               ? "border-stone-200 text-stone-400 cursor-not-allowed dark:border-zinc-700 dark:text-zinc-500"
               : "border-[#F4CA16] text-stone-900 hover:bg-[#F4CA16] hover:text-stone-950 dark:border-[#F4CA16] dark:text-white dark:hover:text-stone-950"
           }`}
         >
-          Reset Workload
+          <span className="pill-label">Reset Workload</span>
         </button>
       </div>
 

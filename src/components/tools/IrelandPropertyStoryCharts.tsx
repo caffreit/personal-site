@@ -287,8 +287,8 @@ export default function IrelandPropertyStoryCharts({ section }: IrelandPropertyS
         <>
           <section className={`${chartCard} hidden md:block`}>
             <h3 className={headingClass}>Total Property Sales vs Annual Household Savings</h3>
-            <p className="mt-3 inline-flex rounded-full border border-red-300/70 bg-red-50 px-3 py-1 text-xs font-semibold text-red-700 dark:border-red-900/70 dark:bg-red-950/40 dark:text-red-300">
-              Crossover begins in 2022
+            <p className="pill-control mt-3 rounded-full border border-red-300/70 bg-red-50 px-3 py-1 text-xs font-semibold text-red-700 dark:border-red-900/70 dark:bg-red-950/40 dark:text-red-300">
+              <span className="pill-label">Crossover begins in 2022</span>
             </p>
             <div className="mt-5 h-[360px]">
               <ResponsiveContainer width="100%" height="100%" minWidth={280}>
@@ -326,8 +326,8 @@ export default function IrelandPropertyStoryCharts({ section }: IrelandPropertyS
 
           <section className={`${chartCard} md:hidden`}>
             <h3 className={headingClass}>Total Property Sales vs Annual Household Savings</h3>
-            <p className="mt-3 inline-flex rounded-full border border-red-300/70 bg-red-50 px-3 py-1 text-xs font-semibold text-red-700 dark:border-red-900/70 dark:bg-red-950/40 dark:text-red-300">
-              Mobile static view (no tooltip)
+            <p className="pill-control mt-3 rounded-full border border-red-300/70 bg-red-50 px-3 py-1 text-xs font-semibold text-red-700 dark:border-red-900/70 dark:bg-red-950/40 dark:text-red-300">
+              <span className="pill-label">Mobile static view (no tooltip)</span>
             </p>
             <div className="pointer-events-none mt-5 h-[360px]">
               <ResponsiveContainer width="100%" height="100%" minWidth={280}>

@@ -217,8 +217,8 @@ export function ThreeStations({ onBack }: ThreeStationsProps) {
 
           {!results && !loading && (
             <div className="pointer-events-none absolute left-1/2 top-1/2 z-10 w-full -translate-x-1/2 -translate-y-1/2 px-4 text-center">
-              <div className="inline-block rounded-full bg-stone-900/90 px-6 py-3 font-bold text-white shadow-2xl backdrop-blur animate-bounce text-sm md:text-base">
-                Tap map to check times
+              <div className="pill-control rounded-full bg-stone-900/90 px-6 py-3 font-bold text-white shadow-2xl backdrop-blur animate-bounce text-sm md:text-base">
+                <span className="pill-label">Tap map to check times</span>
               </div>
             </div>
           )}

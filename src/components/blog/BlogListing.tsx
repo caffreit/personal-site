@@ -152,13 +152,13 @@ function FilterPill({
   return (
     <button
       onClick={onClick}
-      className={`rounded-full border px-4 py-2 text-[10px] font-black uppercase tracking-[0.3em] transition-colors ${
+      className={`pill-control rounded-full border px-4 py-2 text-[10px] font-black uppercase tracking-[0.3em] transition-colors ${
         isActive
           ? "border-stone-900 bg-stone-900 text-white dark:border-white dark:bg-white dark:text-stone-900"
           : "border-stone-200 text-stone-500 hover:border-stone-900 hover:text-stone-900 dark:border-stone-700 dark:text-stone-400 dark:hover:text-white"
       }`}
     >
-      <span className="chip-text">{label}</span>
+      <span className="pill-label">{label}</span>
     </button>
   );
 }
@@ -174,11 +174,11 @@ function BlogPostCard({ post }: { post: PostListItem }) {
       className="group relative flex h-full flex-col overflow-hidden rounded-[2.5rem] border border-stone-200 bg-white p-8 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.35)] transition-transform duration-500 hover:-translate-y-1 hover:shadow-[0_25px_60px_-35px_rgba(0,0,0,0.4)] dark:border-stone-800 dark:bg-[#0f0f0f]"
     >
       <div className="mb-6 flex flex-wrap items-center gap-3 text-[10px] font-bold uppercase tracking-[0.3em] text-stone-400">
-        <span className="rounded-full border border-stone-200 px-3 py-1 text-[10px] font-black tracking-[0.4em] text-stone-600 dark:border-stone-700 dark:text-stone-200">
-          <span className="chip-text">{readingTime}</span>
+        <span className="pill-control rounded-full border border-stone-200 px-3 py-1 text-[10px] font-black tracking-[0.4em] text-stone-600 dark:border-stone-700 dark:text-stone-200">
+          <span className="pill-label">{readingTime}</span>
         </span>
-        <span className="rounded-full bg-lime-100 px-3 py-1 text-lime-700 dark:bg-lime-900/40 dark:text-lime-200">
-          <span className="chip-text">{category}</span>
+        <span className="pill-control rounded-full bg-lime-100 px-3 py-1 text-lime-700 dark:bg-lime-900/40 dark:text-lime-200">
+          <span className="pill-label">{category}</span>
         </span>
       </div>
 
@@ -209,9 +209,9 @@ function BlogPostCard({ post }: { post: PostListItem }) {
           {post.tags.map((tag) => (
             <span
               key={tag}
-              className="rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-600 dark:bg-stone-800 dark:text-stone-200"
+              className="pill-control rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-600 dark:bg-stone-800 dark:text-stone-200"
             >
-              <span className="chip-text">{tag}</span>
+              <span className="pill-label">{tag}</span>
             </span>
           ))}
         </div>

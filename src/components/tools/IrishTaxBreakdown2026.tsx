@@ -408,24 +408,24 @@ export default function IrishTaxBreakdown2026() {
               <button
                 type="button"
                 onClick={() => setViewType("effective")}
-                className={`rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-[0.12em] transition ${
+                className={`pill-control rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-[0.12em] transition ${
                   viewType === "effective"
                     ? "bg-stone-900 text-white"
                     : "text-stone-600 hover:text-stone-900"
                 }`}
               >
-                Effective Rate
+                <span className="pill-label">Effective Rate</span>
               </button>
               <button
                 type="button"
                 onClick={() => setViewType("marginal")}
-                className={`rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-[0.12em] transition ${
+                className={`pill-control rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-[0.12em] transition ${
                   viewType === "marginal"
                     ? "bg-stone-900 text-white"
                     : "text-stone-600 hover:text-stone-900"
                 }`}
               >
-                Marginal Rate
+                <span className="pill-label">Marginal Rate</span>
               </button>
             </div>
           </div>

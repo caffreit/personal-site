@@ -216,8 +216,8 @@ export default function BlogPostLayout({
           {/* Header */}
           <header className="mb-12">
             {category && (
-              <div className="inline-block px-3 py-1 mb-6 rounded-full border border-stone-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-bold text-[var(--color-yellow)] dark:text-[var(--color-yellow)] uppercase tracking-widest shadow-sm font-sans">
-                  {category}
+              <div className="pill-control px-3 py-1 mb-6 rounded-full border border-stone-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-bold text-[var(--color-yellow)] dark:text-[var(--color-yellow)] uppercase tracking-widest shadow-sm font-sans">
+                <span className="pill-label">{category}</span>
               </div>
             )}
             <h1 className="text-4xl sm:text-6xl font-black text-stone-900 dark:text-white tracking-tight leading-[1.1] mb-6 font-sans">

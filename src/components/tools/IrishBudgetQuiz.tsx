@@ -764,20 +764,22 @@ export default function IrishBudgetQuiz() {
                       href={source.href}
                       target="_blank"
                       rel="noreferrer"
-                      className="rounded-full border border-stone-300 bg-white px-3 py-1 underline decoration-stone-400 underline-offset-4 transition hover:border-stone-800 hover:decoration-stone-800"
+                      className="pill-control rounded-full border border-stone-300 bg-white px-3 py-1 underline decoration-stone-400 underline-offset-4 transition hover:border-stone-800 hover:decoration-stone-800"
                     >
-                      Source: {source.label}
+                      <span className="pill-label">Source: {source.label}</span>
                     </a>
                   ))}
                 </div>
                 <button
                   type="button"
                   onClick={goNext}
-                  className="mt-4 inline-flex items-center rounded-full bg-stone-900 px-6 py-2 text-sm font-semibold text-white transition hover:bg-stone-700"
+                  className="pill-control mt-4 rounded-full bg-stone-900 px-6 py-2 text-sm font-semibold text-white transition hover:bg-stone-700"
                 >
-                  {currentIndex + 1 === quizData.length
-                    ? "See Results"
-                    : "Next Question"}
+                  <span className="pill-label">
+                    {currentIndex + 1 === quizData.length
+                      ? "See Results"
+                      : "Next Question"}
+                  </span>
                 </button>
               </div>
             )}
@@ -799,10 +801,10 @@ export default function IrishBudgetQuiz() {
             <button
               type="button"
               onClick={resetQuiz}
-              className="mt-6 inline-flex items-center gap-2 rounded-full border border-stone-300 bg-white px-5 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900"
+              className="pill-control mt-6 gap-2 rounded-full border border-stone-300 bg-white px-5 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900"
             >
               <RotateCcw className="h-4 w-4" />
-              Play Again
+              <span className="pill-label">Play Again</span>
             </button>
           </div>
         )}

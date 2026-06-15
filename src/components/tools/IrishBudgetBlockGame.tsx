@@ -291,17 +291,17 @@ export default function IrishBudgetBlockGame() {
                     type="button"
                     onClick={() => addBlockViaButton(category.id)}
                     disabled={checked || remainingBlocks === 0}
-                    className="rounded-full border border-stone-300 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-stone-800 transition hover:border-stone-900 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="pill-control rounded-full border border-stone-300 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-stone-800 transition hover:border-stone-900 disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    + Add
+                    <span className="pill-label">+ Add</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => removeBlockViaButton(category.id)}
                     disabled={checked || count === 0}
-                    className="rounded-full border border-stone-300 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-stone-800 transition hover:border-stone-900 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="pill-control rounded-full border border-stone-300 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-stone-800 transition hover:border-stone-900 disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    - Remove
+                    <span className="pill-label">- Remove</span>
                   </button>
                 </div>
 
@@ -338,9 +338,9 @@ export default function IrishBudgetBlockGame() {
             <button
               type="button"
               onClick={() => setChecked(true)}
-              className="inline-flex items-center rounded-full bg-stone-900 px-8 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-stone-700"
+              className="pill-control rounded-full bg-stone-900 px-8 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-stone-700"
             >
-              Check My Guess
+              <span className="pill-label">Check My Guess</span>
             </button>
           </div>
         )}
@@ -350,10 +350,10 @@ export default function IrishBudgetBlockGame() {
             <button
               type="button"
               onClick={handleReset}
-              className="inline-flex items-center gap-2 rounded-full border border-stone-300 bg-white px-5 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900"
+              className="pill-control gap-2 rounded-full border border-stone-300 bg-white px-5 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900"
             >
               <RotateCcw className="h-4 w-4" />
-              Play Again
+              <span className="pill-label">Play Again</span>
             </button>
           </div>
         )}

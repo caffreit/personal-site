@@ -121,13 +121,13 @@ function FilterChip({
   return (
     <button
       onClick={onClick}
-      className={`rounded-full border px-4 py-2 text-[10px] font-black uppercase tracking-[0.3em] transition-colors ${
+      className={`pill-control rounded-full border px-4 py-2 text-[10px] font-black uppercase tracking-[0.3em] transition-colors ${
         isActive
           ? "border-stone-900 bg-stone-900 text-white dark:border-white dark:bg-white dark:text-stone-900"
           : "border-stone-200 text-stone-500 hover:border-stone-900 hover:text-stone-900 dark:border-stone-700 dark:text-stone-400 dark:hover:text-white"
       }`}
     >
-      <span className="chip-text">{label}</span>
+      <span className="pill-label">{label}</span>
     </button>
   );
 }
@@ -140,13 +140,13 @@ function LabCard({ lab }: { lab: Lab }) {
     >
       <div className="mb-8 flex items-start justify-between gap-4 text-xs font-bold uppercase tracking-[0.3em] text-stone-400">
         <div className="flex flex-wrap items-center gap-3">
-          <span className="rounded-full bg-lime-100 px-3 py-1 text-lime-700 dark:bg-lime-950/60 dark:text-lime-300">
-            <span className="chip-text">{lab.badge}</span>
+          <span className="pill-control rounded-full bg-lime-100 px-3 py-1 text-lime-700 dark:bg-lime-950/60 dark:text-lime-300">
+            <span className="pill-label">{lab.badge}</span>
           </span>
           {lab.isPinned && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-3 py-1 text-yellow-700 dark:bg-yellow-950/60 dark:text-yellow-300">
+            <span className="pill-control gap-1 rounded-full bg-yellow-100 px-3 py-1 text-yellow-700 dark:bg-yellow-950/60 dark:text-yellow-300">
               <Star className="h-3 w-3 fill-current" />
-              <span className="chip-text">Pinned</span>
+              <span className="pill-label">Pinned</span>
             </span>
           )}
         </div>
