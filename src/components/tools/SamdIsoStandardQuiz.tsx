@@ -605,7 +605,7 @@ export default function SamdIsoStandardQuiz() {
     <div className="mx-auto max-w-7xl px-4 pt-10 pb-24 sm:px-6 lg:px-8">
       <Link
         href="/labs"
-        className="mb-8 inline-flex items-center gap-2 text-stone-500 transition-colors hover:text-stone-900"
+        className="mb-8 inline-flex items-center gap-2 text-stone-500 transition-colors hover:text-stone-900 dark:text-stone-400 dark:hover:text-stone-100"
       >
         <ArrowLeft className="h-4 w-4" />
         <span className="font-mono text-sm font-medium uppercase tracking-[0.2em]">
@@ -617,10 +617,10 @@ export default function SamdIsoStandardQuiz() {
         <p className="font-mono text-xs font-semibold uppercase tracking-[0.3em] text-stone-500">
           BBT Demo Quiz - SaMD Standards Edition
         </p>
-        <h1 className="max-w-5xl text-5xl font-black uppercase leading-[0.9] tracking-tight text-stone-900 sm:text-7xl">
+        <h1 className="max-w-5xl text-5xl font-black uppercase leading-[0.9] tracking-tight text-stone-900 sm:text-7xl dark:text-white">
           Which ISO Standard Are You?
         </h1>
-        <p className="max-w-4xl text-lg leading-relaxed text-stone-600 sm:text-xl">
+        <p className="max-w-4xl text-lg leading-relaxed text-stone-600 sm:text-xl dark:text-stone-300">
           Find out which standard is quietly running your personality, your meetings,
           and probably your Notion workspace.
         </p>
@@ -628,14 +628,14 @@ export default function SamdIsoStandardQuiz() {
 
       <section
         aria-live="polite"
-        className="overflow-hidden rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)] sm:p-8"
+        className="overflow-hidden rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)] sm:p-8 dark:border-stone-800 dark:bg-[#0f0f0f]"
       >
         {showIntro ? (
           <div>
-            <h2 className="text-3xl font-black tracking-tight text-stone-900 sm:text-4xl">
+            <h2 className="text-3xl font-black tracking-tight text-stone-900 sm:text-4xl dark:text-white">
               A deeply unserious standards personality quiz.
             </h2>
-            <p className="mt-4 max-w-4xl text-lg leading-relaxed text-stone-600">
+            <p className="mt-4 max-w-4xl text-lg leading-relaxed text-stone-600 dark:text-stone-300">
               Best taken with the colleague who keeps asking where the evidence lives.
               Nine questions. Six standards. One very judgemental result card.
             </p>
@@ -651,7 +651,7 @@ export default function SamdIsoStandardQuiz() {
               ].map((tag) => (
                 <span
                   key={tag}
-                  className="inline-flex rounded-full border border-stone-200 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-stone-600"
+                  className="inline-flex rounded-full border border-stone-200 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-stone-600 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-300"
                 >
                   {tag}
                 </span>
@@ -675,7 +675,7 @@ export default function SamdIsoStandardQuiz() {
               <button
                 type="button"
                 onClick={openAllResults}
-                className="inline-flex items-center justify-center rounded-full border border-stone-300 bg-white px-6 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900"
+                className="inline-flex items-center justify-center rounded-full border border-stone-300 bg-white px-6 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900 dark:border-stone-700 dark:bg-stone-900 dark:text-white dark:hover:border-stone-400"
               >
                 Peek at all outcomes
               </button>
@@ -686,10 +686,10 @@ export default function SamdIsoStandardQuiz() {
             <span className="inline-flex rounded-full bg-indigo-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-indigo-700">
               Result menu
             </span>
-            <h2 className="mt-4 text-4xl font-black uppercase leading-[0.95] tracking-tight text-stone-900 sm:text-6xl">
+            <h2 className="mt-4 text-4xl font-black uppercase leading-[0.95] tracking-tight text-stone-900 sm:text-6xl dark:text-white">
               Possible quiz outcomes
             </h2>
-            <p className="mt-4 max-w-4xl text-lg leading-relaxed text-stone-600">
+            <p className="mt-4 max-w-4xl text-lg leading-relaxed text-stone-600 dark:text-stone-300">
               These are the six standards personality types in this demo version. The
               final version can swap in other standards depending on audience.
             </p>
@@ -699,7 +699,7 @@ export default function SamdIsoStandardQuiz() {
                 ([key, value]) => (
                   <article
                     key={key}
-                    className="overflow-hidden rounded-2xl border border-stone-200 bg-stone-50"
+                    className="overflow-hidden rounded-2xl border border-stone-200 bg-stone-50 dark:border-stone-800 dark:bg-stone-900"
                   >
                     <div className="relative aspect-[2/3] bg-stone-200">
                       <Image
@@ -714,10 +714,10 @@ export default function SamdIsoStandardQuiz() {
                       <p className="font-mono text-xs font-semibold uppercase tracking-[0.3em] text-stone-500">
                         {value.code}
                       </p>
-                      <h3 className="mt-2 text-2xl font-black tracking-tight text-stone-900">
+                      <h3 className="mt-2 text-2xl font-black tracking-tight text-stone-900 dark:text-white">
                         {value.title}
                       </h3>
-                      <p className="mt-2 leading-relaxed text-stone-600">{value.subtitle}</p>
+                      <p className="mt-2 leading-relaxed text-stone-600 dark:text-stone-300">{value.subtitle}</p>
                     </div>
                   </article>
                 ),
@@ -735,7 +735,7 @@ export default function SamdIsoStandardQuiz() {
               <button
                 type="button"
                 onClick={resetToIntro}
-                className="inline-flex items-center justify-center rounded-full border border-stone-300 bg-white px-5 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900"
+                className="inline-flex items-center justify-center rounded-full border border-stone-300 bg-white px-5 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900 dark:border-stone-700 dark:bg-stone-900 dark:text-white dark:hover:border-stone-400"
               >
                 Back to intro
               </button>
@@ -743,27 +743,27 @@ export default function SamdIsoStandardQuiz() {
           </div>
         ) : !showResult ? (
           <div>
-            <div className="mb-8 flex flex-col gap-4 border-b border-stone-200 pb-5 sm:flex-row sm:items-end sm:justify-between">
+            <div className="mb-8 flex flex-col gap-4 border-b border-stone-200 pb-5 sm:flex-row sm:items-end sm:justify-between dark:border-stone-800">
               <div className="w-full">
                 <p className="font-mono text-xs font-semibold uppercase tracking-[0.3em] text-stone-500">
                   Question {current + 1} of {QUESTIONS.length}
                 </p>
-                <div className="mt-3 h-2 overflow-hidden rounded-full bg-stone-200">
+                <div className="mt-3 h-2 overflow-hidden rounded-full bg-stone-200 dark:bg-stone-800">
                   <div
                     className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 transition-all"
                     style={{ width: `${progressPercent}%` }}
                   />
                 </div>
               </div>
-              <div className="inline-flex shrink-0 items-center whitespace-nowrap rounded-full bg-stone-100 px-4 py-2 text-sm font-bold text-stone-700">
+              <div className="inline-flex shrink-0 items-center whitespace-nowrap rounded-full bg-stone-100 px-4 py-2 text-sm font-bold text-stone-700 dark:bg-stone-800 dark:text-stone-200">
                 {current + 1} of {QUESTIONS.length}
               </div>
             </div>
 
-            <h2 className="mb-3 max-w-5xl text-3xl font-black leading-tight tracking-tight text-stone-900 sm:text-4xl">
+            <h2 className="mb-3 max-w-5xl text-3xl font-black leading-tight tracking-tight text-stone-900 sm:text-4xl dark:text-white">
               {activeQuestion.title}
             </h2>
-            <p className="mb-6 max-w-4xl text-lg leading-relaxed text-stone-600">
+            <p className="mb-6 max-w-4xl text-lg leading-relaxed text-stone-600 dark:text-stone-300">
               {activeQuestion.copy}
             </p>
 
@@ -772,9 +772,9 @@ export default function SamdIsoStandardQuiz() {
                 const isSelected = selectedIndex === answerIndex;
                 const stateClass =
                   selectedIndex === null
-                    ? "hover:border-indigo-400"
+                    ? "hover:border-indigo-400 dark:hover:border-indigo-400"
                     : isSelected
-                      ? "border-indigo-300 bg-indigo-50"
+                      ? "border-indigo-300 bg-indigo-50 dark:border-indigo-500 dark:bg-indigo-950/40"
                       : "opacity-60";
 
                 return (
@@ -783,7 +783,7 @@ export default function SamdIsoStandardQuiz() {
                     type="button"
                     disabled={selectedIndex !== null}
                     onClick={() => handleChooseAnswer(answerIndex)}
-                    className={`rounded-2xl border border-stone-200 px-4 py-4 text-left text-stone-900 transition ${stateClass}`}
+                    className={`rounded-2xl border border-stone-200 px-4 py-4 text-left text-stone-900 transition dark:border-stone-700 dark:text-stone-100 ${stateClass}`}
                   >
                     <strong className="block">
                       {String.fromCharCode(65 + answerIndex)}. {answer.label}
@@ -794,8 +794,8 @@ export default function SamdIsoStandardQuiz() {
             </div>
 
             {selectedAnswer ? (
-              <div className="mt-6 rounded-2xl border border-stone-200 bg-stone-50 px-5 py-6">
-                <p className="font-serif text-xl italic leading-relaxed text-stone-800 sm:text-2xl">
+              <div className="mt-6 rounded-2xl border border-stone-200 bg-stone-50 px-5 py-6 dark:border-stone-800 dark:bg-stone-900">
+                <p className="font-serif text-xl italic leading-relaxed text-stone-800 sm:text-2xl dark:text-stone-200">
                   {selectedAnswer.note}
                 </p>
               </div>
@@ -805,7 +805,7 @@ export default function SamdIsoStandardQuiz() {
               <button
                 type="button"
                 onClick={resetToIntro}
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-stone-300 bg-white px-5 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900"
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-stone-300 bg-white px-5 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900 dark:border-stone-700 dark:bg-stone-900 dark:text-white dark:hover:border-stone-400"
               >
                 <RotateCcw className="h-4 w-4" />
                 Restart
@@ -822,17 +822,17 @@ export default function SamdIsoStandardQuiz() {
           </div>
         ) : (
           <div>
-            <h2 className="max-w-5xl text-4xl font-black uppercase leading-[0.95] tracking-tight text-stone-900 sm:text-6xl">
+            <h2 className="max-w-5xl text-4xl font-black uppercase leading-[0.95] tracking-tight text-stone-900 sm:text-6xl dark:text-white">
               You are {dominantResult.code}: {dominantResult.title}
             </h2>
-            <p className="mt-4 max-w-4xl text-lg leading-relaxed text-stone-600">
-              <span className="font-semibold text-stone-900">{dominantResult.subtitle}</span>
+            <p className="mt-4 max-w-4xl text-lg leading-relaxed text-stone-600 dark:text-stone-300">
+              <span className="font-semibold text-stone-900 dark:text-white">{dominantResult.subtitle}</span>
             </p>
-            <p className="mt-3 max-w-4xl text-lg leading-relaxed text-stone-600">
+            <p className="mt-3 max-w-4xl text-lg leading-relaxed text-stone-600 dark:text-stone-300">
               {dominantResult.description} {bbtIntro}
             </p>
 
-            <div className="mt-6 rounded-2xl border border-indigo-200 bg-indigo-50 p-5">
+            <div className="mt-6 rounded-2xl border border-indigo-200 bg-indigo-50 p-5 dark:border-indigo-900/60 dark:bg-indigo-950/30">
               <div className="grid gap-5 lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)] lg:items-start">
                 <div className="relative mx-auto aspect-[2/3] w-full max-w-sm overflow-hidden rounded-2xl border border-indigo-200 bg-stone-100">
                   <Image
@@ -845,10 +845,10 @@ export default function SamdIsoStandardQuiz() {
                   />
                 </div>
                 <div>
-                  <h3 className="text-xl font-black tracking-tight text-indigo-900">
+                  <h3 className="text-xl font-black tracking-tight text-indigo-900 dark:text-indigo-100">
                     Your shareable result
                   </h3>
-                  <p className="mt-3 leading-relaxed text-indigo-900">{bbtCta}</p>
+                  <p className="mt-3 leading-relaxed text-indigo-900 dark:text-indigo-100">{bbtCta}</p>
                   <Link
                     href={`mailto:${CONTACT_EMAIL}?subject=SaMD%20Standards%20Quiz%20Follow-up`}
                     className="mt-4 inline-flex h-11 items-center justify-center gap-2 rounded-full bg-stone-900 px-5 text-sm font-semibold leading-none text-white transition hover:bg-stone-700"
@@ -856,7 +856,7 @@ export default function SamdIsoStandardQuiz() {
                     <span className="translate-y-px">Talk to someone who gets it</span>
                     <ArrowUpRight className="h-4 w-4 shrink-0" />
                   </Link>
-                  <p className="mt-4 leading-relaxed text-indigo-900">
+                  <p className="mt-4 leading-relaxed text-indigo-900 dark:text-indigo-100">
                     {dominantResult.shareHook}{" "}
                     <Link href={QUIZ_PATH} className="font-semibold underline underline-offset-4">
                       {SHARE_PROMPT}
@@ -873,28 +873,28 @@ export default function SamdIsoStandardQuiz() {
                     </button>
                   </div>
                   {shareStatus ? (
-                    <p className="mt-3 text-sm font-medium text-indigo-900">{shareStatus}</p>
+                    <p className="mt-3 text-sm font-medium text-indigo-900 dark:text-indigo-100">{shareStatus}</p>
                   ) : null}
                 </div>
               </div>
             </div>
 
             <div className="mt-6 grid gap-4 lg:grid-cols-2">
-              <div className="rounded-2xl border border-stone-200 bg-stone-50 p-5">
-                <h3 className="text-xl font-black tracking-tight text-stone-900">
+              <div className="rounded-2xl border border-stone-200 bg-stone-50 p-5 dark:border-stone-800 dark:bg-stone-900">
+                <h3 className="text-xl font-black tracking-tight text-stone-900 dark:text-white">
                   Your strengths
                 </h3>
-                <ul className="mt-3 list-disc space-y-2 pl-5 text-stone-600">
+                <ul className="mt-3 list-disc space-y-2 pl-5 text-stone-600 dark:text-stone-300">
                   {dominantResult.strengths.map((item) => (
                     <li key={item}>{item}</li>
                   ))}
                 </ul>
               </div>
-              <div className="rounded-2xl border border-stone-200 bg-stone-50 p-5">
-                <h3 className="text-xl font-black tracking-tight text-stone-900">
+              <div className="rounded-2xl border border-stone-200 bg-stone-50 p-5 dark:border-stone-800 dark:bg-stone-900">
+                <h3 className="text-xl font-black tracking-tight text-stone-900 dark:text-white">
                   Your risks
                 </h3>
-                <ul className="mt-3 list-disc space-y-2 pl-5 text-stone-600">
+                <ul className="mt-3 list-disc space-y-2 pl-5 text-stone-600 dark:text-stone-300">
                   {dominantResult.risks.map((item) => (
                     <li key={item}>{item}</li>
                   ))}
@@ -902,8 +902,8 @@ export default function SamdIsoStandardQuiz() {
               </div>
             </div>
 
-            <div className="mt-6 rounded-2xl border border-stone-200 bg-stone-50 p-5">
-              <h3 className="text-xl font-black tracking-tight text-stone-900">
+            <div className="mt-6 rounded-2xl border border-stone-200 bg-stone-50 p-5 dark:border-stone-800 dark:bg-stone-900">
+              <h3 className="text-xl font-black tracking-tight text-stone-900 dark:text-white">
                 Your standards stack
               </h3>
               <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -913,22 +913,22 @@ export default function SamdIsoStandardQuiz() {
                   return (
                     <div
                       key={item.key}
-                      className="rounded-xl border border-stone-200 bg-white p-4"
+                      className="rounded-xl border border-stone-200 bg-white p-4 dark:border-stone-700 dark:bg-[#0f0f0f]"
                     >
                       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">
                         {STANDARDS[item.key].code}
                       </p>
-                      <p className="mt-2 text-xl font-black tracking-tight text-stone-900">
+                      <p className="mt-2 text-xl font-black tracking-tight text-stone-900 dark:text-white">
                         {item.score} pts
                       </p>
-                      <p className="text-sm text-stone-500">{percentage}% of answers</p>
+                      <p className="text-sm text-stone-500 dark:text-stone-400">{percentage}% of answers</p>
                     </div>
                   );
                 })}
               </div>
             </div>
 
-            <p className="mt-5 text-sm leading-relaxed text-stone-500">
+            <p className="mt-5 text-sm leading-relaxed text-stone-500 dark:text-stone-400">
               Educational prototype only, not regulatory or legal advice. Final
               submissions should align intended use, risk controls, validation evidence,
               and quality system documentation.
@@ -938,14 +938,14 @@ export default function SamdIsoStandardQuiz() {
               <button
                 type="button"
                 onClick={openAllResults}
-                className="inline-flex items-center justify-center rounded-full border border-stone-300 bg-white px-5 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900"
+                className="inline-flex items-center justify-center rounded-full border border-stone-300 bg-white px-5 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900 dark:border-stone-700 dark:bg-stone-900 dark:text-white dark:hover:border-stone-400"
               >
                 Show all result types
               </button>
               <button
                 type="button"
                 onClick={resetToIntro}
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-stone-300 bg-white px-5 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900"
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-stone-300 bg-white px-5 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900 dark:border-stone-700 dark:bg-stone-900 dark:text-white dark:hover:border-stone-400"
               >
                 <RotateCcw className="h-4 w-4" />
                 Take again
