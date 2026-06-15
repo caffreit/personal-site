@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --color-yellow: #F4CA16;
   --color-black: #0A0A0A;
@@ -64,6 +66,31 @@ body {
   font-family: var(--font-body);
   min-height: 100vh;
   transition: background 0.4s ease, color 0.4s ease;
+}
+
+/* Fallbacks for older components that still use light-only neutral utilities. */
+.dark main :is(.text-stone-900, .text-stone-800, .text-gray-900, .text-gray-800):not([class*="dark:text-"]) {
+  color: #fafaf9;
+}
+
+.dark main :is(.text-stone-700, .text-stone-600, .text-gray-700, .text-gray-600):not([class*="dark:text-"]) {
+  color: #d6d3d1;
+}
+
+.dark main :is(.text-stone-500, .text-gray-500):not([class*="dark:text-"]) {
+  color: #a8a29e;
+}
+
+.dark main :is(.bg-white, .bg-stone-50, .bg-gray-50):not([class*="dark:bg-"]) {
+  background-color: #0f0f0f;
+}
+
+.dark main :is(.bg-stone-100, .bg-gray-100):not([class*="dark:bg-"]) {
+  background-color: #1c1917;
+}
+
+.dark main :is(.border-stone-200, .border-stone-300, .border-gray-200, .border-gray-300):not([class*="dark:border-"]) {
+  border-color: #292524;
 }
 
 h1,

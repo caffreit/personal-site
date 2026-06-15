@@ -64,7 +64,7 @@ export default function LabsListing({ labs }: LabsListingProps) {
 
   return (
     <>
-      <div className="mb-16 rounded-[2.5rem] border border-stone-200/80 bg-white/80 p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.35)] backdrop-blur-sm">
+      <div className="mb-16 rounded-[2.5rem] border border-stone-200/80 bg-white/80 p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.35)] backdrop-blur-sm dark:border-stone-800/70 dark:bg-[#0b0b0b]/80">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="font-mono text-[10px] font-black uppercase tracking-[0.3em] text-stone-400">
@@ -95,11 +95,11 @@ export default function LabsListing({ labs }: LabsListingProps) {
           ))}
         </div>
       ) : (
-        <div className="rounded-[2.5rem] border border-dashed border-stone-200 bg-white py-24 text-center text-stone-500">
+        <div className="rounded-[2.5rem] border border-dashed border-stone-200 bg-white py-24 text-center text-stone-500 dark:border-stone-700 dark:bg-[#0b0b0b] dark:text-stone-400">
           <p className="text-lg">No labs found for this filter.</p>
           <button
             onClick={() => setSelectedFilter("All")}
-            className="mt-4 font-mono text-xs uppercase tracking-[0.3em] text-stone-900 underline decoration-yellow-400 decoration-2 underline-offset-4 transition-colors hover:text-yellow-600"
+            className="mt-4 font-mono text-xs uppercase tracking-[0.3em] text-stone-900 underline decoration-yellow-400 decoration-2 underline-offset-4 transition-colors hover:text-yellow-600 dark:text-white"
           >
             Clear filter
           </button>
@@ -123,8 +123,8 @@ function FilterChip({
       onClick={onClick}
       className={`rounded-full border px-4 py-2 text-[10px] font-black uppercase tracking-[0.3em] transition-colors ${
         isActive
-          ? "border-stone-900 bg-stone-900 text-white"
-          : "border-stone-200 text-stone-500 hover:border-stone-900 hover:text-stone-900"
+          ? "border-stone-900 bg-stone-900 text-white dark:border-white dark:bg-white dark:text-stone-900"
+          : "border-stone-200 text-stone-500 hover:border-stone-900 hover:text-stone-900 dark:border-stone-700 dark:text-stone-400 dark:hover:text-white"
       }`}
     >
       <span className="chip-text">{label}</span>
@@ -136,15 +136,15 @@ function LabCard({ lab }: { lab: Lab }) {
   return (
     <Link
       href={lab.href}
-      className="group relative flex h-full flex-col overflow-hidden rounded-[2.5rem] border border-stone-200 bg-white p-8 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)] transition-transform duration-500 hover:-translate-y-1 hover:shadow-[0_25px_60px_-35px_rgba(0,0,0,0.4)]"
+      className="group relative flex h-full flex-col overflow-hidden rounded-[2.5rem] border border-stone-200 bg-white p-8 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)] transition-transform duration-500 hover:-translate-y-1 hover:shadow-[0_25px_60px_-35px_rgba(0,0,0,0.4)] dark:border-stone-800 dark:bg-[#0f0f0f]"
     >
       <div className="mb-8 flex items-start justify-between gap-4 text-xs font-bold uppercase tracking-[0.3em] text-stone-400">
         <div className="flex flex-wrap items-center gap-3">
-          <span className="rounded-full bg-lime-100 px-3 py-1 text-lime-700">
+          <span className="rounded-full bg-lime-100 px-3 py-1 text-lime-700 dark:bg-lime-950/60 dark:text-lime-300">
             <span className="chip-text">{lab.badge}</span>
           </span>
           {lab.isPinned && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-3 py-1 text-yellow-700">
+            <span className="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-3 py-1 text-yellow-700 dark:bg-yellow-950/60 dark:text-yellow-300">
               <Star className="h-3 w-3 fill-current" />
               <span className="chip-text">Pinned</span>
             </span>
@@ -159,10 +159,10 @@ function LabCard({ lab }: { lab: Lab }) {
       </div>
 
       <div className="space-y-4">
-        <h2 className="text-3xl font-black tracking-tight text-stone-900 sm:text-4xl">
+        <h2 className="text-3xl font-black tracking-tight text-stone-900 sm:text-4xl dark:text-white">
           {lab.title}
         </h2>
-        <p className="text-base leading-relaxed text-stone-600">
+        <p className="text-base leading-relaxed text-stone-600 dark:text-stone-300">
           {lab.description}
         </p>
       </div>
@@ -173,7 +173,7 @@ function LabCard({ lab }: { lab: Lab }) {
             {lab.meta}
           </span>
         </div>
-        <span className="flex items-center gap-2 font-semibold text-stone-900 transition-colors group-hover:text-yellow-600">
+        <span className="flex items-center gap-2 font-semibold text-stone-900 transition-colors group-hover:text-yellow-600 dark:text-white dark:group-hover:text-yellow-400">
           View Lab
           <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
         </span>
