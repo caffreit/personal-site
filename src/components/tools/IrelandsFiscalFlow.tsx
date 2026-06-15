@@ -166,6 +166,13 @@ const OTHER_TAX_DEFAULTS: Pick<
   catGroup: "B",
 };
 
+const ESTIMATE_TAX_DEFAULTS: Partial<FiscalInputs> = {
+  ...ABOUT_YOU_DEFAULTS,
+  ...INCOME_DEFAULTS,
+  ...SPENDING_DEFAULTS,
+  ...OTHER_TAX_DEFAULTS,
+};
+
 const SPENDING_HIERARCHY: SpendingNode = {
   name: "Total Revenue",
   value: TOTAL_REVENUE_MILLIONS,
@@ -642,28 +649,30 @@ export default function IrelandsFiscalFlow() {
       </header>
 
       <section className="mb-8 rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)] sm:p-8">
-        <h2 className="text-2xl font-black tracking-tight text-stone-900 sm:text-3xl">
-          Step 1: Estimate Your Tax
-        </h2>
-        <p className="mt-2 text-stone-600">
-          Enter your details to get an illustrative annual estimate.
-        </p>
-        <p className="mt-1 text-sm text-stone-500">
-          Use the Fill Defaults buttons if you want quick sample values first.
-        </p>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h2 className="text-2xl font-black tracking-tight text-stone-900 sm:text-3xl">
+              Step 1: Estimate Your Tax
+            </h2>
+            <p className="mt-2 text-stone-600">
+              Enter your details to get an illustrative annual estimate.
+            </p>
+            <p className="mt-1 text-sm text-stone-500">
+              Use Fill Defaults if you want quick sample values first.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => applyDefaults(ESTIMATE_TAX_DEFAULTS)}
+            className="rounded-full bg-stone-900 px-5 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-white shadow-sm transition hover:bg-stone-700 sm:shrink-0"
+          >
+            Fill Defaults
+          </button>
+        </div>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-6">
           <div className="rounded-2xl border border-stone-200 bg-stone-50 p-5">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <h3 className="text-lg font-bold text-stone-900">1) About You</h3>
-              <button
-                type="button"
-                onClick={() => applyDefaults(ABOUT_YOU_DEFAULTS)}
-                className="rounded-full border border-stone-300 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-stone-800 transition hover:border-stone-900"
-              >
-                Fill Defaults
-              </button>
-            </div>
+            <h3 className="text-lg font-bold text-stone-900">1) About You</h3>
             <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
               <label className="text-sm font-semibold text-stone-700">
                 Marital Status
@@ -729,16 +738,7 @@ export default function IrelandsFiscalFlow() {
           </div>
 
           <div className="rounded-2xl border border-stone-200 bg-stone-50 p-5">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <h3 className="text-lg font-bold text-stone-900">2) Annual Income</h3>
-              <button
-                type="button"
-                onClick={() => applyDefaults(INCOME_DEFAULTS)}
-                className="rounded-full border border-stone-300 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-stone-800 transition hover:border-stone-900"
-              >
-                Fill Defaults
-              </button>
-            </div>
+            <h3 className="text-lg font-bold text-stone-900">2) Annual Income</h3>
             <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
               <label className="text-sm font-semibold text-stone-700">
                 Gross Salary (PAYE)
@@ -800,16 +800,7 @@ export default function IrelandsFiscalFlow() {
           </div>
 
           <div className="rounded-2xl border border-stone-200 bg-stone-50 p-5">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <h3 className="text-lg font-bold text-stone-900">3) Monthly Spending</h3>
-              <button
-                type="button"
-                onClick={() => applyDefaults(SPENDING_DEFAULTS)}
-                className="rounded-full border border-stone-300 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-stone-800 transition hover:border-stone-900"
-              >
-                Fill Defaults
-              </button>
-            </div>
+            <h3 className="text-lg font-bold text-stone-900">3) Monthly Spending</h3>
             <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
               <label className="text-sm font-semibold text-stone-700">
                 Groceries (~4.6% VAT)
@@ -890,18 +881,9 @@ export default function IrelandsFiscalFlow() {
           </div>
 
           <div className="rounded-2xl border border-stone-200 bg-stone-50 p-5">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <h3 className="text-lg font-bold text-stone-900">
-                4) Other Taxes (Optional)
-              </h3>
-              <button
-                type="button"
-                onClick={() => applyDefaults(OTHER_TAX_DEFAULTS)}
-                className="rounded-full border border-stone-300 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-stone-800 transition hover:border-stone-900"
-              >
-                Fill Defaults
-              </button>
-            </div>
+            <h3 className="text-lg font-bold text-stone-900">
+              4) Other Taxes (Optional)
+            </h3>
             <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
               <label className="text-sm font-semibold text-stone-700">
                 Total Savings

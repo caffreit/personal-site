@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Sparkles, X, ArrowLeft } from 'lucide-react';
-import { analyzeImageAction } from '@/app/actions';
+import { ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Masonry from 'react-masonry-css';
 import Lightbox from "yet-another-react-lightbox";
@@ -42,10 +41,6 @@ interface AlbumViewProps {
 
 export const AlbumView: React.FC<AlbumViewProps> = ({ album, albumId, description, images, onBack }) => {
   const router = useRouter();
-  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
-  const [analysis, setAnalysis] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
@@ -59,33 +54,7 @@ export const AlbumView: React.FC<AlbumViewProps> = ({ album, albumId, descriptio
     window.scrollTo(0, 0);
   }, []);
 
-  const handleAnalyze = async (url: string, id: string) => {
-    setSelectedPhoto(id);
-    setLoading(true);
-    setAnalysis(null);
-    
-    try {
-        const result = await analyzeImageAction(url);
-        setAnalysis(result);
-    } catch (e) {
-        setAnalysis("Failed to analyze image.");
-    }
-    setLoading(false);
-  };
-
-  const closeAnalysis = () => {
-    setSelectedPhoto(null);
-    setAnalysis(null);
-  };
-  
   const openLightbox = (index: number) => {
-    // Prevent lightbox opening if analysis is active for this photo
-    // or if we want to strictly separate modes.
-    // For now, if we are viewing analysis, maybe don't open lightbox?
-    // The click is on the container, the analysis overlay is on top.
-    // If analysis is open, the overlay covers the click area, so this function
-    // technically won't fire if clicked on the overlay (unless overlay bubbles).
-    
     setLightboxIndex(index);
     setLightboxOpen(true);
   };
@@ -95,14 +64,6 @@ export const AlbumView: React.FC<AlbumViewProps> = ({ album, albumId, descriptio
     1024: 2,
     640: 2,
     500: 1,
-  };
-
-  const defaultRequestBase = "mailto:ivan.caffrey@gmail.com";
-
-  const buildRequestUrl = (photo: Photo) => {
-    if (photo.print?.requestUrl) return photo.print.requestUrl;
-    const subject = encodeURIComponent(`Print request: ${photo.id}`);
-    return `${defaultRequestBase}?subject=${subject}`;
   };
 
   const formatPrice = (photo: Photo) => {
@@ -173,7 +134,7 @@ export const AlbumView: React.FC<AlbumViewProps> = ({ album, albumId, descriptio
                     return (
                       <div 
                           key={photo.id} 
-                          onClick={() => !selectedPhoto && openLightbox(globalIndex)}
+                          onClick={() => openLightbox(globalIndex)}
                           style={{ 
                             flex: pair.length > 1 ? `${ratio} ${ratio} 0%` : 'unset',
                             width: pair.length === 1 ? `${(ratio / (ratio + 1)) * 100}%` : 'auto'
@@ -200,65 +161,13 @@ export const AlbumView: React.FC<AlbumViewProps> = ({ album, albumId, descriptio
                             </div>
                           )}
 
-                          {/* Analysis Trigger - Always visible on mobile, hover on desktop */}
-                          <div className="absolute top-4 right-4 z-10 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
-                              <button 
-                                  onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleAnalyze(photo.url, photo.id);
-                                  }}
-                                  className="bg-stone-900/40 backdrop-blur-sm border border-[var(--color-yellow)]/30 text-[var(--color-yellow)] px-4 py-2 rounded-full hover:bg-stone-900/60 transition-all shadow-lg flex items-center gap-2 group/btn"
-                              >
-                                  <Sparkles className="w-4 h-4" />
-                                  <span className="font-serif italic text-lg">Analyse with Gemini</span>
-                              </button>
-                          </div>
-
-                          <a
-                            href={buildRequestUrl(photo)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={(e) => e.stopPropagation()}
-                            className="absolute bottom-4 left-4 z-10 rounded-full bg-black/60 px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-white backdrop-blur-sm transition hover:bg-black/75"
-                          >
-                            {photo.print?.available ? "Request this print" : "Request this as a print"}
-                          </a>
-
                           {photo.print && (
-                            <div className="absolute bottom-16 left-4 z-10 rounded bg-black/65 px-3 py-2 text-[10px] font-mono uppercase tracking-[0.14em] text-white/90 backdrop-blur-sm">
+                            <div className="absolute bottom-4 left-4 z-10 rounded bg-black/65 px-3 py-2 text-[10px] font-mono uppercase tracking-[0.14em] text-white/90 backdrop-blur-sm">
                               {photo.print.status === "sold_out" ? "Sold out" : `Edition of ${photo.print.editionSize}`}{" "}
                               {formatPrice(photo) ? `• ${formatPrice(photo)}` : ""}
                             </div>
                           )}
 
-                          {/* Analysis Popover (In-place at bottom) */}
-                          {selectedPhoto === photo.id && (
-                              <div 
-                                  className="absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-stone-900/90 via-stone-900/70 to-transparent p-6 pt-20 md:p-8 md:pt-24 flex flex-col justify-end animate-in slide-in-from-bottom-4 duration-500"
-                                  onClick={(e) => e.stopPropagation()} // Prevent lightbox open when clicking analysis background
-                              >
-                                  <button onClick={closeAnalysis} className="absolute top-4 right-4 text-stone-400 hover:text-white transition-colors">
-                                      <X className="w-5 h-5" />
-                                  </button>
-                                  
-                                  <div className="space-y-2">
-                                      <div className="flex items-center gap-2 text-[var(--color-yellow)] font-mono text-[10px] uppercase tracking-[0.2em] opacity-80">
-                                          <Sparkles className="w-3 h-3 animate-spin-slow" /> AI Analysis
-                                      </div>
-                                      
-                                      {loading ? (
-                                          <div className="space-y-2">
-                                              <div className="h-3 w-3/4 bg-white/10 rounded animate-pulse"></div>
-                                              <div className="h-3 w-1/2 bg-white/10 rounded animate-pulse"></div>
-                                          </div>
-                                      ) : (
-                                          <p className="text-base md:text-lg font-serif text-stone-100 leading-relaxed italic drop-shadow-sm">
-                                              &quot;{analysis}&quot;
-                                          </p>
-                                      )}
-                                  </div>
-                              </div>
-                          )}
                       </div>
                     );
                   })}
@@ -275,7 +184,7 @@ export const AlbumView: React.FC<AlbumViewProps> = ({ album, albumId, descriptio
               {images.map((photo, index) => (
               <div 
                   key={photo.id} 
-                  onClick={() => !selectedPhoto && openLightbox(index)}
+                  onClick={() => openLightbox(index)}
                   className="mb-8 group relative overflow-hidden rounded-[16px] bg-stone-200 cursor-pointer transition-all duration-500 hover:shadow-2xl"
               >
                   <img 
@@ -296,65 +205,13 @@ export const AlbumView: React.FC<AlbumViewProps> = ({ album, albumId, descriptio
                     </div>
                   )}
 
-                  {/* Analysis Trigger - Always visible on mobile, hover on desktop */}
-                  <div className="absolute top-4 right-4 z-10 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
-                      <button 
-                          onClick={(e) => {
-                              e.stopPropagation();
-                              handleAnalyze(photo.url, photo.id);
-                          }}
-                          className="bg-stone-900/40 backdrop-blur-sm border border-[var(--color-yellow)]/30 text-[var(--color-yellow)] px-4 py-2 rounded-full hover:bg-stone-900/60 transition-all shadow-lg flex items-center gap-2 group/btn"
-                      >
-                          <Sparkles className="w-4 h-4" />
-                          <span className="font-serif italic text-lg">Analyse with Gemini</span>
-                      </button>
-                  </div>
-
-                  <a
-                    href={buildRequestUrl(photo)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()}
-                    className="absolute bottom-4 left-4 z-10 rounded-full bg-black/60 px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-white backdrop-blur-sm transition hover:bg-black/75"
-                  >
-                    {photo.print?.available ? "Request this print" : "Request this as a print"}
-                  </a>
-
                   {photo.print && (
-                    <div className="absolute bottom-16 left-4 z-10 rounded bg-black/65 px-3 py-2 text-[10px] font-mono uppercase tracking-[0.14em] text-white/90 backdrop-blur-sm">
+                    <div className="absolute bottom-4 left-4 z-10 rounded bg-black/65 px-3 py-2 text-[10px] font-mono uppercase tracking-[0.14em] text-white/90 backdrop-blur-sm">
                       {photo.print.status === "sold_out" ? "Sold out" : `Edition of ${photo.print.editionSize}`}{" "}
                       {formatPrice(photo) ? `• ${formatPrice(photo)}` : ""}
                     </div>
                   )}
 
-                  {/* Analysis Popover (In-place at bottom) */}
-                  {selectedPhoto === photo.id && (
-                      <div 
-                          className="absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-stone-900/90 via-stone-900/70 to-transparent p-6 pt-20 md:p-8 md:pt-24 flex flex-col justify-end animate-in slide-in-from-bottom-4 duration-500"
-                          onClick={(e) => e.stopPropagation()} // Prevent lightbox open when clicking analysis background
-                      >
-                          <button onClick={closeAnalysis} className="absolute top-4 right-4 text-stone-400 hover:text-white transition-colors">
-                              <X className="w-5 h-5" />
-                          </button>
-                          
-                          <div className="space-y-2">
-                              <div className="flex items-center gap-2 text-[var(--color-yellow)] font-mono text-[10px] uppercase tracking-[0.2em] opacity-80">
-                                  <Sparkles className="w-3 h-3 animate-spin-slow" /> AI Analysis
-                              </div>
-                              
-                              {loading ? (
-                                  <div className="space-y-2">
-                                      <div className="h-3 w-3/4 bg-white/10 rounded animate-pulse"></div>
-                                      <div className="h-3 w-1/2 bg-white/10 rounded animate-pulse"></div>
-                                  </div>
-                              ) : (
-                                  <p className="text-base md:text-lg font-serif text-stone-100 leading-relaxed italic drop-shadow-sm">
-                                      &quot;{analysis}&quot;
-                                  </p>
-                              )}
-                          </div>
-                      </div>
-                  )}
               </div>
               ))}
           </Masonry>
