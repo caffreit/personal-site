@@ -39,7 +39,7 @@ type QuizQuestion = {
 
 type ScoreMap = Record<StandardKey, number>;
 
-const CONTACT_EMAIL = "hello@bluebridgetech.ie";
+const CONTACT_EMAIL = "ivancaffrey@bluebridgetech.com";
 const RESULT_IMAGE_BASE = "/labs/samd-iso-standard-quiz";
 const QUIZ_PATH = "/labs/samd-iso-standard-quiz";
 const SHARE_PROMPT = 'Take the SaMD "Which ISO Standard Are You?" quiz.';
