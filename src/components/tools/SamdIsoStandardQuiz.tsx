@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, ArrowUpRight, Copy, RotateCcw, Share2 } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, RotateCcw, Share2 } from "lucide-react";
 
 type StandardKey =
   | "qms"
@@ -41,6 +41,8 @@ type ScoreMap = Record<StandardKey, number>;
 
 const CONTACT_EMAIL = "hello@bluebridgetech.ie";
 const RESULT_IMAGE_BASE = "/labs/samd-iso-standard-quiz";
+const QUIZ_PATH = "/labs/samd-iso-standard-quiz";
+const SHARE_PROMPT = 'Take the SaMD "Which ISO Standard Are You?" quiz.';
 
 function resultImageSrc(key: StandardKey) {
   return `${RESULT_IMAGE_BASE}/${key}.png`;
@@ -474,6 +476,14 @@ function rankStandards(scores: ScoreMap, history: StandardKey[]) {
   };
 }
 
+function splitBbtCopy(copy: string) {
+  const [intro, ...ctaParts] = copy.split(" If your ");
+  return {
+    intro,
+    cta: ctaParts.length > 0 ? `If your ${ctaParts.join(" If your ")}` : copy,
+  };
+}
+
 export default function SamdIsoStandardQuiz() {
   const [current, setCurrent] = useState(0);
   const [scores, setScores] = useState<ScoreMap>(INITIAL_SCORES);
@@ -489,27 +499,18 @@ export default function SamdIsoStandardQuiz() {
     selectedIndex === null ? null : activeQuestion.answers[selectedIndex];
   const progressPercent = showResult ? 100 : (current / QUESTIONS.length) * 100;
 
-  const { dominant, runnerUp, sorted } = useMemo(
+  const { dominant, sorted } = useMemo(
     () => rankStandards(scores, history),
     [history, scores],
   );
 
   const dominantResult = STANDARDS[dominant];
+  const { intro: bbtIntro, cta: bbtCta } = splitBbtCopy(dominantResult.bbt);
   const totalAnswers = history.length;
 
   const shareText = useMemo(() => {
-    return `${dominantResult.shareHook} Runner-up: ${STANDARDS[runnerUp].code}. Took the SaMD "Which ISO Standard Are You?" quiz.`;
-  }, [dominantResult.shareHook, runnerUp]);
-
-  const teamMailtoHref = useMemo(() => {
-    const subject = encodeURIComponent(
-      `SaMD Standards Quiz Result - ${dominantResult.code}`,
-    );
-    const body = encodeURIComponent(
-      `${shareText}\n\nBBT translation: ${dominantResult.bbt}\n\nTake the quiz in Labs and compare your standards stack.`,
-    );
-    return `mailto:?subject=${subject}&body=${body}`;
-  }, [dominantResult.bbt, dominantResult.code, shareText]);
+    return `${dominantResult.shareHook} ${SHARE_PROMPT}`;
+  }, [dominantResult.shareHook]);
 
   function resetToIntro() {
     setCurrent(0);
@@ -566,25 +567,34 @@ export default function SamdIsoStandardQuiz() {
     setShowResult(true);
   }
 
-  async function handleCopyShareText() {
-    try {
-      await navigator.clipboard.writeText(shareText);
-      setShareStatus("Share text copied to clipboard.");
-    } catch {
-      setShareStatus("Could not copy automatically. You can still copy the text below.");
-    }
-  }
-
   async function handleNativeShare() {
     if (!("share" in navigator)) {
-      setShareStatus("Native share is not available here. Try copy instead.");
+      setShareStatus("Sharing is not available in this browser.");
       return;
     }
+
+    const shareUrl = `${window.location.origin}${QUIZ_PATH}`;
+    const shareData: ShareData = {
+      title: "Which ISO Standard Are You?",
+      text: shareText,
+      url: shareUrl,
+    };
+
     try {
-      await navigator.share({
-        title: "Which ISO Standard Are You?",
-        text: shareText,
+      const imageResponse = await fetch(resultImageSrc(dominant));
+      const imageBlob = await imageResponse.blob();
+      const imageFile = new File([imageBlob], `${dominant}-iso-standard-quiz.png`, {
+        type: imageBlob.type || "image/png",
       });
+
+      if (navigator.canShare?.({ files: [imageFile] })) {
+        await navigator.share({
+          ...shareData,
+          files: [imageFile],
+        });
+      } else {
+        await navigator.share(shareData);
+      }
       setShareStatus("Shared.");
     } catch {
       setShareStatus("Share was cancelled or unavailable.");
@@ -691,7 +701,7 @@ export default function SamdIsoStandardQuiz() {
                     key={key}
                     className="overflow-hidden rounded-2xl border border-stone-200 bg-stone-50"
                   >
-                    <div className="relative aspect-[4/3] bg-stone-200">
+                    <div className="relative aspect-[2/3] bg-stone-200">
                       <Image
                         src={resultImageSrc(key)}
                         alt={`${value.code}: ${value.title}`}
@@ -701,13 +711,13 @@ export default function SamdIsoStandardQuiz() {
                       />
                     </div>
                     <div className="p-5">
-                    <p className="font-mono text-xs font-semibold uppercase tracking-[0.3em] text-stone-500">
-                      {value.code}
-                    </p>
-                    <h3 className="mt-2 text-2xl font-black tracking-tight text-stone-900">
-                      {value.title}
-                    </h3>
-                    <p className="mt-2 leading-relaxed text-stone-600">{value.subtitle}</p>
+                      <p className="font-mono text-xs font-semibold uppercase tracking-[0.3em] text-stone-500">
+                        {value.code}
+                      </p>
+                      <h3 className="mt-2 text-2xl font-black tracking-tight text-stone-900">
+                        {value.title}
+                      </h3>
+                      <p className="mt-2 leading-relaxed text-stone-600">{value.subtitle}</p>
                     </div>
                   </article>
                 ),
@@ -816,21 +826,58 @@ export default function SamdIsoStandardQuiz() {
               You are {dominantResult.code}: {dominantResult.title}
             </h2>
             <p className="mt-4 max-w-4xl text-lg leading-relaxed text-stone-600">
-              <span className="font-semibold text-stone-900">{dominantResult.subtitle}</span>{" "}
-              {dominantResult.description}
+              <span className="font-semibold text-stone-900">{dominantResult.subtitle}</span>
+            </p>
+            <p className="mt-3 max-w-4xl text-lg leading-relaxed text-stone-600">
+              {dominantResult.description} {bbtIntro}
             </p>
 
-            <div className="relative mt-6 aspect-[4/3] w-full max-w-3xl overflow-hidden rounded-2xl border border-stone-200 bg-stone-100">
-              <Image
-                src={resultImageSrc(dominant)}
-                alt={`${dominantResult.code}: ${dominantResult.title}`}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 768px"
-                priority
-              />
+            <div className="mt-6 rounded-2xl border border-indigo-200 bg-indigo-50 p-5">
+              <div className="grid gap-5 lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)] lg:items-start">
+                <div className="relative mx-auto aspect-[2/3] w-full max-w-sm overflow-hidden rounded-2xl border border-indigo-200 bg-stone-100">
+                  <Image
+                    src={resultImageSrc(dominant)}
+                    alt={`${dominantResult.code}: ${dominantResult.title}`}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 340px"
+                    priority
+                  />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black tracking-tight text-indigo-900">
+                    Your shareable result
+                  </h3>
+                  <p className="mt-3 leading-relaxed text-indigo-900">{bbtCta}</p>
+                  <Link
+                    href={`mailto:${CONTACT_EMAIL}?subject=SaMD%20Standards%20Quiz%20Follow-up`}
+                    className="mt-4 inline-flex h-11 items-center justify-center gap-2 rounded-full bg-stone-900 px-5 text-sm font-semibold leading-none text-white transition hover:bg-stone-700"
+                  >
+                    <span className="translate-y-px">Talk to someone who gets it</span>
+                    <ArrowUpRight className="h-4 w-4 shrink-0" />
+                  </Link>
+                  <p className="mt-4 leading-relaxed text-indigo-900">
+                    {dominantResult.shareHook}{" "}
+                    <Link href={QUIZ_PATH} className="font-semibold underline underline-offset-4">
+                      {SHARE_PROMPT}
+                    </Link>
+                  </p>
+                  <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                    <button
+                      type="button"
+                      onClick={handleNativeShare}
+                      className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-stone-900 px-5 text-sm font-semibold leading-none text-white transition hover:bg-stone-700"
+                    >
+                      <Share2 className="h-4 w-4 shrink-0" />
+                      <span className="translate-y-px">Share result</span>
+                    </button>
+                  </div>
+                  {shareStatus ? (
+                    <p className="mt-3 text-sm font-medium text-indigo-900">{shareStatus}</p>
+                  ) : null}
+                </div>
+              </div>
             </div>
-
 
             <div className="mt-6 grid gap-4 lg:grid-cols-2">
               <div className="rounded-2xl border border-stone-200 bg-stone-50 p-5">
@@ -853,56 +900,6 @@ export default function SamdIsoStandardQuiz() {
                   ))}
                 </ul>
               </div>
-              <div className="rounded-2xl border border-indigo-200 bg-indigo-50 p-5 lg:col-span-2">
-                <h3 className="text-xl font-black tracking-tight text-indigo-900">
-                  Bluebridge gets this
-                </h3>
-                <p className="mt-3 max-w-4xl leading-relaxed text-indigo-900">
-                  {dominantResult.bbt}
-                </p>
-                <Link
-                  href={`mailto:${CONTACT_EMAIL}?subject=SaMD%20Standards%20Quiz%20Follow-up`}
-                  className="mt-5 inline-flex items-center justify-center gap-2 rounded-full bg-stone-900 px-5 py-2 text-sm font-semibold text-white transition hover:bg-stone-700"
-                >
-                  Talk to someone who gets it
-                  <ArrowUpRight className="h-4 w-4" />
-                </Link>
-              </div>
-            </div>
-
-            <div className="mt-6 rounded-2xl border border-indigo-200 bg-indigo-50 p-5">
-              <h3 className="text-xl font-black tracking-tight text-indigo-900">
-                Share text
-              </h3>
-              <p className="mt-2 leading-relaxed text-indigo-900">{shareText}</p>
-              <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-                <button
-                  type="button"
-                  onClick={handleNativeShare}
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-stone-900 px-5 py-2 text-sm font-semibold text-white transition hover:bg-stone-700"
-                >
-                  <Share2 className="h-4 w-4" />
-                  Share result
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCopyShareText}
-                  className="inline-flex items-center justify-center gap-2 rounded-full border border-stone-300 bg-white px-5 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900"
-                >
-                  <Copy className="h-4 w-4" />
-                  Copy text
-                </button>
-                <Link
-                  href={teamMailtoHref}
-                  className="inline-flex items-center justify-center gap-2 rounded-full border border-stone-300 bg-white px-5 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900"
-                >
-                  Send to team
-                  <ArrowUpRight className="h-4 w-4" />
-                </Link>
-              </div>
-              {shareStatus ? (
-                <p className="mt-3 text-sm font-medium text-indigo-900">{shareStatus}</p>
-              ) : null}
             </div>
 
             <div className="mt-6 rounded-2xl border border-stone-200 bg-stone-50 p-5">
