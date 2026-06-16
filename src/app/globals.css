@@ -150,11 +150,18 @@ html {
   color: #1c1917;
 }
 
-/* Nudge chip label glyphs into the visual center of rounded pills. */
-.chip-text {
+/* Shared optical centering for compact pills, chips, and rounded text buttons. */
+.pill-control {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.pill-label {
   display: inline-block;
   line-height: 1;
-  transform: translateY(0.12em);
+  transform: translateY(0.08em);
 }
 
 /* Hero carousel keyframes */

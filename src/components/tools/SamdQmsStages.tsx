@@ -190,8 +190,8 @@ export default function SamdQmsStages() {
 
       <header className="mb-8 grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">
         <div className="rounded-[2rem] border border-stone-200 bg-white/90 p-8 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)]">
-          <p className="mb-4 inline-flex rounded-full bg-indigo-50 px-4 py-2 font-mono text-xs font-semibold uppercase tracking-[0.2em] text-indigo-700">
-            BBT demo concept - interactive listicle
+          <p className="pill-control mb-4 rounded-full bg-indigo-50 px-4 py-2 font-mono text-xs font-semibold uppercase tracking-[0.2em] text-indigo-700">
+            <span className="pill-label">BBT demo concept - interactive listicle</span>
           </p>
           <h1 className="text-4xl font-black uppercase leading-[0.9] tracking-tight text-stone-900 sm:text-6xl">
             The 12 Stages of Realising You Need a QMS
@@ -343,17 +343,19 @@ export default function SamdQmsStages() {
               type="button"
               onClick={onPrevious}
               disabled={current === 0}
-              className="inline-flex items-center justify-center rounded-full border border-stone-300 bg-white px-5 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900 disabled:cursor-not-allowed disabled:opacity-40"
+              className="pill-control rounded-full border border-stone-300 bg-white px-5 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900 disabled:cursor-not-allowed disabled:opacity-40"
             >
-              Previous
+              <span className="pill-label">Previous</span>
             </button>
 
             <button
               type="button"
               onClick={onNext}
-              className="inline-flex items-center justify-center rounded-full bg-stone-900 px-6 py-2 text-sm font-semibold text-white transition hover:bg-stone-700"
+              className="pill-control rounded-full bg-stone-900 px-6 py-2 text-sm font-semibold text-white transition hover:bg-stone-700"
             >
-              {current === STAGES.length - 1 ? "Restart" : "Next stage"}
+              <span className="pill-label">
+                {current === STAGES.length - 1 ? "Restart" : "Next stage"}
+              </span>
             </button>
           </div>
         </article>

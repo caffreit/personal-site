@@ -442,8 +442,8 @@ export default function SamdFdaPreSubQuiz() {
               />
             </div>
           </div>
-          <div className="inline-flex shrink-0 items-center whitespace-nowrap rounded-full bg-stone-100 px-4 py-2 text-sm font-bold text-stone-700">
-            Score: {score}
+          <div className="pill-control shrink-0 whitespace-nowrap rounded-full bg-stone-100 px-4 py-2 text-sm font-bold text-stone-700">
+            <span className="pill-label">Score: {score}</span>
           </div>
         </div>
 
@@ -498,25 +498,27 @@ export default function SamdFdaPreSubQuiz() {
               <button
                 type="button"
                 onClick={handleRestart}
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-stone-300 bg-white px-5 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900"
+                className="pill-control gap-2 rounded-full border border-stone-300 bg-white px-5 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900"
               >
                 <RotateCcw className="h-4 w-4" />
-                Restart
+                <span className="pill-label">Restart</span>
               </button>
               <button
                 type="button"
                 disabled={!isAnswered}
                 onClick={handleNext}
-                className="inline-flex items-center justify-center rounded-full bg-stone-900 px-6 py-2 text-sm font-semibold text-white transition hover:bg-stone-700 disabled:cursor-not-allowed disabled:bg-stone-400"
+                className="pill-control rounded-full bg-stone-900 px-6 py-2 text-sm font-semibold text-white transition hover:bg-stone-700 disabled:cursor-not-allowed disabled:bg-stone-400"
               >
-                {index === QUESTIONS.length - 1 ? "See Result" : "Next"}
+                <span className="pill-label">
+                  {index === QUESTIONS.length - 1 ? "See Result" : "Next"}
+                </span>
               </button>
             </div>
           </div>
         ) : (
           <div>
-            <span className="inline-flex rounded-full bg-amber-100 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-amber-700">
-              {result.badge}
+            <span className="pill-control rounded-full bg-amber-100 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-amber-700">
+              <span className="pill-label">{result.badge}</span>
             </span>
             <h2 className="mt-4 text-4xl font-black uppercase leading-[0.95] tracking-tight text-stone-900 sm:text-6xl">
               {result.title}
@@ -572,18 +574,18 @@ export default function SamdFdaPreSubQuiz() {
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
               <Link
                 href={`mailto:${CONTACT_EMAIL}?subject=FDA%20Pre-Sub%20Readiness%20Session`}
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-stone-900 px-6 py-2 text-sm font-semibold text-white transition hover:bg-stone-700"
+                className="pill-control gap-2 rounded-full bg-stone-900 px-6 py-2 text-sm font-semibold text-white transition hover:bg-stone-700"
               >
-                Book a readiness session
+                <span className="pill-label">Book a readiness session</span>
                 <ArrowUpRight className="h-4 w-4" />
               </Link>
               <button
                 type="button"
                 onClick={handleRestart}
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-stone-300 bg-white px-5 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900"
+                className="pill-control gap-2 rounded-full border border-stone-300 bg-white px-5 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900"
               >
                 <RotateCcw className="h-4 w-4" />
-                Try Again
+                <span className="pill-label">Try Again</span>
               </button>
             </div>
           </div>
@@ -605,9 +607,9 @@ export default function SamdFdaPreSubQuiz() {
               href={source.href}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded-full border border-stone-300 bg-stone-50 px-4 py-2 text-sm font-medium text-stone-700 transition hover:border-stone-600 hover:text-stone-900"
+              className="pill-control gap-2 rounded-full border border-stone-300 bg-stone-50 px-4 py-2 text-sm font-medium text-stone-700 transition hover:border-stone-600 hover:text-stone-900"
             >
-              {source.label}
+              <span className="pill-label">{source.label}</span>
               <ArrowUpRight className="h-4 w-4" />
             </Link>
           ))}

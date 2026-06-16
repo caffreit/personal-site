@@ -69,26 +69,26 @@ const LongTailChart: React.FC<LongTailChartProps> = ({ isExpanded = true }) => {
           onClick={() => setExpanded(true)}
           disabled={expanded}
           aria-pressed={expanded}
-          className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
+          className={`pill-control rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
             expanded
               ? "bg-[#FCEFC0] text-stone-500 cursor-not-allowed"
               : "bg-stone-900 text-[#F4CA16] hover:bg-stone-800"
           }`}
         >
-          Apply AI Efficiency
+          <span className="pill-label">Apply AI Efficiency</span>
         </button>
         <button
           type="button"
           onClick={() => setExpanded(false)}
           disabled={!expanded}
           aria-pressed={!expanded}
-          className={`rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
+          className={`pill-control rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
             !expanded
               ? "border-stone-200 text-stone-400 cursor-not-allowed dark:border-zinc-700 dark:text-zinc-500"
               : "border-[#F4CA16] text-stone-900 hover:bg-[#F4CA16] hover:text-stone-950 dark:border-[#F4CA16] dark:text-white dark:hover:text-stone-950"
           }`}
         >
-          Reset Model
+          <span className="pill-label">Reset Model</span>
         </button>
       </div>
       <div className="relative h-full w-full overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">

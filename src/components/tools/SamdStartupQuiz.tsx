@@ -643,9 +643,9 @@ export default function SamdStartupQuiz() {
                 (tag) => (
                   <span
                     key={tag}
-                    className="inline-flex rounded-full border border-stone-200 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-stone-600"
+                    className="pill-control rounded-full border border-stone-200 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-stone-600"
                   >
-                    {tag}
+                    <span className="pill-label">{tag}</span>
                   </span>
                 ),
               )}
@@ -655,9 +655,9 @@ export default function SamdStartupQuiz() {
               <button
                 type="button"
                 onClick={handleStart}
-                className="inline-flex items-center justify-center rounded-full bg-stone-900 px-6 py-2 text-sm font-semibold text-white transition hover:bg-stone-700"
+                className="pill-control rounded-full bg-stone-900 px-6 py-2 text-sm font-semibold text-white transition hover:bg-stone-700"
               >
-                Start the quiz
+                <span className="pill-label">Start the quiz</span>
               </button>
             </div>
           </div>
@@ -675,8 +675,8 @@ export default function SamdStartupQuiz() {
                   />
                 </div>
               </div>
-              <div className="inline-flex shrink-0 items-center whitespace-nowrap rounded-full bg-stone-100 px-4 py-2 text-sm font-bold text-stone-700">
-                {current + 1} of {QUESTIONS.length}
+              <div className="pill-control shrink-0 whitespace-nowrap rounded-full bg-stone-100 px-4 py-2 text-sm font-bold text-stone-700">
+                <span className="pill-label">{current + 1} of {QUESTIONS.length}</span>
               </div>
             </div>
 
@@ -725,18 +725,20 @@ export default function SamdStartupQuiz() {
               <button
                 type="button"
                 onClick={handleRestartToIntro}
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-stone-300 bg-white px-5 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900"
+                className="pill-control gap-2 rounded-full border border-stone-300 bg-white px-5 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900"
               >
                 <RotateCcw className="h-4 w-4" />
-                Restart
+                <span className="pill-label">Restart</span>
               </button>
               <button
                 type="button"
                 disabled={selectedIndex === null}
                 onClick={handleNextQuestion}
-                className="inline-flex items-center justify-center rounded-full bg-stone-900 px-6 py-2 text-sm font-semibold text-white transition hover:bg-stone-700 disabled:cursor-not-allowed disabled:bg-stone-400"
+                className="pill-control rounded-full bg-stone-900 px-6 py-2 text-sm font-semibold text-white transition hover:bg-stone-700 disabled:cursor-not-allowed disabled:bg-stone-400"
               >
-                {current === QUESTIONS.length - 1 ? "See my result" : "Next question"}
+                <span className="pill-label">
+                  {current === QUESTIONS.length - 1 ? "See my result" : "Next question"}
+                </span>
               </button>
             </div>
           </div>
@@ -752,9 +754,11 @@ export default function SamdStartupQuiz() {
               {dominantResult.summary}
             </p>
 
-            <div className="mt-5 inline-flex items-center rounded-full bg-indigo-50 px-4 py-2 text-sm font-bold text-indigo-700">
-              Dominant signal: {dominantPercent}% - Runner-up:{" "}
-              {stripThePrefix(ARCHETYPES[runnerUpType].title)}
+            <div className="pill-control mt-5 rounded-full bg-indigo-50 px-4 py-2 text-sm font-bold text-indigo-700">
+              <span className="pill-label">
+                Dominant signal: {dominantPercent}% - Runner-up:{" "}
+                {stripThePrefix(ARCHETYPES[runnerUpType].title)}
+              </span>
             </div>
 
             <div className="mt-6 grid gap-4 lg:grid-cols-3">
@@ -795,25 +799,25 @@ export default function SamdStartupQuiz() {
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
               <Link
                 href={`mailto:${CONTACT_EMAIL}?subject=SaMD%20Startup%20Readiness%20Session`}
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-stone-900 px-6 py-2 text-sm font-semibold text-white transition hover:bg-stone-700"
+                className="pill-control gap-2 rounded-full bg-stone-900 px-6 py-2 text-sm font-semibold text-white transition hover:bg-stone-700"
               >
-                Reach out to BBT
+                <span className="pill-label">Reach out to BBT</span>
                 <ArrowUpRight className="h-4 w-4" />
               </Link>
               <button
                 type="button"
                 onClick={handleStart}
-                className="inline-flex items-center justify-center rounded-full border border-stone-300 bg-white px-5 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900"
+                className="pill-control rounded-full border border-stone-300 bg-white px-5 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900"
               >
-                Take it again
+                <span className="pill-label">Take it again</span>
               </button>
               <button
                 type="button"
                 onClick={handleRestartToIntro}
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-stone-300 bg-white px-5 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900"
+                className="pill-control gap-2 rounded-full border border-stone-300 bg-white px-5 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900"
               >
                 <RotateCcw className="h-4 w-4" />
-                Back to start
+                <span className="pill-label">Back to start</span>
               </button>
             </div>
 

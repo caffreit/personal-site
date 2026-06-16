@@ -88,9 +88,9 @@ export function PhotoGalleryView({ albums, locations }: PhotoGalleryViewProps) {
             {availablePrintCount > 0 && (
               <Link
                 href="/photos/prints"
-                className="inline-flex items-center rounded-full border border-[var(--rule-color)] px-4 py-2 font-[family-name:var(--font-mono)] text-[0.62rem] uppercase tracking-[0.17em] text-[var(--foreground)] transition-colors hover:border-[var(--color-yellow)] hover:text-[var(--color-yellow)]"
+                className="pill-control rounded-full border border-[var(--rule-color)] px-4 py-2 font-[family-name:var(--font-mono)] text-[0.62rem] uppercase tracking-[0.17em] text-[var(--foreground)] transition-colors hover:border-[var(--color-yellow)] hover:text-[var(--color-yellow)]"
               >
-                Available Prints ({availablePrintCount})
+                <span className="pill-label">Available Prints ({availablePrintCount})</span>
               </Link>
             )}
             <span className="hidden sm:block font-[family-name:var(--font-display)] text-[0.8rem] uppercase tracking-[0.15em] text-[var(--text-muted)] whitespace-nowrap">

@@ -50,8 +50,8 @@ export function BlogSection({ posts }: { posts: PostListItem[] }) {
                     sizes="(max-width: 768px) 100vw, 550px"
                   />
                 </div>
-                <span className="mb-3 inline-block bg-[var(--card-badge-bg)] px-3 py-1 font-[family-name:var(--font-display)] text-[0.65rem] font-bold uppercase tracking-[0.2em] text-[var(--color-yellow)]">
-                  {category}
+                <span className="pill-control mb-3 bg-[var(--card-badge-bg)] px-3 py-1 font-[family-name:var(--font-display)] text-[0.65rem] font-bold uppercase tracking-[0.2em] text-[var(--color-yellow)]">
+                  <span className="pill-label">{category}</span>
                 </span>
                 <h3 className="mb-2 font-serif text-[1.5rem] font-bold leading-snug">
                   {post.title}
