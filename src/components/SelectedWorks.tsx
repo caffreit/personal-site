@@ -1,10 +1,12 @@
 import Link from "next/link";
 import Image from "next/image";
 import { PostListItem } from "@/lib/posts";
+import type { Lab } from "@/lib/labs";
 
 interface EditorialThreeColProps {
   posts: PostListItem[];
   featuredPost: PostListItem;
+  recentLabs: Lab[];
 }
 
 const formatShortDate = (date: string) =>
@@ -14,7 +16,11 @@ const formatShortDate = (date: string) =>
     year: "numeric",
   });
 
-export function SelectedWorks({ posts, featuredPost }: EditorialThreeColProps) {
+export function SelectedWorks({
+  posts,
+  featuredPost,
+  recentLabs,
+}: EditorialThreeColProps) {
   return (
     <section>
       <div className="mx-auto grid max-w-[1200px] gap-10 px-6 py-16 md:grid-cols-[240px_1fr_240px] md:gap-10 lg:px-10">
@@ -81,30 +87,33 @@ export function SelectedWorks({ posts, featuredPost }: EditorialThreeColProps) {
           </Link>
         </div>
 
-        {/* Right: Colophon / Sidebar */}
+        {/* Right: Labs index */}
         <div>
           <h3 className="mb-6 border-b border-[var(--rule-color)] pb-3 font-[family-name:var(--font-display)] text-[0.7rem] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)]">
-            Colophon
+            Recent Labs
           </h3>
-          <p className="mb-5 text-[0.85rem] italic leading-relaxed text-[var(--text-muted)]">
-            Portraits, Pattrens, Opinions
-          </p>
-          <SidebarItem label="Photographs" value="205 selected from over 30,000 taken" />
-          <SidebarItem label="Cameras" value="Fujifilm X100F, Beirette, Nikon FL2" />
-          <SidebarItem label="Analysis" value="Python, built in Cursor" />
+          {recentLabs.map((lab) => (
+            <Link
+              key={lab.href}
+              href={lab.href}
+              className="block border-b border-[var(--rule-color)] py-3 transition-all hover:pl-2"
+            >
+              <span className="block font-mono text-[0.7rem] text-[var(--text-muted)]">
+                {lab.badge} / {formatShortDate(lab.publishedAt)}
+              </span>
+              <span className="text-[0.95rem] font-semibold leading-snug">
+                {lab.title}
+              </span>
+            </Link>
+          ))}
+          <Link
+            href="/labs"
+            className="mt-5 inline-block font-[family-name:var(--font-display)] text-sm font-medium uppercase tracking-[0.15em] text-[var(--color-yellow)] transition-opacity hover:opacity-80"
+          >
+            View all labs &rarr;
+          </Link>
         </div>
       </div>
     </section>
-  );
-}
-
-function SidebarItem({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="mb-3 text-[0.85rem] leading-normal text-[var(--text-body-rgb)]">
-      <strong className="mb-0.5 block font-[family-name:var(--font-display)] text-[0.75rem] font-bold uppercase tracking-[0.1em] text-[var(--foreground)]">
-        {label}
-      </strong>
-      {value}
-    </div>
   );
 }

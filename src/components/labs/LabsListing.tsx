@@ -3,16 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowUpRight, Star } from "lucide-react";
-
-export type Lab = {
-  title: string;
-  description: string;
-  href: string;
-  badge: string;
-  meta: string;
-  publishedAt: string;
-  isPinned?: boolean;
-};
+import type { Lab } from "@/lib/labs";
 
 type LabsListingProps = {
   labs: Lab[];
@@ -33,34 +24,17 @@ export default function LabsListing({ labs }: LabsListingProps) {
     return ["All", "Pinned", ...badges];
   }, [labs]);
 
-  const sortedLabs = useMemo(() => {
-    return [...labs].sort((a, b) => {
-      if (Boolean(a.isPinned) !== Boolean(b.isPinned)) {
-        return a.isPinned ? -1 : 1;
-      }
-
-      const dateDelta =
-        new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
-
-      if (dateDelta !== 0) {
-        return dateDelta;
-      }
-
-      return a.title.localeCompare(b.title);
-    });
-  }, [labs]);
-
   const filteredLabs = useMemo(() => {
     if (selectedFilter === "All") {
-      return sortedLabs;
+      return labs;
     }
 
     if (selectedFilter === "Pinned") {
-      return sortedLabs.filter((lab) => lab.isPinned);
+      return labs.filter((lab) => lab.isPinned);
     }
 
-    return sortedLabs.filter((lab) => lab.badge === selectedFilter);
-  }, [selectedFilter, sortedLabs]);
+    return labs.filter((lab) => lab.badge === selectedFilter);
+  }, [selectedFilter, labs]);
 
   return (
     <>
