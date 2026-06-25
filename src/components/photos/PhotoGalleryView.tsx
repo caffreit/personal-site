@@ -93,7 +93,7 @@ export function PhotoGalleryView({ albums, locations }: PhotoGalleryViewProps) {
                 <span className="pill-label">Available Prints ({availablePrintCount})</span>
               </Link>
             )}
-            <span className="hidden sm:block font-[family-name:var(--font-display)] text-[0.8rem] uppercase tracking-[0.15em] text-[var(--text-muted)] whitespace-nowrap">
+            <span className="hidden sm:block xl:hidden font-[family-name:var(--font-display)] text-[0.8rem] uppercase tracking-[0.15em] text-[var(--text-muted)] whitespace-nowrap">
               Scroll to browse &rarr;
             </span>
           </div>
@@ -109,7 +109,7 @@ export function PhotoGalleryView({ albums, locations }: PhotoGalleryViewProps) {
             exit="exit"
             transition={{ duration: 0.35, ease: [0.25, 1, 0.5, 1] }}
           >
-            <div className="flex overflow-x-auto snap-x snap-mandatory pb-20 photo-carousel">
+            <div className="flex overflow-x-auto snap-x snap-mandatory pb-20 photo-carousel xl:grid xl:grid-cols-4 2xl:grid-cols-5 xl:gap-2 xl:overflow-visible xl:snap-none xl:px-2 xl:pb-16">
               {viewMode === "themes"
                 ? albums.map((album) => (
                     <Link
@@ -117,25 +117,27 @@ export function PhotoGalleryView({ albums, locations }: PhotoGalleryViewProps) {
                       href={`/photos/${encodeURIComponent(album.id)}`}
                       className="photo-strip-card group"
                     >
-                      <Image
-                        src={`/photos/${encodeURIComponent(album.id)}/${encodeURIComponent(album.cover)}`}
-                        alt={album.title}
-                        fill
-                        className="object-cover transition-transform duration-[600ms] ease-out group-hover:scale-[1.03]"
-                        sizes="(max-width: 640px) 80vw, 45vw"
-                      />
-                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-6 sm:p-10 text-white">
-                        <h4 className="font-[family-name:var(--font-serif)] text-[clamp(1.25rem,2.2vw,1.75rem)] font-semibold mb-1">
-                          {album.title}
-                        </h4>
-                        <span className="font-[family-name:var(--font-mono)] text-[0.65rem] uppercase tracking-[0.15em] text-white/55">
-                          {album.images.length} Photographs
-                        </span>
-                        {album.images.some((image) => image.print?.available) && (
-                          <div className="mt-2 font-[family-name:var(--font-mono)] text-[0.6rem] uppercase tracking-[0.16em] text-[var(--color-yellow)]">
-                            Limited prints available
-                          </div>
-                        )}
+                      <div className="photo-strip-card-frame">
+                        <Image
+                          src={`/photos/${encodeURIComponent(album.id)}/${encodeURIComponent(album.cover)}`}
+                          alt={album.title}
+                          fill
+                          className="object-cover transition-transform duration-[600ms] ease-out group-hover:scale-[1.03]"
+                          sizes="(max-width: 640px) 80vw, (max-width: 1279px) 45vw, 680px"
+                        />
+                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-6 sm:p-10 text-white">
+                          <h4 className="font-[family-name:var(--font-serif)] text-[clamp(1.25rem,2.2vw,1.75rem)] font-semibold mb-1">
+                            {album.title}
+                          </h4>
+                          <span className="font-[family-name:var(--font-mono)] text-[0.65rem] uppercase tracking-[0.15em] text-white/55">
+                            {album.images.length} Photographs
+                          </span>
+                          {album.images.some((image) => image.print?.available) && (
+                            <div className="mt-2 font-[family-name:var(--font-mono)] text-[0.6rem] uppercase tracking-[0.16em] text-[var(--color-yellow)]">
+                              Limited prints available
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </Link>
                   ))
@@ -145,20 +147,22 @@ export function PhotoGalleryView({ albums, locations }: PhotoGalleryViewProps) {
                       href={`/photos/location/${encodeURIComponent(loc.id)}`}
                       className="photo-strip-card group"
                     >
-                      <Image
-                        src={`/photos/${encodeURIComponent(loc.coverAlbum)}/${encodeURIComponent(loc.cover)}`}
-                        alt={loc.name}
-                        fill
-                        className="object-cover transition-transform duration-[600ms] ease-out group-hover:scale-[1.03]"
-                        sizes="(max-width: 640px) 80vw, 45vw"
-                      />
-                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-6 sm:p-10 text-white">
-                        <h4 className="font-[family-name:var(--font-serif)] text-[clamp(1.25rem,2.2vw,1.75rem)] font-semibold mb-1">
-                          {loc.name}
-                        </h4>
-                        <span className="font-[family-name:var(--font-mono)] text-[0.65rem] uppercase tracking-[0.15em] text-white/55">
-                          {loc.photoCount} Photographs
-                        </span>
+                      <div className="photo-strip-card-frame">
+                        <Image
+                          src={`/photos/${encodeURIComponent(loc.coverAlbum)}/${encodeURIComponent(loc.cover)}`}
+                          alt={loc.name}
+                          fill
+                          className="object-cover transition-transform duration-[600ms] ease-out group-hover:scale-[1.03]"
+                          sizes="(max-width: 640px) 80vw, (max-width: 1279px) 45vw, 680px"
+                        />
+                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-6 sm:p-10 text-white">
+                          <h4 className="font-[family-name:var(--font-serif)] text-[clamp(1.25rem,2.2vw,1.75rem)] font-semibold mb-1">
+                            {loc.name}
+                          </h4>
+                          <span className="font-[family-name:var(--font-mono)] text-[0.65rem] uppercase tracking-[0.15em] text-white/55">
+                            {loc.photoCount} Photographs
+                          </span>
+                        </div>
                       </div>
                     </Link>
                   ))}
