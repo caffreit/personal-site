@@ -5,7 +5,10 @@ export type Lab = {
   badge: string;
   meta: string;
   publishedAt: string;
+  image?: string;
+  imageAlt?: string;
   isPinned?: boolean;
+  isFeatured?: boolean;
 };
 
 const LABS: Lab[] = [
@@ -35,7 +38,10 @@ const LABS: Lab[] = [
     badge: "Civics",
     meta: "Budget • Quiz",
     publishedAt: "2026-06-10",
+    image: "/labs/irish-budget-quiz/cover.png",
+    imageAlt: "Screenshot of the Irish Budget Quiz interactive budget controls.",
     isPinned: true,
+    isFeatured: true,
   },
   {
     title: "FDA Pre-Sub Quiz",
@@ -141,6 +147,11 @@ export function sortLabs(labs: Lab[]) {
 
 export function getAllLabs() {
   return sortLabs(LABS);
+}
+
+export function getFeaturedLab() {
+  const labs = getAllLabs();
+  return labs.find((lab) => lab.isFeatured) ?? labs[0];
 }
 
 export function getRecentLabs(limit = 5) {
