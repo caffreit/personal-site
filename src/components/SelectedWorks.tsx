@@ -21,6 +21,10 @@ export function SelectedWorks({
   featuredPost,
   recentLabs,
 }: EditorialThreeColProps) {
+  const recentPosts = posts
+    .filter((post) => post.slug !== featuredPost.slug)
+    .slice(0, 5);
+
   return (
     <section>
       <div className="mx-auto grid max-w-[1200px] gap-10 px-6 py-16 md:grid-cols-[240px_1fr_240px] md:gap-10 lg:px-10">
@@ -29,7 +33,7 @@ export function SelectedWorks({
           <h3 className="mb-6 border-b border-[var(--rule-color)] pb-3 font-[family-name:var(--font-display)] text-[0.7rem] font-bold uppercase tracking-[0.2em] text-[var(--text-muted)]">
             Recent Writing
           </h3>
-          {posts.slice(0, 5).map((post) => (
+          {recentPosts.map((post) => (
             <Link
               key={post.slug}
               href={`/blog/${post.slug}`}
@@ -43,6 +47,12 @@ export function SelectedWorks({
               </span>
             </Link>
           ))}
+          <Link
+            href="/blog"
+            className="mt-5 inline-block font-[family-name:var(--font-display)] text-sm font-medium uppercase tracking-[0.15em] text-[var(--color-yellow)] transition-opacity hover:opacity-80"
+          >
+            View all blogs &rarr;
+          </Link>
         </div>
 
         {/* Center: Featured Essay */}
