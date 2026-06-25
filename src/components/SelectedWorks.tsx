@@ -43,7 +43,7 @@ export function SelectedWorks({
               href={`/blog/${featuredPost.slug}`}
               className="block transition-opacity hover:opacity-90"
             >
-              <h2 className="mb-4 font-serif text-[2.2rem] font-bold leading-tight">
+              <h2 className="mb-4 font-serif text-[2.2rem] font-bold leading-tight md:min-h-[2.5em]">
                 {featuredPost.title}
               </h2>
             </Link>
@@ -84,7 +84,7 @@ export function SelectedWorks({
               href={featuredLab.href}
               className="block transition-opacity hover:opacity-90"
             >
-              <h2 className="mb-4 font-serif text-[2.2rem] font-bold leading-tight">
+              <h2 className="mb-4 font-serif text-[2.2rem] font-bold leading-tight md:min-h-[2.5em]">
                 {featuredLab.title}
               </h2>
             </Link>
