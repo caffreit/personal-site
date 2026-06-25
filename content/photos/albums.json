@@ -16,11 +16,26 @@
     ]
   },
   {
+    "id": "Recents",
+    "title": "Recents",
+    "description": "A small rolling set of recently added photographs",
+    "cover": "img028.jpg",
+    "order": 2,
+    "imageOrder": [
+      "img028.jpg",
+      "img024.jpg",
+      "img022.jpg",
+      "img007.jpg",
+      "img003.jpg",
+      "DSCF9995.jpg"
+    ]
+  },
+  {
     "id": "Portraits",
     "title": "Portraits",
     "description": "Faces and figures, captured in candid and composed moments",
     "cover": "DSCF4666.jpg",
-    "order": 2,
+    "order": 3,
     "excludeImages": [
       "000160980009.jpg",
       "000160990028.jpg",
@@ -40,7 +55,7 @@
     "title": "Black & White",
     "description": "Stripped of color, focused on light, shadow, and form",
     "cover": "000226840017.jpg",
-    "order": 3,
+    "order": 4,
     "excludeImages": [
       "000184140032.jpg"
     ]
@@ -50,7 +65,7 @@
     "title": "Film",
     "description": "Shot on analog film — grain, texture, and the joy of waiting",
     "cover": "000361140009.jpg",
-    "order": 4,
+    "order": 5,
     "excludeImages": [
       "009190440020.jpg",
       "009190440025.jpg",
@@ -68,7 +83,7 @@
     "title": "People",
     "description": "Street life and human moments from around the world",
     "cover": "DSCF6615.jpg",
-    "order": 5,
+    "order": 6,
     "excludeImages": [
       "DSCF0027.jpg",
       "DSCF0039.jpg",
@@ -81,35 +96,35 @@
     "title": "Architecture",
     "description": "Structures, facades, and the geometry of the built environment",
     "cover": "DSCF9580.jpg",
-    "order": 6
+    "order": 7
   },
   {
     "id": "Minimal",
     "title": "Minimal",
     "description": "Less is more — clean compositions and quiet subjects",
     "cover": "DSCF3070.jpg",
-    "order": 7
+    "order": 8
   },
   {
     "id": "Animals",
     "title": "Animals",
     "description": "Creatures great and small, wild and domestic",
     "cover": "000160980013.jpg",
-    "order": 8
+    "order": 9
   },
   {
     "id": "Mountains",
     "title": "Mountains",
     "description": "Peaks, valleys, and the grandeur of elevated landscapes",
     "cover": "DSCF1182.jpg",
-    "order": 9
+    "order": 10
   },
   {
     "id": "Diptych",
     "title": "Diptychs",
     "description": "Paired images that speak to each other",
     "cover": "DSCF8969.jpg",
-    "order": 10,
+    "order": 11,
     "imageOrder": [
       "DSCF8969.jpg",
       "DSCF9219.jpg",
