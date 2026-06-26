@@ -118,6 +118,15 @@ const LABS: Lab[] = [
     publishedAt: "2026-06-12",
   },
   {
+    title: "Irish Purchase Tax Time 2026",
+    description:
+      "Estimate how much working time goes to the thing itself, income taxes, and direct purchase taxes across everyday and big-ticket items.",
+    href: "/labs/irish-purchase-tax-time-2026",
+    badge: "Data Viz",
+    meta: "Tax • Calculator",
+    publishedAt: "2026-06-25",
+  },
+  {
     title: "Ireland's Finances Breakdown",
     description:
       "Explore Ireland's 2024 income and expenditure mix with interactive doughnut charts and clickable spending drilldowns.",
