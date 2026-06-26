@@ -65,7 +65,7 @@ const ITEMS: PurchaseItem[] = [
     id: "roll",
     name: "Chicken fillet roll",
     category: "Lunch",
-    price: 5.5,
+    price: 6,
     vatRate: 0.135,
     description: "The humble deli counter benchmark.",
     assumption: "Assumes a prepared deli item charged at the 13.5% hospitality rate.",
@@ -153,8 +153,12 @@ function formatCurrency(value: number, maximumFractionDigits = 0) {
   });
 }
 
-function formatPercent(value: number) {
-  return `${Math.round(value)}%`;
+function getCurrencyFractionDigits(value: number) {
+  return Math.abs(value) < 100 ? 2 : 0;
+}
+
+function formatPercent(value: number, maximumFractionDigits = 0) {
+  return `${value.toLocaleString("en-IE", { maximumFractionDigits })}%`;
 }
 
 function formatWorkTime(hours: number) {
@@ -200,7 +204,7 @@ function getPurchaseTaxLines(item: PurchaseItem): TaxLine[] {
 
   if (item.vatRate) {
     lines.push({
-      label: `VAT at ${formatPercent(item.vatRate * 100)}`,
+      label: `VAT at ${formatPercent(item.vatRate * 100, 1)}`,
       amount: item.price - item.price / (1 + item.vatRate),
       note: "Estimated VAT included in the displayed purchase price.",
     });
@@ -354,6 +358,9 @@ export default function IrishPurchaseTaxTime2026() {
     };
   }, [grossIncome, selectedItem]);
 
+  const selectedCurrencyDigits = getCurrencyFractionDigits(selectedItem.price);
+  const grossRequiredCurrencyDigits = getCurrencyFractionDigits(result.grossRequired);
+
   return (
     <div className="mx-auto max-w-7xl px-4 pt-10 pb-24 sm:px-6 lg:px-8">
       <Link
@@ -447,7 +454,7 @@ export default function IrishPurchaseTaxTime2026() {
                   <span className="min-w-0">
                     <span className="block text-sm font-black">{item.name}</span>
                     <span className="mt-1 block font-mono text-xs uppercase tracking-[0.16em] text-stone-500">
-                      {formatCurrency(item.price)} - {item.category}
+                      {formatCurrency(item.price, getCurrencyFractionDigits(item.price))} - {item.category}
                     </span>
                   </span>
                 </button>
@@ -475,7 +482,7 @@ export default function IrishPurchaseTaxTime2026() {
                 Shelf or transaction price
               </p>
               <p className="mt-2 text-4xl font-black text-stone-900">
-                {formatCurrency(selectedItem.price)}
+                {formatCurrency(selectedItem.price, selectedCurrencyDigits)}
               </p>
               <p className="mt-2 text-sm leading-relaxed text-stone-600">{selectedItem.assumption}</p>
             </div>
@@ -494,7 +501,7 @@ export default function IrishPurchaseTaxTime2026() {
             <div className="rounded-2xl border border-stone-200 bg-stone-50 p-5">
               <ReceiptText className="h-5 w-5 text-amber-700" />
               <p className="mt-3 text-3xl font-black text-stone-900">
-                {formatCurrency(result.purchaseTaxTotal, selectedItem.price < 100 ? 2 : 0)}
+                {formatCurrency(result.purchaseTaxTotal, selectedCurrencyDigits)}
               </p>
               <p className="mt-1 text-sm font-semibold uppercase tracking-[0.14em] text-stone-500">
                 Direct purchase tax
@@ -503,7 +510,7 @@ export default function IrishPurchaseTaxTime2026() {
             <div className="rounded-2xl border border-stone-200 bg-stone-50 p-5">
               <WalletCards className="h-5 w-5 text-rose-700" />
               <p className="mt-3 text-3xl font-black text-stone-900">
-                {formatCurrency(result.totalTax, selectedItem.price < 100 ? 2 : 0)}
+                {formatCurrency(result.totalTax, selectedCurrencyDigits)}
               </p>
               <p className="mt-1 text-sm font-semibold uppercase tracking-[0.14em] text-stone-500">
                 Total tax in the chain
@@ -522,7 +529,7 @@ export default function IrishPurchaseTaxTime2026() {
                 </p>
               </div>
               <p className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">
-                {formatCurrency(result.grossRequired)} gross earnings
+                {formatCurrency(result.grossRequired, grossRequiredCurrencyDigits)} gross earnings
               </p>
             </div>
 
@@ -532,7 +539,7 @@ export default function IrishPurchaseTaxTime2026() {
                   key={segment.label}
                   className={`inline-block h-full ${segment.color}`}
                   style={{ width: clampPercent((segment.value / result.grossRequired) * 100) }}
-                  title={`${segment.label}: ${formatCurrency(segment.value)}`}
+                  title={`${segment.label}: ${formatCurrency(segment.value, selectedCurrencyDigits)}`}
                 />
               ))}
             </div>
@@ -545,7 +552,7 @@ export default function IrishPurchaseTaxTime2026() {
                     <p className="text-sm font-bold text-stone-800">{segment.label}</p>
                   </div>
                   <p className="mt-2 text-2xl font-black text-stone-900">
-                    {formatCurrency(segment.value, selectedItem.price < 100 ? 2 : 0)}
+                    {formatCurrency(segment.value, selectedCurrencyDigits)}
                   </p>
                   <p className="mt-1 text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
                     {formatPercent((segment.value / result.grossRequired) * 100)} of gross earnings
@@ -562,7 +569,7 @@ export default function IrishPurchaseTaxTime2026() {
                 <div className="flex items-center justify-between gap-4 border-b border-stone-200 pb-3">
                   <span className="text-sm text-stone-600">Item before these direct taxes</span>
                   <span className="font-bold text-stone-900">
-                    {formatCurrency(result.preTaxItemPrice, selectedItem.price < 100 ? 2 : 0)}
+                    {formatCurrency(result.preTaxItemPrice, selectedCurrencyDigits)}
                   </span>
                 </div>
                 {result.purchaseTaxes.map((line) => (
@@ -570,7 +577,7 @@ export default function IrishPurchaseTaxTime2026() {
                     <div className="flex items-center justify-between gap-4">
                       <span className="text-sm font-semibold text-stone-700">{line.label}</span>
                       <span className="font-bold text-stone-900">
-                        {formatCurrency(line.amount, selectedItem.price < 100 ? 2 : 0)}
+                        {formatCurrency(line.amount, selectedCurrencyDigits)}
                       </span>
                     </div>
                     <p className="mt-1 text-xs leading-relaxed text-stone-500">{line.note}</p>
@@ -587,7 +594,7 @@ export default function IrishPurchaseTaxTime2026() {
                     <div className="flex items-center justify-between gap-4">
                       <span className="text-sm font-semibold text-stone-700">{line.label}</span>
                       <span className="font-bold text-stone-900">
-                        {formatCurrency(line.amount, selectedItem.price < 100 ? 2 : 0)}
+                        {formatCurrency(line.amount, selectedCurrencyDigits)}
                       </span>
                     </div>
                     <p className="mt-1 text-xs leading-relaxed text-stone-500">{line.note}</p>
