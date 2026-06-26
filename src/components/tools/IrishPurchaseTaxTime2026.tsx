@@ -42,7 +42,9 @@ type TaxLine = {
 
 type Segment = {
   label: string;
+  shortLabel: string;
   value: number;
+  hours: number;
   color: string;
 };
 
@@ -312,6 +314,8 @@ export default function IrishPurchaseTaxTime2026() {
     const incomeTaxHours = incomeTaxToEarn / grossHourly;
     const purchaseTaxHours = purchaseTaxTotal / grossHourly;
     const itemHours = preTaxItemPrice / grossHourly;
+    const totalTaxHours = incomeTaxHours + purchaseTaxHours;
+    const totalTaxPercent = (totalTax / grossRequired) * 100;
     const annualScale = grossRequired / grossIncome;
 
     const incomeTaxLines: TaxLine[] = [
@@ -333,9 +337,27 @@ export default function IrishPurchaseTaxTime2026() {
     ];
 
     const segments: Segment[] = [
-      { label: "Item before direct purchase tax", value: preTaxItemPrice, color: "bg-emerald-500" },
-      { label: "Purchase tax", value: purchaseTaxTotal, color: "bg-amber-500" },
-      { label: "Income tax to earn it", value: incomeTaxToEarn, color: "bg-rose-500" },
+      {
+        label: "Item before direct purchase tax",
+        shortLabel: "Item",
+        value: preTaxItemPrice,
+        hours: itemHours,
+        color: "bg-emerald-500",
+      },
+      {
+        label: "Purchase tax",
+        shortLabel: "Purchase tax",
+        value: purchaseTaxTotal,
+        hours: purchaseTaxHours,
+        color: "bg-amber-500",
+      },
+      {
+        label: "Income tax to earn it",
+        shortLabel: "Income tax",
+        value: incomeTaxToEarn,
+        hours: incomeTaxHours,
+        color: "bg-rose-500",
+      },
     ];
 
     return {
@@ -353,6 +375,8 @@ export default function IrishPurchaseTaxTime2026() {
       incomeTaxHours,
       purchaseTaxHours,
       itemHours,
+      totalTaxHours,
+      totalTaxPercent,
       incomeTaxLines,
       segments,
     };
@@ -501,19 +525,19 @@ export default function IrishPurchaseTaxTime2026() {
             <div className="rounded-2xl border border-stone-200 bg-stone-50 p-5">
               <ReceiptText className="h-5 w-5 text-amber-700" />
               <p className="mt-3 text-3xl font-black text-stone-900">
-                {formatCurrency(result.purchaseTaxTotal, selectedCurrencyDigits)}
+                {formatWorkTime(result.totalTaxHours)}
               </p>
               <p className="mt-1 text-sm font-semibold uppercase tracking-[0.14em] text-stone-500">
-                Direct purchase tax
+                Work time for tax
               </p>
             </div>
             <div className="rounded-2xl border border-stone-200 bg-stone-50 p-5">
               <WalletCards className="h-5 w-5 text-rose-700" />
               <p className="mt-3 text-3xl font-black text-stone-900">
-                {formatCurrency(result.totalTax, selectedCurrencyDigits)}
+                {formatPercent(result.totalTaxPercent)}
               </p>
               <p className="mt-1 text-sm font-semibold uppercase tracking-[0.14em] text-stone-500">
-                Total tax in the chain
+                Gross earnings paid in tax
               </p>
             </div>
           </div>
@@ -524,16 +548,13 @@ export default function IrishPurchaseTaxTime2026() {
                 <h3 className="text-xl font-black tracking-tight text-stone-900">
                   Where the gross earnings go
                 </h3>
-                <p className="mt-1 text-sm leading-relaxed text-stone-600">
-                  This splits the gross salary required to afford the selected purchase.
-                </p>
               </div>
               <p className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">
                 {formatCurrency(result.grossRequired, grossRequiredCurrencyDigits)} gross earnings
               </p>
             </div>
 
-            <div className="mt-5 h-7 overflow-hidden rounded-full bg-white ring-1 ring-stone-200">
+            <div className="mt-5 h-8 overflow-hidden rounded-full bg-white ring-1 ring-stone-200">
               {result.segments.map((segment) => (
                 <div
                   key={segment.label}
@@ -544,18 +565,26 @@ export default function IrishPurchaseTaxTime2026() {
               ))}
             </div>
 
+            <div className="mt-3 flex items-center justify-end gap-2 text-right">
+              <span className="h-2 w-2 rounded-full bg-amber-500" />
+              <span className="h-2 w-2 rounded-full bg-rose-500" />
+              <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
+                {formatPercent(result.totalTaxPercent)} tax share
+              </p>
+            </div>
+
             <div className="mt-5 grid gap-3 md:grid-cols-3">
               {result.segments.map((segment) => (
                 <div key={segment.label} className="rounded-2xl border border-stone-200 bg-white p-4">
                   <div className="flex items-center gap-2">
                     <span className={`h-3 w-3 rounded-full ${segment.color}`} />
-                    <p className="text-sm font-bold text-stone-800">{segment.label}</p>
+                    <p className="text-sm font-bold text-stone-800">{segment.shortLabel}</p>
                   </div>
                   <p className="mt-2 text-2xl font-black text-stone-900">
-                    {formatCurrency(segment.value, selectedCurrencyDigits)}
+                    {formatWorkTime(segment.hours)}
                   </p>
-                  <p className="mt-1 text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
-                    {formatPercent((segment.value / result.grossRequired) * 100)} of gross earnings
+                  <p className="mt-1 text-sm font-semibold text-stone-600">
+                    {formatCurrency(segment.value, selectedCurrencyDigits)}
                   </p>
                 </div>
               ))}
