@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, ChevronDown, Clock, Info, ReceiptText, Share2, WalletCards } from "lucide-react";
+import { ArrowLeft, ChevronDown, Info, ReceiptText, Share2, WalletCards } from "lucide-react";
 import { useMemo, useState } from "react";
 
 type TaxRules = {
@@ -576,9 +576,33 @@ export default function IrishPurchaseTaxTime2026() {
       },
     );
 
-    drawStatCard(context, 120, 326, 304, "Gross work needed", formatWorkTime(result.totalWorkHours), "#10b981");
-    drawStatCard(context, 448, 326, 304, "Work time for tax", formatWorkTime(result.totalTaxHours), "#f59e0b");
-    drawStatCard(context, 776, 326, 304, "Gross earnings paid in tax", formatPercent(result.totalTaxPercent), "#f43f5e");
+    drawStatCard(
+      context,
+      120,
+      326,
+      304,
+      "Transaction price",
+      formatCurrency(selectedItem.price, selectedCurrencyDigits),
+      "#f59e0b",
+    );
+    drawStatCard(
+      context,
+      448,
+      326,
+      304,
+      "Total tax",
+      formatCurrency(result.totalTax, selectedCurrencyDigits),
+      "#f43f5e",
+    );
+    drawStatCard(
+      context,
+      776,
+      326,
+      304,
+      "Total earnings",
+      formatCurrency(result.grossRequired, grossRequiredCurrencyDigits),
+      "#10b981",
+    );
 
     drawText(context, "Where the gross earnings go", 120, 550, {
       font: "800 32px Arial",
@@ -806,80 +830,82 @@ export default function IrishPurchaseTaxTime2026() {
         </nav>
 
         <article className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)] sm:p-8">
-          <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_18rem]">
-            <div>
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                <p className="font-mono text-xs font-semibold uppercase tracking-[0.3em] text-emerald-700">
-                  {selectedItem.category}
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <p className="font-mono text-xs font-semibold uppercase tracking-[0.3em] text-emerald-700">
+              {selectedItem.category}
+            </p>
+            <div className="flex flex-col items-start gap-2 sm:items-end">
+              <button
+                type="button"
+                onClick={handleShare}
+                disabled={shareStatus === "sharing"}
+                className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-stone-50 px-4 py-2 text-sm font-bold leading-none text-stone-800 transition hover:border-stone-300 hover:bg-white disabled:cursor-wait disabled:opacity-60"
+              >
+                <Share2 className="h-4 w-4" />
+                <span className="leading-none">
+                  {shareStatus === "sharing" ? "Preparing..." : "Share result"}
+                </span>
+              </button>
+              {shareStatus !== "idle" && shareStatus !== "sharing" ? (
+                <p className="max-w-64 text-left text-xs leading-relaxed text-stone-500 sm:text-right">
+                  {shareStatus === "shared"
+                    ? "Shared with a summary image."
+                    : shareStatus === "fallback"
+                      ? "Link copied or shared, and the summary image was downloaded."
+                      : "Could not share this result. Try again."}
                 </p>
-                <div className="flex flex-col items-start gap-2 sm:items-end">
-                  <button
-                    type="button"
-                    onClick={handleShare}
-                    disabled={shareStatus === "sharing"}
-                    className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-stone-50 px-4 py-2 text-sm font-bold leading-none text-stone-800 transition hover:border-stone-300 hover:bg-white disabled:cursor-wait disabled:opacity-60"
-                  >
-                    <Share2 className="h-4 w-4" />
-                    <span className="leading-none">
-                      {shareStatus === "sharing" ? "Preparing..." : "Share result"}
-                    </span>
-                  </button>
-                  {shareStatus !== "idle" && shareStatus !== "sharing" ? (
-                    <p className="max-w-64 text-left text-xs leading-relaxed text-stone-500 sm:text-right">
-                      {shareStatus === "shared"
-                        ? "Shared with a summary image."
-                        : shareStatus === "fallback"
-                          ? "Link copied or shared, and the summary image was downloaded."
-                          : "Could not share this result. Try again."}
-                    </p>
-                  ) : null}
-                </div>
-              </div>
-              <h2 className="mt-3 text-4xl font-black leading-tight tracking-tight text-stone-900 sm:text-5xl">
-                {selectedItem.name}
-              </h2>
-              <p className="mt-3 max-w-2xl text-lg leading-relaxed text-stone-600">
-                {selectedItem.description}
-              </p>
-            </div>
-
-            <div className="rounded-[1.5rem] border border-stone-200 bg-stone-50 p-5">
-              <p className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">
-                Shelf or transaction price
-              </p>
-              <p className="mt-2 text-4xl font-black text-stone-900">
-                {formatCurrency(selectedItem.price, selectedCurrencyDigits)}
-              </p>
-              <p className="mt-2 text-sm leading-relaxed text-stone-600">{selectedItem.assumption}</p>
+              ) : null}
             </div>
           </div>
+          <h2 className="mt-3 text-4xl font-black leading-tight tracking-tight text-stone-900 sm:text-5xl">
+            {selectedItem.name}
+          </h2>
+          <p className="mt-3 max-w-2xl text-lg leading-relaxed text-stone-600">
+            {selectedItem.description}
+          </p>
+          <p className="mt-2 max-w-2xl text-xs leading-relaxed text-stone-500">
+            <span className="text-stone-400" aria-hidden="true">* </span>
+            {selectedItem.assumption}
+          </p>
 
           <div className="mt-8 grid gap-4 md:grid-cols-3">
             <div className="rounded-2xl border border-stone-200 bg-stone-50 p-5">
-              <Clock className="h-5 w-5 text-emerald-700" />
+              <div className="flex items-start gap-2">
+                <span className="flex h-5 shrink-0 items-center">
+                  <ReceiptText className="h-5 w-5 text-amber-700" />
+                </span>
+                <p className="min-w-0 text-sm font-semibold uppercase leading-snug tracking-[0.14em] text-stone-500">
+                  Transaction price
+                </p>
+              </div>
               <p className="mt-3 text-3xl font-black text-stone-900">
-                {formatWorkTime(result.totalWorkHours)}
-              </p>
-              <p className="mt-1 text-sm font-semibold uppercase tracking-[0.14em] text-stone-500">
-                Gross work needed
+                {formatCurrency(selectedItem.price, selectedCurrencyDigits)}
               </p>
             </div>
             <div className="rounded-2xl border border-stone-200 bg-stone-50 p-5">
-              <ReceiptText className="h-5 w-5 text-amber-700" />
+              <div className="flex items-start gap-2">
+                <span className="flex h-5 shrink-0 items-center">
+                  <WalletCards className="h-5 w-5 text-rose-700" />
+                </span>
+                <p className="min-w-0 text-sm font-semibold uppercase leading-snug tracking-[0.14em] text-stone-500">
+                  Total tax
+                </p>
+              </div>
               <p className="mt-3 text-3xl font-black text-stone-900">
-                {formatWorkTime(result.totalTaxHours)}
-              </p>
-              <p className="mt-1 text-sm font-semibold uppercase tracking-[0.14em] text-stone-500">
-                Work time for tax
+                {formatCurrency(result.totalTax, selectedCurrencyDigits)}
               </p>
             </div>
             <div className="rounded-2xl border border-stone-200 bg-stone-50 p-5">
-              <WalletCards className="h-5 w-5 text-rose-700" />
+              <div className="flex items-start gap-2">
+                <span className="flex h-5 shrink-0 items-center">
+                  <WalletCards className="h-5 w-5 text-emerald-700" />
+                </span>
+                <p className="min-w-0 text-sm font-semibold uppercase leading-snug tracking-[0.14em] text-stone-500">
+                  Total earnings
+                </p>
+              </div>
               <p className="mt-3 text-3xl font-black text-stone-900">
-                {formatPercent(result.totalTaxPercent)}
-              </p>
-              <p className="mt-1 text-sm font-semibold uppercase tracking-[0.14em] text-stone-500">
-                Gross earnings paid in tax
+                {formatCurrency(result.grossRequired, grossRequiredCurrencyDigits)}
               </p>
             </div>
           </div>
