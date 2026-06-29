@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, ChevronDown, Info, ReceiptText, Share2, WalletCards } from "lucide-react";
+import { ArrowLeft, ChevronDown, Info, Share2 } from "lucide-react";
 import { useMemo, useState } from "react";
 
 type TaxRules = {
@@ -319,37 +319,29 @@ function drawFittedText(
   context.fillText(text, x, y);
 }
 
-function drawStatCard(
+function drawSpanBrace(
   context: CanvasRenderingContext2D,
   x: number,
   y: number,
   width: number,
-  label: string,
-  value: string,
-  accent: string,
+  height: number,
+  side: "top" | "bottom",
+  color = "#78716c",
 ) {
-  drawRoundedRect(context, x, y, width, 138, 26);
-  context.fillStyle = "#fafaf9";
-  context.fill();
-  context.strokeStyle = "#e7e5e4";
-  context.lineWidth = 2;
-  context.stroke();
+  const horizontalY = side === "top" ? y : y + height;
+  const tickEndY = side === "top" ? y + height : y;
 
-  drawRoundedRect(context, x + 26, y + 24, 22, 22, 11);
-  context.fillStyle = accent;
-  context.fill();
-  drawFittedText(context, value, x + 26, y + 82, width - 52, {
-    fontSize: 40,
-    minFontSize: 26,
-    fontWeight: 700,
-    color: "#1c1917",
-  });
-  drawFittedText(context, label.toUpperCase(), x + 26, y + 114, width - 52, {
-    fontSize: 17,
-    minFontSize: 13,
-    fontWeight: 700,
-    color: "#78716c",
-  });
+  context.beginPath();
+  context.moveTo(x, horizontalY);
+  context.lineTo(x + width, horizontalY);
+  context.moveTo(x, horizontalY);
+  context.lineTo(x, tickEndY);
+  context.moveTo(x + width, horizontalY);
+  context.lineTo(x + width, tickEndY);
+  context.strokeStyle = color;
+  context.lineWidth = 3;
+  context.lineCap = "round";
+  context.stroke();
 }
 
 function downloadBlob(blob: Blob, filename: string) {
@@ -526,6 +518,11 @@ export default function IrishPurchaseTaxTime2026() {
 
   const selectedCurrencyDigits = getCurrencyFractionDigits(selectedItem.price);
   const grossRequiredCurrencyDigits = getCurrencyFractionDigits(result.grossRequired);
+  const itemShare = (result.preTaxItemPrice / result.grossRequired) * 100;
+  const transactionPriceShare = (selectedItem.price / result.grossRequired) * 100;
+  const totalTaxShare = (result.totalTax / result.grossRequired) * 100;
+  const showTransactionBraceLabel = transactionPriceShare >= 24;
+  const showTotalTaxBraceLabel = totalTaxShare >= 24;
 
   const getShareUrl = () => {
     const url = new URL(window.location.href);
@@ -576,48 +573,86 @@ export default function IrishPurchaseTaxTime2026() {
       },
     );
 
-    drawStatCard(
-      context,
-      120,
-      326,
-      304,
-      "Transaction price",
-      formatCurrency(selectedItem.price, selectedCurrencyDigits),
-      "#f59e0b",
-    );
-    drawStatCard(
-      context,
-      448,
-      326,
-      304,
-      "Total tax",
-      formatCurrency(result.totalTax, selectedCurrencyDigits),
-      "#f43f5e",
-    );
-    drawStatCard(
-      context,
-      776,
-      326,
-      304,
-      "Total earnings",
-      formatCurrency(result.grossRequired, grossRequiredCurrencyDigits),
-      "#10b981",
-    );
+    drawRoundedRect(context, 120, 320, 960, 124, 28);
+    context.fillStyle = "#fafaf9";
+    context.fill();
+    context.strokeStyle = "#e7e5e4";
+    context.lineWidth = 2;
+    context.stroke();
 
-    drawText(context, "Where the gross earnings go", 120, 550, {
+    drawText(context, "TRANSACTION PRICE", 158, 362, {
+      font: "800 18px Arial",
+      color: "#92400e",
+    });
+    drawText(context, formatCurrency(selectedItem.price, selectedCurrencyDigits), 158, 406, {
+      font: "900 38px Arial",
+      color: "#1c1917",
+    });
+    drawText(context, "+", 393, 394, {
+      font: "900 34px Arial",
+      color: "#a8a29e",
+      align: "center",
+    });
+    drawText(context, "INCOME TAX TO EARN IT", 430, 362, {
+      font: "800 18px Arial",
+      color: "#be123c",
+    });
+    drawText(context, formatCurrency(result.incomeTaxToEarn, selectedCurrencyDigits), 430, 406, {
+      font: "900 38px Arial",
+      color: "#1c1917",
+    });
+    drawText(context, "=", 687, 394, {
+      font: "900 34px Arial",
+      color: "#a8a29e",
+      align: "center",
+    });
+    drawText(context, "TOTAL EARNINGS", 726, 362, {
+      font: "800 18px Arial",
+      color: "#047857",
+    });
+    drawText(context, formatCurrency(result.grossRequired, grossRequiredCurrencyDigits), 726, 406, {
+      font: "900 38px Arial",
+      color: "#1c1917",
+    });
+    drawText(context, `of which total tax: ${formatCurrency(result.totalTax, selectedCurrencyDigits)}`, 1048, 427, {
+      font: "700 20px Arial",
+      color: "#78716c",
+      align: "right",
+    });
+
+    drawText(context, "Where the gross earnings go", 120, 528, {
       font: "800 32px Arial",
       color: "#1c1917",
     });
-    drawText(context, `${formatCurrency(result.grossRequired, grossRequiredCurrencyDigits)} gross earnings`, 1080, 550, {
+    drawText(context, `${formatCurrency(result.grossRequired, grossRequiredCurrencyDigits)} gross earnings`, 1080, 528, {
       font: "700 20px Arial",
       color: "#78716c",
       align: "right",
     });
 
     const barX = 120;
-    const barY = 590;
+    const barY = 606;
     const barWidth = 960;
     const barHeight = 44;
+    const canvasItemShare = result.preTaxItemPrice / result.grossRequired;
+    const canvasTransactionPriceShare = selectedItem.price / result.grossRequired;
+    const canvasTotalTaxShare = result.totalTax / result.grossRequired;
+
+    drawFittedText(
+      context,
+      `Transaction price ${formatCurrency(selectedItem.price, selectedCurrencyDigits)}`,
+      barX + (canvasTransactionPriceShare * barWidth) / 2,
+      578,
+      Math.max(130, canvasTransactionPriceShare * barWidth - 24),
+      {
+        fontSize: 22,
+        minFontSize: 14,
+        fontWeight: 800,
+        color: "#92400e",
+        align: "center",
+      },
+    );
+    drawSpanBrace(context, barX, 586, canvasTransactionPriceShare * barWidth, 14, "top", "#92400e");
 
     context.save();
     drawRoundedRect(context, barX, barY, barWidth, barHeight, 22);
@@ -637,29 +672,53 @@ export default function IrishPurchaseTaxTime2026() {
     context.lineWidth = 2;
     context.stroke();
 
+    drawSpanBrace(
+      context,
+      barX + canvasItemShare * barWidth,
+      658,
+      canvasTotalTaxShare * barWidth,
+      14,
+      "bottom",
+      "#be123c",
+    );
+    drawFittedText(
+      context,
+      `Total tax ${formatCurrency(result.totalTax, selectedCurrencyDigits)}`,
+      barX + canvasItemShare * barWidth + (canvasTotalTaxShare * barWidth) / 2,
+      702,
+      Math.max(130, canvasTotalTaxShare * barWidth - 24),
+      {
+        fontSize: 22,
+        minFontSize: 14,
+        fontWeight: 800,
+        color: "#be123c",
+        align: "center",
+      },
+    );
+
     result.segments.forEach((segment, index) => {
       const x = 120 + index * 320;
-      drawRoundedRect(context, x, 688, 292, 112, 22);
+      drawRoundedRect(context, x, 728, 292, 92, 22);
       context.fillStyle = "#fafaf9";
       context.fill();
       context.strokeStyle = "#e7e5e4";
       context.stroke();
 
-      drawRoundedRect(context, x + 24, 716, 18, 18, 9);
+      drawRoundedRect(context, x + 24, 750, 18, 18, 9);
       context.fillStyle = segment.fill;
       context.fill();
-      drawText(context, segment.shortLabel, x + 54, 732, {
+      drawText(context, segment.shortLabel, x + 54, 766, {
         font: "700 21px Arial",
         color: "#292524",
       });
-      drawFittedText(context, formatWorkTime(segment.hours), x + 24, 772, 122, {
-        fontSize: 29,
+      drawFittedText(context, formatWorkTime(segment.hours), x + 24, 802, 122, {
+        fontSize: 26,
         minFontSize: 19,
         fontWeight: 800,
         color: "#1c1917",
       });
-      drawFittedText(context, formatCurrency(segment.value, selectedCurrencyDigits), x + 150, 772, 120, {
-        fontSize: 23,
+      drawFittedText(context, formatCurrency(segment.value, selectedCurrencyDigits), x + 150, 802, 120, {
+        fontSize: 21,
         minFontSize: 16,
         fontWeight: 600,
         color: "#57534e",
@@ -868,46 +927,45 @@ export default function IrishPurchaseTaxTime2026() {
             {selectedItem.assumption}
           </p>
 
-          <div className="mt-8 grid gap-4 md:grid-cols-3">
-            <div className="rounded-2xl border border-stone-200 bg-stone-50 p-5">
-              <div className="flex items-start gap-2">
-                <span className="flex h-5 shrink-0 items-center">
-                  <ReceiptText className="h-5 w-5 text-amber-700" />
-                </span>
-                <p className="min-w-0 text-sm font-semibold uppercase leading-snug tracking-[0.14em] text-stone-500">
+          <div className="mt-8 rounded-[1.5rem] border border-stone-200 bg-stone-50 p-5">
+            <div className="grid items-center gap-4 text-center md:grid-cols-[1fr_auto_1fr_auto_1fr]">
+              <div className="rounded-2xl bg-white p-4 ring-1 ring-stone-200">
+                <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">
                   Transaction price
                 </p>
-              </div>
-              <p className="mt-3 text-3xl font-black text-stone-900">
-                {formatCurrency(selectedItem.price, selectedCurrencyDigits)}
-              </p>
-            </div>
-            <div className="rounded-2xl border border-stone-200 bg-stone-50 p-5">
-              <div className="flex items-start gap-2">
-                <span className="flex h-5 shrink-0 items-center">
-                  <WalletCards className="h-5 w-5 text-rose-700" />
-                </span>
-                <p className="min-w-0 text-sm font-semibold uppercase leading-snug tracking-[0.14em] text-stone-500">
-                  Total tax
+                <p className="mt-2 text-3xl font-black text-stone-900">
+                  {formatCurrency(selectedItem.price, selectedCurrencyDigits)}
                 </p>
               </div>
-              <p className="mt-3 text-3xl font-black text-stone-900">
-                {formatCurrency(result.totalTax, selectedCurrencyDigits)}
-              </p>
-            </div>
-            <div className="rounded-2xl border border-stone-200 bg-stone-50 p-5">
-              <div className="flex items-start gap-2">
-                <span className="flex h-5 shrink-0 items-center">
-                  <WalletCards className="h-5 w-5 text-emerald-700" />
-                </span>
-                <p className="min-w-0 text-sm font-semibold uppercase leading-snug tracking-[0.14em] text-stone-500">
+              <span className="text-2xl font-black text-stone-400" aria-hidden="true">
+                +
+              </span>
+              <div className="rounded-2xl bg-white p-4 ring-1 ring-stone-200">
+                <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-rose-700">
+                  Income tax to earn it
+                </p>
+                <p className="mt-2 text-3xl font-black text-stone-900">
+                  {formatCurrency(result.incomeTaxToEarn, selectedCurrencyDigits)}
+                </p>
+              </div>
+              <span className="text-2xl font-black text-stone-400" aria-hidden="true">
+                =
+              </span>
+              <div className="rounded-2xl bg-white p-4 ring-1 ring-stone-200">
+                <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
                   Total earnings
                 </p>
+                <p className="mt-2 text-3xl font-black text-stone-900">
+                  {formatCurrency(result.grossRequired, grossRequiredCurrencyDigits)}
+                </p>
               </div>
-              <p className="mt-3 text-3xl font-black text-stone-900">
-                {formatCurrency(result.grossRequired, grossRequiredCurrencyDigits)}
-              </p>
             </div>
+            <p className="mt-4 text-center text-sm font-semibold text-stone-600">
+              Of which total tax is{" "}
+              <span className="font-black text-stone-900">
+                {formatCurrency(result.totalTax, selectedCurrencyDigits)}.
+              </span>
+            </p>
           </div>
 
           <section className="mt-8 rounded-[1.5rem] border border-stone-200 bg-stone-50 p-5">
@@ -922,15 +980,55 @@ export default function IrishPurchaseTaxTime2026() {
               </p>
             </div>
 
-            <div className="mt-5 h-8 overflow-hidden rounded-full bg-white ring-1 ring-stone-200">
-              {result.segments.map((segment) => (
+            <div className="mt-6">
+              <div className="relative h-32 sm:h-36">
                 <div
-                  key={segment.label}
-                  className={`inline-block h-full ${segment.color}`}
-                  style={{ width: clampPercent((segment.value / result.grossRequired) * 100) }}
-                  title={`${segment.label}: ${formatCurrency(segment.value, selectedCurrencyDigits)}`}
+                  className="absolute top-0 text-center"
+                  style={{ left: "0%", width: clampPercent(transactionPriceShare) }}
+                >
+                  <p
+                    className={`font-mono text-[0.65rem] font-black uppercase tracking-[0.16em] text-amber-700 sm:text-xs ${
+                      showTransactionBraceLabel ? "" : "sr-only"
+                    }`}
+                  >
+                    Transaction price {formatCurrency(selectedItem.price, selectedCurrencyDigits)}
+                  </p>
+                </div>
+                <div
+                  aria-label={`Transaction price: ${formatCurrency(selectedItem.price, selectedCurrencyDigits)}`}
+                  className="absolute top-7 h-4 rounded-t-xl border-x-2 border-t-2 border-amber-600"
+                  style={{ left: "0%", width: clampPercent(transactionPriceShare) }}
                 />
-              ))}
+
+                <div className="absolute top-12 flex h-8 w-full overflow-hidden rounded-full bg-white ring-1 ring-stone-200">
+                  {result.segments.map((segment) => (
+                    <div
+                      key={segment.label}
+                      className={`h-full ${segment.color}`}
+                      style={{ width: clampPercent((segment.value / result.grossRequired) * 100) }}
+                      title={`${segment.label}: ${formatCurrency(segment.value, selectedCurrencyDigits)}`}
+                    />
+                  ))}
+                </div>
+
+                <div
+                  aria-label={`Total tax: ${formatCurrency(result.totalTax, selectedCurrencyDigits)}`}
+                  className="absolute top-[5.25rem] h-4 rounded-b-xl border-x-2 border-b-2 border-rose-600"
+                  style={{ left: clampPercent(itemShare), width: clampPercent(totalTaxShare) }}
+                />
+                <div
+                  className="absolute top-[6.75rem] text-center"
+                  style={{ left: clampPercent(itemShare), width: clampPercent(totalTaxShare) }}
+                >
+                  <p
+                    className={`font-mono text-[0.65rem] font-black uppercase tracking-[0.16em] text-rose-700 sm:text-xs ${
+                      showTotalTaxBraceLabel ? "" : "sr-only"
+                    }`}
+                  >
+                    Total tax {formatCurrency(result.totalTax, selectedCurrencyDigits)}
+                  </p>
+                </div>
+              </div>
             </div>
 
             <div className="mt-3 flex items-center justify-end gap-2 text-right">
