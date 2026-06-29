@@ -927,31 +927,14 @@ export default function IrishPurchaseTaxTime2026() {
             {selectedItem.assumption}
           </p>
 
-          <div className="mt-8 rounded-[1.5rem] border border-stone-200 bg-stone-50 p-5">
-            <div className="grid items-center gap-4 text-center md:grid-cols-[1fr_auto_1fr_auto_1fr]">
-              <div className="rounded-2xl bg-white p-4 ring-1 ring-stone-200">
-                <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">
-                  Transaction price
-                </p>
-                <p className="mt-2 text-3xl font-black text-stone-900">
-                  {formatCurrency(selectedItem.price, selectedCurrencyDigits)}
-                </p>
+          <section className="mt-8 rounded-[1.5rem] border border-stone-200 bg-stone-50 p-5">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 className="text-xl font-black tracking-tight text-stone-900">
+                  Where your earnings go
+                </h3>
               </div>
-              <span className="text-2xl font-black text-stone-400" aria-hidden="true">
-                +
-              </span>
-              <div className="rounded-2xl bg-white p-4 ring-1 ring-stone-200">
-                <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-rose-700">
-                  Income tax to earn it
-                </p>
-                <p className="mt-2 text-3xl font-black text-stone-900">
-                  {formatCurrency(result.incomeTaxToEarn, selectedCurrencyDigits)}
-                </p>
-              </div>
-              <span className="text-2xl font-black text-stone-400" aria-hidden="true">
-                =
-              </span>
-              <div className="rounded-2xl bg-white p-4 ring-1 ring-stone-200">
+              <div className="shrink-0 rounded-2xl bg-white p-4 ring-1 ring-stone-200">
                 <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
                   Total earnings
                 </p>
@@ -959,25 +942,6 @@ export default function IrishPurchaseTaxTime2026() {
                   {formatCurrency(result.grossRequired, grossRequiredCurrencyDigits)}
                 </p>
               </div>
-            </div>
-            <p className="mt-4 text-center text-sm font-semibold text-stone-600">
-              Of which total tax is{" "}
-              <span className="font-black text-stone-900">
-                {formatCurrency(result.totalTax, selectedCurrencyDigits)}.
-              </span>
-            </p>
-          </div>
-
-          <section className="mt-8 rounded-[1.5rem] border border-stone-200 bg-stone-50 p-5">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <h3 className="text-xl font-black tracking-tight text-stone-900">
-                  Where the gross earnings go
-                </h3>
-              </div>
-              <p className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">
-                {formatCurrency(result.grossRequired, grossRequiredCurrencyDigits)} gross earnings
-              </p>
             </div>
 
             <div className="mt-6">
@@ -1031,14 +995,6 @@ export default function IrishPurchaseTaxTime2026() {
               </div>
             </div>
 
-            <div className="mt-3 flex items-center justify-end gap-2 text-right">
-              <span className="h-2 w-2 rounded-full bg-amber-500" />
-              <span className="h-2 w-2 rounded-full bg-rose-500" />
-              <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
-                {formatPercent(result.totalTaxPercent)} tax share
-              </p>
-            </div>
-
             <div className="mt-5 grid gap-3 md:grid-cols-3">
               {result.segments.map((segment) => (
                 <div key={segment.label} className="rounded-2xl border border-stone-200 bg-white p-4">
@@ -1047,10 +1003,10 @@ export default function IrishPurchaseTaxTime2026() {
                     <p className="text-sm font-bold text-stone-800">{segment.shortLabel}</p>
                   </div>
                   <p className="mt-2 text-2xl font-black text-stone-900">
-                    {formatWorkTime(segment.hours)}
+                    {formatCurrency(segment.value, selectedCurrencyDigits)}
                   </p>
                   <p className="mt-1 text-sm font-semibold text-stone-600">
-                    {formatCurrency(segment.value, selectedCurrencyDigits)}
+                    {formatWorkTime(segment.hours)}
                   </p>
                 </div>
               ))}
