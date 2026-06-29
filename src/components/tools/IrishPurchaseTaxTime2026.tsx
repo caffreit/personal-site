@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { motion, useReducedMotion } from "framer-motion";
 import { ArrowLeft, ChevronDown, Info, Share2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type TaxRules = {
   srcop: number;
@@ -223,30 +224,23 @@ function getPurchaseTaxLines(item: PurchaseItem): TaxLine[] {
   return lines;
 }
 
-function clampPercent(value: number) {
-  return `${Math.max(0, Math.min(100, value)).toFixed(1)}%`;
-}
-
 function clampIncome(value: number) {
   return Math.max(MIN_INCOME, Math.min(MAX_INCOME, Math.round(value / INCOME_STEP) * INCOME_STEP));
 }
 
-function getInitialGrossIncome() {
-  if (typeof window === "undefined") {
-    return DEFAULT_INCOME;
+function readIncomeParam(): number | null {
+  const raw = new URLSearchParams(window.location.search).get("income");
+  if (raw === null) {
+    return null;
   }
 
-  const income = Number(new URLSearchParams(window.location.search).get("income"));
-  return Number.isFinite(income) ? clampIncome(income) : DEFAULT_INCOME;
+  const income = Number(raw);
+  return Number.isFinite(income) && income > 0 ? clampIncome(income) : null;
 }
 
-function getInitialSelectedId(): ItemKind {
-  if (typeof window === "undefined") {
-    return "roll";
-  }
-
+function readItemParam(): ItemKind | null {
   const item = new URLSearchParams(window.location.search).get("item");
-  return ITEMS.some((candidate) => candidate.id === item) ? (item as ItemKind) : "roll";
+  return ITEMS.some((candidate) => candidate.id === item) ? (item as ItemKind) : null;
 }
 
 function drawRoundedRect(
@@ -319,28 +313,42 @@ function drawFittedText(
   context.fillText(text, x, y);
 }
 
-function drawSpanBrace(
+function buildCurlyBrace(x0: number, x1: number, spineY: number, depth: number) {
+  const xc = (x0 + x1) / 2;
+  const shoulder = depth * 0.6;
+
+  return (
+    `M ${x0} ${spineY} ` +
+    `Q ${x0} ${spineY + shoulder} ${(x0 + xc) / 2} ${spineY + shoulder} ` +
+    `T ${xc} ${spineY + depth} ` +
+    `M ${x1} ${spineY} ` +
+    `Q ${x1} ${spineY + shoulder} ${(x1 + xc) / 2} ${spineY + shoulder} ` +
+    `T ${xc} ${spineY + depth}`
+  );
+}
+
+function drawCurlyBrace(
   context: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-  side: "top" | "bottom",
-  color = "#78716c",
+  x0: number,
+  x1: number,
+  spineY: number,
+  depth: number,
+  color: string,
 ) {
-  const horizontalY = side === "top" ? y : y + height;
-  const tickEndY = side === "top" ? y + height : y;
+  const xc = (x0 + x1) / 2;
+  const shoulder = depth * 0.6;
 
   context.beginPath();
-  context.moveTo(x, horizontalY);
-  context.lineTo(x + width, horizontalY);
-  context.moveTo(x, horizontalY);
-  context.lineTo(x, tickEndY);
-  context.moveTo(x + width, horizontalY);
-  context.lineTo(x + width, tickEndY);
+  context.moveTo(x0, spineY);
+  context.quadraticCurveTo(x0, spineY + shoulder, (x0 + xc) / 2, spineY + shoulder);
+  context.quadraticCurveTo(xc, spineY + shoulder, xc, spineY + depth);
+  context.moveTo(x1, spineY);
+  context.quadraticCurveTo(x1, spineY + shoulder, (x1 + xc) / 2, spineY + shoulder);
+  context.quadraticCurveTo(xc, spineY + shoulder, xc, spineY + depth);
   context.strokeStyle = color;
   context.lineWidth = 3;
   context.lineCap = "round";
+  context.lineJoin = "round";
   context.stroke();
 }
 
@@ -423,10 +431,184 @@ function ItemIllustration({ kind }: { kind: ItemKind }) {
   );
 }
 
+type EarningsBarProps = {
+  segments: Segment[];
+  grossRequired: number;
+  itemPrice: number;
+  totalTax: number;
+  currencyDigits: number;
+  itemPriceShare: number;
+  taxStartShare: number;
+  showItemLabel: boolean;
+  showTaxLabel: boolean;
+};
+
+const BAR_VIEW_HEIGHT = 154;
+
+function EarningsBar({
+  segments,
+  grossRequired,
+  itemPrice,
+  totalTax,
+  currencyDigits,
+  itemPriceShare,
+  taxStartShare,
+  showItemLabel,
+  showTaxLabel,
+}: EarningsBarProps) {
+  const reduceMotion = useReducedMotion();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(0);
+
+  useEffect(() => {
+    const element = containerRef.current;
+    if (!element) {
+      return;
+    }
+
+    setWidth(element.clientWidth);
+
+    const observer = new ResizeObserver((entries) => {
+      const measured = entries[0]?.contentRect.width;
+      if (typeof measured === "number") {
+        setWidth(measured);
+      }
+    });
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  const barY = 56;
+  const barHeight = 40;
+  const gap = 3;
+  const radius = 9;
+  const topSpineY = 42;
+  const bottomSpineY = 108;
+  const braceDepth = 10;
+  const topLabelY = 24;
+  const bottomLabelY = 132;
+
+  const toPx = (share: number) => (Math.max(0, Math.min(100, share)) / 100) * width;
+
+  const segmentRects = segments.map((segment, index) => {
+    const segmentWidth = (segment.value / grossRequired) * width;
+    const offset = segments
+      .slice(0, index)
+      .reduce((sum, previous) => sum + (previous.value / grossRequired) * width, 0);
+    return { segment, x: offset, width: segmentWidth };
+  });
+
+  const itemBraceX1 = toPx(itemPriceShare);
+  const taxBraceX0 = toPx(taxStartShare);
+  const taxBraceX1 = width;
+  const itemLabelCenter = itemBraceX1 / 2;
+  const taxLabelCenter = (taxBraceX0 + taxBraceX1) / 2;
+
+  const transition = reduceMotion
+    ? { duration: 0 }
+    : { type: "spring" as const, stiffness: 140, damping: 22, mass: 0.9 };
+
+  return (
+    <div ref={containerRef} className="w-full">
+      <svg
+        width="100%"
+        height={BAR_VIEW_HEIGHT}
+        viewBox={`0 0 ${Math.max(1, width)} ${BAR_VIEW_HEIGHT}`}
+        className="overflow-visible"
+        role="img"
+        aria-label={`Earnings breakdown: item price ${formatCurrency(itemPrice, currencyDigits)} and total tax ${formatCurrency(totalTax, currencyDigits)} out of ${formatCurrency(grossRequired, getCurrencyFractionDigits(grossRequired))} gross earnings.`}
+      >
+        {width > 0 ? (
+          <>
+            <motion.path
+              initial={false}
+              animate={{ d: buildCurlyBrace(0, itemBraceX1, topSpineY, -braceDepth) }}
+              transition={transition}
+              fill="none"
+              stroke="#b45309"
+              strokeWidth={2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <motion.g
+              initial={false}
+              animate={{ x: itemLabelCenter, opacity: showItemLabel ? 1 : 0 }}
+              transition={transition}
+            >
+              <text textAnchor="middle" y={topLabelY} fontSize={14} fill="#b45309" letterSpacing={0.2}>
+                <tspan fontWeight={600}>Item price</tspan>
+                <tspan fontWeight={800} dx={7}>
+                  {formatCurrency(itemPrice, currencyDigits)}
+                </tspan>
+              </text>
+            </motion.g>
+
+            {segmentRects.map(({ segment, x, width: segmentWidth }) => (
+              <motion.rect
+                key={segment.label}
+                x={0}
+                y={barY}
+                height={barHeight}
+                rx={radius}
+                fill={segment.fill}
+                initial={false}
+                animate={{ x: x + gap / 2, width: Math.max(0, segmentWidth - gap) }}
+                transition={transition}
+              >
+                <title>{`${segment.label}: ${formatCurrency(segment.value, currencyDigits)}`}</title>
+              </motion.rect>
+            ))}
+
+            <motion.path
+              initial={false}
+              animate={{ d: buildCurlyBrace(taxBraceX0, taxBraceX1, bottomSpineY, braceDepth) }}
+              transition={transition}
+              fill="none"
+              stroke="#be123c"
+              strokeWidth={2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <motion.g
+              initial={false}
+              animate={{ x: taxLabelCenter, opacity: showTaxLabel ? 1 : 0 }}
+              transition={transition}
+            >
+              <text textAnchor="middle" y={bottomLabelY} fontSize={14} fill="#be123c" letterSpacing={0.2}>
+                <tspan fontWeight={600}>Total tax</tspan>
+                <tspan fontWeight={800} dx={7}>
+                  {formatCurrency(totalTax, currencyDigits)}
+                </tspan>
+              </text>
+            </motion.g>
+          </>
+        ) : null}
+      </svg>
+    </div>
+  );
+}
+
 export default function IrishPurchaseTaxTime2026() {
-  const [grossIncome, setGrossIncome] = useState(getInitialGrossIncome);
-  const [selectedId, setSelectedId] = useState<ItemKind>(getInitialSelectedId);
+  const [grossIncome, setGrossIncome] = useState(DEFAULT_INCOME);
+  const [selectedId, setSelectedId] = useState<ItemKind>("roll");
   const [shareStatus, setShareStatus] = useState<"idle" | "sharing" | "shared" | "fallback" | "error">("idle");
+
+  // Seed editable state from URL params after mount. Reading the URL during the
+  // initial render would diverge from the server-rendered defaults and break hydration,
+  // so this one-shot sync intentionally calls setState inside an effect.
+  useEffect(() => {
+    const income = readIncomeParam();
+    if (income !== null) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setGrossIncome(income);
+    }
+
+    const item = readItemParam();
+    if (item !== null) {
+      setSelectedId(item);
+    }
+  }, []);
 
   const selectedItem = ITEMS.find((item) => item.id === selectedId) ?? ITEMS[0];
 
@@ -580,7 +762,7 @@ export default function IrishPurchaseTaxTime2026() {
     context.lineWidth = 2;
     context.stroke();
 
-    drawText(context, "TRANSACTION PRICE", 158, 362, {
+    drawText(context, "ITEM PRICE", 158, 362, {
       font: "800 18px Arial",
       color: "#92400e",
     });
@@ -640,57 +822,49 @@ export default function IrishPurchaseTaxTime2026() {
 
     drawFittedText(
       context,
-      `Transaction price ${formatCurrency(selectedItem.price, selectedCurrencyDigits)}`,
+      `Item price ${formatCurrency(selectedItem.price, selectedCurrencyDigits)}`,
       barX + (canvasTransactionPriceShare * barWidth) / 2,
-      578,
-      Math.max(130, canvasTransactionPriceShare * barWidth - 24),
+      576,
+      Math.max(150, canvasTransactionPriceShare * barWidth - 24),
       {
-        fontSize: 22,
-        minFontSize: 14,
-        fontWeight: 800,
+        fontSize: 24,
+        minFontSize: 16,
+        fontWeight: 600,
         color: "#92400e",
         align: "center",
       },
     );
-    drawSpanBrace(context, barX, 586, canvasTransactionPriceShare * barWidth, 14, "top", "#92400e");
+    drawCurlyBrace(context, barX, barX + canvasTransactionPriceShare * barWidth, 592, -12, "#92400e");
 
-    context.save();
-    drawRoundedRect(context, barX, barY, barWidth, barHeight, 22);
-    context.clip();
-
+    const canvasGap = 6;
     let segmentX = barX;
     for (const segment of result.segments) {
       const segmentWidth = (segment.value / result.grossRequired) * barWidth;
+      const drawWidth = Math.max(0, segmentWidth - canvasGap);
+      drawRoundedRect(context, segmentX + canvasGap / 2, barY, drawWidth, barHeight, 12);
       context.fillStyle = segment.fill;
-      context.fillRect(segmentX, barY, segmentWidth, barHeight);
+      context.fill();
       segmentX += segmentWidth;
     }
 
-    context.restore();
-    drawRoundedRect(context, barX, barY, barWidth, barHeight, 22);
-    context.strokeStyle = "#e7e5e4";
-    context.lineWidth = 2;
-    context.stroke();
-
-    drawSpanBrace(
+    drawCurlyBrace(
       context,
       barX + canvasItemShare * barWidth,
-      658,
-      canvasTotalTaxShare * barWidth,
-      14,
-      "bottom",
+      barX + canvasItemShare * barWidth + canvasTotalTaxShare * barWidth,
+      664,
+      12,
       "#be123c",
     );
     drawFittedText(
       context,
       `Total tax ${formatCurrency(result.totalTax, selectedCurrencyDigits)}`,
       barX + canvasItemShare * barWidth + (canvasTotalTaxShare * barWidth) / 2,
-      702,
-      Math.max(130, canvasTotalTaxShare * barWidth - 24),
+      706,
+      Math.max(150, canvasTotalTaxShare * barWidth - 24),
       {
-        fontSize: 22,
-        minFontSize: 14,
-        fontWeight: 800,
+        fontSize: 24,
+        minFontSize: 16,
+        fontWeight: 600,
         color: "#be123c",
         align: "center",
       },
@@ -928,71 +1102,39 @@ export default function IrishPurchaseTaxTime2026() {
           </p>
 
           <section className="mt-8 rounded-[1.5rem] border border-stone-200 bg-stone-50 p-5">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div>
                 <h3 className="text-xl font-black tracking-tight text-stone-900">
                   Where your earnings go
                 </h3>
               </div>
-              <div className="shrink-0 rounded-2xl bg-white p-4 ring-1 ring-stone-200">
+              <div className="shrink-0 rounded-2xl bg-white px-4 pt-4 pb-3 ring-1 ring-stone-200">
                 <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
                   Total earnings
                 </p>
-                <p className="mt-2 text-3xl font-black text-stone-900">
-                  {formatCurrency(result.grossRequired, grossRequiredCurrencyDigits)}
-                </p>
+                <div className="mt-2 flex items-baseline gap-2">
+                  <p className="text-3xl font-black leading-none text-stone-900">
+                    {formatCurrency(result.grossRequired, grossRequiredCurrencyDigits)}
+                  </p>
+                  <p className="text-sm font-semibold text-stone-600">
+                    {formatWorkTime(result.totalWorkHours)}
+                  </p>
+                </div>
               </div>
             </div>
 
-            <div className="mt-6">
-              <div className="relative h-32 sm:h-36">
-                <div
-                  className="absolute top-0 text-center"
-                  style={{ left: "0%", width: clampPercent(transactionPriceShare) }}
-                >
-                  <p
-                    className={`font-mono text-[0.65rem] font-black uppercase tracking-[0.16em] text-amber-700 sm:text-xs ${
-                      showTransactionBraceLabel ? "" : "sr-only"
-                    }`}
-                  >
-                    Transaction price {formatCurrency(selectedItem.price, selectedCurrencyDigits)}
-                  </p>
-                </div>
-                <div
-                  aria-label={`Transaction price: ${formatCurrency(selectedItem.price, selectedCurrencyDigits)}`}
-                  className="absolute top-7 h-4 rounded-t-xl border-x-2 border-t-2 border-amber-600"
-                  style={{ left: "0%", width: clampPercent(transactionPriceShare) }}
-                />
-
-                <div className="absolute top-12 flex h-8 w-full overflow-hidden rounded-full bg-white ring-1 ring-stone-200">
-                  {result.segments.map((segment) => (
-                    <div
-                      key={segment.label}
-                      className={`h-full ${segment.color}`}
-                      style={{ width: clampPercent((segment.value / result.grossRequired) * 100) }}
-                      title={`${segment.label}: ${formatCurrency(segment.value, selectedCurrencyDigits)}`}
-                    />
-                  ))}
-                </div>
-
-                <div
-                  aria-label={`Total tax: ${formatCurrency(result.totalTax, selectedCurrencyDigits)}`}
-                  className="absolute top-[5.25rem] h-4 rounded-b-xl border-x-2 border-b-2 border-rose-600"
-                  style={{ left: clampPercent(itemShare), width: clampPercent(totalTaxShare) }}
-                />
-                <div
-                  className="absolute top-[6.75rem] text-center"
-                  style={{ left: clampPercent(itemShare), width: clampPercent(totalTaxShare) }}
-                >
-                  <p
-                    className={`font-mono text-[0.65rem] font-black uppercase tracking-[0.16em] text-rose-700 sm:text-xs ${
-                      showTotalTaxBraceLabel ? "" : "sr-only"
-                    }`}
-                  >
-                    Total tax {formatCurrency(result.totalTax, selectedCurrencyDigits)}
-                  </p>
-                </div>
-              </div>
+            <div className="mt-3">
+              <EarningsBar
+                segments={result.segments}
+                grossRequired={result.grossRequired}
+                itemPrice={selectedItem.price}
+                totalTax={result.totalTax}
+                currencyDigits={selectedCurrencyDigits}
+                itemPriceShare={transactionPriceShare}
+                taxStartShare={itemShare}
+                showItemLabel={showTransactionBraceLabel}
+                showTaxLabel={showTotalTaxBraceLabel}
+              />
             </div>
 
             <div className="mt-5 grid gap-3 md:grid-cols-3">
