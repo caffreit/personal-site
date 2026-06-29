@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import IrishPurchaseTaxTime2026 from "@/components/tools/IrishPurchaseTaxTime2026";
 
 export const metadata: Metadata = {
-  title: "Irish Purchase Tax Time 2026 | Labs",
+  title: "What Did That Really Cost? | Labs",
   description:
-    "Estimate how much working time goes to Irish income tax and purchase taxes when buying everyday and big-ticket items.",
+    "See how much working time goes to the thing itself, purchase taxes, and the income taxes paid before your wages became spending money.",
 };
 
 export default function IrishPurchaseTaxTime2026Page() {
