@@ -85,6 +85,8 @@ const MAX_INCOME = 250_000;
 const INCOME_STEP = 1_000;
 
 const PURCHASE_IMAGE_BASE = "/labs/irish-purchase-tax-time-2026";
+const CANVAS_BODY_FONT = `"Newsreader", Georgia, serif`;
+const CANVAS_MONO_FONT = `"Geist Mono", "SFMono-Regular", Consolas, monospace`;
 
 const ITEMS: PurchaseItem[] = [
   {
@@ -533,11 +535,13 @@ function drawText(
     color?: string;
     font?: string;
     align?: CanvasTextAlign;
+    baseline?: CanvasTextBaseline;
   } = {},
 ) {
   context.fillStyle = options.color ?? "#1c1917";
-  context.font = options.font ?? "32px Arial";
+  context.font = options.font ?? `32px ${CANVAS_BODY_FONT}`;
   context.textAlign = options.align ?? "left";
+  context.textBaseline = options.baseline ?? "alphabetic";
   context.fillText(text, x, y);
 }
 
@@ -552,23 +556,75 @@ function drawFittedText(
     fontSize?: number;
     minFontSize?: number;
     fontWeight?: number;
+    fontFamily?: string;
     align?: CanvasTextAlign;
+    baseline?: CanvasTextBaseline;
   } = {},
 ) {
   let fontSize = options.fontSize ?? 32;
   const minFontSize = options.minFontSize ?? 20;
   const fontWeight = options.fontWeight ?? 700;
+  const fontFamily = options.fontFamily ?? CANVAS_BODY_FONT;
 
   context.textAlign = options.align ?? "left";
+  context.textBaseline = options.baseline ?? "alphabetic";
   context.fillStyle = options.color ?? "#1c1917";
-  context.font = `${fontWeight} ${fontSize}px Arial`;
+  context.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
 
   while (context.measureText(text).width > maxWidth && fontSize > minFontSize) {
     fontSize -= 2;
-    context.font = `${fontWeight} ${fontSize}px Arial`;
+    context.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
   }
 
   context.fillText(text, x, y);
+}
+
+function drawWrappedText(
+  context: CanvasRenderingContext2D,
+  text: string,
+  x: number,
+  y: number,
+  maxWidth: number,
+  lineHeight: number,
+  maxLines: number,
+  options: {
+    color?: string;
+    font?: string;
+  } = {},
+) {
+  const words = text.split(" ");
+  const lines: string[] = [];
+  let currentLine = "";
+
+  context.font = options.font ?? `32px ${CANVAS_BODY_FONT}`;
+  context.fillStyle = options.color ?? "#1c1917";
+  context.textAlign = "left";
+  context.textBaseline = "alphabetic";
+
+  for (const word of words) {
+    const nextLine = currentLine ? `${currentLine} ${word}` : word;
+
+    if (context.measureText(nextLine).width <= maxWidth || !currentLine) {
+      currentLine = nextLine;
+      continue;
+    }
+
+    lines.push(currentLine);
+    currentLine = word;
+
+    if (lines.length === maxLines) {
+      break;
+    }
+  }
+
+  if (currentLine && lines.length < maxLines) {
+    lines.push(currentLine);
+  }
+
+  lines.forEach((line, index) => {
+    const isLastVisibleLine = index === maxLines - 1 && words.join(" ").length > lines.join(" ").length;
+    context.fillText(isLastVisibleLine ? `${line.replace(/\s+\S+$/, "")}...` : line, x, y + index * lineHeight);
+  });
 }
 
 function buildCurlyBrace(x0: number, x1: number, spineY: number, depth: number) {
@@ -903,6 +959,8 @@ export default function IrishPurchaseTaxTime2026() {
   };
 
   const createShareImageBlob = async () => {
+    await document.fonts?.ready;
+
     const width = 1200;
     const height = 920;
     const canvas = document.createElement("canvas");
@@ -914,116 +972,126 @@ export default function IrishPurchaseTaxTime2026() {
       throw new Error("Could not create share image.");
     }
 
-    context.fillStyle = "#f8f5f0";
+    context.fillStyle = "#faf9f6";
     context.fillRect(0, 0, width, height);
 
+    const cardX = 72;
+    const cardY = 56;
+    const cardWidth = 1056;
+    const cardHeight = 794;
+    const contentX = 120;
+    const contentWidth = 960;
+
+    context.save();
     context.shadowColor = "rgba(0, 0, 0, 0.18)";
     context.shadowBlur = 40;
     context.shadowOffsetY = 18;
-    drawRoundedRect(context, 72, 66, 1056, 788, 44);
+    drawRoundedRect(context, cardX, cardY, cardWidth, cardHeight, 44);
     context.fillStyle = "#ffffff";
     context.fill();
-    context.shadowColor = "transparent";
+    context.restore();
 
-    drawText(context, "WHAT DID THAT REALLY COST?", 120, 138, {
-      font: "800 30px Arial",
-      color: "#0a5c36",
+    context.strokeStyle = "#e7e5e4";
+    context.lineWidth = 2;
+    drawRoundedRect(context, cardX, cardY, cardWidth, cardHeight, 44);
+    context.stroke();
+
+    drawText(context, selectedItem.category, contentX, 134, {
+      font: `700 17px ${CANVAS_MONO_FONT}`,
+      color: "#047857",
     });
-    drawText(context, selectedItem.name, 120, 220, {
-      font: "900 64px Arial",
+
+    drawFittedText(context, selectedItem.name, contentX, 204, 620, {
+      fontSize: 70,
+      minFontSize: 46,
+      fontWeight: 700,
       color: "#1c1917",
     });
-    drawText(
-      context,
-      `${selectedItem.category} - ${formatCurrency(selectedItem.price, selectedCurrencyDigits)} shelf price - ${formatCurrency(grossIncome)} gross salary`,
-      120,
-      268,
-      {
-        font: "500 25px Arial",
-        color: "#57534e",
-      },
-    );
 
-    drawRoundedRect(context, 120, 320, 960, 124, 28);
+    drawWrappedText(context, selectedItem.description, contentX, 254, 610, 33, 2, {
+      font: `400 27px ${CANVAS_BODY_FONT}`,
+      color: "#57534e",
+    });
+
+    drawRoundedRect(context, 806, 104, 274, 112, 28);
+    context.fillStyle = "#fafaf9";
+    context.fill();
+    context.strokeStyle = "#e7e5e4";
+    context.stroke();
+    drawText(context, "Gross salary", 834, 146, {
+      font: `700 15px ${CANVAS_MONO_FONT}`,
+      color: "#78716c",
+    });
+    drawText(context, formatCurrency(grossIncome), 834, 190, {
+      font: `700 43px ${CANVAS_BODY_FONT}`,
+      color: "#1c1917",
+    });
+
+    drawRoundedRect(context, contentX, 314, contentWidth, 488, 30);
     context.fillStyle = "#fafaf9";
     context.fill();
     context.strokeStyle = "#e7e5e4";
     context.lineWidth = 2;
     context.stroke();
 
-    drawText(context, "ITEM PRICE", 158, 362, {
-      font: "800 18px Arial",
-      color: "#92400e",
-    });
-    drawText(context, formatCurrency(selectedItem.price, selectedCurrencyDigits), 158, 406, {
-      font: "900 38px Arial",
+    drawText(context, "Where your earnings go", 160, 378, {
+      font: `700 35px ${CANVAS_BODY_FONT}`,
       color: "#1c1917",
     });
-    drawText(context, "+", 393, 394, {
-      font: "900 34px Arial",
-      color: "#a8a29e",
-      align: "center",
-    });
-    drawText(context, "INCOME TAX TO EARN IT", 430, 362, {
-      font: "800 18px Arial",
-      color: "#be123c",
-    });
-    drawText(context, formatCurrency(result.incomeTaxToEarn, selectedCurrencyDigits), 430, 406, {
-      font: "900 38px Arial",
-      color: "#1c1917",
-    });
-    drawText(context, "=", 687, 394, {
-      font: "900 34px Arial",
-      color: "#a8a29e",
-      align: "center",
-    });
-    drawText(context, "TOTAL EARNINGS", 726, 362, {
-      font: "800 18px Arial",
+
+    drawRoundedRect(context, 770, 342, 270, 100, 24);
+    context.fillStyle = "#ffffff";
+    context.fill();
+    context.strokeStyle = "#e7e5e4";
+    context.stroke();
+    drawText(context, "Total earnings", 796, 374, {
+      font: `700 14px ${CANVAS_MONO_FONT}`,
       color: "#047857",
     });
-    drawText(context, formatCurrency(result.grossRequired, grossRequiredCurrencyDigits), 726, 406, {
-      font: "900 38px Arial",
-      color: "#1c1917",
-    });
-    drawText(context, `of which total tax: ${formatCurrency(result.totalTax, selectedCurrencyDigits)}`, 1048, 427, {
-      font: "700 20px Arial",
-      color: "#78716c",
+    drawFittedText(
+      context,
+      formatCurrency(result.grossRequired, grossRequiredCurrencyDigits),
+      796,
+      418,
+      150,
+      {
+        fontSize: 38,
+        minFontSize: 25,
+        fontWeight: 700,
+        color: "#1c1917",
+      },
+    );
+    drawText(context, formatWorkTime(result.totalWorkHours), 1012, 414, {
+      font: `600 21px ${CANVAS_BODY_FONT}`,
+      color: "#57534e",
       align: "right",
     });
 
-    drawText(context, "Where the gross earnings go", 120, 528, {
-      font: "800 32px Arial",
-      color: "#1c1917",
-    });
-    drawText(context, `${formatCurrency(result.grossRequired, grossRequiredCurrencyDigits)} gross earnings`, 1080, 528, {
-      font: "700 20px Arial",
-      color: "#78716c",
-      align: "right",
-    });
-
-    const barX = 120;
-    const barY = 606;
-    const barWidth = 960;
-    const barHeight = 44;
+    const barX = 160;
+    const barY = 538;
+    const barWidth = 880;
+    const barHeight = 48;
     const canvasItemShare = result.preTaxItemPrice / result.grossRequired;
     const canvasTransactionPriceShare = selectedItem.price / result.grossRequired;
     const canvasTotalTaxShare = result.totalTax / result.grossRequired;
 
-    drawFittedText(
-      context,
-      `Item price ${formatCurrency(selectedItem.price, selectedCurrencyDigits)}`,
-      barX + (canvasTransactionPriceShare * barWidth) / 2,
-      576,
-      Math.max(150, canvasTransactionPriceShare * barWidth - 24),
-      {
-        fontSize: 24,
-        minFontSize: 16,
-        fontWeight: 600,
-        color: "#92400e",
-        align: "center",
-      },
-    );
-    drawCurlyBrace(context, barX, barX + canvasTransactionPriceShare * barWidth, 592, -12, "#92400e");
+    if (showTransactionBraceLabel) {
+      drawFittedText(
+        context,
+        `Item price ${formatCurrency(selectedItem.price, selectedCurrencyDigits)}`,
+        barX + (canvasTransactionPriceShare * barWidth) / 2,
+        506,
+        Math.max(160, canvasTransactionPriceShare * barWidth - 24),
+        {
+          fontSize: 21,
+          minFontSize: 16,
+          fontWeight: 600,
+          color: "#92400e",
+          align: "center",
+        },
+      );
+      drawCurlyBrace(context, barX, barX + canvasTransactionPriceShare * barWidth, 522, -12, "#92400e");
+    }
 
     const canvasGap = 6;
     let segmentX = barX;
@@ -1036,61 +1104,60 @@ export default function IrishPurchaseTaxTime2026() {
       segmentX += segmentWidth;
     }
 
-    drawCurlyBrace(
-      context,
-      barX + canvasItemShare * barWidth,
-      barX + canvasItemShare * barWidth + canvasTotalTaxShare * barWidth,
-      664,
-      12,
-      "#be123c",
-    );
-    drawFittedText(
-      context,
-      `Total tax ${formatCurrency(result.totalTax, selectedCurrencyDigits)}`,
-      barX + canvasItemShare * barWidth + (canvasTotalTaxShare * barWidth) / 2,
-      706,
-      Math.max(150, canvasTotalTaxShare * barWidth - 24),
-      {
-        fontSize: 24,
-        minFontSize: 16,
-        fontWeight: 600,
-        color: "#be123c",
-        align: "center",
-      },
-    );
+    if (showTotalTaxBraceLabel) {
+      drawCurlyBrace(
+        context,
+        barX + canvasItemShare * barWidth,
+        barX + canvasItemShare * barWidth + canvasTotalTaxShare * barWidth,
+        604,
+        12,
+        "#be123c",
+      );
+      drawFittedText(
+        context,
+        `Total tax ${formatCurrency(result.totalTax, selectedCurrencyDigits)}`,
+        barX + canvasItemShare * barWidth + (canvasTotalTaxShare * barWidth) / 2,
+        646,
+        Math.max(160, canvasTotalTaxShare * barWidth - 24),
+        {
+          fontSize: 21,
+          minFontSize: 16,
+          fontWeight: 600,
+          color: "#be123c",
+          align: "center",
+        },
+      );
+    }
 
     result.segments.forEach((segment, index) => {
-      const x = 120 + index * 320;
-      drawRoundedRect(context, x, 728, 292, 92, 22);
-      context.fillStyle = "#fafaf9";
+      const x = 160 + index * 296;
+      const y = 674;
+      drawRoundedRect(context, x, y, 270, 90, 22);
+      context.fillStyle = "#ffffff";
       context.fill();
       context.strokeStyle = "#e7e5e4";
       context.stroke();
 
-      drawRoundedRect(context, x + 24, 750, 18, 18, 9);
+      drawRoundedRect(context, x + 24, y + 22, 14, 14, 7);
       context.fillStyle = segment.fill;
       context.fill();
-      drawText(context, segment.shortLabel, x + 54, 766, {
-        font: "700 21px Arial",
+      drawText(context, segment.shortLabel, x + 50, y + 36, {
+        font: `700 22px ${CANVAS_BODY_FONT}`,
         color: "#292524",
       });
-      drawFittedText(context, formatWorkTime(segment.hours), x + 24, 802, 122, {
-        fontSize: 26,
-        minFontSize: 19,
-        fontWeight: 800,
+      drawFittedText(context, formatCurrency(segment.value, selectedCurrencyDigits), x + 24, y + 70, 116, {
+        fontSize: 27,
+        minFontSize: 18,
+        fontWeight: 700,
         color: "#1c1917",
       });
-      drawFittedText(context, formatCurrency(segment.value, selectedCurrencyDigits), x + 150, 802, 120, {
-        fontSize: 21,
-        minFontSize: 16,
+      drawFittedText(context, formatWorkTime(segment.hours), x + 244, y + 70, 96, {
+        fontSize: 18,
+        minFontSize: 14,
         fontWeight: 600,
         color: "#57534e",
+        align: "right",
       });
-    });
-
-    drawText(context, "Irish Purchase Tax Time 2026 - illustrative assumptions", 120, 838, {
-      font: "600 18px Arial",
-      color: "#78716c",
     });
 
     return new Promise<Blob>((resolve, reject) => {
