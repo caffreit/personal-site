@@ -50,6 +50,21 @@ type Segment = {
   fill: string;
 };
 
+type EquivalentScale = "small" | "medium" | "large" | "all";
+
+type EquivalentKind = "time" | "days" | "visits" | "length" | "percent";
+
+type StateEquivalent = {
+  id: string;
+  label: string;
+  bucket: "Public service" | "Welfare" | "Transport" | "Mega project" | "Civic oddity";
+  unitCost: number;
+  unitLabel: "minute" | "day" | "visit" | "metre" | "project";
+  kind: EquivalentKind;
+  scale: EquivalentScale[];
+  note: string;
+};
+
 const TAX_RULES_2026: TaxRules = {
   srcop: 44_000,
   personalCredit: 2_000,
@@ -152,6 +167,135 @@ const ITEMS: PurchaseItem[] = [
   },
 ];
 
+const STATE_EQUIVALENTS: StateEquivalent[] = [
+  {
+    id: "nurse-time",
+    label: "Nurse time",
+    bucket: "Public service",
+    unitCost: 55 / 60,
+    unitLabel: "minute",
+    kind: "time",
+    scale: ["small", "medium"],
+    note: "Using a rough EUR55/hour fully-loaded cost.",
+  },
+  {
+    id: "teacher-time",
+    label: "Teacher time",
+    bucket: "Public service",
+    unitCost: 50 / 60,
+    unitLabel: "minute",
+    kind: "time",
+    scale: ["medium"],
+    note: "Using a rough EUR50/hour fully-loaded cost.",
+  },
+  {
+    id: "gp-visit",
+    label: "GP subsidy equivalent",
+    bucket: "Public service",
+    unitCost: 60,
+    unitLabel: "visit",
+    kind: "visits",
+    scale: ["medium"],
+    note: "Treats a subsidised GP visit as roughly EUR60.",
+  },
+  {
+    id: "state-pension",
+    label: "State Pension",
+    bucket: "Welfare",
+    unitCost: 299.3 / 7,
+    unitLabel: "day",
+    kind: "days",
+    scale: ["small", "large"],
+    note: "Based on the 2026 weekly contributory rate.",
+  },
+  {
+    id: "jobseeker",
+    label: "Jobseeker payment",
+    bucket: "Welfare",
+    unitCost: 254 / 7,
+    unitLabel: "day",
+    kind: "days",
+    scale: ["small", "large"],
+    note: "Based on the 2026 weekly adult rate.",
+  },
+  {
+    id: "bus-route",
+    label: "City bus route",
+    bucket: "Transport",
+    unitCost: 125 / 60,
+    unitLabel: "minute",
+    kind: "time",
+    scale: ["medium"],
+    note: "Uses a broad EUR125/hour operating-cost placeholder.",
+  },
+  {
+    id: "cycle-lane",
+    label: "Urban cycle lane",
+    bucket: "Transport",
+    unitCost: 2_000_000 / 1_000,
+    unitLabel: "metre",
+    kind: "length",
+    scale: ["medium", "large"],
+    note: "Based on a rough EUR2m/km urban scheme.",
+  },
+  {
+    id: "luas-track",
+    label: "Luas-style track",
+    bucket: "Transport",
+    unitCost: 100_000_000 / 1_000,
+    unitLabel: "metre",
+    kind: "length",
+    scale: ["large"],
+    note: "Uses a round EUR100m/km light-rail estimate.",
+  },
+  {
+    id: "motorway",
+    label: "M50-style works",
+    bucket: "Transport",
+    unitCost: 30_000_000 / 1_000,
+    unitLabel: "metre",
+    kind: "length",
+    scale: ["large"],
+    note: "Uses a rough EUR30m/km motorway-works estimate.",
+  },
+  {
+    id: "traffic-light",
+    label: "Traffic light crossing",
+    bucket: "Civic oddity",
+    unitCost: 125_000,
+    unitLabel: "project",
+    kind: "percent",
+    scale: ["small", "medium"],
+    note: "Compared with a rough EUR125k signalised crossing.",
+  },
+  {
+    id: "road-paint",
+    label: "White road paint",
+    bucket: "Civic oddity",
+    unitCost: 3,
+    unitLabel: "metre",
+    kind: "length",
+    scale: ["small"],
+    note: "Very rough EUR3/metre line-paint placeholder.",
+  },
+  {
+    id: "childrens-hospital",
+    label: "Children's hospital",
+    bucket: "Mega project",
+    unitCost: 2_240_000_000,
+    unitLabel: "project",
+    kind: "percent",
+    scale: ["small", "large"],
+    note: "Compared with the roughly EUR2.24bn approved budget.",
+  },
+];
+
+const EQUIVALENT_IDS_BY_SCALE: Record<Exclude<EquivalentScale, "all">, string[]> = {
+  small: ["nurse-time", "jobseeker", "childrens-hospital"],
+  medium: ["teacher-time", "bus-route", "cycle-lane"],
+  large: ["state-pension", "luas-track", "childrens-hospital"],
+};
+
 function formatCurrency(value: number, maximumFractionDigits = 0) {
   return value.toLocaleString("en-IE", {
     style: "currency",
@@ -178,6 +322,110 @@ function formatWorkTime(hours: number) {
   }
 
   return `${(hours / 7.5).toFixed(1)} working days`;
+}
+
+function formatApproxNumber(value: number, maximumFractionDigits = 1) {
+  return value.toLocaleString("en-IE", {
+    maximumFractionDigits,
+  });
+}
+
+function formatEquivalentTime(minutes: number) {
+  if (minutes < 1) {
+    return "less than 1 minute";
+  }
+
+  if (minutes < 60) {
+    return `about ${formatApproxNumber(minutes, minutes < 10 ? 1 : 0)} minutes`;
+  }
+
+  const hours = minutes / 60;
+  return `about ${formatApproxNumber(hours, hours < 10 ? 1 : 0)} hours`;
+}
+
+function formatEquivalentDays(days: number, label: string) {
+  if (days < 1) {
+    return `about ${formatApproxNumber(days, 1)} days of ${label}`;
+  }
+
+  if (days < 14) {
+    return `about ${formatApproxNumber(days, days < 10 ? 1 : 0)} days of ${label}`;
+  }
+
+  const weeks = days / 7;
+  return `about ${formatApproxNumber(weeks, weeks < 10 ? 1 : 0)} weeks of ${label}`;
+}
+
+function formatEquivalentVisits(visits: number) {
+  if (visits < 1) {
+    return `about ${formatApproxNumber(visits, 1)} GP visits`;
+  }
+
+  return `about ${formatApproxNumber(visits, visits < 10 ? 1 : 0)} GP visits`;
+}
+
+function formatEquivalentLength(metres: number, label: string) {
+  if (metres < 0.01) {
+    return `about ${formatApproxNumber(metres * 1_000, 1)} mm of ${label}`;
+  }
+
+  if (metres < 1) {
+    return `about ${formatApproxNumber(metres * 100, 1)} cm of ${label}`;
+  }
+
+  return `about ${formatApproxNumber(metres, metres < 10 ? 1 : 0)} metres of ${label}`;
+}
+
+function formatEquivalentPercent(projectShare: number, label: string) {
+  const percent = projectShare * 100;
+  const digits = percent < 0.0001 ? 8 : percent < 0.01 ? 6 : percent < 1 ? 4 : 1;
+  return `about ${formatPercent(percent, digits)} of ${label}`;
+}
+
+function getEquivalentValue(equivalent: StateEquivalent, totalTax: number) {
+  const units = totalTax / equivalent.unitCost;
+
+  if (equivalent.kind === "time") {
+    return formatEquivalentTime(units);
+  }
+
+  if (equivalent.kind === "days") {
+    return formatEquivalentDays(units, equivalent.label);
+  }
+
+  if (equivalent.kind === "visits") {
+    return formatEquivalentVisits(units);
+  }
+
+  if (equivalent.kind === "length") {
+    return formatEquivalentLength(units, equivalent.label);
+  }
+
+  return formatEquivalentPercent(units, equivalent.label);
+}
+
+function getEquivalentScale(totalTax: number): Exclude<EquivalentScale, "all"> {
+  if (totalTax < 25) {
+    return "small";
+  }
+
+  if (totalTax < 1_000) {
+    return "medium";
+  }
+
+  return "large";
+}
+
+function getStateEquivalents(totalTax: number) {
+  const scale = getEquivalentScale(totalTax);
+
+  return EQUIVALENT_IDS_BY_SCALE[scale]
+    .map((id) => STATE_EQUIVALENTS.find((equivalent) => equivalent.id === id))
+    .filter((equivalent): equivalent is StateEquivalent => Boolean(equivalent))
+    .map((equivalent) => ({
+      ...equivalent,
+      value: getEquivalentValue(equivalent, totalTax),
+    }));
 }
 
 function calculateIncomeTaxes(grossIncome: number) {
@@ -705,6 +953,7 @@ export default function IrishPurchaseTaxTime2026() {
   const totalTaxShare = (result.totalTax / result.grossRequired) * 100;
   const showTransactionBraceLabel = transactionPriceShare >= 24;
   const showTotalTaxBraceLabel = totalTaxShare >= 24;
+  const stateEquivalents = getStateEquivalents(result.totalTax);
 
   const getShareUrl = () => {
     const url = new URL(window.location.href);
@@ -1151,6 +1400,39 @@ export default function IrishPurchaseTaxTime2026() {
                     {formatWorkTime(segment.hours)}
                   </p>
                 </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="mt-6 rounded-[1.5rem] border border-stone-200 bg-white p-5">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h3 className="text-xl font-black tracking-tight text-stone-900">
+                  What could the state buy with this tax?
+                </h3>
+                <p className="mt-1 text-sm leading-relaxed text-stone-600">
+                  Very rough scale comparisons, not earmarked spending.
+                </p>
+              </div>
+              <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
+                {formatCurrency(result.totalTax, selectedCurrencyDigits)} total tax
+              </p>
+            </div>
+
+            <div className="mt-5 grid gap-3 md:grid-cols-3">
+              {stateEquivalents.map((equivalent) => (
+                <article key={equivalent.id} className="rounded-2xl border border-stone-200 bg-stone-50 p-4">
+                  <p className="font-mono text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
+                    {equivalent.bucket}
+                  </p>
+                  <h4 className="mt-2 text-base font-black tracking-tight text-stone-900">
+                    {equivalent.label}
+                  </h4>
+                  <p className="mt-3 text-2xl font-black leading-tight text-stone-900">
+                    {equivalent.value}
+                  </p>
+                  <p className="mt-2 text-xs leading-relaxed text-stone-500">{equivalent.note}</p>
+                </article>
               ))}
             </div>
           </section>
