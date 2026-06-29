@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { ArrowLeft, ChevronDown, Info, Share2 } from "lucide-react";
@@ -29,6 +30,7 @@ type PurchaseItem = {
   name: string;
   category: string;
   price: number;
+  image: string;
   vatRate?: number;
   fixedTaxes?: FixedTax[];
   description: string;
@@ -82,12 +84,15 @@ const MIN_INCOME = 20_000;
 const MAX_INCOME = 250_000;
 const INCOME_STEP = 1_000;
 
+const PURCHASE_IMAGE_BASE = "/labs/irish-purchase-tax-time-2026";
+
 const ITEMS: PurchaseItem[] = [
   {
     id: "roll",
     name: "Chicken fillet roll",
     category: "Lunch",
     price: 6,
+    image: `${PURCHASE_IMAGE_BASE}/roll.png`,
     vatRate: 0.135,
     description: "The humble deli counter benchmark.",
     assumption: "Assumes a prepared deli item charged at the 13.5% hospitality rate.",
@@ -97,6 +102,7 @@ const ITEMS: PurchaseItem[] = [
     name: "Pint in a pub",
     category: "Hospitality",
     price: 6.5,
+    image: `${PURCHASE_IMAGE_BASE}/pint.png`,
     vatRate: 0.23,
     fixedTaxes: [
       {
@@ -113,6 +119,7 @@ const ITEMS: PurchaseItem[] = [
     name: "Tank of petrol",
     category: "Transport",
     price: 108,
+    image: `${PURCHASE_IMAGE_BASE}/petrol.png`,
     vatRate: 0.23,
     fixedTaxes: [
       {
@@ -129,6 +136,7 @@ const ITEMS: PurchaseItem[] = [
     name: "Mirrorless camera",
     category: "Gear",
     price: 1_600,
+    image: `${PURCHASE_IMAGE_BASE}/camera.png`,
     vatRate: 0.23,
     description: "A discretionary purchase at the standard VAT rate.",
     assumption: "Assumes a new camera body or kit bought retail in Ireland at 23% VAT.",
@@ -138,6 +146,7 @@ const ITEMS: PurchaseItem[] = [
     name: "New family car",
     category: "Motoring",
     price: 38_000,
+    image: `${PURCHASE_IMAGE_BASE}/car.png`,
     vatRate: 0.23,
     fixedTaxes: [
       {
@@ -154,6 +163,7 @@ const ITEMS: PurchaseItem[] = [
     name: "Home purchase",
     category: "Housing",
     price: 424_200,
+    image: `${PURCHASE_IMAGE_BASE}/house.png`,
     fixedTaxes: [
       {
         label: "Stamp duty",
@@ -321,7 +331,7 @@ function formatWorkTime(hours: number) {
     return `${hours.toFixed(hours < 10 ? 1 : 0)} h`;
   }
 
-  return `${(hours / 7.5).toFixed(1)} working days`;
+  return `${(hours / 7.5).toFixed(1)} days`;
 }
 
 function formatApproxNumber(value: number, maximumFractionDigits = 1) {
@@ -607,76 +617,6 @@ function downloadBlob(blob: Blob, filename: string) {
   link.download = filename;
   link.click();
   URL.revokeObjectURL(url);
-}
-
-function ItemIllustration({ kind }: { kind: ItemKind }) {
-  const common = "drop-shadow-[0_12px_18px_rgba(0,0,0,0.18)]";
-
-  if (kind === "roll") {
-    return (
-      <svg viewBox="0 0 96 72" aria-hidden="true" className={common}>
-        <rect x="10" y="28" width="76" height="24" rx="12" fill="#f6d8a8" />
-        <rect x="17" y="33" width="62" height="14" rx="7" fill="#c47a5a" />
-        <path d="M25 30l7-14 9 14M46 30l7-18 9 18M66 30l6-12 8 12" fill="#f8f5f0" />
-        <path d="M22 38h50" stroke="#8f4f34" strokeWidth="4" strokeLinecap="round" />
-      </svg>
-    );
-  }
-
-  if (kind === "pint") {
-    return (
-      <svg viewBox="0 0 96 72" aria-hidden="true" className={common}>
-        <path d="M32 14h29l-4 46H36z" fill="#f4ca16" />
-        <path d="M35 10h25a6 6 0 016 6v3H29v-3a6 6 0 016-6z" fill="#f8f5f0" />
-        <path d="M62 24h8a9 9 0 010 18h-10" fill="none" stroke="#f8f5f0" strokeWidth="6" />
-        <path d="M38 23h16" stroke="#d4a017" strokeWidth="5" strokeLinecap="round" />
-      </svg>
-    );
-  }
-
-  if (kind === "petrol") {
-    return (
-      <svg viewBox="0 0 96 72" aria-hidden="true" className={common}>
-        <rect x="24" y="13" width="34" height="48" rx="6" fill="#c47a5a" />
-        <rect x="31" y="20" width="20" height="13" rx="2" fill="#f8f5f0" />
-        <path d="M58 23h10l6 8v22a6 6 0 01-12 0V40" fill="none" stroke="#d4a017" strokeWidth="6" />
-        <path d="M35 45h13" stroke="#8f4f34" strokeWidth="5" strokeLinecap="round" />
-      </svg>
-    );
-  }
-
-  if (kind === "camera") {
-    return (
-      <svg viewBox="0 0 96 72" aria-hidden="true" className={common}>
-        <rect x="17" y="24" width="62" height="36" rx="9" fill="#3f3a36" />
-        <rect x="27" y="17" width="23" height="10" rx="4" fill="#c47a5a" />
-        <circle cx="49" cy="42" r="15" fill="#d4a017" />
-        <circle cx="49" cy="42" r="8" fill="#0a5c36" />
-        <circle cx="69" cy="31" r="4" fill="#f8f5f0" />
-      </svg>
-    );
-  }
-
-  if (kind === "car") {
-    return (
-      <svg viewBox="0 0 96 72" aria-hidden="true" className={common}>
-        <path d="M18 42l9-18h37l14 18v11H18z" fill="#c47a5a" />
-        <path d="M33 28h25l8 12H27z" fill="#f8f5f0" />
-        <circle cx="31" cy="55" r="8" fill="#302b28" />
-        <circle cx="66" cy="55" r="8" fill="#302b28" />
-        <path d="M20 44h55" stroke="#8f4f34" strokeWidth="4" strokeLinecap="round" />
-      </svg>
-    );
-  }
-
-  return (
-    <svg viewBox="0 0 96 72" aria-hidden="true" className={common}>
-      <path d="M18 39l30-25 30 25v24H18z" fill="#c47a5a" />
-      <path d="M27 39l21-17 21 17" fill="none" stroke="#8f4f34" strokeWidth="7" />
-      <rect x="41" y="45" width="14" height="18" rx="2" fill="#f8f5f0" />
-      <circle cx="68" cy="51" r="8" fill="#d4a017" />
-    </svg>
-  );
 }
 
 type EarningsBarProps = {
@@ -1228,7 +1168,7 @@ export default function IrishPurchaseTaxTime2026() {
             What Did That Really Cost?
           </h1>
           <p className="max-w-4xl text-lg leading-relaxed text-stone-600 sm:text-xl">
-            Pick a purchase and see how much working time goes to the thing itself, the tax
+            See how much working time goes to the thing itself, the tax
             charged when you buy it, and the income taxes paid before your wages became spending
             money.
           </p>
@@ -1296,8 +1236,14 @@ export default function IrishPurchaseTaxTime2026() {
                       : "border-transparent text-stone-700 hover:bg-stone-100"
                   }`}
                 >
-                  <span className="flex h-14 w-16 shrink-0 items-center justify-center rounded-2xl bg-[#0A5C36]">
-                    <ItemIllustration kind={item.id} />
+                  <span className="relative h-14 w-16 shrink-0 overflow-hidden rounded-2xl bg-stone-100 ring-1 ring-stone-200">
+                    <Image
+                      src={item.image}
+                      alt=""
+                      fill
+                      sizes="64px"
+                      className="object-cover"
+                    />
                   </span>
                   <span className="min-w-0">
                     <span className="block text-sm font-black">{item.name}</span>
