@@ -998,9 +998,9 @@ export default function IrishPurchaseTaxTime2026() {
             <div className="mt-5 grid gap-3 md:grid-cols-3">
               {result.segments.map((segment) => (
                 <div key={segment.label} className="rounded-2xl border border-stone-200 bg-white p-4">
-                  <div className="flex items-center gap-2">
-                    <span className={`h-3 w-3 rounded-full ${segment.color}`} />
-                    <p className="text-sm font-bold text-stone-800">{segment.shortLabel}</p>
+                  <div className="flex items-center gap-2.5">
+                    <span className={`h-3.5 w-3.5 rounded-full ${segment.color}`} />
+                    <p className="text-base font-black tracking-tight text-stone-900">{segment.shortLabel}</p>
                   </div>
                   <p className="mt-2 text-2xl font-black text-stone-900">
                     {formatCurrency(segment.value, selectedCurrencyDigits)}
