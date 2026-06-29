@@ -1,0 +1,1500 @@
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { motion, useReducedMotion } from "framer-motion";
+import { ArrowLeft, ChevronDown, Info, Share2 } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+
+type TaxRules = {
+  srcop: number;
+  personalCredit: number;
+  payeCredit: number;
+  uscExemptionLimit: number;
+  uscBands: [number, number, number];
+  uscRates: [number, number, number, number];
+  prsiRate: number;
+  prsiThreshold: number;
+};
+
+type ItemKind = "roll" | "pint" | "petrol" | "camera" | "car" | "house";
+
+type FixedTax = {
+  label: string;
+  amount: number;
+  note: string;
+};
+
+type PurchaseItem = {
+  id: ItemKind;
+  name: string;
+  category: string;
+  price: number;
+  image: string;
+  vatRate?: number;
+  fixedTaxes?: FixedTax[];
+  description: string;
+  assumption: string;
+};
+
+type TaxLine = {
+  label: string;
+  amount: number;
+  note: string;
+};
+
+type Segment = {
+  label: string;
+  shortLabel: string;
+  value: number;
+  hours: number;
+  color: string;
+  fill: string;
+};
+
+type EquivalentScale = "small" | "medium" | "large" | "all";
+
+type EquivalentKind = "time" | "days" | "visits" | "length" | "percent";
+
+type StateEquivalent = {
+  id: string;
+  label: string;
+  bucket: "Public service" | "Welfare" | "Transport" | "Mega project" | "Civic oddity";
+  unitCost: number;
+  unitLabel: "minute" | "day" | "visit" | "metre" | "project";
+  kind: EquivalentKind;
+  scale: EquivalentScale[];
+  note: string;
+};
+
+const TAX_RULES_2026: TaxRules = {
+  srcop: 44_000,
+  personalCredit: 2_000,
+  payeCredit: 2_000,
+  uscExemptionLimit: 13_000,
+  uscBands: [12_012, 28_700, 70_044],
+  uscRates: [0.005, 0.02, 0.03, 0.08],
+  prsiRate: 0.0435,
+  prsiThreshold: 18_304,
+};
+
+const ANNUAL_WORK_HOURS = 37.5 * 52;
+const DEFAULT_INCOME = 60_000;
+const MIN_INCOME = 20_000;
+const MAX_INCOME = 250_000;
+const INCOME_STEP = 1_000;
+
+const PURCHASE_IMAGE_BASE = "/labs/irish-purchase-tax-time-2026";
+
+const ITEMS: PurchaseItem[] = [
+  {
+    id: "roll",
+    name: "Chicken fillet roll",
+    category: "Lunch",
+    price: 6,
+    image: `${PURCHASE_IMAGE_BASE}/roll.png`,
+    vatRate: 0.135,
+    description: "The humble deli counter benchmark.",
+    assumption: "Assumes a prepared deli item charged at the 13.5% hospitality rate.",
+  },
+  {
+    id: "pint",
+    name: "Pint in a pub",
+    category: "Hospitality",
+    price: 6.5,
+    image: `${PURCHASE_IMAGE_BASE}/pint.png`,
+    vatRate: 0.23,
+    fixedTaxes: [
+      {
+        label: "Alcohol excise",
+        amount: 0.55,
+        note: "Illustrative duty estimate for one pint.",
+      },
+    ],
+    description: "A small purchase with a surprisingly tax-heavy tail.",
+    assumption: "Assumes on-premise alcohol at 23% VAT plus a simplified excise estimate.",
+  },
+  {
+    id: "petrol",
+    name: "Tank of petrol",
+    category: "Transport",
+    price: 108,
+    image: `${PURCHASE_IMAGE_BASE}/petrol.png`,
+    vatRate: 0.23,
+    fixedTaxes: [
+      {
+        label: "Fuel excise and carbon charge",
+        amount: 33,
+        note: "Illustrative 60 litre tank estimate before supplier margins.",
+      },
+    ],
+    description: "A weekly-ish transport cost where tax is very visible.",
+    assumption: "Assumes 60 litres at EUR1.80 per litre, with VAT plus simplified excise/carbon charges.",
+  },
+  {
+    id: "camera",
+    name: "Mirrorless camera",
+    category: "Gear",
+    price: 1_600,
+    image: `${PURCHASE_IMAGE_BASE}/camera.png`,
+    vatRate: 0.23,
+    description: "A discretionary purchase at the standard VAT rate.",
+    assumption: "Assumes a new camera body or kit bought retail in Ireland at 23% VAT.",
+  },
+  {
+    id: "car",
+    name: "New family car",
+    category: "Motoring",
+    price: 38_000,
+    image: `${PURCHASE_IMAGE_BASE}/car.png`,
+    vatRate: 0.23,
+    fixedTaxes: [
+      {
+        label: "VRT",
+        amount: 4_950,
+        note: "Illustrative 15% VRT-style estimate for a mid-emissions car.",
+      },
+    ],
+    description: "The big-ticket example where VAT and VRT stack quickly.",
+    assumption: "Assumes a new car with standard VAT and an illustrative VRT amount already inside the sticker price.",
+  },
+  {
+    id: "house",
+    name: "Home purchase",
+    category: "Housing",
+    price: 424_200,
+    image: `${PURCHASE_IMAGE_BASE}/house.png`,
+    fixedTaxes: [
+      {
+        label: "Stamp duty",
+        amount: 4_200,
+        note: "1% stamp duty on a EUR420,000 residential purchase.",
+      },
+    ],
+    description: "A lifetime-scale purchase, shown with stamp duty rather than ordinary VAT.",
+    assumption:
+      "Assumes a EUR420,000 residential property plus 1% stamp duty. New builds, second homes, and higher bands can differ.",
+  },
+];
+
+const STATE_EQUIVALENTS: StateEquivalent[] = [
+  {
+    id: "nurse-time",
+    label: "Nurse time",
+    bucket: "Public service",
+    unitCost: 55 / 60,
+    unitLabel: "minute",
+    kind: "time",
+    scale: ["small", "medium"],
+    note: "Using a rough EUR55/hour fully-loaded cost.",
+  },
+  {
+    id: "teacher-time",
+    label: "Teacher time",
+    bucket: "Public service",
+    unitCost: 50 / 60,
+    unitLabel: "minute",
+    kind: "time",
+    scale: ["medium"],
+    note: "Using a rough EUR50/hour fully-loaded cost.",
+  },
+  {
+    id: "gp-visit",
+    label: "GP subsidy equivalent",
+    bucket: "Public service",
+    unitCost: 60,
+    unitLabel: "visit",
+    kind: "visits",
+    scale: ["medium"],
+    note: "Treats a subsidised GP visit as roughly EUR60.",
+  },
+  {
+    id: "state-pension",
+    label: "State Pension",
+    bucket: "Welfare",
+    unitCost: 299.3 / 7,
+    unitLabel: "day",
+    kind: "days",
+    scale: ["small", "large"],
+    note: "Based on the 2026 weekly contributory rate.",
+  },
+  {
+    id: "jobseeker",
+    label: "Jobseeker payment",
+    bucket: "Welfare",
+    unitCost: 254 / 7,
+    unitLabel: "day",
+    kind: "days",
+    scale: ["small", "large"],
+    note: "Based on the 2026 weekly adult rate.",
+  },
+  {
+    id: "bus-route",
+    label: "City bus route",
+    bucket: "Transport",
+    unitCost: 125 / 60,
+    unitLabel: "minute",
+    kind: "time",
+    scale: ["medium"],
+    note: "Uses a broad EUR125/hour operating-cost placeholder.",
+  },
+  {
+    id: "cycle-lane",
+    label: "Urban cycle lane",
+    bucket: "Transport",
+    unitCost: 2_000_000 / 1_000,
+    unitLabel: "metre",
+    kind: "length",
+    scale: ["medium", "large"],
+    note: "Based on a rough EUR2m/km urban scheme.",
+  },
+  {
+    id: "luas-track",
+    label: "Luas-style track",
+    bucket: "Transport",
+    unitCost: 100_000_000 / 1_000,
+    unitLabel: "metre",
+    kind: "length",
+    scale: ["large"],
+    note: "Uses a round EUR100m/km light-rail estimate.",
+  },
+  {
+    id: "motorway",
+    label: "M50-style works",
+    bucket: "Transport",
+    unitCost: 30_000_000 / 1_000,
+    unitLabel: "metre",
+    kind: "length",
+    scale: ["large"],
+    note: "Uses a rough EUR30m/km motorway-works estimate.",
+  },
+  {
+    id: "traffic-light",
+    label: "Traffic light crossing",
+    bucket: "Civic oddity",
+    unitCost: 125_000,
+    unitLabel: "project",
+    kind: "percent",
+    scale: ["small", "medium"],
+    note: "Compared with a rough EUR125k signalised crossing.",
+  },
+  {
+    id: "road-paint",
+    label: "White road paint",
+    bucket: "Civic oddity",
+    unitCost: 3,
+    unitLabel: "metre",
+    kind: "length",
+    scale: ["small"],
+    note: "Very rough EUR3/metre line-paint placeholder.",
+  },
+  {
+    id: "childrens-hospital",
+    label: "Children's hospital",
+    bucket: "Mega project",
+    unitCost: 2_240_000_000,
+    unitLabel: "project",
+    kind: "percent",
+    scale: ["small", "large"],
+    note: "Compared with the roughly EUR2.24bn approved budget.",
+  },
+];
+
+const EQUIVALENT_IDS_BY_SCALE: Record<Exclude<EquivalentScale, "all">, string[]> = {
+  small: ["nurse-time", "jobseeker", "childrens-hospital"],
+  medium: ["teacher-time", "bus-route", "cycle-lane"],
+  large: ["state-pension", "luas-track", "childrens-hospital"],
+};
+
+function formatCurrency(value: number, maximumFractionDigits = 0) {
+  return value.toLocaleString("en-IE", {
+    style: "currency",
+    currency: "EUR",
+    maximumFractionDigits,
+  });
+}
+
+function getCurrencyFractionDigits(value: number) {
+  return Math.abs(value) < 100 ? 2 : 0;
+}
+
+function formatPercent(value: number, maximumFractionDigits = 0) {
+  return `${value.toLocaleString("en-IE", { maximumFractionDigits })}%`;
+}
+
+function formatWorkTime(hours: number) {
+  if (hours < 1) {
+    return `${Math.max(1, Math.round(hours * 60))} min`;
+  }
+
+  if (hours < 24) {
+    return `${hours.toFixed(hours < 10 ? 1 : 0)} h`;
+  }
+
+  return `${(hours / 7.5).toFixed(1)} days`;
+}
+
+function formatApproxNumber(value: number, maximumFractionDigits = 1) {
+  return value.toLocaleString("en-IE", {
+    maximumFractionDigits,
+  });
+}
+
+function formatEquivalentTime(minutes: number) {
+  if (minutes < 1) {
+    return "less than 1 minute";
+  }
+
+  if (minutes < 60) {
+    return `${formatApproxNumber(minutes, minutes < 10 ? 1 : 0)} minutes`;
+  }
+
+  const hours = minutes / 60;
+  return `${formatApproxNumber(hours, hours < 10 ? 1 : 0)} hours`;
+}
+
+function formatEquivalentDays(days: number, label: string) {
+  if (days < 1) {
+    return `${formatApproxNumber(days, 1)} days of ${label}`;
+  }
+
+  if (days < 14) {
+    return `${formatApproxNumber(days, days < 10 ? 1 : 0)} days of ${label}`;
+  }
+
+  const weeks = days / 7;
+  return `${formatApproxNumber(weeks, weeks < 10 ? 1 : 0)} weeks of ${label}`;
+}
+
+function formatEquivalentVisits(visits: number) {
+  if (visits < 1) {
+    return `${formatApproxNumber(visits, 1)} GP visits`;
+  }
+
+  return `${formatApproxNumber(visits, visits < 10 ? 1 : 0)} GP visits`;
+}
+
+function formatEquivalentLength(metres: number, label: string) {
+  if (metres < 0.01) {
+    return `${formatApproxNumber(metres * 1_000, 1)} mm of ${label}`;
+  }
+
+  if (metres < 1) {
+    return `${formatApproxNumber(metres * 100, 1)} cm of ${label}`;
+  }
+
+  return `${formatApproxNumber(metres, metres < 10 ? 1 : 0)} metres of ${label}`;
+}
+
+function formatEquivalentPercent(projectShare: number, label: string) {
+  const percent = projectShare * 100;
+  const digits = percent < 0.0001 ? 8 : percent < 0.01 ? 6 : percent < 1 ? 4 : 1;
+  return `${formatPercent(percent, digits)} of ${label}`;
+}
+
+function getEquivalentValue(equivalent: StateEquivalent, totalTax: number) {
+  const units = totalTax / equivalent.unitCost;
+
+  if (equivalent.kind === "time") {
+    return formatEquivalentTime(units);
+  }
+
+  if (equivalent.kind === "days") {
+    return formatEquivalentDays(units, equivalent.label);
+  }
+
+  if (equivalent.kind === "visits") {
+    return formatEquivalentVisits(units);
+  }
+
+  if (equivalent.kind === "length") {
+    return formatEquivalentLength(units, equivalent.label);
+  }
+
+  return formatEquivalentPercent(units, equivalent.label);
+}
+
+function getEquivalentScale(totalTax: number): Exclude<EquivalentScale, "all"> {
+  if (totalTax < 25) {
+    return "small";
+  }
+
+  if (totalTax < 1_000) {
+    return "medium";
+  }
+
+  return "large";
+}
+
+function getStateEquivalents(totalTax: number) {
+  const scale = getEquivalentScale(totalTax);
+
+  return EQUIVALENT_IDS_BY_SCALE[scale]
+    .map((id) => STATE_EQUIVALENTS.find((equivalent) => equivalent.id === id))
+    .filter((equivalent): equivalent is StateEquivalent => Boolean(equivalent))
+    .map((equivalent) => ({
+      ...equivalent,
+      value: getEquivalentValue(equivalent, totalTax),
+    }));
+}
+
+function calculateIncomeTaxes(grossIncome: number) {
+  const grossPaye =
+    grossIncome <= TAX_RULES_2026.srcop
+      ? grossIncome * 0.2
+      : TAX_RULES_2026.srcop * 0.2 + (grossIncome - TAX_RULES_2026.srcop) * 0.4;
+  const payeCredits = TAX_RULES_2026.personalCredit + TAX_RULES_2026.payeCredit;
+  const paye = Math.max(0, grossPaye - payeCredits);
+
+  const [band1, band2, band3] = TAX_RULES_2026.uscBands;
+  const [rate1, rate2, rate3, rate4] = TAX_RULES_2026.uscRates;
+
+  let usc = 0;
+  if (grossIncome > TAX_RULES_2026.uscExemptionLimit) {
+    usc += Math.min(grossIncome, band1) * rate1;
+    usc += Math.max(0, Math.min(grossIncome, band2) - band1) * rate2;
+    usc += Math.max(0, Math.min(grossIncome, band3) - band2) * rate3;
+    usc += Math.max(0, grossIncome - band3) * rate4;
+  }
+
+  const prsi =
+    grossIncome > TAX_RULES_2026.prsiThreshold ? grossIncome * TAX_RULES_2026.prsiRate : 0;
+  const total = paye + usc + prsi;
+
+  return { paye, usc, prsi, total };
+}
+
+function getPurchaseTaxLines(item: PurchaseItem): TaxLine[] {
+  const lines: TaxLine[] = [];
+
+  if (item.vatRate) {
+    lines.push({
+      label: `VAT at ${formatPercent(item.vatRate * 100, 1)}`,
+      amount: item.price - item.price / (1 + item.vatRate),
+      note: "Estimated VAT included in the displayed purchase price.",
+    });
+  }
+
+  for (const tax of item.fixedTaxes ?? []) {
+    lines.push(tax);
+  }
+
+  return lines;
+}
+
+function clampIncome(value: number) {
+  return Math.max(MIN_INCOME, Math.min(MAX_INCOME, Math.round(value / INCOME_STEP) * INCOME_STEP));
+}
+
+function readIncomeParam(): number | null {
+  const raw = new URLSearchParams(window.location.search).get("income");
+  if (raw === null) {
+    return null;
+  }
+
+  const income = Number(raw);
+  return Number.isFinite(income) && income > 0 ? clampIncome(income) : null;
+}
+
+function readItemParam(): ItemKind | null {
+  const item = new URLSearchParams(window.location.search).get("item");
+  return ITEMS.some((candidate) => candidate.id === item) ? (item as ItemKind) : null;
+}
+
+function drawRoundedRect(
+  context: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  radius: number,
+) {
+  const clampedRadius = Math.min(radius, width / 2, height / 2);
+
+  context.beginPath();
+  context.moveTo(x + clampedRadius, y);
+  context.lineTo(x + width - clampedRadius, y);
+  context.quadraticCurveTo(x + width, y, x + width, y + clampedRadius);
+  context.lineTo(x + width, y + height - clampedRadius);
+  context.quadraticCurveTo(x + width, y + height, x + width - clampedRadius, y + height);
+  context.lineTo(x + clampedRadius, y + height);
+  context.quadraticCurveTo(x, y + height, x, y + height - clampedRadius);
+  context.lineTo(x, y + clampedRadius);
+  context.quadraticCurveTo(x, y, x + clampedRadius, y);
+  context.closePath();
+}
+
+function drawText(
+  context: CanvasRenderingContext2D,
+  text: string,
+  x: number,
+  y: number,
+  options: {
+    color?: string;
+    font?: string;
+    align?: CanvasTextAlign;
+  } = {},
+) {
+  context.fillStyle = options.color ?? "#1c1917";
+  context.font = options.font ?? "32px Arial";
+  context.textAlign = options.align ?? "left";
+  context.fillText(text, x, y);
+}
+
+function drawFittedText(
+  context: CanvasRenderingContext2D,
+  text: string,
+  x: number,
+  y: number,
+  maxWidth: number,
+  options: {
+    color?: string;
+    fontSize?: number;
+    minFontSize?: number;
+    fontWeight?: number;
+    align?: CanvasTextAlign;
+  } = {},
+) {
+  let fontSize = options.fontSize ?? 32;
+  const minFontSize = options.minFontSize ?? 20;
+  const fontWeight = options.fontWeight ?? 700;
+
+  context.textAlign = options.align ?? "left";
+  context.fillStyle = options.color ?? "#1c1917";
+  context.font = `${fontWeight} ${fontSize}px Arial`;
+
+  while (context.measureText(text).width > maxWidth && fontSize > minFontSize) {
+    fontSize -= 2;
+    context.font = `${fontWeight} ${fontSize}px Arial`;
+  }
+
+  context.fillText(text, x, y);
+}
+
+function buildCurlyBrace(x0: number, x1: number, spineY: number, depth: number) {
+  const xc = (x0 + x1) / 2;
+  const shoulder = depth * 0.6;
+
+  return (
+    `M ${x0} ${spineY} ` +
+    `Q ${x0} ${spineY + shoulder} ${(x0 + xc) / 2} ${spineY + shoulder} ` +
+    `T ${xc} ${spineY + depth} ` +
+    `M ${x1} ${spineY} ` +
+    `Q ${x1} ${spineY + shoulder} ${(x1 + xc) / 2} ${spineY + shoulder} ` +
+    `T ${xc} ${spineY + depth}`
+  );
+}
+
+function drawCurlyBrace(
+  context: CanvasRenderingContext2D,
+  x0: number,
+  x1: number,
+  spineY: number,
+  depth: number,
+  color: string,
+) {
+  const xc = (x0 + x1) / 2;
+  const shoulder = depth * 0.6;
+
+  context.beginPath();
+  context.moveTo(x0, spineY);
+  context.quadraticCurveTo(x0, spineY + shoulder, (x0 + xc) / 2, spineY + shoulder);
+  context.quadraticCurveTo(xc, spineY + shoulder, xc, spineY + depth);
+  context.moveTo(x1, spineY);
+  context.quadraticCurveTo(x1, spineY + shoulder, (x1 + xc) / 2, spineY + shoulder);
+  context.quadraticCurveTo(xc, spineY + shoulder, xc, spineY + depth);
+  context.strokeStyle = color;
+  context.lineWidth = 3;
+  context.lineCap = "round";
+  context.lineJoin = "round";
+  context.stroke();
+}
+
+function downloadBlob(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+type EarningsBarProps = {
+  segments: Segment[];
+  grossRequired: number;
+  itemPrice: number;
+  totalTax: number;
+  currencyDigits: number;
+  itemPriceShare: number;
+  taxStartShare: number;
+  showItemLabel: boolean;
+  showTaxLabel: boolean;
+};
+
+const BAR_VIEW_HEIGHT = 154;
+
+function EarningsBar({
+  segments,
+  grossRequired,
+  itemPrice,
+  totalTax,
+  currencyDigits,
+  itemPriceShare,
+  taxStartShare,
+  showItemLabel,
+  showTaxLabel,
+}: EarningsBarProps) {
+  const reduceMotion = useReducedMotion();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(0);
+
+  useEffect(() => {
+    const element = containerRef.current;
+    if (!element) {
+      return;
+    }
+
+    setWidth(element.clientWidth);
+
+    const observer = new ResizeObserver((entries) => {
+      const measured = entries[0]?.contentRect.width;
+      if (typeof measured === "number") {
+        setWidth(measured);
+      }
+    });
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  const barY = 56;
+  const barHeight = 40;
+  const gap = 3;
+  const radius = 9;
+  const topSpineY = 42;
+  const bottomSpineY = 108;
+  const braceDepth = 10;
+  const topLabelY = 24;
+  const bottomLabelY = 132;
+
+  const toPx = (share: number) => (Math.max(0, Math.min(100, share)) / 100) * width;
+
+  const segmentRects = segments.map((segment, index) => {
+    const segmentWidth = (segment.value / grossRequired) * width;
+    const offset = segments
+      .slice(0, index)
+      .reduce((sum, previous) => sum + (previous.value / grossRequired) * width, 0);
+    return { segment, x: offset, width: segmentWidth };
+  });
+
+  const itemBraceX1 = toPx(itemPriceShare);
+  const taxBraceX0 = toPx(taxStartShare);
+  const taxBraceX1 = width;
+  const itemLabelCenter = itemBraceX1 / 2;
+  const taxLabelCenter = (taxBraceX0 + taxBraceX1) / 2;
+
+  const transition = reduceMotion
+    ? { duration: 0 }
+    : { type: "spring" as const, stiffness: 140, damping: 22, mass: 0.9 };
+
+  return (
+    <div ref={containerRef} className="w-full">
+      <svg
+        width="100%"
+        height={BAR_VIEW_HEIGHT}
+        viewBox={`0 0 ${Math.max(1, width)} ${BAR_VIEW_HEIGHT}`}
+        className="overflow-visible"
+        role="img"
+        aria-label={`Earnings breakdown: item price ${formatCurrency(itemPrice, currencyDigits)} and total tax ${formatCurrency(totalTax, currencyDigits)} out of ${formatCurrency(grossRequired, getCurrencyFractionDigits(grossRequired))} gross earnings.`}
+      >
+        {width > 0 ? (
+          <>
+            <motion.path
+              initial={false}
+              animate={{ d: buildCurlyBrace(0, itemBraceX1, topSpineY, -braceDepth) }}
+              transition={transition}
+              fill="none"
+              stroke="#b45309"
+              strokeWidth={2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <motion.g
+              initial={false}
+              animate={{ x: itemLabelCenter, opacity: showItemLabel ? 1 : 0 }}
+              transition={transition}
+            >
+              <text textAnchor="middle" y={topLabelY} fontSize={14} fill="#b45309" letterSpacing={0.2}>
+                <tspan fontWeight={600}>Item price</tspan>
+                <tspan fontWeight={800} dx={7}>
+                  {formatCurrency(itemPrice, currencyDigits)}
+                </tspan>
+              </text>
+            </motion.g>
+
+            {segmentRects.map(({ segment, x, width: segmentWidth }) => (
+              <motion.rect
+                key={segment.label}
+                x={0}
+                y={barY}
+                height={barHeight}
+                rx={radius}
+                fill={segment.fill}
+                initial={false}
+                animate={{ x: x + gap / 2, width: Math.max(0, segmentWidth - gap) }}
+                transition={transition}
+              >
+                <title>{`${segment.label}: ${formatCurrency(segment.value, currencyDigits)}`}</title>
+              </motion.rect>
+            ))}
+
+            <motion.path
+              initial={false}
+              animate={{ d: buildCurlyBrace(taxBraceX0, taxBraceX1, bottomSpineY, braceDepth) }}
+              transition={transition}
+              fill="none"
+              stroke="#be123c"
+              strokeWidth={2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <motion.g
+              initial={false}
+              animate={{ x: taxLabelCenter, opacity: showTaxLabel ? 1 : 0 }}
+              transition={transition}
+            >
+              <text textAnchor="middle" y={bottomLabelY} fontSize={14} fill="#be123c" letterSpacing={0.2}>
+                <tspan fontWeight={600}>Total tax</tspan>
+                <tspan fontWeight={800} dx={7}>
+                  {formatCurrency(totalTax, currencyDigits)}
+                </tspan>
+              </text>
+            </motion.g>
+          </>
+        ) : null}
+      </svg>
+    </div>
+  );
+}
+
+export default function IrishPurchaseTaxTime2026() {
+  const [grossIncome, setGrossIncome] = useState(DEFAULT_INCOME);
+  const [selectedId, setSelectedId] = useState<ItemKind>("roll");
+  const [shareStatus, setShareStatus] = useState<"idle" | "sharing" | "shared" | "fallback" | "error">("idle");
+
+  // Seed editable state from URL params after mount. Reading the URL during the
+  // initial render would diverge from the server-rendered defaults and break hydration,
+  // so this one-shot sync intentionally calls setState inside an effect.
+  useEffect(() => {
+    const income = readIncomeParam();
+    if (income !== null) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setGrossIncome(income);
+    }
+
+    const item = readItemParam();
+    if (item !== null) {
+      setSelectedId(item);
+    }
+  }, []);
+
+  const selectedItem = ITEMS.find((item) => item.id === selectedId) ?? ITEMS[0];
+
+  const result = useMemo(() => {
+    const annualTaxes = calculateIncomeTaxes(grossIncome);
+    const netAnnual = Math.max(0, grossIncome - annualTaxes.total);
+    const netRate = netAnnual / grossIncome;
+    const grossHourly = grossIncome / ANNUAL_WORK_HOURS;
+    const purchaseTaxes = getPurchaseTaxLines(selectedItem);
+    const purchaseTaxTotal = purchaseTaxes.reduce((total, line) => total + line.amount, 0);
+    const preTaxItemPrice = Math.max(0, selectedItem.price - purchaseTaxTotal);
+    const grossRequired = selectedItem.price / Math.max(netRate, 0.01);
+    const incomeTaxToEarn = Math.max(0, grossRequired - selectedItem.price);
+    const totalTax = incomeTaxToEarn + purchaseTaxTotal;
+    const totalWorkHours = grossRequired / grossHourly;
+    const incomeTaxHours = incomeTaxToEarn / grossHourly;
+    const purchaseTaxHours = purchaseTaxTotal / grossHourly;
+    const itemHours = preTaxItemPrice / grossHourly;
+    const totalTaxHours = incomeTaxHours + purchaseTaxHours;
+    const totalTaxPercent = (totalTax / grossRequired) * 100;
+    const annualScale = grossRequired / grossIncome;
+
+    const incomeTaxLines: TaxLine[] = [
+      {
+        label: "Income tax",
+        amount: annualTaxes.paye * annualScale,
+        note: "PAYE income tax allocated across the gross earnings needed for this purchase.",
+      },
+      {
+        label: "USC",
+        amount: annualTaxes.usc * annualScale,
+        note: "USC allocated across the gross earnings needed for this purchase.",
+      },
+      {
+        label: "PRSI",
+        amount: annualTaxes.prsi * annualScale,
+        note: "Employee PRSI allocated across the gross earnings needed for this purchase.",
+      },
+    ];
+
+    const segments: Segment[] = [
+      {
+        label: "Item before direct purchase tax",
+        shortLabel: "Item",
+        value: preTaxItemPrice,
+        hours: itemHours,
+        color: "bg-emerald-500",
+        fill: "#10b981",
+      },
+      {
+        label: "Purchase tax",
+        shortLabel: "Purchase tax",
+        value: purchaseTaxTotal,
+        hours: purchaseTaxHours,
+        color: "bg-amber-500",
+        fill: "#f59e0b",
+      },
+      {
+        label: "Income tax to earn it",
+        shortLabel: "Income tax",
+        value: incomeTaxToEarn,
+        hours: incomeTaxHours,
+        color: "bg-rose-500",
+        fill: "#f43f5e",
+      },
+    ];
+
+    return {
+      annualTaxes,
+      netAnnual,
+      netRate,
+      grossHourly,
+      purchaseTaxes,
+      purchaseTaxTotal,
+      preTaxItemPrice,
+      grossRequired,
+      incomeTaxToEarn,
+      totalTax,
+      totalWorkHours,
+      incomeTaxHours,
+      purchaseTaxHours,
+      itemHours,
+      totalTaxHours,
+      totalTaxPercent,
+      incomeTaxLines,
+      segments,
+    };
+  }, [grossIncome, selectedItem]);
+
+  const selectedCurrencyDigits = getCurrencyFractionDigits(selectedItem.price);
+  const grossRequiredCurrencyDigits = getCurrencyFractionDigits(result.grossRequired);
+  const itemShare = (result.preTaxItemPrice / result.grossRequired) * 100;
+  const transactionPriceShare = (selectedItem.price / result.grossRequired) * 100;
+  const totalTaxShare = (result.totalTax / result.grossRequired) * 100;
+  const showTransactionBraceLabel = transactionPriceShare >= 24;
+  const showTotalTaxBraceLabel = totalTaxShare >= 24;
+  const stateEquivalents = getStateEquivalents(result.totalTax);
+
+  const getShareUrl = () => {
+    const url = new URL(window.location.href);
+    url.searchParams.set("item", selectedItem.id);
+    url.searchParams.set("income", String(grossIncome));
+    return url.toString();
+  };
+
+  const createShareImageBlob = async () => {
+    const width = 1200;
+    const height = 920;
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+
+    const context = canvas.getContext("2d");
+    if (!context) {
+      throw new Error("Could not create share image.");
+    }
+
+    context.fillStyle = "#f8f5f0";
+    context.fillRect(0, 0, width, height);
+
+    context.shadowColor = "rgba(0, 0, 0, 0.18)";
+    context.shadowBlur = 40;
+    context.shadowOffsetY = 18;
+    drawRoundedRect(context, 72, 66, 1056, 788, 44);
+    context.fillStyle = "#ffffff";
+    context.fill();
+    context.shadowColor = "transparent";
+
+    drawText(context, "WHAT DID THAT REALLY COST?", 120, 138, {
+      font: "800 30px Arial",
+      color: "#0a5c36",
+    });
+    drawText(context, selectedItem.name, 120, 220, {
+      font: "900 64px Arial",
+      color: "#1c1917",
+    });
+    drawText(
+      context,
+      `${selectedItem.category} - ${formatCurrency(selectedItem.price, selectedCurrencyDigits)} shelf price - ${formatCurrency(grossIncome)} gross salary`,
+      120,
+      268,
+      {
+        font: "500 25px Arial",
+        color: "#57534e",
+      },
+    );
+
+    drawRoundedRect(context, 120, 320, 960, 124, 28);
+    context.fillStyle = "#fafaf9";
+    context.fill();
+    context.strokeStyle = "#e7e5e4";
+    context.lineWidth = 2;
+    context.stroke();
+
+    drawText(context, "ITEM PRICE", 158, 362, {
+      font: "800 18px Arial",
+      color: "#92400e",
+    });
+    drawText(context, formatCurrency(selectedItem.price, selectedCurrencyDigits), 158, 406, {
+      font: "900 38px Arial",
+      color: "#1c1917",
+    });
+    drawText(context, "+", 393, 394, {
+      font: "900 34px Arial",
+      color: "#a8a29e",
+      align: "center",
+    });
+    drawText(context, "INCOME TAX TO EARN IT", 430, 362, {
+      font: "800 18px Arial",
+      color: "#be123c",
+    });
+    drawText(context, formatCurrency(result.incomeTaxToEarn, selectedCurrencyDigits), 430, 406, {
+      font: "900 38px Arial",
+      color: "#1c1917",
+    });
+    drawText(context, "=", 687, 394, {
+      font: "900 34px Arial",
+      color: "#a8a29e",
+      align: "center",
+    });
+    drawText(context, "TOTAL EARNINGS", 726, 362, {
+      font: "800 18px Arial",
+      color: "#047857",
+    });
+    drawText(context, formatCurrency(result.grossRequired, grossRequiredCurrencyDigits), 726, 406, {
+      font: "900 38px Arial",
+      color: "#1c1917",
+    });
+    drawText(context, `of which total tax: ${formatCurrency(result.totalTax, selectedCurrencyDigits)}`, 1048, 427, {
+      font: "700 20px Arial",
+      color: "#78716c",
+      align: "right",
+    });
+
+    drawText(context, "Where the gross earnings go", 120, 528, {
+      font: "800 32px Arial",
+      color: "#1c1917",
+    });
+    drawText(context, `${formatCurrency(result.grossRequired, grossRequiredCurrencyDigits)} gross earnings`, 1080, 528, {
+      font: "700 20px Arial",
+      color: "#78716c",
+      align: "right",
+    });
+
+    const barX = 120;
+    const barY = 606;
+    const barWidth = 960;
+    const barHeight = 44;
+    const canvasItemShare = result.preTaxItemPrice / result.grossRequired;
+    const canvasTransactionPriceShare = selectedItem.price / result.grossRequired;
+    const canvasTotalTaxShare = result.totalTax / result.grossRequired;
+
+    drawFittedText(
+      context,
+      `Item price ${formatCurrency(selectedItem.price, selectedCurrencyDigits)}`,
+      barX + (canvasTransactionPriceShare * barWidth) / 2,
+      576,
+      Math.max(150, canvasTransactionPriceShare * barWidth - 24),
+      {
+        fontSize: 24,
+        minFontSize: 16,
+        fontWeight: 600,
+        color: "#92400e",
+        align: "center",
+      },
+    );
+    drawCurlyBrace(context, barX, barX + canvasTransactionPriceShare * barWidth, 592, -12, "#92400e");
+
+    const canvasGap = 6;
+    let segmentX = barX;
+    for (const segment of result.segments) {
+      const segmentWidth = (segment.value / result.grossRequired) * barWidth;
+      const drawWidth = Math.max(0, segmentWidth - canvasGap);
+      drawRoundedRect(context, segmentX + canvasGap / 2, barY, drawWidth, barHeight, 12);
+      context.fillStyle = segment.fill;
+      context.fill();
+      segmentX += segmentWidth;
+    }
+
+    drawCurlyBrace(
+      context,
+      barX + canvasItemShare * barWidth,
+      barX + canvasItemShare * barWidth + canvasTotalTaxShare * barWidth,
+      664,
+      12,
+      "#be123c",
+    );
+    drawFittedText(
+      context,
+      `Total tax ${formatCurrency(result.totalTax, selectedCurrencyDigits)}`,
+      barX + canvasItemShare * barWidth + (canvasTotalTaxShare * barWidth) / 2,
+      706,
+      Math.max(150, canvasTotalTaxShare * barWidth - 24),
+      {
+        fontSize: 24,
+        minFontSize: 16,
+        fontWeight: 600,
+        color: "#be123c",
+        align: "center",
+      },
+    );
+
+    result.segments.forEach((segment, index) => {
+      const x = 120 + index * 320;
+      drawRoundedRect(context, x, 728, 292, 92, 22);
+      context.fillStyle = "#fafaf9";
+      context.fill();
+      context.strokeStyle = "#e7e5e4";
+      context.stroke();
+
+      drawRoundedRect(context, x + 24, 750, 18, 18, 9);
+      context.fillStyle = segment.fill;
+      context.fill();
+      drawText(context, segment.shortLabel, x + 54, 766, {
+        font: "700 21px Arial",
+        color: "#292524",
+      });
+      drawFittedText(context, formatWorkTime(segment.hours), x + 24, 802, 122, {
+        fontSize: 26,
+        minFontSize: 19,
+        fontWeight: 800,
+        color: "#1c1917",
+      });
+      drawFittedText(context, formatCurrency(segment.value, selectedCurrencyDigits), x + 150, 802, 120, {
+        fontSize: 21,
+        minFontSize: 16,
+        fontWeight: 600,
+        color: "#57534e",
+      });
+    });
+
+    drawText(context, "Irish Purchase Tax Time 2026 - illustrative assumptions", 120, 838, {
+      font: "600 18px Arial",
+      color: "#78716c",
+    });
+
+    return new Promise<Blob>((resolve, reject) => {
+      canvas.toBlob((blob) => {
+        if (blob) {
+          resolve(blob);
+          return;
+        }
+
+        reject(new Error("Could not create share image."));
+      }, "image/png");
+    });
+  };
+
+  const handleShare = async () => {
+    setShareStatus("sharing");
+
+    try {
+      const shareUrl = getShareUrl();
+      const blob = await createShareImageBlob();
+      const file = new File([blob], `purchase-tax-time-${selectedItem.id}.png`, { type: "image/png" });
+      const shareData = {
+        title: `What did ${selectedItem.name.toLowerCase()} really cost?`,
+        text: `${selectedItem.name}: ${formatWorkTime(result.totalWorkHours)} gross work, with ${formatPercent(result.totalTaxPercent)} paid in tax.`,
+        url: shareUrl,
+        files: [file],
+      };
+
+      if (navigator.share && navigator.canShare?.({ files: [file] })) {
+        await navigator.share(shareData);
+        setShareStatus("shared");
+        return;
+      }
+
+      if (navigator.share) {
+        await navigator.share({
+          title: shareData.title,
+          text: shareData.text,
+          url: shareData.url,
+        });
+        downloadBlob(blob, file.name);
+        setShareStatus("fallback");
+        return;
+      }
+
+      await navigator.clipboard?.writeText(shareUrl);
+      downloadBlob(blob, file.name);
+      setShareStatus("fallback");
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        setShareStatus("idle");
+        return;
+      }
+
+      setShareStatus("error");
+    }
+  };
+
+  return (
+    <div className="mx-auto max-w-7xl px-4 pt-10 pb-24 sm:px-6 lg:px-8">
+      <Link
+        href="/labs"
+        className="mb-8 inline-flex items-center gap-2 text-stone-500 transition-colors hover:text-stone-900"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        <span className="font-mono text-sm font-medium uppercase tracking-[0.2em]">Back to Labs</span>
+      </Link>
+
+      <header className="mb-10 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+        <div className="space-y-4">
+          <p className="font-mono text-xs font-semibold uppercase tracking-[0.3em] text-stone-500">
+            Irish Tax Lens - 2026 assumptions
+          </p>
+          <h1 className="text-5xl font-black uppercase leading-[0.9] tracking-tight text-stone-900 sm:text-7xl">
+            What Did That Really Cost?
+          </h1>
+          <p className="max-w-4xl text-lg leading-relaxed text-stone-600 sm:text-xl">
+            See how much working time goes to the thing itself, the tax
+            charged when you buy it, and the income taxes paid before your wages became spending
+            money.
+          </p>
+        </div>
+
+        <aside className="h-fit rounded-[2rem] border border-stone-200 bg-white p-5 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)]">
+          <div className="flex items-center justify-between gap-4">
+            <span className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">
+              Gross salary
+            </span>
+            <span className="text-lg font-black text-stone-900">{formatCurrency(grossIncome)}</span>
+          </div>
+          <div className="mt-5 grid grid-cols-2 gap-3">
+            <div className="rounded-2xl border border-stone-200 bg-stone-50 p-4">
+              <p className="text-2xl font-black text-stone-900">
+                {formatPercent(result.netRate * 100)}
+              </p>
+              <p className="mt-1 text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
+                Take-home ratio
+              </p>
+            </div>
+            <div className="rounded-2xl border border-stone-200 bg-stone-50 p-4">
+              <p className="text-2xl font-black text-stone-900">
+                {formatCurrency(result.grossHourly, 2)}
+              </p>
+              <p className="mt-1 text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
+                Gross hourly
+              </p>
+            </div>
+          </div>
+          <label className="mt-5 block">
+            <input
+              type="range"
+              min={MIN_INCOME}
+              max={MAX_INCOME}
+              step={INCOME_STEP}
+              value={grossIncome}
+              onChange={(event) => setGrossIncome(clampIncome(Number(event.target.value)))}
+              className="h-2 w-full cursor-pointer appearance-none rounded-full bg-stone-200 accent-stone-900"
+            />
+          </label>
+        </aside>
+      </header>
+
+      <section className="grid gap-6 lg:grid-cols-[19rem_minmax(0,1fr)]">
+        <nav
+          className="h-fit rounded-[2rem] border border-stone-200 bg-white p-4 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)] lg:sticky lg:top-6"
+          aria-label="Purchases"
+        >
+          <h2 className="mb-3 px-2 font-mono text-xs font-semibold uppercase tracking-[0.3em] text-stone-500">
+            Purchases
+          </h2>
+          <div className="space-y-2">
+            {ITEMS.map((item) => {
+              const isSelected = item.id === selectedItem.id;
+
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => setSelectedId(item.id)}
+                  className={`flex w-full items-center gap-3 rounded-2xl border p-3 text-left transition ${
+                    isSelected
+                      ? "border-emerald-300 bg-emerald-50 text-emerald-950"
+                      : "border-transparent text-stone-700 hover:bg-stone-100"
+                  }`}
+                >
+                  <span className="relative h-14 w-16 shrink-0 overflow-hidden rounded-2xl bg-stone-100 ring-1 ring-stone-200">
+                    <Image
+                      src={item.image}
+                      alt=""
+                      fill
+                      sizes="64px"
+                      className="object-cover"
+                    />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-sm font-black">{item.name}</span>
+                    <span className="mt-1 block font-mono text-xs uppercase tracking-[0.16em] text-stone-500">
+                      {formatCurrency(item.price, getCurrencyFractionDigits(item.price))} - {item.category}
+                    </span>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </nav>
+
+        <article className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)] sm:p-8">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <p className="font-mono text-xs font-semibold uppercase tracking-[0.3em] text-emerald-700">
+              {selectedItem.category}
+            </p>
+            <div className="flex flex-col items-start gap-2 sm:items-end">
+              <button
+                type="button"
+                onClick={handleShare}
+                disabled={shareStatus === "sharing"}
+                className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-stone-50 px-4 py-2 text-sm font-bold leading-none text-stone-800 transition hover:border-stone-300 hover:bg-white disabled:cursor-wait disabled:opacity-60"
+              >
+                <Share2 className="h-4 w-4" />
+                <span className="leading-none">
+                  {shareStatus === "sharing" ? "Preparing..." : "Share result"}
+                </span>
+              </button>
+              {shareStatus !== "idle" && shareStatus !== "sharing" ? (
+                <p className="max-w-64 text-left text-xs leading-relaxed text-stone-500 sm:text-right">
+                  {shareStatus === "shared"
+                    ? "Shared with a summary image."
+                    : shareStatus === "fallback"
+                      ? "Link copied or shared, and the summary image was downloaded."
+                      : "Could not share this result. Try again."}
+                </p>
+              ) : null}
+            </div>
+          </div>
+          <h2 className="mt-3 text-4xl font-black leading-tight tracking-tight text-stone-900 sm:text-5xl">
+            {selectedItem.name}
+          </h2>
+          <p className="mt-3 max-w-2xl text-lg leading-relaxed text-stone-600">
+            {selectedItem.description}
+          </p>
+          <p className="mt-2 max-w-2xl text-xs leading-relaxed text-stone-500">
+            <span className="text-stone-400" aria-hidden="true">* </span>
+            {selectedItem.assumption}
+          </p>
+
+          <section className="mt-8 rounded-[1.5rem] border border-stone-200 bg-stone-50 p-5">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <h3 className="text-xl font-black tracking-tight text-stone-900">
+                  Where your earnings go
+                </h3>
+              </div>
+              <div className="shrink-0 min-w-[15rem] rounded-2xl bg-white px-6 pt-4 pb-3 ring-1 ring-stone-200">
+                <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
+                  Total earnings
+                </p>
+                <div className="mt-2 flex w-full items-baseline justify-between gap-4">
+                  <p className="text-3xl font-black leading-none text-stone-900">
+                    {formatCurrency(result.grossRequired, grossRequiredCurrencyDigits)}
+                  </p>
+                  <p className="text-sm font-semibold text-stone-600">
+                    {formatWorkTime(result.totalWorkHours)}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-3">
+              <EarningsBar
+                segments={result.segments}
+                grossRequired={result.grossRequired}
+                itemPrice={selectedItem.price}
+                totalTax={result.totalTax}
+                currencyDigits={selectedCurrencyDigits}
+                itemPriceShare={transactionPriceShare}
+                taxStartShare={itemShare}
+                showItemLabel={showTransactionBraceLabel}
+                showTaxLabel={showTotalTaxBraceLabel}
+              />
+            </div>
+
+            <div className="mt-5 grid gap-3 md:grid-cols-3">
+              {result.segments.map((segment) => (
+                <div key={segment.label} className="rounded-2xl border border-stone-200 bg-white p-4">
+                  <div className="flex items-center gap-2.5">
+                    <span className={`h-3.5 w-3.5 rounded-full ${segment.color}`} />
+                    <p className="text-base font-black tracking-tight text-stone-900">{segment.shortLabel}</p>
+                  </div>
+                  <div className="mt-2 flex w-full items-baseline justify-between gap-4">
+                    <p className="text-2xl font-black leading-none text-stone-900">
+                      {formatCurrency(segment.value, selectedCurrencyDigits)}
+                    </p>
+                    <p className="text-sm font-semibold text-stone-600">
+                      {formatWorkTime(segment.hours)}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="mt-6 rounded-[1.5rem] border border-stone-200 bg-white p-5">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h3 className="text-xl font-black tracking-tight text-stone-900">
+                  What could the state buy with this tax?
+                </h3>
+                <p className="mt-1 text-sm leading-relaxed text-stone-600">
+                  Very rough scale comparisons, not earmarked spending.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-5 grid gap-3 md:grid-cols-3">
+              {stateEquivalents.map((equivalent) => (
+                <article key={equivalent.id} className="rounded-2xl border border-stone-200 bg-stone-50 p-4">
+                  <p className="font-mono text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
+                    {equivalent.bucket}
+                  </p>
+                  <h4 className="mt-2 text-base font-black tracking-tight text-stone-900">
+                    {equivalent.label}
+                  </h4>
+                  <p className="mt-3 text-2xl font-black leading-tight text-stone-900">
+                    {equivalent.value}
+                  </p>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <details className="group mt-6 rounded-[1.5rem] border border-stone-200 bg-white">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-5 [&::-webkit-details-marker]:hidden">
+              <div>
+                <h3 className="text-lg font-black tracking-tight text-stone-900">Additional detail</h3>
+                <p className="mt-1 text-sm text-stone-600">
+                  Show the tax line items and model assumptions.
+                </p>
+              </div>
+              <ChevronDown className="h-5 w-5 shrink-0 text-stone-500 transition-transform group-open:rotate-180" />
+            </summary>
+
+            <div className="border-t border-stone-200 p-5 pt-0">
+              <section className="mt-5 rounded-[1.5rem] border border-stone-200 bg-stone-50 p-5">
+                <h3 className="text-lg font-black tracking-tight text-stone-900">
+                  State-equivalent assumptions
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-stone-600">
+                  These are order-of-magnitude comparisons used for the state-scale cards.
+                </p>
+                <div className="mt-4 grid gap-3 text-sm text-stone-700 md:grid-cols-2">
+                  {STATE_EQUIVALENTS.map((equivalent) => (
+                    <div key={equivalent.id} className="border-b border-stone-200 pb-3 last:border-b-0 md:last:border-b">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="font-semibold text-stone-900">{equivalent.label}</p>
+                          <p className="mt-1 text-xs font-semibold uppercase tracking-[0.14em] text-stone-500">
+                            {equivalent.bucket}
+                          </p>
+                        </div>
+                        <span className="shrink-0 rounded-full bg-white px-2.5 py-1 font-mono text-xs font-semibold text-stone-500 ring-1 ring-stone-200">
+                          {formatCurrency(equivalent.unitCost, getCurrencyFractionDigits(equivalent.unitCost))} /{" "}
+                          {equivalent.unitLabel}
+                        </span>
+                      </div>
+                      <p className="mt-2 text-xs leading-relaxed text-stone-500">{equivalent.note}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              <div className="grid gap-6 pt-5 xl:grid-cols-2">
+                <section className="rounded-[1.5rem] border border-stone-200 bg-stone-50 p-5">
+                  <h3 className="text-lg font-black tracking-tight text-stone-900">Purchase tax detail</h3>
+                  <div className="mt-4 space-y-3">
+                    <div className="flex items-center justify-between gap-4 border-b border-stone-200 pb-3">
+                      <span className="text-sm text-stone-600">Item before these direct taxes</span>
+                      <span className="font-bold text-stone-900">
+                        {formatCurrency(result.preTaxItemPrice, selectedCurrencyDigits)}
+                      </span>
+                    </div>
+                    {result.purchaseTaxes.map((line) => (
+                      <div key={line.label} className="border-b border-stone-200 pb-3 last:border-b-0">
+                        <div className="flex items-center justify-between gap-4">
+                          <span className="text-sm font-semibold text-stone-700">{line.label}</span>
+                          <span className="font-bold text-stone-900">
+                            {formatCurrency(line.amount, selectedCurrencyDigits)}
+                          </span>
+                        </div>
+                        <p className="mt-1 text-xs leading-relaxed text-stone-500">{line.note}</p>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="rounded-[1.5rem] border border-stone-200 bg-stone-50 p-5">
+                  <h3 className="text-lg font-black tracking-tight text-stone-900">Income tax detail</h3>
+                  <div className="mt-4 space-y-3">
+                    {result.incomeTaxLines.map((line) => (
+                      <div key={line.label} className="border-b border-stone-200 pb-3 last:border-b-0">
+                        <div className="flex items-center justify-between gap-4">
+                          <span className="text-sm font-semibold text-stone-700">{line.label}</span>
+                          <span className="font-bold text-stone-900">
+                            {formatCurrency(line.amount, selectedCurrencyDigits)}
+                          </span>
+                        </div>
+                        <p className="mt-1 text-xs leading-relaxed text-stone-500">{line.note}</p>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              </div>
+
+              <section className="mt-6 rounded-[1.5rem] border border-amber-200 bg-amber-50 p-5">
+                <div className="flex gap-3">
+                  <Info className="mt-0.5 h-5 w-5 shrink-0 text-amber-700" />
+                  <div>
+                    <h3 className="font-black tracking-tight text-stone-900">What this model leaves out</h3>
+                    <p className="mt-2 leading-relaxed text-stone-700">
+                      These are illustrative direct taxes only. The model does not estimate supplier
+                      VAT, corporate tax, employer PRSI, import duties, local charges, discounts,
+                      deductions, pension contributions, or product-specific reliefs. It is meant to
+                      make the time trade-off legible, not to produce a tax bill.
+                    </p>
+                    <div className="mt-4 grid gap-3 text-sm text-stone-700 md:grid-cols-3">
+                      <p>
+                        <span className="font-bold text-stone-900">Income:</span> single PAYE employee,
+                        2026 illustrative PAYE, USC, and employee PRSI.
+                      </p>
+                      <p>
+                        <span className="font-bold text-stone-900">Time:</span> 37.5 paid hours per
+                        week for 52 weeks, before holidays or unpaid time.
+                      </p>
+                      <p>
+                        <span className="font-bold text-stone-900">Purchases:</span> direct transaction
+                        taxes are simplified and displayed beside each item.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </details>
+        </article>
+      </section>
+    </div>
+  );
+}

@@ -91,6 +91,7 @@ const THEME_FOLDERS = new Set([
   "Mountains",
   "People",
   "Portraits",
+  "Recents",
 ]);
 
 function loadCurated(): Record<string, CuratedAlbum> {
@@ -298,9 +299,7 @@ async function main() {
   if (uncategorizedImages.length > 0) {
     console.log(`Found ${uncategorizedImages.length} photos not in any theme album`);
     
-    // Get the folder for the first uncategorized image to use as cover source
     const firstImg = uncategorizedImages[0];
-    const firstLocation = firstImg.location ?? "Uncategorized";
     
     albumsById.set("Uncategorized", {
       id: "Uncategorized",

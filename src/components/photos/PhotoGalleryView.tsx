@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { type CSSProperties, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -13,20 +13,121 @@ interface PhotoGalleryViewProps {
   locations: LocationAlbum[];
 }
 
+type PhotoBrowseItem = {
+  id: string;
+  title: string;
+  href: string;
+  imageSrc: string;
+  imageAlt: string;
+  count: number;
+  hasPrints?: boolean;
+};
+
 const carouselVariants = {
   enter: { opacity: 0, y: 14 },
   visible: { opacity: 1, y: 0 },
   exit: { opacity: 0, y: 14 },
 };
 
+function getBalancedRows<T>(items: T[], maxRowSize: number) {
+  if (items.length === 0) return [];
+
+  const rowCount = Math.ceil(items.length / maxRowSize);
+  const baseRowSize = Math.floor(items.length / rowCount);
+  const rowsWithExtraItem = items.length % rowCount;
+  const rows: T[][] = [];
+  let start = 0;
+
+  for (let rowIndex = 0; rowIndex < rowCount; rowIndex += 1) {
+    const rowSize = baseRowSize + (rowIndex < rowsWithExtraItem ? 1 : 0);
+    rows.push(items.slice(start, start + rowSize));
+    start += rowSize;
+  }
+
+  return rows;
+}
+
+function PhotoBrowseCard({
+  item,
+  className = "",
+  style,
+  onMouseEnter,
+  onFocus,
+  onBlur,
+}: {
+  item: PhotoBrowseItem;
+  className?: string;
+  style?: CSSProperties;
+  onMouseEnter?: () => void;
+  onFocus?: () => void;
+  onBlur?: () => void;
+}) {
+  return (
+    <Link
+      href={item.href}
+      className={`photo-strip-card group ${className}`}
+      style={style}
+      onMouseEnter={onMouseEnter}
+      onFocus={onFocus}
+      onBlur={onBlur}
+    >
+      <div
+        className="photo-strip-card-frame"
+        style={{ inset: 0, width: "100%", height: "100%", transform: "none", boxShadow: "none" }}
+      >
+        <Image
+          src={item.imageSrc}
+          alt={item.imageAlt}
+          fill
+          className="object-cover transition-transform duration-[600ms] ease-out group-hover:scale-[1.03]"
+          sizes="(max-width: 640px) 80vw, (max-width: 1279px) 45vw, 60vw"
+        />
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-6 sm:p-10 text-white">
+          <h4 className="font-[family-name:var(--font-serif)] text-[clamp(1.25rem,2.2vw,1.75rem)] font-semibold mb-1">
+            {item.title}
+          </h4>
+          <span className="font-[family-name:var(--font-mono)] text-[0.65rem] uppercase tracking-[0.15em] text-white/55">
+            {item.count} Photographs
+          </span>
+          {item.hasPrints && (
+            <div className="mt-2 font-[family-name:var(--font-mono)] text-[0.6rem] uppercase tracking-[0.16em] text-[var(--color-yellow)]">
+              Limited prints available
+            </div>
+          )}
+        </div>
+      </div>
+    </Link>
+  );
+}
+
 export function PhotoGalleryView({ albums, locations }: PhotoGalleryViewProps) {
   const [viewMode, setViewMode] = useState<ViewMode>("themes");
+  const [activeDesktopItem, setActiveDesktopItem] = useState<string | null>(null);
 
   const featured = albums[0];
   const availablePrintCount = albums.reduce(
     (count, album) => count + album.images.filter((image) => image.print?.available).length,
     0,
   );
+  const themeItems: PhotoBrowseItem[] = albums.map((album) => ({
+    id: album.id,
+    title: album.title,
+    href: `/photos/${encodeURIComponent(album.id)}`,
+    imageSrc: `/photos/${encodeURIComponent(album.id)}/${encodeURIComponent(album.cover)}`,
+    imageAlt: album.title,
+    count: album.images.length,
+    hasPrints: album.images.some((image) => image.print?.available),
+  }));
+  const locationItems: PhotoBrowseItem[] = locations.map((loc) => ({
+    id: loc.id,
+    title: loc.name,
+    href: `/photos/location/${encodeURIComponent(loc.id)}`,
+    imageSrc: `/photos/${encodeURIComponent(loc.coverAlbum)}/${encodeURIComponent(loc.cover)}`,
+    imageAlt: loc.name,
+    count: loc.photoCount,
+  }));
+  const browseItems = viewMode === "themes" ? themeItems : locationItems;
+  const desktopRows = getBalancedRows(browseItems, 5);
 
   return (
     <div>
@@ -93,7 +194,7 @@ export function PhotoGalleryView({ albums, locations }: PhotoGalleryViewProps) {
                 <span className="pill-label">Available Prints ({availablePrintCount})</span>
               </Link>
             )}
-            <span className="hidden sm:block font-[family-name:var(--font-display)] text-[0.8rem] uppercase tracking-[0.15em] text-[var(--text-muted)] whitespace-nowrap">
+            <span className="hidden sm:block xl:hidden font-[family-name:var(--font-display)] text-[0.8rem] uppercase tracking-[0.15em] text-[var(--text-muted)] whitespace-nowrap">
               Scroll to browse &rarr;
             </span>
           </div>
@@ -109,59 +210,50 @@ export function PhotoGalleryView({ albums, locations }: PhotoGalleryViewProps) {
             exit="exit"
             transition={{ duration: 0.35, ease: [0.25, 1, 0.5, 1] }}
           >
-            <div className="flex overflow-x-auto snap-x snap-mandatory pb-20 photo-carousel">
-              {viewMode === "themes"
-                ? albums.map((album) => (
-                    <Link
-                      key={album.id}
-                      href={`/photos/${encodeURIComponent(album.id)}`}
-                      className="photo-strip-card group"
-                    >
-                      <Image
-                        src={`/photos/${encodeURIComponent(album.id)}/${encodeURIComponent(album.cover)}`}
-                        alt={album.title}
-                        fill
-                        className="object-cover transition-transform duration-[600ms] ease-out group-hover:scale-[1.03]"
-                        sizes="(max-width: 640px) 80vw, 45vw"
+            <div className="flex overflow-x-auto snap-x snap-mandatory pb-20 photo-carousel xl:hidden">
+              {browseItems.map((item) => (
+                <PhotoBrowseCard key={item.id} item={item} />
+              ))}
+            </div>
+
+            <div className="hidden photo-accordion xl:flex xl:flex-col xl:gap-2 xl:px-2 xl:pb-16">
+              {desktopRows.map((row, rowIndex) => (
+                <div
+                  key={`${viewMode}-${rowIndex}`}
+                  className="photo-accordion-row"
+                  style={{
+                    display: "flex",
+                    gap: "0.5rem",
+                    height: "clamp(340px, 34vw, 560px)",
+                  }}
+                  onMouseLeave={() => setActiveDesktopItem(null)}
+                >
+                  {row.map((item) => {
+                    const rowHasActiveItem = row.some(({ id }) => id === activeDesktopItem);
+                    const isActive = activeDesktopItem === item.id;
+
+                    return (
+                      <PhotoBrowseCard
+                        key={item.id}
+                        item={item}
+                        className="photo-accordion-card"
+                        style={{
+                          flex: rowHasActiveItem ? (isActive ? "2.8 1 0" : "0.85 1 0") : "1 1 0",
+                          width: "auto",
+                          minWidth: 0,
+                          height: "100%",
+                          aspectRatio: "auto",
+                          overflow: "hidden",
+                          transition: "flex 0.7s cubic-bezier(0.25, 1, 0.5, 1)",
+                        }}
+                        onMouseEnter={() => setActiveDesktopItem(item.id)}
+                        onFocus={() => setActiveDesktopItem(item.id)}
+                        onBlur={() => setActiveDesktopItem(null)}
                       />
-                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-6 sm:p-10 text-white">
-                        <h4 className="font-[family-name:var(--font-serif)] text-[clamp(1.25rem,2.2vw,1.75rem)] font-semibold mb-1">
-                          {album.title}
-                        </h4>
-                        <span className="font-[family-name:var(--font-mono)] text-[0.65rem] uppercase tracking-[0.15em] text-white/55">
-                          {album.images.length} Photographs
-                        </span>
-                        {album.images.some((image) => image.print?.available) && (
-                          <div className="mt-2 font-[family-name:var(--font-mono)] text-[0.6rem] uppercase tracking-[0.16em] text-[var(--color-yellow)]">
-                            Limited prints available
-                          </div>
-                        )}
-                      </div>
-                    </Link>
-                  ))
-                : locations.map((loc) => (
-                    <Link
-                      key={loc.id}
-                      href={`/photos/location/${encodeURIComponent(loc.id)}`}
-                      className="photo-strip-card group"
-                    >
-                      <Image
-                        src={`/photos/${encodeURIComponent(loc.coverAlbum)}/${encodeURIComponent(loc.cover)}`}
-                        alt={loc.name}
-                        fill
-                        className="object-cover transition-transform duration-[600ms] ease-out group-hover:scale-[1.03]"
-                        sizes="(max-width: 640px) 80vw, 45vw"
-                      />
-                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-6 sm:p-10 text-white">
-                        <h4 className="font-[family-name:var(--font-serif)] text-[clamp(1.25rem,2.2vw,1.75rem)] font-semibold mb-1">
-                          {loc.name}
-                        </h4>
-                        <span className="font-[family-name:var(--font-mono)] text-[0.65rem] uppercase tracking-[0.15em] text-white/55">
-                          {loc.photoCount} Photographs
-                        </span>
-                      </div>
-                    </Link>
-                  ))}
+                    );
+                  })}
+                </div>
+              ))}
             </div>
           </motion.div>
         </AnimatePresence>

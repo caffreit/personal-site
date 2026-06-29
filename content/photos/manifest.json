@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-17T18:29:11.612Z",
+  "generatedAt": "2026-06-25T11:55:44.561Z",
   "albums": [
     {
       "id": "Faves",
@@ -412,6 +412,56 @@
           "height": 2048,
           "isFeatured": false,
           "location": "Lisbon on film"
+        }
+      ]
+    },
+    {
+      "id": "Recents",
+      "title": "Recents",
+      "description": "A small rolling set of recently added photographs",
+      "cover": "img028.jpg",
+      "images": [
+        {
+          "filename": "img028.jpg",
+          "width": 1370,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lisbon on film"
+        },
+        {
+          "filename": "img024.jpg",
+          "width": 2048,
+          "height": 1378,
+          "isFeatured": false,
+          "location": "Lisbon on film"
+        },
+        {
+          "filename": "img022.jpg",
+          "width": 1377,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lisbon on film"
+        },
+        {
+          "filename": "img007.jpg",
+          "width": 1381,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lisbon on film"
+        },
+        {
+          "filename": "img003.jpg",
+          "width": 1398,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Lisbon on film"
+        },
+        {
+          "filename": "DSCF9995.jpg",
+          "width": 2048,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Chengdu"
         }
       ]
     },
@@ -2704,7 +2754,7 @@
     {
       "id": "Chengdu",
       "name": "Chengdu",
-      "photoCount": 29,
+      "photoCount": 30,
       "cover": "DSCF0032.jpg",
       "coverAlbum": "Diptych"
     },
@@ -2788,7 +2838,7 @@
     {
       "id": "Lisbon on film",
       "name": "Lisbon on film",
-      "photoCount": 10,
+      "photoCount": 15,
       "cover": "img006.jpg",
       "coverAlbum": "Buildings"
     },

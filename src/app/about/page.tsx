@@ -28,13 +28,13 @@ export default function AboutPage() {
 
           <div className="prose prose-zinc dark:prose-invert text-zinc-600 dark:text-zinc-400 leading-loose text-lg">
             <p className="mb-6">
-              I write articles and build interactive tools about economics and finance — clear explanations, useful takeaways, and charts you don't need an economics degree to read. Neither incomprehensible nor dry — just allergic to jargon and fond of charts.
+              I write articles and build interactive tools about economics and finance — clear explanations, useful takeaways, and charts you don&apos;t need an economics degree to read. Neither incomprehensible nor dry — just allergic to jargon and fond of charts.
             </p>
             <p className="mb-6">
               The photos are a hobby. People are the main subject, though I also photograph the dogs I look after (every dog deserves a portrait session).
             </p>
             <p>
-              By day I do AI in medtech. On the side I'm building fintech for the people banks ignore. This site is just for fun stuff.
+              By day I do AI in medtech. On the side I&apos;m building fintech for the people banks ignore. This site is just for fun stuff.
             </p>
           </div>
 
@@ -98,8 +98,33 @@ export default function AboutPage() {
               <span>LLM omnivore — tries them all</span>
             </div>
           </div>
+
+          <div className="flex flex-col gap-5">
+            <h3 className="text-lg font-bold uppercase tracking-wider text-zinc-900 dark:text-zinc-50 border-b border-zinc-200 dark:border-zinc-800 pb-2">
+              Colophon
+            </h3>
+            <p className="text-sm italic leading-relaxed text-zinc-500 dark:text-zinc-400">
+              Portraits, Pattrens, Opinions
+            </p>
+            <div className="grid gap-3 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+              <ColophonItem label="Photographs" value="205 selected from over 30,000 taken" />
+              <ColophonItem label="Cameras" value="Fujifilm X100F, Beirette, Nikon FL2" />
+              <ColophonItem label="Analysis" value="Python, built in Cursor" />
+            </div>
+          </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function ColophonItem({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <strong className="mb-0.5 block text-xs font-bold uppercase tracking-[0.2em] text-zinc-900 dark:text-zinc-50">
+        {label}
+      </strong>
+      {value}
     </div>
   );
 }

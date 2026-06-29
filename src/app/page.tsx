@@ -4,6 +4,7 @@ import { PhotoGallery } from "@/components/photos/PhotoGallery";
 import { BlogSection } from "@/components/blog/BlogSection";
 import { SelectedWorks } from "@/components/SelectedWorks";
 import HeroSection from "@/components/HeroSection";
+import { getFeaturedLab, getRecentLabs } from "@/lib/labs";
 
 export default function Home() {
   const posts = getAllPosts();
@@ -12,6 +13,8 @@ export default function Home() {
 
   const featuredPost = posts.find((p) => p.slug === "dunbars-number") ?? posts[0];
   const blogPosts = posts.slice(0, 4);
+  const featuredLab = getFeaturedLab();
+  const recentLabs = getRecentLabs(6);
 
   return (
     <>
@@ -22,6 +25,8 @@ export default function Home() {
       <SelectedWorks
         posts={posts}
         featuredPost={featuredPost}
+        featuredLab={featuredLab}
+        recentLabs={recentLabs}
       />
 
       {/* Photo strip: full-bleed horizontal scroll */}
