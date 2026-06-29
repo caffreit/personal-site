@@ -118,13 +118,13 @@ const LABS: Lab[] = [
     publishedAt: "2026-06-12",
   },
   {
-    title: "Irish Purchase Tax Time 2026",
+    title: "What Did That Really Cost?",
     description:
-      "Estimate how much working time goes to the thing itself, income taxes, and direct purchase taxes across everyday and big-ticket items.",
+      "See how much working time goes to the thing itself, purchase taxes, and the income taxes paid before your wages became spending money.",
     href: "/labs/irish-purchase-tax-time-2026",
     badge: "Data Viz",
     meta: "Tax • Calculator",
-    publishedAt: "2026-06-25",
+    publishedAt: "2026-06-29",
   },
   {
     title: "Ireland's Finances Breakdown",
@@ -164,5 +164,10 @@ export function getFeaturedLab() {
 }
 
 export function getRecentLabs(limit = 5) {
-  return getAllLabs().slice(0, limit);
+  return [...LABS]
+    .sort(
+      (a, b) =>
+        new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime(),
+    )
+    .slice(0, limit);
 }
