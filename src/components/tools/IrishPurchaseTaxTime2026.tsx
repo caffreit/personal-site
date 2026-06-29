@@ -1431,7 +1431,6 @@ export default function IrishPurchaseTaxTime2026() {
                   <p className="mt-3 text-2xl font-black leading-tight text-stone-900">
                     {equivalent.value}
                   </p>
-                  <p className="mt-2 text-xs leading-relaxed text-stone-500">{equivalent.note}</p>
                 </article>
               ))}
             </div>
@@ -1449,6 +1448,34 @@ export default function IrishPurchaseTaxTime2026() {
             </summary>
 
             <div className="border-t border-stone-200 p-5 pt-0">
+              <section className="rounded-[1.5rem] border border-stone-200 bg-stone-50 p-5">
+                <h3 className="text-lg font-black tracking-tight text-stone-900">
+                  State-equivalent assumptions
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-stone-600">
+                  These are order-of-magnitude comparisons used for the state-scale cards.
+                </p>
+                <div className="mt-4 grid gap-3 text-sm text-stone-700 md:grid-cols-2">
+                  {STATE_EQUIVALENTS.map((equivalent) => (
+                    <div key={equivalent.id} className="border-b border-stone-200 pb-3 last:border-b-0 md:last:border-b">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="font-semibold text-stone-900">{equivalent.label}</p>
+                          <p className="mt-1 text-xs font-semibold uppercase tracking-[0.14em] text-stone-500">
+                            {equivalent.bucket}
+                          </p>
+                        </div>
+                        <span className="shrink-0 rounded-full bg-white px-2.5 py-1 font-mono text-xs font-semibold text-stone-500 ring-1 ring-stone-200">
+                          {formatCurrency(equivalent.unitCost, getCurrencyFractionDigits(equivalent.unitCost))} /{" "}
+                          {equivalent.unitLabel}
+                        </span>
+                      </div>
+                      <p className="mt-2 text-xs leading-relaxed text-stone-500">{equivalent.note}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
               <div className="grid gap-6 pt-5 xl:grid-cols-2">
                 <section className="rounded-[1.5rem] border border-stone-200 bg-stone-50 p-5">
                   <h3 className="text-lg font-black tracking-tight text-stone-900">Purchase tax detail</h3>
