@@ -336,50 +336,50 @@ function formatEquivalentTime(minutes: number) {
   }
 
   if (minutes < 60) {
-    return `about ${formatApproxNumber(minutes, minutes < 10 ? 1 : 0)} minutes`;
+    return `${formatApproxNumber(minutes, minutes < 10 ? 1 : 0)} minutes`;
   }
 
   const hours = minutes / 60;
-  return `about ${formatApproxNumber(hours, hours < 10 ? 1 : 0)} hours`;
+  return `${formatApproxNumber(hours, hours < 10 ? 1 : 0)} hours`;
 }
 
 function formatEquivalentDays(days: number, label: string) {
   if (days < 1) {
-    return `about ${formatApproxNumber(days, 1)} days of ${label}`;
+    return `${formatApproxNumber(days, 1)} days of ${label}`;
   }
 
   if (days < 14) {
-    return `about ${formatApproxNumber(days, days < 10 ? 1 : 0)} days of ${label}`;
+    return `${formatApproxNumber(days, days < 10 ? 1 : 0)} days of ${label}`;
   }
 
   const weeks = days / 7;
-  return `about ${formatApproxNumber(weeks, weeks < 10 ? 1 : 0)} weeks of ${label}`;
+  return `${formatApproxNumber(weeks, weeks < 10 ? 1 : 0)} weeks of ${label}`;
 }
 
 function formatEquivalentVisits(visits: number) {
   if (visits < 1) {
-    return `about ${formatApproxNumber(visits, 1)} GP visits`;
+    return `${formatApproxNumber(visits, 1)} GP visits`;
   }
 
-  return `about ${formatApproxNumber(visits, visits < 10 ? 1 : 0)} GP visits`;
+  return `${formatApproxNumber(visits, visits < 10 ? 1 : 0)} GP visits`;
 }
 
 function formatEquivalentLength(metres: number, label: string) {
   if (metres < 0.01) {
-    return `about ${formatApproxNumber(metres * 1_000, 1)} mm of ${label}`;
+    return `${formatApproxNumber(metres * 1_000, 1)} mm of ${label}`;
   }
 
   if (metres < 1) {
-    return `about ${formatApproxNumber(metres * 100, 1)} cm of ${label}`;
+    return `${formatApproxNumber(metres * 100, 1)} cm of ${label}`;
   }
 
-  return `about ${formatApproxNumber(metres, metres < 10 ? 1 : 0)} metres of ${label}`;
+  return `${formatApproxNumber(metres, metres < 10 ? 1 : 0)} metres of ${label}`;
 }
 
 function formatEquivalentPercent(projectShare: number, label: string) {
   const percent = projectShare * 100;
   const digits = percent < 0.0001 ? 8 : percent < 0.01 ? 6 : percent < 1 ? 4 : 1;
-  return `about ${formatPercent(percent, digits)} of ${label}`;
+  return `${formatPercent(percent, digits)} of ${label}`;
 }
 
 function getEquivalentValue(equivalent: StateEquivalent, totalTax: number) {
@@ -1235,23 +1235,12 @@ export default function IrishPurchaseTaxTime2026() {
         </div>
 
         <aside className="h-fit rounded-[2rem] border border-stone-200 bg-white p-5 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)]">
-          <label className="space-y-3">
-            <div className="flex items-center justify-between gap-4">
-              <span className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">
-                Gross salary
-              </span>
-              <span className="text-lg font-black text-stone-900">{formatCurrency(grossIncome)}</span>
-            </div>
-            <input
-              type="range"
-              min={MIN_INCOME}
-              max={MAX_INCOME}
-              step={INCOME_STEP}
-              value={grossIncome}
-              onChange={(event) => setGrossIncome(clampIncome(Number(event.target.value)))}
-              className="h-2 w-full cursor-pointer appearance-none rounded-full bg-stone-200 accent-stone-900"
-            />
-          </label>
+          <div className="flex items-center justify-between gap-4">
+            <span className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">
+              Gross salary
+            </span>
+            <span className="text-lg font-black text-stone-900">{formatCurrency(grossIncome)}</span>
+          </div>
           <div className="mt-5 grid grid-cols-2 gap-3">
             <div className="rounded-2xl border border-stone-200 bg-stone-50 p-4">
               <p className="text-2xl font-black text-stone-900">
@@ -1270,6 +1259,17 @@ export default function IrishPurchaseTaxTime2026() {
               </p>
             </div>
           </div>
+          <label className="mt-5 block">
+            <input
+              type="range"
+              min={MIN_INCOME}
+              max={MAX_INCOME}
+              step={INCOME_STEP}
+              value={grossIncome}
+              onChange={(event) => setGrossIncome(clampIncome(Number(event.target.value)))}
+              className="h-2 w-full cursor-pointer appearance-none rounded-full bg-stone-200 accent-stone-900"
+            />
+          </label>
         </aside>
       </header>
 
@@ -1357,11 +1357,11 @@ export default function IrishPurchaseTaxTime2026() {
                   Where your earnings go
                 </h3>
               </div>
-              <div className="shrink-0 rounded-2xl bg-white px-4 pt-4 pb-3 ring-1 ring-stone-200">
+              <div className="shrink-0 min-w-[15rem] rounded-2xl bg-white px-6 pt-4 pb-3 ring-1 ring-stone-200">
                 <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
                   Total earnings
                 </p>
-                <div className="mt-2 flex items-baseline gap-2">
+                <div className="mt-2 flex w-full items-baseline justify-between gap-4">
                   <p className="text-3xl font-black leading-none text-stone-900">
                     {formatCurrency(result.grossRequired, grossRequiredCurrencyDigits)}
                   </p>
@@ -1393,12 +1393,14 @@ export default function IrishPurchaseTaxTime2026() {
                     <span className={`h-3.5 w-3.5 rounded-full ${segment.color}`} />
                     <p className="text-base font-black tracking-tight text-stone-900">{segment.shortLabel}</p>
                   </div>
-                  <p className="mt-2 text-2xl font-black text-stone-900">
-                    {formatCurrency(segment.value, selectedCurrencyDigits)}
-                  </p>
-                  <p className="mt-1 text-sm font-semibold text-stone-600">
-                    {formatWorkTime(segment.hours)}
-                  </p>
+                  <div className="mt-2 flex w-full items-baseline justify-between gap-4">
+                    <p className="text-2xl font-black leading-none text-stone-900">
+                      {formatCurrency(segment.value, selectedCurrencyDigits)}
+                    </p>
+                    <p className="text-sm font-semibold text-stone-600">
+                      {formatWorkTime(segment.hours)}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>
@@ -1414,9 +1416,6 @@ export default function IrishPurchaseTaxTime2026() {
                   Very rough scale comparisons, not earmarked spending.
                 </p>
               </div>
-              <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
-                {formatCurrency(result.totalTax, selectedCurrencyDigits)} total tax
-              </p>
             </div>
 
             <div className="mt-5 grid gap-3 md:grid-cols-3">
@@ -1448,7 +1447,7 @@ export default function IrishPurchaseTaxTime2026() {
             </summary>
 
             <div className="border-t border-stone-200 p-5 pt-0">
-              <section className="rounded-[1.5rem] border border-stone-200 bg-stone-50 p-5">
+              <section className="mt-5 rounded-[1.5rem] border border-stone-200 bg-stone-50 p-5">
                 <h3 className="text-lg font-black tracking-tight text-stone-900">
                   State-equivalent assumptions
                 </h3>
