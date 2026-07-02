@@ -127,6 +127,15 @@ const LABS: Lab[] = [
     publishedAt: "2026-06-29",
   },
   {
+    title: "Tax Schedule Comparison",
+    description:
+      "Compare stylised tax schedules against Ireland's current income tax shape across rates, net income, and working-time views.",
+    href: "/labs/tax-schedule-comparison",
+    badge: "Data Viz",
+    meta: "Tax • Workbench",
+    publishedAt: "2026-07-02",
+  },
+  {
     title: "Ireland's Finances Breakdown",
     description:
       "Explore Ireland's 2024 income and expenditure mix with interactive doughnut charts and clickable spending drilldowns.",
