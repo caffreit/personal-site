@@ -79,7 +79,7 @@ const INCOME_COMPRESSION_ALPHA = 0.8;
 const ANNUAL_WORK_HOURS = 37.5 * 52;
 const DEFAULT_SPENDING_AMOUNT = 1_000;
 const MIN_SALARY = 10_000;
-const MAX_SALARY = 1_000_000;
+const MAX_SALARY = 500_000;
 
 const BENCHMARK_TAX = calculateIrishTax(BENCHMARK_INCOME).tax;
 const BENCHMARK_NET = BENCHMARK_INCOME - BENCHMARK_TAX;
@@ -174,7 +174,7 @@ const METRICS: { id: MetricId; label: string; description: string }[] = [
   },
 ];
 
-const SALARY_TICKS = [10_000, 20_000, 40_000, 60_000, 100_000, 200_000, 500_000, 1_000_000];
+const SALARY_TICKS = [10_000, 20_000, 40_000, 60_000, 100_000, 200_000, 500_000];
 
 function formatCurrency(value: number, maximumFractionDigits = 0) {
   return value.toLocaleString("en-IE", {
