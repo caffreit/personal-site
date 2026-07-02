@@ -9,6 +9,8 @@ type LabsListingProps = {
   labs: Lab[];
 };
 
+const TAX_FILTER = "Tax";
+
 const DATE_FORMATTER = new Intl.DateTimeFormat("en-IE", {
   day: "numeric",
   month: "short",
@@ -21,7 +23,7 @@ export default function LabsListing({ labs }: LabsListingProps) {
 
   const filters = useMemo(() => {
     const badges = Array.from(new Set(labs.map((lab) => lab.badge))).sort();
-    return ["All", "Pinned", ...badges];
+    return ["All", "Pinned", TAX_FILTER, ...badges];
   }, [labs]);
 
   const filteredLabs = useMemo(() => {
@@ -31,6 +33,14 @@ export default function LabsListing({ labs }: LabsListingProps) {
 
     if (selectedFilter === "Pinned") {
       return labs.filter((lab) => lab.isPinned);
+    }
+
+    if (selectedFilter === TAX_FILTER) {
+      return labs.filter((lab) =>
+        [lab.title, lab.description, lab.href, lab.meta].some((value) =>
+          value.toLowerCase().includes("tax"),
+        ),
+      );
     }
 
     return labs.filter((lab) => lab.badge === selectedFilter);
