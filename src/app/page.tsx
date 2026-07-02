@@ -16,7 +16,11 @@ export default function Home() {
   const featuredLab =
     getAllLabs().find((lab) => lab.href === "/labs/tax-schedule-comparison") ??
     getFeaturedLab();
-  const recentLabs = getRecentLabs(6);
+  const budgetQuizLab = getAllLabs().find((lab) => lab.href === "/labs/irish-budget-quiz");
+  const recentLabs = [
+    ...(budgetQuizLab ? [budgetQuizLab] : []),
+    ...getRecentLabs(6).filter((lab) => lab.href !== budgetQuizLab?.href),
+  ];
 
   return (
     <>
