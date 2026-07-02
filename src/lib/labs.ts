@@ -134,6 +134,8 @@ const LABS: Lab[] = [
     badge: "Data Viz",
     meta: "Tax • Workbench",
     publishedAt: "2026-07-02",
+    image: "/labs/tax-schedule-comparison/cover.png",
+    imageAlt: "Balance scale comparing euros and working time for tax schedule choices.",
   },
   {
     title: "Ireland's Finances Breakdown",

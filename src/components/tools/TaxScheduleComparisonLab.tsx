@@ -128,14 +128,16 @@ const SCHEDULES: ScheduleConfig[] = [
     label: "Negative income tax",
     shortLabel: "NIT",
     color: "#9333ea",
-    description: "A EUR10,000 guarantee is withdrawn through a constant marginal rate.",
+    description:
+      "Everyone is guaranteed a minimum income. If earnings are too low, the tax number turns negative and tops them up.",
   },
   {
     id: "equalPurchaseTime",
     label: "Equal purchase time",
     shortLabel: "Equal time",
     color: "#ea580c",
-    description: "Average tax rate follows S / (S + K), making tax time flatter.",
+    description:
+      "For a given purchase, everyone contributes the same amount of working time to the state.",
   },
   {
     id: "incomeCompression",
