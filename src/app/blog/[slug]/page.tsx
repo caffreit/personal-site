@@ -34,6 +34,7 @@ export default async function BlogPostPage({ params }: { params: Promise<PostPar
   const slugs = getPostSlugs();
   if (!slugs.includes(slug)) return notFound();
   const { content, data } = readPostMdx(slug);
+  const image = data.image ?? `https://picsum.photos/seed/${slug}/400/400`;
 
   // Calculate read time (approx 200 words per minute)
   const wordCount = content.split(/\s+/g).length;
@@ -54,6 +55,7 @@ export default async function BlogPostPage({ params }: { params: Promise<PostPar
       date={date}
       readTime={readTime}
       excerpt={data.summary} // Using summary as excerpt/subtitle
+      image={image}
     >
       <MDXRemote
         source={content}

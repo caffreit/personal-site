@@ -2,6 +2,7 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowLeft, Clock, Share2, ThumbsUp } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
@@ -11,6 +12,7 @@ interface BlogPostLayoutProps {
   date: string;
   readTime: string;
   excerpt?: string;
+  image: string;
   children: React.ReactNode;
 }
 
@@ -20,6 +22,7 @@ export default function BlogPostLayout({
   date,
   readTime,
   excerpt,
+  image,
   children,
 }: BlogPostLayoutProps) {
   
@@ -229,6 +232,18 @@ export default function BlogPostLayout({
               </p>
             )}
           </header>
+
+          <figure className="mb-12 overflow-hidden rounded-[2rem] border border-stone-200 bg-stone-100 shadow-[0_18px_45px_-30px_rgba(0,0,0,0.55)] dark:border-zinc-800 dark:bg-zinc-900">
+            <Image
+              src={image}
+              alt={`Cover image for ${title}`}
+              width={1200}
+              height={675}
+              className="aspect-[16/9] w-full object-cover"
+              sizes="(max-width: 768px) 100vw, 672px"
+              priority
+            />
+          </figure>
 
           {/* Body Content */}
           <div className="blog-post-body prose prose-xl prose-stone dark:prose-invert max-w-none
