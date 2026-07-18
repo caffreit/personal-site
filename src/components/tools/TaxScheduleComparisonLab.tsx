@@ -1,11 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, Info, RotateCcw, SlidersHorizontal } from "lucide-react";
+import { ArrowLeft, Info, RotateCcw } from "lucide-react";
 import { useMemo, useState } from "react";
 import {
   CartesianGrid,
-  Legend,
   Line,
   LineChart,
   ReferenceLine,
@@ -21,8 +20,6 @@ type MetricId =
   | "netIncome"
   | "taxMinutes"
   | "totalMinutes";
-type AxisScale = "linear" | "log";
-
 type TaxRules = {
   srcop: number;
   personalCredit: number;
@@ -77,7 +74,7 @@ const PROTECTED_MINIMUM = 20_000;
 const NEGATIVE_INCOME_GUARANTEE = 10_000;
 const INCOME_COMPRESSION_ALPHA = 0.8;
 const ANNUAL_WORK_HOURS = 37.5 * 52;
-const DEFAULT_SPENDING_AMOUNT = 1_000;
+const SPENDING_AMOUNT = 100;
 const MIN_SALARY = 10_000;
 const MAX_SALARY = 500_000;
 
@@ -118,7 +115,7 @@ const SCHEDULES: ScheduleConfig[] = [
   },
   {
     id: "protectedMinimum",
-    label: "Protected minimum plus flat rate",
+    label: "Protected minimum",
     shortLabel: "Protected min",
     color: "#16a34a",
     description: "The first EUR20,000 is untaxed; income above that faces a flat rate.",
@@ -167,16 +164,18 @@ const METRICS: { id: MetricId; label: string; description: string }[] = [
   {
     id: "taxMinutes",
     label: "Minutes worked for tax",
-    description: "Work minutes used to earn the tax component of the selected spending amount.",
+    description: "For a €100 purchase, work minutes used to earn its tax component.",
   },
   {
     id: "totalMinutes",
     label: "Total minutes worked",
-    description: "Total work minutes needed to keep the selected spending amount after tax.",
+    description: "For a €100 purchase, total work minutes needed to keep it after tax.",
   },
 ];
 
 const SALARY_TICKS = [10_000, 20_000, 40_000, 60_000, 100_000, 200_000, 500_000];
+const AXIS_TICK_FONT_SIZE = 14;
+const AXIS_LABEL_FONT_SIZE = 16;
 
 function formatCurrency(value: number, maximumFractionDigits = 0) {
   return value.toLocaleString("en-IE", {
@@ -389,24 +388,16 @@ function getYAxisLabel(metric: MetricId) {
   return "Minutes";
 }
 
-function getBenchmarkValue(metric: MetricId, spendingAmount: number, purchaseTimeK: number) {
-  const outcome = getScheduleOutcome("currentIrish", BENCHMARK_INCOME, purchaseTimeK);
-  return getMetricValue(metric, BENCHMARK_INCOME, outcome, spendingAmount);
-}
-
 export default function TaxScheduleComparisonLab() {
   const [selectedMetric, setSelectedMetric] = useState<MetricId>("averageRate");
-  const [axisScale, setAxisScale] = useState<AxisScale>("linear");
-  const [spendingAmount, setSpendingAmount] = useState(DEFAULT_SPENDING_AMOUNT);
   const [purchaseTimeK, setPurchaseTimeK] = useState(Math.round(DEFAULT_PURCHASE_TIME_K / 1_000) * 1_000);
   const [visibleIds, setVisibleIds] = useState<ScheduleId[]>(SCHEDULES.map((schedule) => schedule.id));
 
   const visibleSet = useMemo(() => new Set(visibleIds), [visibleIds]);
   const chartData = useMemo(
-    () => getChartData(selectedMetric, spendingAmount, purchaseTimeK),
-    [selectedMetric, spendingAmount, purchaseTimeK],
+    () => getChartData(selectedMetric, SPENDING_AMOUNT, purchaseTimeK),
+    [selectedMetric, purchaseTimeK],
   );
-  const benchmarkValue = getBenchmarkValue(selectedMetric, spendingAmount, purchaseTimeK);
 
   function toggleSchedule(id: ScheduleId) {
     setVisibleIds((current) =>
@@ -418,8 +409,6 @@ export default function TaxScheduleComparisonLab() {
 
   function resetControls() {
     setSelectedMetric("averageRate");
-    setAxisScale("linear");
-    setSpendingAmount(DEFAULT_SPENDING_AMOUNT);
     setPurchaseTimeK(Math.round(DEFAULT_PURCHASE_TIME_K / 1_000) * 1_000);
     setVisibleIds(SCHEDULES.map((schedule) => schedule.id));
   }
@@ -453,10 +442,6 @@ export default function TaxScheduleComparisonLab() {
       <section className="grid grid-cols-1 gap-8 lg:grid-cols-4">
         <aside className="space-y-5 lg:col-span-1">
           <article className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)]">
-            <h2 className="mb-4 flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">
-              <SlidersHorizontal className="h-4 w-4" />
-              Plot
-            </h2>
             <div className="space-y-2">
               {METRICS.map((metric) => (
                 <button
@@ -479,51 +464,6 @@ export default function TaxScheduleComparisonLab() {
                   </span>
                 </button>
               ))}
-            </div>
-          </article>
-
-          <article className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)]">
-            <h2 className="mb-4 font-mono text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">
-              X-axis scale
-            </h2>
-            <div className="flex rounded-full border border-stone-200 bg-stone-100 p-1">
-              {(["linear", "log"] as AxisScale[]).map((scale) => (
-                <button
-                  key={scale}
-                  type="button"
-                  onClick={() => setAxisScale(scale)}
-                  className={`pill-control flex-1 rounded-full px-4 py-2 text-xs font-bold uppercase tracking-[0.12em] transition ${
-                    axisScale === scale
-                      ? "bg-stone-900 text-white"
-                      : "text-stone-600 hover:text-stone-900"
-                  }`}
-                >
-                  <span className="pill-label">{scale}</span>
-                </button>
-              ))}
-            </div>
-          </article>
-
-          <article className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)]">
-            <h2 className="mb-3 font-mono text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">
-              Spending amount
-            </h2>
-            <input
-              type="range"
-              min={100}
-              max={5_000}
-              step={100}
-              value={spendingAmount}
-              onChange={(event) => setSpendingAmount(Number(event.target.value))}
-              className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-stone-200 accent-stone-900"
-            />
-            <div className="mt-2 flex items-baseline justify-between gap-3">
-              <p className="text-2xl font-black tracking-tight text-stone-900">
-                {formatCurrency(spendingAmount)}
-              </p>
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
-                disposable
-              </p>
             </div>
           </article>
 
@@ -561,28 +501,13 @@ export default function TaxScheduleComparisonLab() {
         </aside>
 
         <article className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)] sm:p-8 lg:col-span-3">
-          <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <p className="font-mono text-xs font-semibold uppercase tracking-[0.3em] text-stone-500">
-                Gross salary on x-axis
-              </p>
-              <h2 className="mt-2 text-3xl font-black tracking-tight text-stone-900 sm:text-4xl">
-                {getMetricLabel(selectedMetric)}
-              </h2>
-              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-stone-600">
-                {getMetricDescription(selectedMetric)}
-              </p>
-            </div>
-            <div className="rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3 text-right">
-              <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-stone-500">
-                Benchmark
-              </p>
-              <p className="mt-1 text-xl font-black text-stone-900">
-                {benchmarkValue === null
-                  ? "n/a"
-                  : formatMetricValue(benchmarkValue, selectedMetric)}
-              </p>
-            </div>
+          <div className="mb-6">
+            <h2 className="text-3xl font-black tracking-tight text-stone-900 sm:text-4xl">
+              {getMetricLabel(selectedMetric)}
+            </h2>
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-stone-600">
+              {getMetricDescription(selectedMetric)}
+            </p>
           </div>
 
           <div className="mb-5 flex flex-wrap gap-2">
@@ -593,17 +518,20 @@ export default function TaxScheduleComparisonLab() {
                   key={schedule.id}
                   type="button"
                   onClick={() => toggleSchedule(schedule.id)}
-                  className={`pill-control rounded-full border px-3 py-2 text-[10px] font-black uppercase tracking-[0.18em] transition ${
+                  aria-pressed={isVisible}
+                  title={`${isVisible ? "Hide" : "Show"} ${schedule.label}`}
+                  style={{ borderColor: schedule.color }}
+                  className={`pill-control relative overflow-hidden rounded-full border-2 bg-white py-2 pr-3 pl-10 text-[10px] font-black uppercase tracking-[0.14em] transition ${
                     isVisible
-                      ? "border-stone-900 bg-stone-900 text-white"
-                      : "border-stone-200 bg-white text-stone-400 hover:border-stone-400 hover:text-stone-700"
+                      ? "text-stone-900"
+                      : "opacity-45 hover:opacity-100"
                   }`}
                 >
                   <span
-                    className="mr-2 inline-block h-2.5 w-2.5 rounded-full"
+                    className="absolute inset-y-1 left-1 aspect-square rounded-full"
                     style={{ backgroundColor: schedule.color }}
                   />
-                  <span className="pill-label">{schedule.shortLabel}</span>
+                  <span className="pill-label relative">{schedule.label}</span>
                 </button>
               );
             })}
@@ -611,28 +539,35 @@ export default function TaxScheduleComparisonLab() {
 
           <div className="h-[34rem] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData} margin={{ top: 18, right: 28, left: 8, bottom: 10 }}>
+              <LineChart data={chartData} margin={{ top: 18, right: 28, left: 8, bottom: 32 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e7e5e4" />
                 <XAxis
                   dataKey="income"
                   type="number"
-                  scale={axisScale}
+                  scale="log"
                   domain={[MIN_SALARY, MAX_SALARY]}
                   ticks={SALARY_TICKS}
                   allowDataOverflow
                   stroke="#78716c"
-                  fontSize={11}
+                  fontSize={AXIS_TICK_FONT_SIZE}
                   tickFormatter={formatSalaryTick}
+                  label={{
+                    value: "Gross Salary",
+                    position: "insideBottom",
+                    offset: -8,
+                    fontSize: AXIS_LABEL_FONT_SIZE,
+                    fill: "#78716c",
+                  }}
                 />
                 <YAxis
                   stroke="#78716c"
-                  fontSize={11}
-                  width={72}
+                  fontSize={AXIS_TICK_FONT_SIZE}
+                  width={80}
                   label={{
                     value: getYAxisLabel(selectedMetric),
                     angle: -90,
                     position: "insideLeft",
-                    fontSize: 11,
+                    fontSize: AXIS_LABEL_FONT_SIZE,
                     fill: "#78716c",
                   }}
                   tickFormatter={(value) => formatMetricValue(Number(value), selectedMetric)}
@@ -651,7 +586,6 @@ export default function TaxScheduleComparisonLab() {
                     boxShadow: "0 14px 28px -18px rgba(0,0,0,0.45)",
                   }}
                 />
-                <Legend verticalAlign="top" height={44} wrapperStyle={{ fontSize: 12 }} />
                 <ReferenceLine
                   x={BENCHMARK_INCOME}
                   stroke="#a8a29e"
