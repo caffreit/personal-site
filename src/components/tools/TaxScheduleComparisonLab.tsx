@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, Info, RotateCcw } from "lucide-react";
+import { ArrowLeft, Info } from "lucide-react";
 import { useMemo, useState } from "react";
 import {
   CartesianGrid,
@@ -20,6 +20,7 @@ type MetricId =
   | "netIncome"
   | "taxMinutes"
   | "totalMinutes";
+type CalibrationMode = "statusQuo" | "revenueNeutral";
 type TaxRules = {
   srcop: number;
   personalCredit: number;
@@ -34,6 +35,15 @@ type TaxRules = {
 type TaxOutcome = {
   tax: number;
   marginalRate: number;
+};
+
+type ScheduleCalibration = {
+  equalAbsoluteTax: number;
+  flatRate: number;
+  protectedMinimumRate: number;
+  negativeIncomeTaxRate: number;
+  purchaseTimeK: number;
+  incomeCompressionScale: number;
 };
 
 type ScheduleConfig = {
@@ -77,12 +87,15 @@ const ANNUAL_WORK_HOURS = 37.5 * 52;
 const SPENDING_AMOUNT = 100;
 const MIN_SALARY = 10_000;
 const MAX_SALARY = 500_000;
+const WAGE_SAMPLE_2024 = [13_500, 20_700, 27_400, 32_400, 38_000, 44_900, 53_700, 67_200, 90_500];
 
 const BENCHMARK_TAX = calculateIrishTax(BENCHMARK_INCOME).tax;
 const BENCHMARK_NET = BENCHMARK_INCOME - BENCHMARK_TAX;
 const BENCHMARK_AVERAGE_RATE = BENCHMARK_TAX / BENCHMARK_INCOME;
 const DEFAULT_PURCHASE_TIME_K =
   (BENCHMARK_INCOME * (1 - BENCHMARK_AVERAGE_RATE)) / BENCHMARK_AVERAGE_RATE;
+const PURCHASE_TIME_K = Math.round(DEFAULT_PURCHASE_TIME_K / 1_000) * 1_000;
+const WORKING_MINUTES_PER_YEAR = ANNUAL_WORK_HOURS * 60;
 
 const SCHEDULES: ScheduleConfig[] = [
   {
@@ -104,7 +117,7 @@ const SCHEDULES: ScheduleConfig[] = [
     label: "Equal absolute contribution",
     shortLabel: "Equal euro",
     color: "#dc2626",
-    description: "Everyone pays the same euro amount as the benchmark taxpayer.",
+    description: "Everyone pays the same euro amount under the selected calibration.",
   },
   {
     id: "flatPercentage",
@@ -256,7 +269,73 @@ function calculateIrishTax(income: number): TaxOutcome {
   };
 }
 
-function getScheduleOutcome(id: ScheduleId, income: number, purchaseTimeK: number): TaxOutcome {
+function solvePurchaseTimeK(targetTax: number) {
+  const aggregateTax = (purchaseTimeK: number) =>
+    WAGE_SAMPLE_2024.reduce(
+      (total, income) => total + (income * income) / (income + purchaseTimeK),
+      0,
+    );
+
+  let lowerBound = 0;
+  let upperBound = 1_000_000;
+
+  while (aggregateTax(upperBound) > targetTax) {
+    upperBound *= 2;
+  }
+
+  for (let iteration = 0; iteration < 100; iteration += 1) {
+    const midpoint = (lowerBound + upperBound) / 2;
+    if (aggregateTax(midpoint) > targetTax) {
+      lowerBound = midpoint;
+    } else {
+      upperBound = midpoint;
+    }
+  }
+
+  return (lowerBound + upperBound) / 2;
+}
+
+const STATUS_QUO_CALIBRATION: ScheduleCalibration = {
+  equalAbsoluteTax: BENCHMARK_TAX,
+  flatRate: BENCHMARK_AVERAGE_RATE,
+  protectedMinimumRate: BENCHMARK_TAX / (BENCHMARK_INCOME - PROTECTED_MINIMUM),
+  negativeIncomeTaxRate:
+    (BENCHMARK_TAX + NEGATIVE_INCOME_GUARANTEE) / BENCHMARK_INCOME,
+  purchaseTimeK: PURCHASE_TIME_K,
+  incomeCompressionScale: BENCHMARK_NET / BENCHMARK_INCOME ** INCOME_COMPRESSION_ALPHA,
+};
+
+const SAMPLE_TOTAL_INCOME = WAGE_SAMPLE_2024.reduce((total, income) => total + income, 0);
+const SAMPLE_IRISH_TAX = WAGE_SAMPLE_2024.reduce(
+  (total, income) => total + calculateIrishTax(income).tax,
+  0,
+);
+const SAMPLE_TAXABLE_ABOVE_MINIMUM = WAGE_SAMPLE_2024.reduce(
+  (total, income) => total + Math.max(0, income - PROTECTED_MINIMUM),
+  0,
+);
+const SAMPLE_COMPRESSED_INCOME = WAGE_SAMPLE_2024.reduce(
+  (total, income) => total + income ** INCOME_COMPRESSION_ALPHA,
+  0,
+);
+
+const REVENUE_NEUTRAL_CALIBRATION: ScheduleCalibration = {
+  equalAbsoluteTax: SAMPLE_IRISH_TAX / WAGE_SAMPLE_2024.length,
+  flatRate: SAMPLE_IRISH_TAX / SAMPLE_TOTAL_INCOME,
+  protectedMinimumRate: SAMPLE_IRISH_TAX / SAMPLE_TAXABLE_ABOVE_MINIMUM,
+  negativeIncomeTaxRate:
+    (SAMPLE_IRISH_TAX + NEGATIVE_INCOME_GUARANTEE * WAGE_SAMPLE_2024.length) /
+    SAMPLE_TOTAL_INCOME,
+  purchaseTimeK: solvePurchaseTimeK(SAMPLE_IRISH_TAX),
+  incomeCompressionScale:
+    (SAMPLE_TOTAL_INCOME - SAMPLE_IRISH_TAX) / SAMPLE_COMPRESSED_INCOME,
+};
+
+function getScheduleOutcome(
+  id: ScheduleId,
+  income: number,
+  calibration: ScheduleCalibration,
+): TaxOutcome {
   if (income <= 0) {
     return { tax: 0, marginalRate: 0 };
   }
@@ -270,39 +349,42 @@ function getScheduleOutcome(id: ScheduleId, income: number, purchaseTimeK: numbe
   }
 
   if (id === "equalAbsolute") {
-    return { tax: BENCHMARK_TAX, marginalRate: 0 };
+    return { tax: calibration.equalAbsoluteTax, marginalRate: 0 };
   }
 
   if (id === "flatPercentage") {
     return {
-      tax: BENCHMARK_AVERAGE_RATE * income,
-      marginalRate: BENCHMARK_AVERAGE_RATE,
+      tax: calibration.flatRate * income,
+      marginalRate: calibration.flatRate,
     };
   }
 
   if (id === "protectedMinimum") {
-    const rate = BENCHMARK_TAX / (BENCHMARK_INCOME - PROTECTED_MINIMUM);
     return {
-      tax: income <= PROTECTED_MINIMUM ? 0 : (income - PROTECTED_MINIMUM) * rate,
-      marginalRate: income <= PROTECTED_MINIMUM ? 0 : rate,
+      tax:
+        income <= PROTECTED_MINIMUM
+          ? 0
+          : (income - PROTECTED_MINIMUM) * calibration.protectedMinimumRate,
+      marginalRate: income <= PROTECTED_MINIMUM ? 0 : calibration.protectedMinimumRate,
     };
   }
 
   if (id === "negativeIncomeTax") {
-    const withdrawalRate = (BENCHMARK_TAX + NEGATIVE_INCOME_GUARANTEE) / BENCHMARK_INCOME;
     return {
-      tax: income * withdrawalRate - NEGATIVE_INCOME_GUARANTEE,
-      marginalRate: withdrawalRate,
+      tax: income * calibration.negativeIncomeTaxRate - NEGATIVE_INCOME_GUARANTEE,
+      marginalRate: calibration.negativeIncomeTaxRate,
     };
   }
 
   if (id === "equalPurchaseTime") {
-    const tax = (income * income) / (income + purchaseTimeK);
-    const marginalRate = (income * (income + 2 * purchaseTimeK)) / (income + purchaseTimeK) ** 2;
+    const tax = (income * income) / (income + calibration.purchaseTimeK);
+    const marginalRate =
+      (income * (income + 2 * calibration.purchaseTimeK)) /
+      (income + calibration.purchaseTimeK) ** 2;
     return { tax, marginalRate };
   }
 
-  const netIncome = BENCHMARK_NET * (income / BENCHMARK_INCOME) ** INCOME_COMPRESSION_ALPHA;
+  const netIncome = calibration.incomeCompressionScale * income ** INCOME_COMPRESSION_ALPHA;
   return {
     tax: income - netIncome,
     marginalRate: 1 - (INCOME_COMPRESSION_ALPHA * netIncome) / income,
@@ -361,12 +443,16 @@ function getMetricValue(
   return ((grossRequired - spendingAmount) / grossHourly) * 60;
 }
 
-function getChartData(metric: MetricId, spendingAmount: number, purchaseTimeK: number) {
+function getChartData(
+  metric: MetricId,
+  spendingAmount: number,
+  calibration: ScheduleCalibration,
+) {
   return getSalarySamples().map((income) => {
     const row: ChartRow = { income };
 
     for (const schedule of SCHEDULES) {
-      const outcome = getScheduleOutcome(schedule.id, income, purchaseTimeK);
+      const outcome = getScheduleOutcome(schedule.id, income, calibration);
       row[schedule.id] = getMetricValue(metric, income, outcome, spendingAmount);
     }
 
@@ -390,14 +476,21 @@ function getYAxisLabel(metric: MetricId) {
 
 export default function TaxScheduleComparisonLab() {
   const [selectedMetric, setSelectedMetric] = useState<MetricId>("averageRate");
-  const [purchaseTimeK, setPurchaseTimeK] = useState(Math.round(DEFAULT_PURCHASE_TIME_K / 1_000) * 1_000);
+  const [calibrationMode, setCalibrationMode] = useState<CalibrationMode>("statusQuo");
   const [visibleIds, setVisibleIds] = useState<ScheduleId[]>(SCHEDULES.map((schedule) => schedule.id));
 
+  const calibration =
+    calibrationMode === "statusQuo"
+      ? STATUS_QUO_CALIBRATION
+      : REVENUE_NEUTRAL_CALIBRATION;
+  const isStatusQuo = calibrationMode === "statusQuo";
   const visibleSet = useMemo(() => new Set(visibleIds), [visibleIds]);
   const chartData = useMemo(
-    () => getChartData(selectedMetric, SPENDING_AMOUNT, purchaseTimeK),
-    [selectedMetric, purchaseTimeK],
+    () => getChartData(selectedMetric, SPENDING_AMOUNT, calibration),
+    [selectedMetric, calibration],
   );
+  const oneMinutePurchasePrice =
+    calibration.purchaseTimeK / WORKING_MINUTES_PER_YEAR;
 
   function toggleSchedule(id: ScheduleId) {
     setVisibleIds((current) =>
@@ -405,12 +498,6 @@ export default function TaxScheduleComparisonLab() {
         ? current.filter((candidate) => candidate !== id)
         : [...current, id],
     );
-  }
-
-  function resetControls() {
-    setSelectedMetric("averageRate");
-    setPurchaseTimeK(Math.round(DEFAULT_PURCHASE_TIME_K / 1_000) * 1_000);
-    setVisibleIds(SCHEDULES.map((schedule) => schedule.id));
   }
 
   return (
@@ -434,8 +521,10 @@ export default function TaxScheduleComparisonLab() {
         </h1>
         <p className="max-w-4xl text-lg leading-relaxed text-stone-600 sm:text-xl">
           Compare eight ways of turning gross salary into tax, take-home pay, and
-          working time. The stylised schedules start calibrated to the current
-          Irish model at a EUR60,000 salary.
+          working time.{" "}
+          {isStatusQuo
+            ? "The stylised schedules are calibrated to the current Irish model at a €60,000 salary."
+            : "The stylised schedules are calibrated to collect the same aggregate tax as the current Irish model across the representative wage sample."}
         </p>
       </header>
 
@@ -467,37 +556,51 @@ export default function TaxScheduleComparisonLab() {
             </div>
           </article>
 
-          <article className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)]">
-            <h2 className="mb-3 font-mono text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">
-              Equal-time K
-            </h2>
-            <input
-              type="range"
-              min={20_000}
-              max={500_000}
-              step={5_000}
-              value={purchaseTimeK}
-              onChange={(event) => setPurchaseTimeK(Number(event.target.value))}
-              className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-stone-200 accent-orange-600"
-            />
-            <div className="mt-2 flex items-baseline justify-between gap-3">
-              <p className="text-2xl font-black tracking-tight text-stone-900">
-                {formatCurrency(purchaseTimeK)}
-              </p>
-              <p className="max-w-[9rem] text-right text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
-                50% average tax salary
-              </p>
+          <fieldset className="rounded-[2rem] border border-stone-200 bg-white p-4 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)]">
+            <legend className="px-2 font-mono text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">
+              Calibration
+            </legend>
+            <div className="grid gap-2" role="radiogroup" aria-label="Tax schedule calibration">
+              {(
+                [
+                  {
+                    id: "statusQuo",
+                    label: "Status quo",
+                    description: "25.2% at €60k",
+                  },
+                  {
+                    id: "revenueNeutral",
+                    label: "Same total revenue",
+                    description: "Nine-worker sample",
+                  },
+                ] as const
+              ).map((option) => {
+                const isSelected = calibrationMode === option.id;
+                return (
+                  <button
+                    key={option.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={isSelected}
+                    onClick={() => setCalibrationMode(option.id)}
+                    className={`rounded-2xl border px-4 py-3 text-left transition ${
+                      isSelected
+                        ? "border-orange-600 bg-orange-50 text-stone-900"
+                        : "border-stone-200 bg-stone-50 text-stone-600 hover:border-stone-400"
+                    }`}
+                  >
+                    <span className="block text-sm font-black tracking-tight">
+                      {option.label}
+                    </span>
+                    <span className="mt-1 block text-xs text-stone-500">
+                      {option.description}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
-          </article>
+          </fieldset>
 
-          <button
-            type="button"
-            onClick={resetControls}
-            className="pill-control inline-flex w-full items-center justify-center gap-2 rounded-full border border-stone-300 px-5 py-3 font-mono text-xs font-bold uppercase tracking-[0.2em] text-stone-700 transition hover:border-stone-900 hover:text-stone-900"
-          >
-            <RotateCcw className="h-4 w-4" />
-            <span className="pill-label">Reset</span>
-          </button>
         </aside>
 
         <article className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)] sm:p-8 lg:col-span-3">
@@ -586,29 +689,33 @@ export default function TaxScheduleComparisonLab() {
                     boxShadow: "0 14px 28px -18px rgba(0,0,0,0.45)",
                   }}
                 />
-                <ReferenceLine
-                  x={BENCHMARK_INCOME}
-                  stroke="#a8a29e"
-                  strokeDasharray="4 4"
-                  label={{
-                    position: "top",
-                    value: "EUR60k concordance",
-                    fontSize: 10,
-                    fill: "#78716c",
-                  }}
-                />
-                {selectedMetric === "averageRate" && (
-                  <ReferenceLine
-                    y={BENCHMARK_AVERAGE_RATE * 100}
-                    stroke="#d6d3d1"
-                    strokeDasharray="3 3"
-                    label={{
-                      position: "insideTopRight",
-                      value: "benchmark rate",
-                      fontSize: 10,
-                      fill: "#78716c",
-                    }}
-                  />
+                {isStatusQuo && (
+                  <>
+                    <ReferenceLine
+                      x={BENCHMARK_INCOME}
+                      stroke="#a8a29e"
+                      strokeDasharray="4 4"
+                      label={{
+                        position: "top",
+                        value: "€60k concordance",
+                        fontSize: 10,
+                        fill: "#78716c",
+                      }}
+                    />
+                    {selectedMetric === "averageRate" && (
+                      <ReferenceLine
+                        y={BENCHMARK_AVERAGE_RATE * 100}
+                        stroke="#d6d3d1"
+                        strokeDasharray="3 3"
+                        label={{
+                          position: "insideTopRight",
+                          value: "benchmark rate",
+                          fontSize: 10,
+                          fill: "#78716c",
+                        }}
+                      />
+                    )}
+                  </>
                 )}
 
                 {SCHEDULES.filter((schedule) => visibleSet.has(schedule.id)).map((schedule) => (
@@ -629,9 +736,18 @@ export default function TaxScheduleComparisonLab() {
           </div>
 
           <p className="mt-5 rounded-xl border border-stone-200 bg-stone-50 p-3 text-sm leading-relaxed text-stone-600">
-            All stylised schedules except no-tax start calibrated to the current
-            Irish model at EUR60,000. Moving K intentionally changes the
-            equal-purchase-time line so you can see how that assumption reshapes the curve.
+            {isStatusQuo ? (
+              <>
+                All stylised schedules except no tax are calibrated to the current
+                Irish model at €60,000.
+              </>
+            ) : (
+              <>
+                Each stylised schedule is calibrated to match the current Irish
+                model&apos;s aggregate tax across nine equally weighted 2024 salary
+                observations. No tax remains a non-neutral baseline.
+              </>
+            )}
           </p>
         </article>
       </section>
@@ -639,24 +755,47 @@ export default function TaxScheduleComparisonLab() {
       <section className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-3">
         <article className="rounded-[2rem] border border-stone-200 bg-stone-900 p-6 text-white shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)] sm:p-8">
           <p className="font-mono text-xs font-semibold uppercase tracking-[0.3em] text-stone-400">
-            Concordance point
+            {isStatusQuo ? "Status Quo" : "Revenue Target"}
           </p>
           <p className="mt-4 text-4xl font-black tracking-tight">
-            {formatPercent(BENCHMARK_AVERAGE_RATE * 100)}
+            {isStatusQuo
+              ? formatPercent(BENCHMARK_AVERAGE_RATE * 100)
+              : formatCurrency(SAMPLE_IRISH_TAX)}
           </p>
-          <p className="mt-3 text-sm leading-relaxed text-stone-300">
-            A single PAYE employee on {formatCurrency(BENCHMARK_INCOME)} pays about{" "}
-            {formatCurrency(BENCHMARK_TAX)} in PAYE, USC, and PRSI in this model.
-          </p>
+          {isStatusQuo ? (
+            <>
+              <p className="mt-3 text-sm leading-relaxed text-stone-300">
+                A single PAYE employee on {formatCurrency(BENCHMARK_INCOME)} pays about{" "}
+                {formatCurrency(BENCHMARK_TAX)} in PAYE, USC, and PRSI in this model.
+              </p>
+              <p className="mt-3 text-sm leading-relaxed text-stone-300">
+                I tuned the other tax schedules so that each reaches 25.2% at €60,000. I
+                chose this to allow rough comparison to the current Irish-tax status quo.
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="mt-3 text-sm leading-relaxed text-stone-300">
+                This is the current Irish model&apos;s combined tax across the nine
+                representative salaries.
+              </p>
+              <p className="mt-3 text-sm leading-relaxed text-stone-300">
+                Each salary observation has equal weight. The figures are percentile
+                reference points, not a complete population or top-tail revenue estimate.
+              </p>
+            </>
+          )}
         </article>
 
         <article className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)] sm:p-8 lg:col-span-2">
           <p className="flex items-start gap-3 text-sm leading-relaxed text-stone-600">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-stone-500" />
             <span>
-              The chart is a shape explorer, not a revenue model. It compares how
-              different fairness rules distribute the burden across salaries after
-              they are anchored to the same benchmark taxpayer.
+              The chart is a shape explorer, not a full-population revenue forecast.
+              It compares how different fairness rules distribute the burden across salaries after{" "}
+              {isStatusQuo
+                ? "they are anchored to the same benchmark taxpayer."
+                : "their parameters are adjusted to the same sample-based revenue target."}
             </span>
           </p>
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
@@ -674,6 +813,16 @@ export default function TaxScheduleComparisonLab() {
                 <p className="mt-2 text-xs leading-relaxed text-stone-600">
                   {schedule.description}
                 </p>
+                {schedule.id === "equalPurchaseTime" && (
+                  <p className="mt-3 border-t border-stone-200 pt-3 text-xs leading-relaxed text-stone-600">
+                    Its average tax rate reaches 50% at a salary of{" "}
+                    <strong>{formatCurrency(calibration.purchaseTimeK)}</strong>. With
+                    37.5 working hours a week for 52 weeks (
+                    {WORKING_MINUTES_PER_YEAR.toLocaleString("en-IE")} minutes a year),
+                    one gross minute at that salary buys about{" "}
+                    <strong>{formatCurrency(oneMinutePurchasePrice, 2)}</strong>.
+                  </p>
+                )}
               </div>
             ))}
           </div>
