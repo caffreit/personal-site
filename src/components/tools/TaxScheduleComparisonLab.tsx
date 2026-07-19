@@ -59,7 +59,6 @@ type ChartRow = {
 } & Record<string, number | null>;
 
 type ScheduleId =
-  | "noTax"
   | "currentIrish"
   | "equalAbsolute"
   | "flatPercentage"
@@ -104,13 +103,6 @@ const SCHEDULES: ScheduleConfig[] = [
     shortLabel: "Irish rates",
     color: "#0f172a",
     description: "PAYE income tax, USC, and employee PRSI using the site's 2026 assumptions.",
-  },
-  {
-    id: "noTax",
-    label: "No tax",
-    shortLabel: "No tax",
-    color: "#94a3b8",
-    description: "A baseline where gross salary and net income are the same.",
   },
   {
     id: "equalAbsolute",
@@ -189,6 +181,11 @@ const METRICS: { id: MetricId; label: string; description: string }[] = [
 const SALARY_TICKS = [10_000, 20_000, 40_000, 60_000, 100_000, 200_000, 500_000];
 const AXIS_TICK_FONT_SIZE = 14;
 const AXIS_LABEL_FONT_SIZE = 16;
+const DEFAULT_VISIBLE_SCHEDULE_IDS: ScheduleId[] = [
+  "currentIrish",
+  "equalAbsolute",
+  "flatPercentage",
+];
 
 function formatCurrency(value: number, maximumFractionDigits = 0) {
   return value.toLocaleString("en-IE", {
@@ -208,10 +205,10 @@ function formatPercent(value: number, maximumFractionDigits = 1) {
 
 function formatSalaryTick(value: number) {
   if (value >= 1_000_000) {
-    return "EUR1m";
+    return "€1m";
   }
 
-  return `EUR${value / 1_000}k`;
+  return `€${value / 1_000}k`;
 }
 
 function formatMetricValue(value: number, metric: MetricId) {
@@ -344,10 +341,6 @@ function getScheduleOutcome(
     return calculateIrishTax(income);
   }
 
-  if (id === "noTax") {
-    return { tax: 0, marginalRate: 0 };
-  }
-
   if (id === "equalAbsolute") {
     return { tax: calibration.equalAbsoluteTax, marginalRate: 0 };
   }
@@ -477,7 +470,7 @@ function getYAxisLabel(metric: MetricId) {
 export default function TaxScheduleComparisonLab() {
   const [selectedMetric, setSelectedMetric] = useState<MetricId>("averageRate");
   const [calibrationMode, setCalibrationMode] = useState<CalibrationMode>("statusQuo");
-  const [visibleIds, setVisibleIds] = useState<ScheduleId[]>(SCHEDULES.map((schedule) => schedule.id));
+  const [visibleIds, setVisibleIds] = useState<ScheduleId[]>(DEFAULT_VISIBLE_SCHEDULE_IDS);
 
   const calibration =
     calibrationMode === "statusQuo"
@@ -738,14 +731,14 @@ export default function TaxScheduleComparisonLab() {
           <p className="mt-5 rounded-xl border border-stone-200 bg-stone-50 p-3 text-sm leading-relaxed text-stone-600">
             {isStatusQuo ? (
               <>
-                All stylised schedules except no tax are calibrated to the current
-                Irish model at €60,000.
+                All stylised schedules are calibrated to the current Irish model at
+                €60,000.
               </>
             ) : (
               <>
                 Each stylised schedule is calibrated to match the current Irish
                 model&apos;s aggregate tax across nine equally weighted 2024 salary
-                observations. No tax remains a non-neutral baseline.
+                observations.
               </>
             )}
           </p>
