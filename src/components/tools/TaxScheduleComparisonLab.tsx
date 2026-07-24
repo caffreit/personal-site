@@ -86,6 +86,7 @@ const ANNUAL_WORK_HOURS = 37.5 * 52;
 const SPENDING_AMOUNT = 100;
 const MIN_SALARY = 10_000;
 const MAX_SALARY = 500_000;
+const NATIONAL_INCOME_TAX_RECEIPTS_2024 = 35_071_000_000;
 const WAGE_SAMPLE_2024 = [13_500, 20_700, 27_400, 32_400, 38_000, 44_900, 53_700, 67_200, 90_500];
 
 const BENCHMARK_TAX = calculateIrishTax(BENCHMARK_INCOME).tax;
@@ -201,6 +202,12 @@ function formatNumber(value: number, maximumFractionDigits = 0) {
 
 function formatPercent(value: number, maximumFractionDigits = 1) {
   return `${value.toLocaleString("en-IE", { maximumFractionDigits })}%`;
+}
+
+function formatBillions(value: number) {
+  return `€${(value / 1_000_000_000).toLocaleString("en-IE", {
+    maximumFractionDigits: 1,
+  })}bn`;
 }
 
 function formatSalaryTick(value: number) {
@@ -517,7 +524,7 @@ export default function TaxScheduleComparisonLab() {
           working time.{" "}
           {isStatusQuo
             ? "The stylised schedules are calibrated to the current Irish model at a €60,000 salary."
-            : "The stylised schedules are calibrated to collect the same aggregate tax as the current Irish model across the representative wage sample."}
+            : "The stylised schedules show the rates needed to keep Ireland’s total income-tax take unchanged."}
         </p>
       </header>
 
@@ -564,7 +571,7 @@ export default function TaxScheduleComparisonLab() {
                   {
                     id: "revenueNeutral",
                     label: "Same total revenue",
-                    description: "Nine-worker sample",
+                    description: "Ireland’s 2024 tax take",
                   },
                 ] as const
               ).map((option) => {
@@ -736,9 +743,9 @@ export default function TaxScheduleComparisonLab() {
               </>
             ) : (
               <>
-                Each stylised schedule is calibrated to match the current Irish
-                model&apos;s aggregate tax across nine equally weighted 2024 salary
-                observations.
+                Each stylised schedule is calibrated to preserve Ireland&apos;s 2024
+                Income Tax and USC take. Nine equally weighted salary observations
+                are used behind the scenes to estimate the required rates.
               </>
             )}
           </p>
@@ -748,12 +755,12 @@ export default function TaxScheduleComparisonLab() {
       <section className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-3">
         <article className="rounded-[2rem] border border-stone-200 bg-stone-900 p-6 text-white shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)] sm:p-8">
           <p className="font-mono text-xs font-semibold uppercase tracking-[0.3em] text-stone-400">
-            {isStatusQuo ? "Status Quo" : "Revenue Target"}
+            {isStatusQuo ? "Status Quo" : "2024 Income Tax Take"}
           </p>
           <p className="mt-4 text-4xl font-black tracking-tight">
             {isStatusQuo
               ? formatPercent(BENCHMARK_AVERAGE_RATE * 100)
-              : formatCurrency(SAMPLE_IRISH_TAX)}
+              : formatBillions(NATIONAL_INCOME_TAX_RECEIPTS_2024)}
           </p>
           {isStatusQuo ? (
             <>
@@ -769,12 +776,12 @@ export default function TaxScheduleComparisonLab() {
           ) : (
             <>
               <p className="mt-3 text-sm leading-relaxed text-stone-300">
-                This is the current Irish model&apos;s combined tax across the nine
-                representative salaries.
+                Ireland collected €35.071 billion in net Income Tax receipts,
+                including USC, in 2024.
               </p>
               <p className="mt-3 text-sm leading-relaxed text-stone-300">
-                Each salary observation has equal weight. The figures are percentile
-                reference points, not a complete population or top-tail revenue estimate.
+                The nine salary observations are used behind the scenes to estimate
+                the rates each schedule would need to keep that national take unchanged.
               </p>
             </>
           )}
@@ -788,7 +795,7 @@ export default function TaxScheduleComparisonLab() {
               It compares how different fairness rules distribute the burden across salaries after{" "}
               {isStatusQuo
                 ? "they are anchored to the same benchmark taxpayer."
-                : "their parameters are adjusted to the same sample-based revenue target."}
+                : "their parameters are adjusted to keep Ireland’s overall income-tax take unchanged."}
             </span>
           </p>
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
