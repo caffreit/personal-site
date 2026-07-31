@@ -42,19 +42,30 @@ export function FilterLink({
   label,
   isActive,
   onClick,
+  accent,
 }: {
   label: string;
   isActive: boolean;
   onClick: () => void;
+  /* Custom properties from getBadgeAccentVars: when present the rule under the
+     label is drawn in the category's colour instead of the default yellow. */
+  accent?: CSSProperties;
 }) {
+  const state = isActive
+    ? "text-[var(--foreground)]"
+    : "text-[var(--text-muted)] hover:text-[var(--foreground)]";
+  const rule = accent
+    ? "filter-accent"
+    : isActive
+      ? "border-[var(--color-yellow)]"
+      : "border-transparent";
+
   return (
     <button
       onClick={onClick}
-      className={`border-b pb-[2px] font-mono text-[0.63rem] uppercase tracking-[0.18em] transition-colors ${
-        isActive
-          ? "border-[var(--color-yellow)] text-[var(--foreground)]"
-          : "border-transparent text-[var(--text-muted)] hover:text-[var(--foreground)]"
-      }`}
+      data-active={isActive}
+      style={accent}
+      className={`border-b pb-[2px] font-mono text-[0.63rem] uppercase tracking-[0.18em] transition-colors ${rule} ${state}`}
     >
       {label}
     </button>

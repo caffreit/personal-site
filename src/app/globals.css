@@ -319,29 +319,69 @@ button:focus-visible {
 }
 
 /* Stand-in cover for items with no image (most labs): a tinted gradient with
-   an oversized numeral, sized so the numeral stays inside the closed strip. */
+   an oversized numeral over the category it is coloured for, sized to stay
+   inside the closed strip. */
 .rolodex-media-generated {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 12px;
   height: 100%;
   width: 100%;
+  padding: 0 12px;
   background-image: var(--tile-gradient);
+  transition: transform var(--rolodex-dur) var(--rolodex-ease);
+}
+
+.rolodex-panel[data-open="true"] .rolodex-media-generated {
+  transform: scale(1.15);
 }
 
 .rolodex-media-index {
   font-family: var(--font-mono, ui-monospace, monospace);
-  font-size: clamp(3.5rem, 9vw, 8rem);
+  font-size: clamp(3rem, 7vw, 6.5rem);
   font-weight: 300;
   line-height: 1;
   letter-spacing: -0.04em;
   color: rgba(255, 255, 255, 0.55);
   mix-blend-mode: overlay;
-  transition: transform var(--rolodex-dur) var(--rolodex-ease);
 }
 
-.rolodex-panel[data-open="true"] .rolodex-media-index {
-  transform: scale(1.25);
+.rolodex-media-label {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.6rem;
+  line-height: 1.3;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/* Category colour on the badge word in a caption, and on the rule under the
+   matching filter - dimmed until that filter is the active one. */
+.badge-accent {
+  color: var(--badge-accent);
+}
+
+.dark .badge-accent {
+  color: var(--badge-accent-dark);
+}
+
+.filter-accent {
+  border-bottom-color: var(--badge-rule);
+}
+
+.filter-accent[data-active="true"] {
+  border-bottom-color: var(--badge-accent);
+}
+
+.dark .filter-accent {
+  border-bottom-color: var(--badge-rule-dark);
+}
+
+.dark .filter-accent[data-active="true"] {
+  border-bottom-color: var(--badge-accent-dark);
 }
 
 .rolodex-cap {
@@ -458,7 +498,13 @@ button:focus-visible {
   }
 
   .rolodex-media-index {
-    font-size: clamp(2.25rem, 12vw, 4.5rem);
+    font-size: clamp(2rem, 10vw, 3.5rem);
+  }
+
+  /* Too narrow a strip for the category to sit legibly under the numeral; the
+     coloured badge word in the caption carries it instead. */
+  .rolodex-media-label {
+    display: none;
   }
 
   .rolodex-tail {

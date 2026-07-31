@@ -11,6 +11,7 @@ import Rolodex, {
   formatListingDate,
   type RolodexItem,
 } from "@/components/shared/Rolodex";
+import { getBadgeAccentVars, getTileGradient } from "./labBadgeColors";
 
 type LabsListingProps = {
   labs: Lab[];
@@ -20,41 +21,19 @@ const ALL_FILTER = "All";
 const PINNED_FILTER = "Pinned";
 const TAX_FILTER = "Tax";
 
-// Base hue per badge so a lab family reads as one colour, with the second
-// stop nudged by the href hash so no two panels are identical.
-const BADGE_HUE: Record<string, number> = {
-  "Data Viz": 202,
-  Civics: 96,
-  SaMD: 272,
-  "Google Maps": 22,
-};
-
-function hashString(value: string): number {
-  let hash = 0;
-  for (let i = 0; i < value.length; i += 1) {
-    hash = (hash * 31 + value.charCodeAt(i)) | 0;
-  }
-  return Math.abs(hash);
-}
-
-function getTileGradient(lab: Lab): string {
-  const hash = hashString(lab.href);
-  const hue = BADGE_HUE[lab.badge] ?? 45;
-  const shift = 18 + (hash % 26);
-  const angle = 120 + (hash % 5) * 15;
-  return `linear-gradient(${angle}deg, hsl(${hue} 42% 40%) 0%, hsl(${
-    (hue + shift) % 360
-  } 38% 20%) 100%)`;
-}
-
 export default function LabsListing({ labs }: LabsListingProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState(ALL_FILTER);
 
-  const filters = useMemo(() => {
-    const badges = Array.from(new Set(labs.map((lab) => lab.badge))).sort();
-    return [ALL_FILTER, PINNED_FILTER, TAX_FILTER, ...badges];
-  }, [labs]);
+  const badges = useMemo(
+    () => Array.from(new Set(labs.map((lab) => lab.badge))).sort(),
+    [labs],
+  );
+
+  const filters = useMemo(
+    () => [ALL_FILTER, PINNED_FILTER, TAX_FILTER, ...badges],
+    [badges],
+  );
 
   const filteredLabs = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -92,7 +71,9 @@ export default function LabsListing({ labs }: LabsListingProps) {
         <>
           <span>{position}</span>
           <span>{formatListingDate(lab.publishedAt)}</span>
-          <span className="text-[var(--foreground)]">{lab.badge}</span>
+          <span className="badge-accent" style={getBadgeAccentVars(lab.badge)}>
+            {lab.badge}
+          </span>
           <span>{lab.meta}</span>
           {lab.isPinned && (
             <span className="inline-flex items-center gap-[6px] text-[var(--foreground)]">
@@ -116,10 +97,17 @@ export default function LabsListing({ labs }: LabsListingProps) {
       ) : (
         <div
           className="rolodex-media-generated"
-          style={{ "--tile-gradient": getTileGradient(lab) } as CSSProperties}
+          style={
+            {
+              "--tile-gradient": getTileGradient(lab.href, lab.badge),
+            } as CSSProperties
+          }
         >
           <span className="rolodex-media-index" aria-hidden>
             {position}
+          </span>
+          <span className="rolodex-media-label" aria-hidden>
+            {lab.badge}
           </span>
         </div>
       ),
@@ -154,6 +142,11 @@ export default function LabsListing({ labs }: LabsListingProps) {
                 key={filter}
                 label={filter}
                 isActive={selectedFilter === filter}
+                accent={
+                  badges.includes(filter)
+                    ? getBadgeAccentVars(filter)
+                    : undefined
+                }
                 onClick={() =>
                   setSelectedFilter(
                     filter === selectedFilter ? ALL_FILTER : filter,
