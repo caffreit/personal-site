@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog Page Redesign — Directions</title>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --yellow: #F4CA16;
+    --bg: #0A0A0A;
+    --fg: #FFFFFF;
+    --muted: rgba(255,255,255,0.5);
+    --faint: rgba(255,255,255,0.3);
+    --rule: #222;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Newsreader', Georgia, serif;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 80px 40px 120px;
+  }
+
+  .label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--yellow);
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-size: clamp(2.4rem, 5vw, 4rem);
+    font-weight: 300;
+    line-height: 1.1;
+    margin-bottom: 20px;
+  }
+
+  .intro {
+    font-size: 1.1rem;
+    color: var(--muted);
+    max-width: 640px;
+    line-height: 1.7;
+    font-style: italic;
+    margin-bottom: 24px;
+  }
+
+  .shared {
+    border-left: 2px solid var(--yellow);
+    padding: 4px 0 4px 20px;
+    max-width: 660px;
+    margin-bottom: 20px;
+    color: var(--muted);
+    font-size: 0.98rem;
+    line-height: 1.75;
+  }
+  .shared + .shared { margin-bottom: 64px; }
+  .shared strong { color: var(--fg); font-weight: 400; }
+  .shared code {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.82em;
+    color: rgba(255,255,255,0.7);
+  }
+
+  .card {
+    display: block;
+    border-top: 1px solid var(--rule);
+    padding: 36px 0;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.4s;
+  }
+  .card:last-of-type { border-bottom: 1px solid var(--rule); }
+  .card:hover { border-color: var(--yellow); }
+
+  .card-top {
+    display: flex;
+    align-items: baseline;
+    gap: 18px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+
+  .num {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--faint);
+  }
+
+  h2 {
+    font-size: clamp(1.5rem, 3vw, 2.1rem);
+    font-weight: 400;
+    line-height: 1.15;
+    transition: color 0.3s;
+  }
+  .card:hover h2 { color: var(--yellow); }
+
+  .theme {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--faint);
+    border: 1px solid var(--rule);
+    padding: 3px 8px;
+  }
+
+  .desc {
+    color: var(--muted);
+    line-height: 1.7;
+    max-width: 700px;
+    margin-bottom: 18px;
+  }
+
+  .notes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 32px;
+    max-width: 760px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    line-height: 1.8;
+  }
+  .notes .k { color: var(--faint); }
+  .notes .v { color: rgba(255,255,255,0.72); }
+
+  .open {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 22px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.63rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--fg);
+    border-bottom: 1px solid var(--yellow);
+    padding-bottom: 3px;
+  }
+
+  .dropped {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+    color: var(--faint);
+    line-height: 1.7;
+    max-width: 660px;
+    font-size: 0.95rem;
+  }
+  .dropped strong { color: var(--muted); font-weight: 400; }
+
+  @media (max-width: 720px) {
+    .page { padding: 56px 20px 80px; }
+    .notes { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <div class="label">Blog page redesign</div>
+  <h1>Vertical accordion directions</h1>
+  <p class="intro">Replacing the two-column grid of rounded cards with full-width panels stacked newest to oldest, where one panel is open at a time.</p>
+
+  <div class="shared">
+    <strong>Shared rules.</strong> No drop shadows, no gradient washes, square corners. Search and tags are a quiet inline row rather than a container card. Every panel's text layer stands on its own — use the <em>Images: On/Off</em> toggle at the top right of each mockup to see how it degrades without covers. Timing is the 0.7s <code>cubic-bezier(0.25, 1, 0.5, 1)</code> already used by the photos page.
+  </div>
+
+  <div class="shared">
+    <strong>Two interaction modes.</strong> Above 860px wide, hovering a panel opens it. Below 860px the stack pins to the viewport and the open panel is driven purely by scroll position — the first one is open on load, and each one closes as the next expands under your thumb, with no tapping. The switch is keyed to viewport width, so you can see the phone behaviour just by narrowing your desktop window.
+  </div>
+
+  <a class="card" href="blog-1-cinematic-rolodex.html">
+    <div class="card-top">
+      <span class="num">01</span>
+      <h2>Cinematic Rolodex</h2>
+      <span class="theme">Dark</span>
+    </div>
+    <p class="desc">The direct vertical translation of the hero snippet. Every panel is a full-bleed cover behind a dark scrim; closed panels are a 116px band showing title and date, and the open one expands to 55vh as the scrim lifts and the image comes into focus.</p>
+    <div class="notes">
+      <div><span class="k">Mood</span> <span class="v">Dark, photographic, confident</span></div>
+      <div><span class="k">Image treatment</span> <span class="v">Scrim over the whole cover</span></div>
+      <div><span class="k">Legibility</span> <span class="v">Guaranteed, at the photo's expense</span></div>
+      <div><span class="k">Trade-off</span> <span class="v">Mutes the splash image</span></div>
+    </div>
+    <span class="open">Open mockup &rarr;</span>
+  </a>
+
+  <a class="card" href="blog-1a-cinematic-rolodex-light.html">
+    <div class="card-top">
+      <span class="num">01a</span>
+      <h2>Cinematic Rolodex</h2>
+      <span class="theme">Light</span>
+    </div>
+    <p class="desc">The merge of 01 and 02, and the current front-runner. Nothing is laid over the photograph. Closed, a panel is a ledger line on white — text centred against a hairline rule, with a 220px strip of the cover peeking in from the right. Opening one wipes that strip out to full bleed at full colour while the text settles into a paper caption card at the bottom left, capped with a yellow rule. Page, panel, and card are all the same white, so there are no seams or false edges. You keep the big image and you keep clean type; they just stop competing for the same pixels.</p>
+    <div class="notes">
+      <div><span class="k">Mood</span> <span class="v">Editorial, gallery wall</span></div>
+      <div><span class="k">Image treatment</span> <span class="v">Untouched, no overlay</span></div>
+      <div><span class="k">Legibility</span> <span class="v">Guaranteed by the paper block</span></div>
+      <div><span class="k">Trade-off</span> <span class="v">Caption covers part of the photo</span></div>
+    </div>
+    <span class="open">Open mockup &rarr;</span>
+  </a>
+
+  <a class="card" href="blog-2-index-ledger.html">
+    <div class="card-top">
+      <span class="num">02</span>
+      <h2>Index Ledger</h2>
+      <span class="theme">Light</span>
+    </div>
+    <p class="desc">Typographic first. Closed rows are pure text separated by hairlines and read like an archive index. Opening a row wipes the cover in from the right as a band, desaturated until it settles, while the summary fades up and a yellow marker runs down the left edge.</p>
+    <div class="notes">
+      <div><span class="k">Mood</span> <span class="v">Sharp, restrained</span></div>
+      <div><span class="k">Image treatment</span> <span class="v">Clean, but only a band</span></div>
+      <div><span class="k">Legibility</span> <span class="v">Never an issue</span></div>
+      <div><span class="k">Trade-off</span> <span class="v">Less impact, no big splash</span></div>
+    </div>
+    <span class="open">Open mockup &rarr;</span>
+  </a>
+
+  <p class="dropped">
+    <strong>Dropped:</strong> 03 Stacked Deck, the sticky card deck. Harder to navigate, and its scroll-driven feel has been folded into the mobile behaviour of the three above.
+  </p>
+</div>
+
+</body>
+</html>

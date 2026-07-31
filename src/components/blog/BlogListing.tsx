@@ -1,16 +1,26 @@
 'use client';
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef, type CSSProperties } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, ArrowUpRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { PostListItem } from "@/lib/posts";
 
-// Helper function to get placeholder image based on slug
+const NARROW = "(max-width: 860px)";
+
 function getPlaceholderImage(slug: string): string {
-  // You can customize this to use actual images or a placeholder service
-  // For now, using a simple gradient placeholder
-  return `https://picsum.photos/seed/${slug}/400/400`;
+  return `https://picsum.photos/seed/${slug}/1600/900`;
+}
+
+function formatDate(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  });
 }
 
 interface BlogListingProps {
@@ -20,127 +30,171 @@ interface BlogListingProps {
 export default function BlogListing({ posts }: BlogListingProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [openIndex, setOpenIndex] = useState(0);
+  const [isNarrow, setIsNarrow] = useState(false);
+  const [navOffset, setNavOffset] = useState(0);
+  const rolodexRef = useRef<HTMLDivElement>(null);
 
-  // Get all unique tags from posts
   const allTags = useMemo(() => {
     const tags = new Set<string>();
-    posts.forEach((post) => {
-      post.tags.forEach((tag) => tags.add(tag));
-    });
+    posts.forEach((post) => post.tags.forEach((tag) => tags.add(tag)));
     return Array.from(tags).sort();
   }, [posts]);
 
-  // Filter posts based on search and tag
   const filteredPosts = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
     return posts.filter((post) => {
       const matchesSearch =
-        searchQuery === "" ||
-        post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        post.summary?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        post.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
-
+        query === "" ||
+        post.title.toLowerCase().includes(query) ||
+        post.summary?.toLowerCase().includes(query) ||
+        post.tags.some((tag) => tag.toLowerCase().includes(query));
       const matchesTag = selectedTag === null || post.tags.includes(selectedTag);
-
       return matchesSearch && matchesTag;
     });
   }, [posts, searchQuery, selectedTag]);
 
+  const count = filteredPosts.length;
+
+  useEffect(() => {
+    setOpenIndex(0);
+  }, [searchQuery, selectedTag]);
+
+  useEffect(() => {
+    const query = window.matchMedia(NARROW);
+    const update = () => setIsNarrow(query.matches);
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
+
+  // The pinned stack has to clear the sticky site header.
+  useEffect(() => {
+    const measure = () => {
+      const header = document.querySelector("header");
+      setNavOffset(header instanceof HTMLElement ? header.offsetHeight : 0);
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, []);
+
+  // On narrow viewports the open panel is a pure function of scroll position:
+  // no tap needed, and the first panel is already open on load.
+  useEffect(() => {
+    if (!isNarrow || count === 0) {
+      setOpenIndex(0);
+      return;
+    }
+
+    let frame = 0;
+    const read = () => {
+      frame = 0;
+      const element = rolodexRef.current;
+      if (!element) return;
+      const travel = element.offsetHeight - (window.innerHeight - navOffset);
+      const scrolled = navOffset - element.getBoundingClientRect().top;
+      const progress = travel > 0 ? scrolled / travel : 0;
+      const next = Math.min(count - 1, Math.max(0, Math.floor(progress * count)));
+      setOpenIndex(next);
+    };
+    const onScroll = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(read);
+    };
+
+    read();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, [isNarrow, count, navOffset]);
+
   return (
-    <div className="min-h-screen bg-white text-stone-900 dark:bg-[#050505] dark:text-stone-100">
-      <div className="mx-auto max-w-7xl px-4 pt-12 pb-32 sm:px-6 lg:px-8">
-        <div className="mb-12">
-          <Link
-            href="/"
-            className="mb-8 inline-flex items-center gap-2 text-stone-500 transition-colors hover:text-stone-900 dark:text-stone-400 dark:hover:text-stone-100"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            <span className="font-mono text-sm font-medium uppercase tracking-[0.2em]">
-              Back to Home
-            </span>
-          </Link>
+    <div className="pb-24">
+      <div className="mx-auto max-w-[1400px] px-5 pt-16 sm:px-10">
+        <h1 className="text-[clamp(3rem,7vw,5.5rem)] font-light leading-[0.95] tracking-[-0.02em]">
+          Blog
+        </h1>
+        <p className="mt-5 max-w-[520px] font-serif text-[1.05rem] font-light italic leading-relaxed text-[var(--text-muted)]">
+          Essays, build logs, and notes from data-forward experiments.
+        </p>
 
-          <h1 className="text-6xl font-black uppercase leading-[0.8] tracking-tighter text-stone-900 sm:text-8xl dark:text-white mb-8">
-            Blog
-          </h1>
-          <p className="max-w-2xl text-xl leading-relaxed text-stone-600 font-serif italic dark:text-stone-300">
-            Essays, build logs, and notes from data-forward experiments—curated
-            with the same editorial energy as the labs playground.
-          </p>
-        </div>
-
-        {/* Navigation Bar with Filters and Search */}
-        <div className="mb-16 rounded-[2.5rem] border border-stone-200/80 bg-white/80 p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.35)] backdrop-blur-sm dark:border-stone-800/70 dark:bg-[#0b0b0b]/80">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-            {/* Filter Buttons */}
-            <div className="flex flex-wrap items-center gap-3">
-              <FilterPill
-                label="All"
-                isActive={selectedTag === null}
-                onClick={() => setSelectedTag(null)}
+        <div className="mt-14 flex flex-wrap items-baseline justify-between gap-6 border-b border-[var(--rule-color)] pb-4">
+          <div className="flex flex-wrap gap-[22px]">
+            <FilterLink
+              label="All"
+              isActive={selectedTag === null}
+              onClick={() => setSelectedTag(null)}
+            />
+            {allTags.map((tag) => (
+              <FilterLink
+                key={tag}
+                label={tag}
+                isActive={selectedTag === tag}
+                onClick={() => setSelectedTag(tag === selectedTag ? null : tag)}
               />
-              {allTags.map((tag) => (
-                <FilterPill
-                  key={tag}
-                  label={tag}
-                  isActive={selectedTag === tag}
-                  onClick={() => setSelectedTag(tag === selectedTag ? null : tag)}
+            ))}
+          </div>
+
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder="Search"
+            aria-label="Search posts"
+            className="w-full border-b border-[var(--rule-color)] bg-transparent py-1 font-mono text-[0.63rem] uppercase tracking-[0.18em] outline-none transition-colors placeholder:text-[var(--text-muted)] focus:border-[var(--color-yellow)] sm:w-[200px]"
+          />
+        </div>
+      </div>
+
+      {count > 0 ? (
+        <>
+          <div
+            ref={rolodexRef}
+            className="blog-rolodex mx-auto max-w-[1400px] px-5 sm:px-10"
+            style={{ "--blog-n": count } as CSSProperties}
+          >
+            <div className="blog-stack" style={{ top: navOffset }}>
+              {filteredPosts.map((post, index) => (
+                <BlogPanel
+                  key={post.slug}
+                  post={post}
+                  index={index}
+                  isOpen={index === openIndex}
+                  onActivate={() => {
+                    if (!isNarrow) setOpenIndex(index);
+                  }}
                 />
               ))}
             </div>
-
-            {/* Search Bar */}
-            <div className="relative w-full lg:max-w-sm">
-              <input
-                type="text"
-                placeholder="Search posts"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-full border border-stone-200 bg-transparent py-3 pl-12 pr-4 text-sm uppercase tracking-[0.2em] text-stone-900 placeholder:text-stone-400 focus:border-stone-900 focus:outline-none focus:ring-0 dark:border-stone-700 dark:text-white dark:placeholder:text-stone-500"
-              />
-              <svg
-                className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400 dark:text-stone-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </div>
           </div>
+          <div className="blog-rolodex-tail" />
+        </>
+      ) : (
+        <div className="mx-auto max-w-[1400px] px-5 py-24 text-center sm:px-10">
+          <p className="font-serif text-lg italic text-[var(--text-muted)]">
+            No posts found matching your criteria.
+          </p>
+          <button
+            onClick={() => {
+              setSearchQuery("");
+              setSelectedTag(null);
+            }}
+            className="mt-5 border-b border-[var(--color-yellow)] pb-1 font-mono text-[0.62rem] uppercase tracking-[0.2em]"
+          >
+            Clear filters
+          </button>
         </div>
-
-        {/* Blog Posts Grid */}
-        {filteredPosts.length > 0 ? (
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            {filteredPosts.map((post) => (
-              <BlogPostCard key={post.slug} post={post} />
-            ))}
-          </div>
-        ) : (
-          <div className="rounded-[2.5rem] border border-dashed border-stone-200 bg-white py-24 text-center text-stone-500 dark:border-stone-700 dark:bg-[#0b0b0b]">
-            <p className="text-lg">No posts found matching your criteria.</p>
-            <button
-              onClick={() => {
-                setSearchQuery("");
-                setSelectedTag(null);
-              }}
-              className="mt-4 font-mono text-xs uppercase tracking-[0.3em] text-stone-900 underline decoration-yellow-400 decoration-2 underline-offset-4 transition-colors hover:text-yellow-600 dark:text-white"
-            >
-              Clear filters
-            </button>
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 }
 
-function FilterPill({
+function FilterLink({
   label,
   isActive,
   onClick,
@@ -152,82 +206,71 @@ function FilterPill({
   return (
     <button
       onClick={onClick}
-      className={`pill-control rounded-full border px-4 py-2 text-[10px] font-black uppercase tracking-[0.3em] transition-colors ${
+      className={`border-b pb-[2px] font-mono text-[0.63rem] uppercase tracking-[0.18em] transition-colors ${
         isActive
-          ? "border-stone-900 bg-stone-900 text-white dark:border-white dark:bg-white dark:text-stone-900"
-          : "border-stone-200 text-stone-500 hover:border-stone-900 hover:text-stone-900 dark:border-stone-700 dark:text-stone-400 dark:hover:text-white"
+          ? "border-[var(--color-yellow)] text-[var(--foreground)]"
+          : "border-transparent text-[var(--text-muted)] hover:text-[var(--foreground)]"
       }`}
     >
-      <span className="pill-label">{label}</span>
+      {label}
     </button>
   );
 }
 
-function BlogPostCard({ post }: { post: PostListItem }) {
+function BlogPanel({
+  post,
+  index,
+  isOpen,
+  onActivate,
+}: {
+  post: PostListItem;
+  index: number;
+  isOpen: boolean;
+  onActivate: () => void;
+}) {
   const imageUrl = post.image || getPlaceholderImage(post.slug);
   const category = post.category || post.tags[0] || "Post";
-  const readingTime = post.readTime;
 
   return (
     <Link
       href={`/blog/${post.slug}`}
-      className="group relative flex h-full flex-col overflow-hidden rounded-[2.5rem] border border-stone-200 bg-white p-8 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.35)] transition-transform duration-500 hover:-translate-y-1 hover:shadow-[0_25px_60px_-35px_rgba(0,0,0,0.4)] dark:border-stone-800 dark:bg-[#0f0f0f]"
+      className="blog-panel group"
+      data-open={isOpen}
+      onMouseEnter={onActivate}
+      onFocus={onActivate}
     >
-      <div className="mb-6 flex flex-wrap items-center gap-3 text-[10px] font-bold uppercase tracking-[0.3em] text-stone-400">
-        <span className="pill-control rounded-full border border-stone-200 px-3 py-1 text-[10px] font-black tracking-[0.4em] text-stone-600 dark:border-stone-700 dark:text-stone-200">
-          <span className="pill-label">{readingTime}</span>
-        </span>
-        <span className="pill-control rounded-full bg-lime-100 px-3 py-1 text-lime-700 dark:bg-lime-900/40 dark:text-lime-200">
-          <span className="pill-label">{category}</span>
-        </span>
-      </div>
-
-      <div className="mb-8 overflow-hidden rounded-3xl border border-stone-100 dark:border-stone-800">
+      <div className="blog-panel-media">
         <Image
           src={imageUrl}
-          alt={post.title}
-          width={900}
-          height={500}
-          className="h-48 w-full object-cover transition-transform duration-500 group-hover:scale-105"
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          alt=""
+          fill
+          sizes="(max-width: 860px) 100vw, 1400px"
+          priority={index === 0}
         />
       </div>
 
-      <div className="space-y-4">
-        <h2 className="text-3xl font-black tracking-tight text-stone-900 transition-colors group-hover:text-yellow-600 dark:text-white">
-          {post.title}
-        </h2>
-        {post.summary && (
-          <p className="font-serif text-lg italic text-stone-600 dark:text-stone-300">
-            {post.summary}
-          </p>
-        )}
-      </div>
-
-      {post.tags.length > 0 && (
-        <div className="mt-6 flex flex-wrap gap-2">
-          {post.tags.map((tag) => (
-            <span
-              key={tag}
-              className="pill-control rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-600 dark:bg-stone-800 dark:text-stone-200"
-            >
-              <span className="pill-label">{tag}</span>
-            </span>
-          ))}
+      <div className="blog-cap">
+        <div className="flex flex-wrap items-baseline gap-4 font-mono text-[0.6rem] uppercase tracking-[0.2em] text-[var(--text-muted)]">
+          <span>{String(index + 1).padStart(2, "0")}</span>
+          <span>{formatDate(post.date)}</span>
+          <span className="text-[var(--foreground)]">{category}</span>
+          <span>{post.readTime}</span>
         </div>
-      )}
 
-      <div className="mt-10 flex items-center justify-end text-sm text-stone-900 dark:text-white">
-        <span className="flex items-center gap-2 font-semibold text-stone-900 transition-colors group-hover:text-yellow-600 dark:text-white">
-          Read Article
-          <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
-        </span>
+        <h2 className="blog-cap-title mt-[10px]">{post.title}</h2>
+
+        <div className="blog-cap-reveal">
+          {post.summary && (
+            <p className="font-serif text-base font-light italic leading-relaxed text-[var(--text-muted)]">
+              {post.summary}
+            </p>
+          )}
+          <span className="mt-[18px] inline-flex items-center gap-[10px] border-b border-[var(--color-yellow)] pb-[3px] font-mono text-[0.62rem] uppercase tracking-[0.2em]">
+            Read article
+            <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-[5px]" />
+          </span>
+        </div>
       </div>
-
-      <div
-        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-10"
-        style={{ backgroundImage: "linear-gradient(135deg, #bef264 0%, #0ea5e9 100%)" }}
-      />
     </Link>
   );
 }
