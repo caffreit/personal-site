@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog Redesign — 01a Cinematic Rolodex (Light)</title>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --yellow: #F4CA16;
+    --paper: #FFFFFF;
+    --bg: #FFFFFF;
+    --fg: #0A0A0A;
+    --muted: rgba(0,0,0,0.45);
+    --faint: rgba(0,0,0,0.32);
+    --rule: #d4d0c8;
+    --ease: cubic-bezier(0.25, 1, 0.5, 1);
+    --dur: 0.7s;
+    --flag: 32px;
+    --strip: 220px;   /* width of the cover peeking out of a closed panel */
+    --cap-pad: 32px;  /* constant, so the text measure never changes */
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Newsreader', Georgia, serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    padding-top: var(--flag);
+  }
+
+  /* ---------- Header ---------- */
+
+  .head {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 64px 40px 0;
+  }
+
+  .back {
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--faint);
+    text-decoration: none;
+    margin-bottom: 48px;
+    transition: color 0.3s;
+  }
+  .back:hover { color: var(--fg); }
+
+  h1 {
+    font-size: clamp(3rem, 7vw, 5.5rem);
+    font-weight: 300;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    margin-bottom: 18px;
+  }
+
+  .intro {
+    font-size: 1.05rem;
+    font-style: italic;
+    font-weight: 300;
+    color: var(--muted);
+    max-width: 520px;
+    line-height: 1.65;
+  }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 24px;
+    margin: 56px 0 0;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .filters { display: flex; flex-wrap: wrap; gap: 22px; }
+
+  .filter {
+    background: none;
+    border: none;
+    padding: 0 0 2px;
+    cursor: pointer;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.63rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--faint);
+    border-bottom: 1px solid transparent;
+    transition: color 0.25s;
+  }
+  .filter:hover { color: var(--fg); }
+  .filter.is-on { color: var(--fg); border-bottom-color: var(--yellow); }
+
+  .search {
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--rule);
+    padding: 4px 0;
+    width: 200px;
+    color: var(--fg);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.63rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    outline: none;
+    transition: border-color 0.25s;
+  }
+  .search::placeholder { color: var(--faint); }
+  .search:focus { border-bottom-color: var(--yellow); }
+
+  /* ---------- Accordion ---------- */
+
+  .rolodex {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px 120px;
+  }
+
+  .panel {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 140px;
+    overflow: hidden;
+    background: var(--paper);
+    border-bottom: 1px solid var(--rule);
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    transition: height var(--dur) var(--ease), flex var(--dur) var(--ease);
+  }
+  .panel:first-child { border-top: 1px solid var(--rule); }
+  .panel.is-active { height: 60vh; }
+
+  /* The cover is never dimmed. Closed, only a strip of it shows on the
+     right; opening the panel wipes it out to full bleed. */
+  .panel-media {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: var(--strip);
+    overflow: hidden;
+    transition: width var(--dur) var(--ease);
+  }
+  .panel.is-active .panel-media { width: 100%; }
+  .panel-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.04);
+    transition: transform 1.6s var(--ease);
+  }
+  .panel.is-active .panel-media img { transform: scale(1); }
+  body.no-images .panel-media { display: none; }
+
+  /* Text sits on solid paper, so legibility never depends on the photo.
+
+     The measure — width and horizontal padding — is identical open and
+     closed, and the left offset compensates so the closed text still lines
+     up with the page grid. Nothing the type is laid out inside ever
+     animates, so the lines cannot re-wrap mid-transition. */
+  .cap {
+    position: absolute;
+    z-index: 2;
+    left: calc(var(--cap-pad) * -1);
+    /* Closed, the text is centred in the row like a ledger line.
+       Open, it settles into a card near the bottom-left of the photo. */
+    bottom: 50%;
+    transform: translateY(50%);
+    width: min(46%, 540px);
+    background: var(--paper);
+    padding: 0 var(--cap-pad);
+    border-top: 2px solid transparent;
+    transition:
+      left var(--dur) var(--ease),
+      bottom var(--dur) var(--ease),
+      transform var(--dur) var(--ease),
+      padding-top var(--dur) var(--ease),
+      padding-bottom var(--dur) var(--ease),
+      border-color var(--dur) var(--ease);
+  }
+  .panel.is-active .cap {
+    left: 44px;
+    bottom: 44px;
+    transform: translateY(0);
+    padding-top: 26px;
+    padding-bottom: 30px;
+    border-top-color: var(--yellow);
+  }
+
+  .cap-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--faint);
+    margin-bottom: 10px;
+  }
+  .cap-num { color: var(--faint); }
+  .cap-cat { color: var(--fg); }
+
+  /* Grown with a transform rather than font-size: scaling is composited and
+     leaves the line breaks alone, where an animated font-size re-flows the
+     paragraph on every frame. */
+  .cap-title {
+    font-size: clamp(1.6rem, 2.4vw, 2.15rem);
+    font-weight: 400;
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+    transform: scale(0.82);
+    transform-origin: left center;
+    transition: transform var(--dur) var(--ease);
+  }
+  .panel.is-active .cap-title { transform: scale(1); }
+
+  .cap-reveal {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height var(--dur) var(--ease), opacity 0.4s ease 0.14s, margin-top var(--dur) var(--ease);
+  }
+  .panel.is-active .cap-reveal { max-height: 300px; opacity: 1; margin-top: 16px; }
+
+  .cap-summary {
+    font-size: 1rem;
+    font-style: italic;
+    font-weight: 300;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+
+  .cap-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 18px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--fg);
+    border-bottom: 1px solid var(--yellow);
+    padding-bottom: 3px;
+  }
+  .cap-cta .arrow { transition: transform 0.3s var(--ease); }
+  .panel:hover .cap-cta .arrow { transform: translateX(5px); }
+
+  /* ---------- Mobile: automatic scroll-driven rolodex ---------- */
+
+  @media (max-width: 860px) {
+    :root { --strip: 96px; --cap-pad: 20px; }
+
+    .head { padding-left: 20px; padding-right: 20px; }
+
+    .rolodex {
+      position: relative;
+      height: calc(var(--n) * 60vh);
+      padding: 0;
+    }
+
+    .stack {
+      position: sticky;
+      top: var(--flag);
+      height: 100vh;
+      height: 100svh;
+      max-height: calc(100svh - var(--flag));
+      display: flex;
+      flex-direction: column;
+      padding: 0 20px;
+    }
+
+    .panel {
+      height: auto;
+      flex: 1 1 0;
+      min-height: 0;
+    }
+    .panel.is-active { height: auto; flex: 5 1 0; }
+
+    .cap {
+      width: calc(100% - var(--strip) + var(--cap-pad));
+      padding: 0 var(--cap-pad);
+    }
+    .panel.is-active .cap {
+      left: 0;
+      bottom: 0;
+      padding-top: 16px;
+      padding-bottom: 18px;
+    }
+    .cap-title { font-size: 1.5rem; transform: scale(0.78); }
+    .panel.is-active .cap-reveal { max-height: 140px; }
+    .search { width: 100%; }
+
+    .rolodex-tail { height: 20vh; }
+  }
+
+  @media (min-width: 861px) {
+    .rolodex-tail { display: none; }
+  }
+
+  /* ---------- Mockup chrome ---------- */
+
+  .flag {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 8px 16px;
+    height: var(--flag);
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--rule);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--faint);
+  }
+  .flag a { color: var(--faint); text-decoration: none; }
+  .flag a:hover { color: var(--fg); }
+  .flag strong { color: var(--fg); font-weight: 400; }
+  .toggle {
+    background: none;
+    border: 1px solid var(--rule);
+    color: var(--faint);
+    padding: 4px 10px;
+    cursor: pointer;
+    font: inherit;
+    letter-spacing: 0.18em;
+    white-space: nowrap;
+  }
+  .toggle:hover { color: var(--fg); border-color: var(--fg); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition-duration: 0.01ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="flag">
+  <span><a href="blog-redesign-index.html">&larr; All</a> &nbsp;/&nbsp; <strong>01a — Cinematic Rolodex (Light)</strong></span>
+  <button class="toggle" id="imgToggle">Images: On</button>
+</div>
+
+<div class="head">
+  <a class="back" href="#">&larr; Back to Home</a>
+  <h1>Blog</h1>
+  <p class="intro">Essays, build logs, and notes from data-forward experiments.</p>
+
+  <div class="controls">
+    <div class="filters">
+      <button class="filter is-on">All</button>
+      <button class="filter">Ireland</button>
+      <button class="filter">Housing</button>
+      <button class="filter">Economics</button>
+      <button class="filter">Data</button>
+      <button class="filter">AI</button>
+    </div>
+    <input class="search" type="text" placeholder="Search">
+  </div>
+</div>
+
+<div class="rolodex" id="rolodex" style="--n:5">
+  <div class="stack">
+
+    <a class="panel is-active" href="#">
+      <div class="panel-media"><img src="../public/blog/property-tax/cover.png" alt=""></div>
+      <div class="cap">
+        <div class="cap-meta">
+          <span class="cap-num">01</span>
+          <span>18 Jul 2026</span>
+          <span class="cap-cat">Political Economy</span>
+          <span>9 min read</span>
+        </div>
+        <h2 class="cap-title">Against Idle Land: A Case for Self-Assessed Property Tax</h2>
+        <div class="cap-reveal">
+          <p class="cap-summary">A piece written for an old company newsletter — arguing for taxing self-assessed land value to curb dereliction, limit monopoly pricing, and improve allocative efficiency.</p>
+          <span class="cap-cta">Read article <span class="arrow">&rarr;</span></span>
+        </div>
+      </div>
+    </a>
+
+    <a class="panel" href="#">
+      <div class="panel-media"><img src="../public/blog/ireland-housing-market/cover.png" alt=""></div>
+      <div class="cap">
+        <div class="cap-meta">
+          <span class="cap-num">02</span>
+          <span>02 Jun 2026</span>
+          <span class="cap-cat">Data Story</span>
+          <span>12 min read</span>
+        </div>
+        <h2 class="cap-title">House Prices Are Not the Whole Affordability Story</h2>
+        <div class="cap-reveal">
+          <p class="cap-summary">A mortgage-first view of affordability across five decades of Irish housing data.</p>
+          <span class="cap-cta">Read article <span class="arrow">&rarr;</span></span>
+        </div>
+      </div>
+    </a>
+
+    <a class="panel" href="#">
+      <div class="panel-media"><img src="../public/blog/ireland-property-economy/cover.png" alt=""></div>
+      <div class="cap">
+        <div class="cap-meta">
+          <span class="cap-num">03</span>
+          <span>23 Feb 2026</span>
+          <span class="cap-cat">Data Story</span>
+          <span>14 min read</span>
+        </div>
+        <h2 class="cap-title">The &euro;27.8 Billion Question</h2>
+        <div class="cap-reveal">
+          <p class="cap-summary">Fifteen years of Irish property data, re-contextualized against wealth, income, savings, and the real economy.</p>
+          <span class="cap-cta">Read article <span class="arrow">&rarr;</span></span>
+        </div>
+      </div>
+    </a>
+
+    <a class="panel" href="#">
+      <div class="panel-media"><img src="../public/blog/software-costs-approach-zero/cover.png" alt=""></div>
+      <div class="cap">
+        <div class="cap-meta">
+          <span class="cap-num">04</span>
+          <span>28 Nov 2025</span>
+          <span class="cap-cat">AI &amp; Product</span>
+          <span>6 min read</span>
+        </div>
+        <h2 class="cap-title">Software Costs Approach Zero</h2>
+        <div class="cap-reveal">
+          <p class="cap-summary">LLMs are collapsing development costs and inviting domain experts to become technical founders.</p>
+          <span class="cap-cta">Read article <span class="arrow">&rarr;</span></span>
+        </div>
+      </div>
+    </a>
+
+    <a class="panel" href="#">
+      <div class="panel-media"><img src="../public/blog/dunbars-number/cover.png" alt=""></div>
+      <div class="cap">
+        <div class="cap-meta">
+          <span class="cap-num">05</span>
+          <span>20 Nov 2025</span>
+          <span class="cap-cat">Data Science</span>
+          <span>16 min read</span>
+        </div>
+        <h2 class="cap-title">Calling Dunbar's Number: Number not in service</h2>
+        <div class="cap-reveal">
+          <p class="cap-summary">Is the cognitive limit on social relationships a real biological constraint or a statistical artifact? A critique of &ldquo;Calling Dunbar's Numbers&rdquo;.</p>
+          <span class="cap-cta">Read article <span class="arrow">&rarr;</span></span>
+        </div>
+      </div>
+    </a>
+
+  </div>
+</div>
+<div class="rolodex-tail"></div>
+
+<script>
+  const rolodex = document.getElementById('rolodex');
+  const panels = Array.from(document.querySelectorAll('.panel'));
+  const FLAG = 32;
+
+  /* Keyed to viewport width rather than touch support, so resizing a
+     desktop browser demonstrates the phone behaviour. */
+  const narrow = window.matchMedia('(max-width: 860px)');
+
+  function setActive(el) {
+    if (el.classList.contains('is-active')) return;
+    panels.forEach((p) => p.classList.toggle('is-active', p === el));
+  }
+
+  panels.forEach((p) => p.addEventListener('mouseenter', () => {
+    if (!narrow.matches) setActive(p);
+  }));
+
+  let frame = null;
+  function onScroll() {
+    if (frame) return;
+    frame = requestAnimationFrame(() => {
+      frame = null;
+      const travel = rolodex.offsetHeight - (window.innerHeight - FLAG);
+      const scrolled = FLAG - rolodex.getBoundingClientRect().top;
+      const progress = travel > 0 ? scrolled / travel : 0;
+      const index = Math.min(panels.length - 1, Math.max(0, Math.floor(progress * panels.length)));
+      setActive(panels[index]);
+    });
+  }
+
+  let mode = null;
+  function applyMode() {
+    const next = narrow.matches ? 'scroll' : 'hover';
+    if (next === mode) return;
+    mode = next;
+    if (mode === 'scroll') {
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    } else {
+      window.removeEventListener('scroll', onScroll);
+      setActive(panels[0]);
+    }
+  }
+
+  narrow.addEventListener('change', applyMode);
+  window.addEventListener('resize', onScroll, { passive: true });
+  applyMode();
+
+  const toggle = document.getElementById('imgToggle');
+  toggle.addEventListener('click', () => {
+    const off = document.body.classList.toggle('no-images');
+    toggle.textContent = off ? 'Images: Off' : 'Images: On';
+  });
+
+  document.querySelectorAll('.filter').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter').forEach((b) => b.classList.remove('is-on'));
+      btn.classList.add('is-on');
+    });
+  });
+</script>
+
+</body>
+</html>
