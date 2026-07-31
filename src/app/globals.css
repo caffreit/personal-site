@@ -253,10 +253,10 @@ button:focus-visible {
   border-bottom-color: #27272a;
 }
 
-/* ---- Blog listing: vertical rolodex ----
-   Full-width panels, newest first, one open at a time. Above 860px hovering
-   opens a panel; below that the stack pins and the open panel is driven by
-   scroll position (see BlogListing.tsx).
+/* ---- Listing: vertical rolodex ----
+   Shared by the blog and labs indexes. Full-width panels, newest first, one
+   open at a time. Above 860px hovering opens a panel; below that the stack
+   pins and the open panel is driven by scroll position (see Rolodex.tsx).
 
    The caption's measure - width and horizontal padding - is deliberately
    identical open and closed, with a negative left offset compensating so the
@@ -264,14 +264,14 @@ button:focus-visible {
    inside animates, so lines cannot re-wrap mid-transition. For the same
    reason the title grows with a transform rather than font-size. */
 
-.blog-rolodex {
-  --blog-strip: 220px;
-  --blog-cap-pad: 32px;
-  --blog-ease: cubic-bezier(0.25, 1, 0.5, 1);
-  --blog-dur: 0.7s;
+.rolodex {
+  --rolodex-strip: 220px;
+  --rolodex-cap-pad: 32px;
+  --rolodex-ease: cubic-bezier(0.25, 1, 0.5, 1);
+  --rolodex-dur: 0.7s;
 }
 
-.blog-panel {
+.rolodex-panel {
   position: relative;
   display: block;
   width: 100%;
@@ -281,63 +281,89 @@ button:focus-visible {
   border-bottom: 1px solid var(--rule-color);
   color: inherit;
   text-decoration: none;
-  transition: height var(--blog-dur) var(--blog-ease), flex var(--blog-dur) var(--blog-ease);
+  transition: height var(--rolodex-dur) var(--rolodex-ease), flex var(--rolodex-dur) var(--rolodex-ease);
 }
 
-.blog-panel:first-child {
+.rolodex-panel:first-child {
   border-top: 1px solid var(--rule-color);
 }
 
-.blog-panel[data-open="true"] {
+.rolodex-panel[data-open="true"] {
   height: 60vh;
 }
 
 /* The cover is never dimmed. Closed, only a strip of it shows on the right;
    opening the panel wipes it out to full bleed. */
-.blog-panel-media {
+.rolodex-panel-media {
   position: absolute;
   top: 0;
   right: 0;
   height: 100%;
-  width: var(--blog-strip);
+  width: var(--rolodex-strip);
   overflow: hidden;
-  transition: width var(--blog-dur) var(--blog-ease);
+  transition: width var(--rolodex-dur) var(--rolodex-ease);
 }
 
-.blog-panel[data-open="true"] .blog-panel-media {
+.rolodex-panel[data-open="true"] .rolodex-panel-media {
   width: 100%;
 }
 
-.blog-panel-media img {
+.rolodex-panel-media img {
   object-fit: cover;
   transform: scale(1.04);
-  transition: transform 1.6s var(--blog-ease);
+  transition: transform 1.6s var(--rolodex-ease);
 }
 
-.blog-panel[data-open="true"] .blog-panel-media img {
+.rolodex-panel[data-open="true"] .rolodex-panel-media img {
   transform: scale(1);
 }
 
-.blog-cap {
+/* Stand-in cover for items with no image (most labs): a tinted gradient with
+   an oversized numeral, sized so the numeral stays inside the closed strip. */
+.rolodex-media-generated {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  background-image: var(--tile-gradient);
+}
+
+.rolodex-media-index {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: clamp(3.5rem, 9vw, 8rem);
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: rgba(255, 255, 255, 0.55);
+  mix-blend-mode: overlay;
+  transition: transform var(--rolodex-dur) var(--rolodex-ease);
+}
+
+.rolodex-panel[data-open="true"] .rolodex-media-index {
+  transform: scale(1.25);
+}
+
+.rolodex-cap {
   position: absolute;
   z-index: 2;
-  left: calc(var(--blog-cap-pad) * -1);
+  left: calc(var(--rolodex-cap-pad) * -1);
   bottom: 50%;
   transform: translateY(50%);
   width: min(46%, 540px);
   background: var(--background);
-  padding: 0 var(--blog-cap-pad);
+  padding: 0 var(--rolodex-cap-pad);
   border-top: 2px solid transparent;
   transition:
-    left var(--blog-dur) var(--blog-ease),
-    bottom var(--blog-dur) var(--blog-ease),
-    transform var(--blog-dur) var(--blog-ease),
-    padding-top var(--blog-dur) var(--blog-ease),
-    padding-bottom var(--blog-dur) var(--blog-ease),
-    border-color var(--blog-dur) var(--blog-ease);
+    left var(--rolodex-dur) var(--rolodex-ease),
+    bottom var(--rolodex-dur) var(--rolodex-ease),
+    transform var(--rolodex-dur) var(--rolodex-ease),
+    padding-top var(--rolodex-dur) var(--rolodex-ease),
+    padding-bottom var(--rolodex-dur) var(--rolodex-ease),
+    border-color var(--rolodex-dur) var(--rolodex-ease);
 }
 
-.blog-panel[data-open="true"] .blog-cap {
+.rolodex-panel[data-open="true"] .rolodex-cap {
   left: 44px;
   bottom: 44px;
   transform: translateY(0);
@@ -346,7 +372,7 @@ button:focus-visible {
   border-top-color: var(--color-yellow);
 }
 
-.blog-cap-title {
+.rolodex-cap-title {
   font-family: var(--font-heading);
   font-size: clamp(1.6rem, 2.4vw, 2.15rem);
   font-weight: 400;
@@ -354,96 +380,120 @@ button:focus-visible {
   letter-spacing: -0.01em;
   transform: scale(0.82);
   transform-origin: left center;
-  transition: transform var(--blog-dur) var(--blog-ease);
+  transition: transform var(--rolodex-dur) var(--rolodex-ease);
 }
 
-.blog-panel[data-open="true"] .blog-cap-title {
+.rolodex-panel[data-open="true"] .rolodex-cap-title {
   transform: scale(1);
 }
 
-.blog-cap-reveal {
+.rolodex-cap-reveal {
   max-height: 0;
   opacity: 0;
   overflow: hidden;
   transition:
-    max-height var(--blog-dur) var(--blog-ease),
+    max-height var(--rolodex-dur) var(--rolodex-ease),
     opacity 0.4s ease 0.14s,
-    margin-top var(--blog-dur) var(--blog-ease);
+    margin-top var(--rolodex-dur) var(--rolodex-ease);
 }
 
-.blog-panel[data-open="true"] .blog-cap-reveal {
+.rolodex-panel[data-open="true"] .rolodex-cap-reveal {
   max-height: 300px;
   opacity: 1;
   margin-top: 16px;
 }
 
-.blog-rolodex-tail {
+.rolodex-tail {
   display: none;
 }
 
 /* Below 860px the stack pins and scroll position picks the open panel, so
    panels open and close on their own as you scroll past them. */
 @media (max-width: 860px) {
-  .blog-rolodex {
-    --blog-strip: 96px;
-    --blog-cap-pad: 20px;
+  .rolodex {
+    --rolodex-strip: 96px;
+    --rolodex-cap-pad: 20px;
     position: relative;
-    height: calc(var(--blog-n, 1) * 60vh);
+    height: calc(var(--rolodex-n, 1) * 60vh);
   }
 
-  .blog-stack {
+  .rolodex-stack {
     position: sticky;
     height: 100vh;
     height: 100svh;
-    max-height: calc(100svh - var(--blog-nav, 0px));
+    max-height: calc(100svh - var(--rolodex-nav, 0px));
     display: flex;
     flex-direction: column;
   }
 
-  .blog-panel {
+  .rolodex-panel {
     height: auto;
     flex: 1 1 0;
     min-height: 0;
   }
 
-  .blog-panel[data-open="true"] {
+  .rolodex-panel[data-open="true"] {
     height: auto;
     flex: 5 1 0;
   }
 
-  .blog-cap {
-    width: calc(100% - var(--blog-strip) + var(--blog-cap-pad));
+  .rolodex-cap {
+    width: calc(100% - var(--rolodex-strip) + var(--rolodex-cap-pad));
   }
 
-  .blog-panel[data-open="true"] .blog-cap {
+  .rolodex-panel[data-open="true"] .rolodex-cap {
     left: 0;
     bottom: 0;
     padding-top: 16px;
     padding-bottom: 18px;
   }
 
-  .blog-cap-title {
+  .rolodex-cap-title {
     font-size: 1.5rem;
     transform: scale(0.78);
   }
 
-  .blog-panel[data-open="true"] .blog-cap-reveal {
+  .rolodex-panel[data-open="true"] .rolodex-cap-reveal {
     max-height: 140px;
   }
 
-  .blog-rolodex-tail {
+  .rolodex-media-index {
+    font-size: clamp(2.25rem, 12vw, 4.5rem);
+  }
+
+  .rolodex-tail {
     display: block;
     height: 20vh;
+  }
+
+  /* Sets too long to share one viewport read as a plain index instead: every
+     panel closed, page scrolls normally, tap goes straight to the item. */
+  .rolodex--list {
+    position: static;
+    height: auto;
+  }
+
+  .rolodex--list .rolodex-stack {
+    position: static;
+    display: block;
+    height: auto;
+    max-height: none;
+  }
+
+  .rolodex--list .rolodex-panel {
+    height: 104px;
+    flex: none;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .blog-panel,
-  .blog-panel-media,
-  .blog-panel-media img,
-  .blog-cap,
-  .blog-cap-title,
-  .blog-cap-reveal {
+  .rolodex-panel,
+  .rolodex-panel-media,
+  .rolodex-panel-media img,
+  .rolodex-media-index,
+  .rolodex-cap,
+  .rolodex-cap-title,
+  .rolodex-cap-reveal {
     transition-duration: 0.01ms;
   }
 }
