@@ -1,174 +1,183 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type CSSProperties } from "react";
 import Link from "next/link";
-import { ArrowUpRight, Star } from "lucide-react";
+import Image from "next/image";
+import { ArrowLeft, Star } from "lucide-react";
 import type { Lab } from "@/lib/labs";
+import Rolodex, {
+  FilterLink,
+  ListingEmptyState,
+  formatListingDate,
+  type RolodexItem,
+} from "@/components/shared/Rolodex";
+import { getBadgeAccentVars, getTileGradient } from "./labBadgeColors";
 
 type LabsListingProps = {
   labs: Lab[];
 };
 
+const ALL_FILTER = "All";
+const PINNED_FILTER = "Pinned";
 const TAX_FILTER = "Tax";
 
-const DATE_FORMATTER = new Intl.DateTimeFormat("en-IE", {
-  day: "numeric",
-  month: "short",
-  timeZone: "UTC",
-  year: "numeric",
-});
-
 export default function LabsListing({ labs }: LabsListingProps) {
-  const [selectedFilter, setSelectedFilter] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedFilter, setSelectedFilter] = useState(ALL_FILTER);
 
-  const filters = useMemo(() => {
-    const badges = Array.from(new Set(labs.map((lab) => lab.badge))).sort();
-    return ["All", "Pinned", TAX_FILTER, ...badges];
-  }, [labs]);
+  const badges = useMemo(
+    () => Array.from(new Set(labs.map((lab) => lab.badge))).sort(),
+    [labs],
+  );
+
+  const filters = useMemo(
+    () => [ALL_FILTER, PINNED_FILTER, TAX_FILTER, ...badges],
+    [badges],
+  );
 
   const filteredLabs = useMemo(() => {
-    if (selectedFilter === "All") {
-      return labs;
-    }
+    const query = searchQuery.trim().toLowerCase();
 
-    if (selectedFilter === "Pinned") {
-      return labs.filter((lab) => lab.isPinned);
-    }
+    return labs.filter((lab) => {
+      const matchesSearch =
+        query === "" ||
+        [lab.title, lab.description, lab.badge, lab.meta].some((value) =>
+          value.toLowerCase().includes(query),
+        );
 
-    if (selectedFilter === TAX_FILTER) {
-      return labs.filter((lab) =>
-        [lab.title, lab.description, lab.href, lab.meta].some((value) =>
+      if (!matchesSearch) return false;
+
+      if (selectedFilter === ALL_FILTER) return true;
+      if (selectedFilter === PINNED_FILTER) return Boolean(lab.isPinned);
+      if (selectedFilter === TAX_FILTER) {
+        return [lab.title, lab.description, lab.href, lab.meta].some((value) =>
           value.toLowerCase().includes("tax"),
-        ),
-      );
-    }
+        );
+      }
+      return lab.badge === selectedFilter;
+    });
+  }, [labs, searchQuery, selectedFilter]);
 
-    return labs.filter((lab) => lab.badge === selectedFilter);
-  }, [selectedFilter, labs]);
+  const items: RolodexItem[] = filteredLabs.map((lab, index) => {
+    const position = String(index + 1).padStart(2, "0");
+
+    return {
+      key: lab.href,
+      href: lab.href,
+      title: lab.title,
+      summary: lab.description,
+      cta: "Open lab",
+      meta: (
+        <>
+          <span>{position}</span>
+          <span>{formatListingDate(lab.publishedAt)}</span>
+          <span className="badge-accent" style={getBadgeAccentVars(lab.badge)}>
+            {lab.badge}
+          </span>
+          <span>{lab.meta}</span>
+          {lab.isPinned && (
+            <span className="inline-flex items-center gap-[6px] text-[var(--foreground)]">
+              <Star
+                className="h-3 w-3 fill-[var(--color-yellow)] text-[var(--color-yellow)]"
+                aria-hidden
+              />
+              Pinned
+            </span>
+          )}
+        </>
+      ),
+      media: lab.image ? (
+        <Image
+          src={lab.image}
+          alt={lab.imageAlt ?? ""}
+          fill
+          sizes="(max-width: 860px) 100vw, 1400px"
+          priority={index === 0}
+        />
+      ) : (
+        <div
+          className="rolodex-media-generated"
+          style={
+            {
+              "--tile-gradient": getTileGradient(lab.href, lab.badge),
+            } as CSSProperties
+          }
+        >
+          <span className="rolodex-media-index" aria-hidden>
+            {position}
+          </span>
+          <span className="rolodex-media-label" aria-hidden>
+            {lab.badge}
+          </span>
+        </div>
+      ),
+    };
+  });
 
   return (
-    <>
-      <div className="mb-16 rounded-[2.5rem] border border-stone-200/80 bg-white/80 p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.35)] backdrop-blur-sm dark:border-stone-800/70 dark:bg-[#0b0b0b]/80">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="font-mono text-[10px] font-black uppercase tracking-[0.3em] text-stone-400">
-              Filter labs
-            </p>
-            <p className="mt-2 text-sm text-stone-500">
-              Pinned favourites stay first; everything else is newest first.
-            </p>
-          </div>
+    <div className="pb-24">
+      <div className="mx-auto max-w-[1400px] px-5 pt-16 sm:px-10">
+        <Link
+          href="/"
+          className="mb-8 inline-flex items-center gap-2 text-stone-500 transition-colors hover:text-stone-900 dark:text-stone-400 dark:hover:text-stone-100"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          <span className="font-mono text-sm font-medium uppercase tracking-[0.2em]">
+            Back to Home
+          </span>
+        </Link>
 
-          <div className="flex flex-wrap gap-3">
+        <h1 className="text-[clamp(3rem,7vw,5.5rem)] font-light leading-[0.95] tracking-[-0.02em]">
+          Labs
+        </h1>
+        <p className="mt-5 max-w-[520px] font-serif text-[1.05rem] font-light italic leading-relaxed text-[var(--text-muted)]">
+          WIP explorations that lean on APIs, data viz, and playful UI patterns.
+          Pinned favourites stay first; everything else is newest first.
+        </p>
+
+        <div className="mt-14 flex flex-wrap items-baseline justify-between gap-6 border-b border-[var(--rule-color)] pb-4">
+          <div className="flex flex-wrap gap-[22px]">
             {filters.map((filter) => (
-              <FilterChip
+              <FilterLink
                 key={filter}
                 label={filter}
                 isActive={selectedFilter === filter}
-                onClick={() => setSelectedFilter(filter)}
+                accent={
+                  badges.includes(filter)
+                    ? getBadgeAccentVars(filter)
+                    : undefined
+                }
+                onClick={() =>
+                  setSelectedFilter(
+                    filter === selectedFilter ? ALL_FILTER : filter,
+                  )
+                }
               />
             ))}
           </div>
+
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder="Search"
+            aria-label="Search labs"
+            className="w-full border-b border-[var(--rule-color)] bg-transparent py-1 font-mono text-[0.63rem] uppercase tracking-[0.18em] outline-none transition-colors placeholder:text-[var(--text-muted)] focus:border-[var(--color-yellow)] sm:w-[200px]"
+          />
         </div>
       </div>
 
-      {filteredLabs.length > 0 ? (
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          {filteredLabs.map((lab) => (
-            <LabCard key={lab.href} lab={lab} />
-          ))}
-        </div>
+      {items.length > 0 ? (
+        <Rolodex items={items} />
       ) : (
-        <div className="rounded-[2.5rem] border border-dashed border-stone-200 bg-white py-24 text-center text-stone-500 dark:border-stone-700 dark:bg-[#0b0b0b] dark:text-stone-400">
-          <p className="text-lg">No labs found for this filter.</p>
-          <button
-            onClick={() => setSelectedFilter("All")}
-            className="mt-4 font-mono text-xs uppercase tracking-[0.3em] text-stone-900 underline decoration-yellow-400 decoration-2 underline-offset-4 transition-colors hover:text-yellow-600 dark:text-white"
-          >
-            Clear filter
-          </button>
-        </div>
+        <ListingEmptyState
+          message="No labs found matching your criteria."
+          onClear={() => {
+            setSearchQuery("");
+            setSelectedFilter(ALL_FILTER);
+          }}
+        />
       )}
-    </>
-  );
-}
-
-function FilterChip({
-  label,
-  isActive,
-  onClick,
-}: {
-  label: string;
-  isActive: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={`pill-control rounded-full border px-4 py-2 text-[10px] font-black uppercase tracking-[0.3em] transition-colors ${
-        isActive
-          ? "border-stone-900 bg-stone-900 text-white dark:border-white dark:bg-white dark:text-stone-900"
-          : "border-stone-200 text-stone-500 hover:border-stone-900 hover:text-stone-900 dark:border-stone-700 dark:text-stone-400 dark:hover:text-white"
-      }`}
-    >
-      <span className="pill-label">{label}</span>
-    </button>
-  );
-}
-
-function LabCard({ lab }: { lab: Lab }) {
-  return (
-    <Link
-      href={lab.href}
-      className="group relative flex h-full flex-col overflow-hidden rounded-[2.5rem] border border-stone-200 bg-white p-8 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)] transition-transform duration-500 hover:-translate-y-1 hover:shadow-[0_25px_60px_-35px_rgba(0,0,0,0.4)] dark:border-stone-800 dark:bg-[#0f0f0f]"
-    >
-      <div className="mb-8 flex items-start justify-between gap-4 text-xs font-bold uppercase tracking-[0.3em] text-stone-400">
-        <div className="flex flex-wrap items-center gap-3">
-          <span className="pill-control rounded-full bg-lime-100 px-3 py-1 text-lime-700 dark:bg-lime-950/60 dark:text-lime-300">
-            <span className="pill-label">{lab.badge}</span>
-          </span>
-          {lab.isPinned && (
-            <span className="pill-control gap-1 rounded-full bg-yellow-100 px-3 py-1 text-yellow-700 dark:bg-yellow-950/60 dark:text-yellow-300">
-              <Star className="h-3 w-3 fill-current" />
-              <span className="pill-label">Pinned</span>
-            </span>
-          )}
-        </div>
-        <time
-          dateTime={lab.publishedAt}
-          className="shrink-0 pt-1 text-right font-mono text-[10px] font-black text-stone-400"
-        >
-          {DATE_FORMATTER.format(new Date(lab.publishedAt))}
-        </time>
-      </div>
-
-      <div className="space-y-4">
-        <h2 className="text-3xl font-black tracking-tight text-stone-900 sm:text-4xl dark:text-white">
-          {lab.title}
-        </h2>
-        <p className="text-base leading-relaxed text-stone-600 dark:text-stone-300">
-          {lab.description}
-        </p>
-      </div>
-
-      <div className="mt-auto flex flex-col gap-4 pt-10 text-sm text-stone-500 sm:flex-row sm:items-center sm:justify-between">
-        <div className="space-y-1">
-          <span className="block font-mono uppercase tracking-[0.3em]">
-            {lab.meta}
-          </span>
-        </div>
-        <span className="flex items-center gap-2 font-semibold text-stone-900 transition-colors group-hover:text-yellow-600 dark:text-white dark:group-hover:text-yellow-400">
-          View Lab
-          <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
-        </span>
-      </div>
-
-      <div
-        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-10"
-        style={{
-          backgroundImage: "linear-gradient(135deg, #bef264 0%, #0ea5e9 100%)",
-        }}
-      />
-    </Link>
+    </div>
   );
 }
