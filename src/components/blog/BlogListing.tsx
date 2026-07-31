@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect, useRef, type CSSProperties } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { PostListItem } from "@/lib/posts";
 
 const NARROW = "(max-width: 860px)";
@@ -116,6 +116,16 @@ export default function BlogListing({ posts }: BlogListingProps) {
   return (
     <div className="pb-24">
       <div className="mx-auto max-w-[1400px] px-5 pt-16 sm:px-10">
+        <Link
+          href="/"
+          className="mb-8 inline-flex items-center gap-2 text-stone-500 transition-colors hover:text-stone-900 dark:text-stone-400 dark:hover:text-stone-100"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          <span className="font-mono text-sm font-medium uppercase tracking-[0.2em]">
+            Back to Home
+          </span>
+        </Link>
+
         <h1 className="text-[clamp(3rem,7vw,5.5rem)] font-light leading-[0.95] tracking-[-0.02em]">
           Blog
         </h1>
