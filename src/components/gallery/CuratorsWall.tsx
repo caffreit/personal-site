@@ -7,7 +7,7 @@ import Lightbox from "yet-another-react-lightbox";
 import Zoom from "yet-another-react-lightbox/plugins/zoom";
 import "yet-another-react-lightbox/styles.css";
 import "@/styles/curators-wall.css";
-import type { WallPlate, WallPlatePhoto } from "@/lib/favesWallTypes";
+import type { WallPlate, WallPlatePhoto } from "@/lib/albumWallTypes";
 
 type CuratorsWallProps = {
   title: string;
@@ -225,12 +225,14 @@ export function CuratorsWall({ title, description, plates }: CuratorsWallProps) 
                 <span>Locations</span>
                 <b>{locationCount}</b>
               </div>
-              <div className="cw-ledger-row">
-                <span>Editions available</span>
-                <b>
-                  {editions.available} of {editions.total}
-                </b>
-              </div>
+              {editions.total > 0 && (
+                <div className="cw-ledger-row">
+                  <span>Editions available</span>
+                  <b>
+                    {editions.available} of {editions.total}
+                  </b>
+                </div>
+              )}
             </div>
           </div>
         </header>
