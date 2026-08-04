@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Album Redesign — 02 Filmstrip Essay</title>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --yellow: #F4CA16;
+    --bg: #FFFFFF;
+    --fg: #0A0A0A;
+    --muted: rgba(0,0,0,0.45);
+    --faint: rgba(0,0,0,0.32);
+    --rule: #d4d0c8;
+    --ease: cubic-bezier(0.25, 1, 0.5, 1);
+    --dur: 0.7s;
+  }
+
+  [data-theme="dark"] {
+    --bg: #0A0A0A;
+    --fg: #FFFFFF;
+    --muted: rgba(255,255,255,0.5);
+    --faint: rgba(255,255,255,0.36);
+    --rule: #222;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Newsreader', Georgia, serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    transition: background 0.4s ease, color 0.4s ease;
+  }
+
+  /* ---------- Fixed progress rail ---------- */
+
+  .rail {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    z-index: 50;
+    background: var(--bg);
+    padding: 16px 40px 14px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+  }
+  .rail a { color: var(--faint); text-decoration: none; transition: color 0.3s; }
+  .rail a:hover { color: var(--fg); }
+
+  .rail-now {
+    display: flex;
+    gap: 16px;
+    align-items: baseline;
+  }
+  .rail-now .idx { color: var(--fg); }
+  .rail-now .loc {
+    color: var(--muted);
+    transition: opacity 0.35s var(--ease);
+  }
+
+  .rule-track {
+    position: absolute;
+    left: 0; bottom: 0;
+    width: 100%;
+    height: 1px;
+    background: var(--rule);
+  }
+  .rule-fill {
+    position: absolute;
+    left: 0; bottom: 0;
+    height: 1px;
+    background: var(--yellow);
+    width: 0;
+    transition: width 0.2s linear;
+  }
+
+  /* ---------- Theme toggle ---------- */
+
+  .theme-toggle {
+    position: fixed;
+    right: 40px;
+    bottom: 32px;
+    z-index: 60;
+    background: var(--bg);
+    border: 1px solid var(--rule);
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.55rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    padding: 9px 14px;
+    cursor: pointer;
+    transition: color 0.3s, border-color 0.3s;
+  }
+  .theme-toggle:hover { color: var(--fg); border-color: var(--yellow); }
+
+  /* ---------- Title plate ---------- */
+
+  .title-plate {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 120px 40px 60px;
+  }
+
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.63rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--faint);
+    text-decoration: none;
+    margin-bottom: 56px;
+    transition: color 0.3s;
+    align-self: flex-start;
+  }
+  .back:hover { color: var(--fg); }
+  .back .arrow { display: inline-block; transition: transform 0.3s var(--ease); }
+  .back:hover .arrow { transform: translateX(-5px); }
+
+  .eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.24em;
+    color: var(--yellow);
+    margin-bottom: 22px;
+  }
+
+  h1 {
+    font-size: clamp(3rem, 9vw, 7rem);
+    font-weight: 300;
+    line-height: 0.92;
+    letter-spacing: -0.025em;
+  }
+
+  .intro {
+    margin-top: 24px;
+    max-width: 560px;
+    font-size: 1.15rem;
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1.65;
+    color: var(--muted);
+  }
+
+  .stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 28px;
+    margin-top: 44px;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+  }
+  .stats b { color: var(--fg); font-weight: 400; }
+
+  .cue {
+    margin-top: 70px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: 0.24em;
+    color: var(--faint);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .cue .tick {
+    display: inline-block;
+    width: 46px;
+    height: 1px;
+    background: var(--yellow);
+    animation: cueSlide 2.4s var(--ease) infinite;
+    transform-origin: left;
+  }
+  @keyframes cueSlide {
+    0%, 100% { transform: scaleX(0.35); }
+    50% { transform: scaleX(1); }
+  }
+
+  /* ---------- Plates ---------- */
+
+  .plate {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    gap: 48px;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 60px 40px;
+  }
+
+  .plate[data-side="right"] { flex-direction: row-reverse; }
+
+  .plate-media {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .plate[data-side="left"] .plate-media { justify-content: flex-start; }
+  .plate[data-side="right"] .plate-media { justify-content: flex-end; }
+
+  .plate-media img {
+    display: block;
+    max-height: 78vh;
+    max-width: 100%;
+    opacity: 0;
+    transform: scale(1.06);
+    transition: opacity 1s var(--ease), transform 1.6s var(--ease);
+  }
+
+  .plate[data-in="true"] .plate-media img {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .plate-note {
+    width: 230px;
+    flex-shrink: 0;
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity var(--dur) var(--ease) 0.14s, transform var(--dur) var(--ease) 0.14s;
+  }
+  .plate[data-in="true"] .plate-note {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .plate-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--fg);
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 16px;
+  }
+
+  .plate-loc {
+    font-size: 1.6rem;
+    font-weight: 300;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin-bottom: 14px;
+  }
+
+  .plate-meta {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.55rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    line-height: 2.1;
+  }
+
+  .plate-print {
+    margin-top: 20px;
+    padding-top: 14px;
+    border-top: 2px solid var(--yellow);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.55rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    line-height: 2;
+  }
+  .plate-print .price { color: var(--fg); }
+  .plate-print .avail { color: var(--muted); display: block; }
+  .plate-print[data-sold="true"] { border-top-color: var(--rule); }
+  .plate-print[data-sold="true"] .price { color: var(--faint); }
+
+  .plate-cta {
+    display: inline-block;
+    margin-top: 12px;
+    padding-bottom: 3px;
+    border-bottom: 1px solid var(--yellow);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.55rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--fg);
+    text-decoration: none;
+  }
+
+  /* ---------- End plate ---------- */
+
+  .end {
+    min-height: 60vh;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 60px 40px 140px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-top: 1px solid var(--rule);
+  }
+  .end-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.24em;
+    color: var(--faint);
+    margin-bottom: 20px;
+  }
+  .end h2 {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    margin-bottom: 28px;
+  }
+  .end a {
+    align-self: flex-start;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--fg);
+    text-decoration: none;
+    border-bottom: 1px solid var(--yellow);
+    padding-bottom: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+    .plate-media img, .plate-note { opacity: 1; transform: none; }
+  }
+
+  @media (max-width: 900px) {
+    .plate {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 26px;
+      min-height: auto;
+      padding: 70px 20px;
+    }
+    .plate[data-side="right"] { flex-direction: column; }
+    .plate-media { width: 100%; justify-content: flex-start !important; }
+    .plate-media img { max-height: 62vh; }
+    .plate-note { width: 100%; }
+    .title-plate, .end { padding-left: 20px; padding-right: 20px; }
+    .rail { padding: 14px 20px 12px; }
+    .theme-toggle { right: 20px; bottom: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="rail">
+  <a href="album-redesign-index.html">&larr; Favourites</a>
+  <div class="rail-now">
+    <span class="idx" id="railIdx">00 / 43</span>
+    <span class="loc" id="railLoc">&mdash;</span>
+  </div>
+  <div class="rule-track"></div>
+  <div class="rule-fill" id="ruleFill"></div>
+</div>
+
+<button class="theme-toggle" id="themeToggle">Dark</button>
+
+<section class="title-plate">
+  <a class="back" href="album-redesign-index.html"><span class="arrow">&larr;</span> Back to Albums</a>
+  <div class="eyebrow">Album 01</div>
+  <h1>Favourites</h1>
+  <p class="intro">A curated selection of my best shots across all locations and themes.</p>
+  <div class="stats">
+    <span><b>43</b> Photographs</span>
+    <span><b>14</b> Locations</span>
+    <span><b>6</b> Available editions</span>
+  </div>
+  <div class="cue"><span class="tick"></span> Scroll to begin</div>
+</section>
+
+<main id="plates"></main>
+
+<section class="end">
+  <div class="end-label">End of album</div>
+  <h2>Forty-three frames, fourteen places.</h2>
+  <a href="album-redesign-index.html">Back to Albums</a>
+</section>
+
+<script>
+const RAW = [
+  ["000160980007.jpg",1358,2048,"Home",0,0,0,""],
+  ["000160980013.jpg",1358,2048,"Home",5,1,180,"available"],
+  ["000160990012.jpg",2048,1358,"Home",0,0,0,""],
+  ["000226830008.jpg",2048,1358,"Home",0,0,0,""],
+  ["000361140009.jpg",1358,2048,"Dublin",5,2,230,"available"],
+  ["DSCF0032.jpg",2048,1638,"Chengdu",0,0,0,""],
+  ["DSCF0578.jpg",1638,2048,"Kyoto",0,0,0,""],
+  ["DSCF0752.jpg",2048,1638,"Kyoto",0,0,0,""],
+  ["DSCF0776.jpg",2048,1365,"Kyoto",0,0,0,""],
+  ["DSCF0818.jpg",1366,2048,"Kyoto",0,0,0,""],
+  ["DSCF1317.jpg",1639,2048,"Osaka",0,0,0,""],
+  ["DSCF1364.jpg",1638,2048,"Osaka",0,0,0,""],
+  ["DSCF1703.jpg",2048,1638,"Chengdu",0,0,0,""],
+  ["DSCF2458.jpg",1365,2048,"Home",0,0,0,""],
+  ["DSCF3535.jpg",2048,1638,"Amsterdam",5,4,280,"available"],
+  ["DSCF4457.jpg",2048,931,"Bordeaux",0,0,0,""],
+  ["DSCF4590.jpg",2048,1024,"Bordeaux",0,0,0,""],
+  ["DSCF4666.jpg",1365,2048,"Bordeaux",5,0,240,"available"],
+  ["DSCF4846.jpg",1638,2048,"Lisbon",0,0,0,""],
+  ["DSCF4919.jpg",2048,1365,"Eastern Europe",0,0,0,""],
+  ["DSCF4935.jpg",2048,1638,"Eastern Europe",0,0,0,""],
+  ["DSCF5109.jpg",1536,2048,"Lisbon",0,0,0,""],
+  ["DSCF5444.jpg",2048,864,"Lisbon",0,0,0,""],
+  ["DSCF5712.jpg",1365,2048,"Venice",0,0,0,""],
+  ["DSCF5866.jpg",2048,864,"Lisbon",0,0,0,""],
+  ["DSCF5909.jpg",1365,2048,"Venice",0,0,0,""],
+  ["DSCF6037.jpg",1638,2048,"Venice",0,0,0,""],
+  ["DSCF6083.jpg",2048,1024,"Venice",0,0,0,""],
+  ["DSCF6102.jpg",1639,2048,"Venice",0,0,0,""],
+  ["DSCF6615.jpg",2048,1638,"Venice",5,1,250,"available"],
+  ["DSCF7793.jpg",1365,2048,"Beijing",0,0,0,""],
+  ["DSCF8021.jpg",1365,2048,"Beijing",0,0,0,""],
+  ["DSCF8148.jpg",1536,2048,"Beijing",0,0,0,""],
+  ["DSCF8202.jpg",2048,1365,"Dublin",0,0,0,""],
+  ["DSCF8286.jpg",2048,1365,"Dublin",0,0,0,""],
+  ["DSCF8343.jpg",1638,2048,"Dublin",0,0,0,""],
+  ["DSCF8848.jpg",1638,2048,"Hong Kong",0,0,0,""],
+  ["DSCF8955.jpg",2048,1024,"Hong Kong",0,0,0,""],
+  ["DSCF9580.jpg",1365,2048,"Tokyo",5,5,260,"sold_out"],
+  ["DSCF9708.jpg",2048,1024,"Tokyo",0,0,0,""],
+  ["img022.jpg",1377,2048,"Lisbon on film",0,0,0,""],
+  ["img029.jpg",2048,1362,"Lisbon on film",0,0,0,""],
+  ["img034.jpg",1345,2048,"Lisbon on film",0,0,0,""]
+];
+const PHOTOS = RAW.map((r, i) => ({ n: i + 1, file: r[0], w: r[1], h: r[2], loc: r[3], ed: r[4], sold: r[5], price: r[6], status: r[7] }));
+
+const SRC = (f) => "../public/photos/Faves/" + encodeURIComponent(f);
+const pad = (n) => String(n).padStart(2, "0");
+const total = PHOTOS.length;
+const money = (v) => new Intl.NumberFormat("en-IE", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(v);
+const orientation = (p) => (p.w > p.h ? (p.w / p.h > 1.9 ? "Panoramic" : "Horizontal") : "Vertical");
+
+const platesEl = document.getElementById("plates");
+
+PHOTOS.forEach((p, i) => {
+  const plate = document.createElement("section");
+  plate.className = "plate";
+  plate.dataset.side = i % 2 === 0 ? "left" : "right";
+  plate.dataset.index = String(p.n);
+  plate.dataset.loc = p.loc;
+
+  const media = document.createElement("div");
+  media.className = "plate-media";
+  const img = document.createElement("img");
+  img.src = SRC(p.file);
+  img.alt = p.loc;
+  img.loading = "lazy";
+  media.appendChild(img);
+
+  const note = document.createElement("div");
+  note.className = "plate-note";
+
+  const num = document.createElement("div");
+  num.className = "plate-num";
+  num.textContent = pad(p.n) + " / " + pad(total);
+
+  const loc = document.createElement("div");
+  loc.className = "plate-loc";
+  loc.textContent = p.loc;
+
+  const meta = document.createElement("div");
+  meta.className = "plate-meta";
+  meta.innerHTML = orientation(p) + "<br>" + p.w + " &times; " + p.h;
+
+  note.appendChild(num);
+  note.appendChild(loc);
+  note.appendChild(meta);
+
+  if (p.ed) {
+    const sold = p.status === "sold_out";
+    const print = document.createElement("div");
+    print.className = "plate-print";
+    print.dataset.sold = String(sold);
+    print.innerHTML =
+      '<span class="price">' + (sold ? "Sold out" : money(p.price)) + "</span>" +
+      '<span class="avail">Edition of ' + p.ed + " &middot; " + p.sold + " sold</span>";
+    if (!sold) {
+      const cta = document.createElement("a");
+      cta.className = "plate-cta";
+      cta.href = "#";
+      cta.textContent = "Enquire →";
+      print.appendChild(cta);
+    }
+    note.appendChild(print);
+  }
+
+  plate.appendChild(media);
+  plate.appendChild(note);
+  platesEl.appendChild(plate);
+});
+
+const railIdx = document.getElementById("railIdx");
+const railLoc = document.getElementById("railLoc");
+const ruleFill = document.getElementById("ruleFill");
+
+const revealObserver = new IntersectionObserver(
+  (entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) entry.target.dataset.in = "true";
+    });
+  },
+  { rootMargin: "0px 0px -18% 0px", threshold: 0.12 }
+);
+
+const currentObserver = new IntersectionObserver(
+  (entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      const el = entry.target;
+      railIdx.textContent = pad(el.dataset.index) + " / " + pad(total);
+      if (railLoc.textContent !== el.dataset.loc) {
+        railLoc.style.opacity = "0";
+        setTimeout(() => {
+          railLoc.textContent = el.dataset.loc;
+          railLoc.style.opacity = "1";
+        }, 180);
+      }
+    });
+  },
+  { rootMargin: "-45% 0px -45% 0px" }
+);
+
+document.querySelectorAll(".plate").forEach((el) => {
+  revealObserver.observe(el);
+  currentObserver.observe(el);
+});
+
+window.addEventListener(
+  "scroll",
+  () => {
+    const max = document.body.scrollHeight - window.innerHeight;
+    ruleFill.style.width = (max > 0 ? Math.min(1, window.scrollY / max) : 0) * 100 + "%";
+  },
+  { passive: true }
+);
+
+const toggle = document.getElementById("themeToggle");
+toggle.addEventListener("click", () => {
+  const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+  document.documentElement.dataset.theme = next;
+  toggle.textContent = next === "dark" ? "Light" : "Dark";
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Album Redesign — 01 Contact Sheet</title>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --yellow: #F4CA16;
+    --bg: #FFFFFF;
+    --fg: #0A0A0A;
+    --muted: rgba(0,0,0,0.45);
+    --faint: rgba(0,0,0,0.32);
+    --rule: #d4d0c8;
+    --ease: cubic-bezier(0.25, 1, 0.5, 1);
+    --dur: 0.7s;
+  }
+
+  [data-theme="dark"] {
+    --bg: #0A0A0A;
+    --fg: #FFFFFF;
+    --muted: rgba(255,255,255,0.5);
+    --faint: rgba(255,255,255,0.36);
+    --rule: #222;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Newsreader', Georgia, serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    transition: background 0.4s ease, color 0.4s ease;
+  }
+
+  .mono {
+    font-family: 'Space Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+  }
+
+  /* ---------- Sticky rail ---------- */
+
+  .rail {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 46px;
+    background: var(--bg);
+    border-bottom: 1px solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    z-index: 50;
+    opacity: 0;
+    transform: translateY(-100%);
+    transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease), border-color var(--dur) var(--ease);
+  }
+  .rail[data-visible="true"] {
+    opacity: 1;
+    transform: translateY(0);
+    border-bottom-color: var(--rule);
+  }
+  .rail a, .rail span {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  .rail a:hover { color: var(--fg); }
+  .rail .rail-title { color: var(--fg); }
+
+  .rail-progress {
+    position: absolute;
+    bottom: -1px; left: 0;
+    height: 1px;
+    background: var(--yellow);
+    width: 0;
+  }
+
+  /* ---------- Theme toggle ---------- */
+
+  .theme-toggle {
+    position: fixed;
+    right: 40px;
+    bottom: 32px;
+    z-index: 60;
+    background: var(--bg);
+    border: 1px solid var(--rule);
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.55rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    padding: 9px 14px;
+    cursor: pointer;
+    transition: color 0.3s, border-color 0.3s;
+  }
+  .theme-toggle:hover { color: var(--fg); border-color: var(--yellow); }
+
+  /* ---------- Header ---------- */
+
+  .wrap {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+
+  header.head { padding-top: 88px; }
+
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.63rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--faint);
+    text-decoration: none;
+    margin-bottom: 52px;
+    transition: color 0.3s;
+  }
+  .back:hover { color: var(--fg); }
+  .back .arrow { transition: transform 0.3s var(--ease); display: inline-block; }
+  .back:hover .arrow { transform: translateX(-5px); }
+
+  h1 {
+    font-size: clamp(3rem, 7vw, 5.5rem);
+    font-weight: 300;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+  }
+
+  .intro {
+    margin-top: 18px;
+    max-width: 520px;
+    font-size: 1.05rem;
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1.65;
+    color: var(--muted);
+  }
+
+  .stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 26px;
+    margin-top: 34px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+  }
+  .stats b { color: var(--fg); font-weight: 400; }
+
+  /* ---------- Filter row ---------- */
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 20px;
+    margin-top: 56px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 22px;
+  }
+
+  .filter {
+    background: none;
+    border: none;
+    border-bottom: 1px solid transparent;
+    padding: 0 0 3px;
+    cursor: pointer;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.63rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    transition: color 0.3s, border-color 0.3s;
+  }
+  .filter:hover { color: var(--fg); }
+  .filter[data-active="true"] { color: var(--fg); border-bottom-color: var(--yellow); }
+
+  .count {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--faint);
+  }
+
+  /* ---------- Contact sheet grid ---------- */
+
+  .sheet {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-left: 1px solid var(--rule);
+    margin: 0 0 120px;
+  }
+
+  @media (max-width: 1100px) { .sheet { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 720px)  { .sheet { grid-template-columns: repeat(2, 1fr); } }
+
+  .cell {
+    border-right: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    padding: 26px 26px 0;
+    cursor: pointer;
+    transition: opacity var(--dur) var(--ease);
+  }
+
+  .sheet[data-hovering="true"] .cell { opacity: 0.28; }
+  .sheet[data-hovering="true"] .cell:hover { opacity: 1; }
+
+  /* Square cells give portraits and landscapes comparable presence when contained. */
+  .frame {
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .frame img {
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+    filter: grayscale(0.25);
+    transform: scale(0.985);
+    transition: transform 1.6s var(--ease), filter var(--dur) var(--ease);
+  }
+
+  .cell:hover .frame img {
+    transform: scale(1);
+    filter: grayscale(0);
+  }
+
+  .caption {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-top: 18px;
+    padding: 10px 0 22px;
+    border-top: 1px solid transparent;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.55rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    transition: border-color var(--dur) var(--ease);
+  }
+  .cell:hover .caption { border-top-color: var(--yellow); }
+
+  .caption .num { color: var(--fg); }
+  .caption .loc { flex: 1; }
+  .caption .orient { color: var(--faint); }
+
+  .edition {
+    color: var(--yellow);
+    letter-spacing: 0.16em;
+  }
+  .edition[data-sold="true"] {
+    color: var(--faint);
+    text-decoration: line-through;
+  }
+
+  .empty {
+    grid-column: 1 / -1;
+    padding: 90px 0;
+    text-align: center;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--muted);
+    border-right: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  /* ---------- Reveal ---------- */
+
+  .cell {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  .cell[data-in="true"] {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
+  }
+  .sheet[data-hovering="true"] .cell[data-in="true"] { opacity: 0.28; }
+  .sheet[data-hovering="true"] .cell[data-in="true"]:hover { opacity: 1; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+    .cell { opacity: 1; transform: none; }
+  }
+
+  @media (max-width: 720px) {
+    .wrap { padding: 0 20px; }
+    .rail { padding: 0 20px; }
+    .theme-toggle { right: 20px; bottom: 20px; }
+    .cell { padding: 16px 16px 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="rail" id="rail">
+  <a href="album-redesign-index.html">&larr; Photos</a>
+  <span class="rail-title">Favourites</span>
+  <span id="railCount">01 / 43</span>
+  <div class="rail-progress" id="railProgress"></div>
+</div>
+
+<button class="theme-toggle" id="themeToggle">Dark</button>
+
+<div class="wrap">
+  <header class="head">
+    <a class="back" href="album-redesign-index.html"><span class="arrow">&larr;</span> Back to Albums</a>
+    <h1>Favourites</h1>
+    <p class="intro">A curated selection of my best shots across all locations and themes.</p>
+    <div class="stats">
+      <span><b>43</b> Photographs</span>
+      <span><b>14</b> Locations</span>
+      <span><b>6</b> Available editions</span>
+    </div>
+
+    <div class="controls">
+      <div class="filters" id="filters"></div>
+      <div class="count" id="count">43 Frames</div>
+    </div>
+  </header>
+</div>
+
+<div class="wrap">
+  <div class="sheet" id="sheet"></div>
+</div>
+
+<script>
+const RAW = [
+  ["000160980007.jpg",1358,2048,"Home",0,0,0,""],
+  ["000160980013.jpg",1358,2048,"Home",5,1,180,"available"],
+  ["000160990012.jpg",2048,1358,"Home",0,0,0,""],
+  ["000226830008.jpg",2048,1358,"Home",0,0,0,""],
+  ["000361140009.jpg",1358,2048,"Dublin",5,2,230,"available"],
+  ["DSCF0032.jpg",2048,1638,"Chengdu",0,0,0,""],
+  ["DSCF0578.jpg",1638,2048,"Kyoto",0,0,0,""],
+  ["DSCF0752.jpg",2048,1638,"Kyoto",0,0,0,""],
+  ["DSCF0776.jpg",2048,1365,"Kyoto",0,0,0,""],
+  ["DSCF0818.jpg",1366,2048,"Kyoto",0,0,0,""],
+  ["DSCF1317.jpg",1639,2048,"Osaka",0,0,0,""],
+  ["DSCF1364.jpg",1638,2048,"Osaka",0,0,0,""],
+  ["DSCF1703.jpg",2048,1638,"Chengdu",0,0,0,""],
+  ["DSCF2458.jpg",1365,2048,"Home",0,0,0,""],
+  ["DSCF3535.jpg",2048,1638,"Amsterdam",5,4,280,"available"],
+  ["DSCF4457.jpg",2048,931,"Bordeaux",0,0,0,""],
+  ["DSCF4590.jpg",2048,1024,"Bordeaux",0,0,0,""],
+  ["DSCF4666.jpg",1365,2048,"Bordeaux",5,0,240,"available"],
+  ["DSCF4846.jpg",1638,2048,"Lisbon",0,0,0,""],
+  ["DSCF4919.jpg",2048,1365,"Eastern Europe",0,0,0,""],
+  ["DSCF4935.jpg",2048,1638,"Eastern Europe",0,0,0,""],
+  ["DSCF5109.jpg",1536,2048,"Lisbon",0,0,0,""],
+  ["DSCF5444.jpg",2048,864,"Lisbon",0,0,0,""],
+  ["DSCF5712.jpg",1365,2048,"Venice",0,0,0,""],
+  ["DSCF5866.jpg",2048,864,"Lisbon",0,0,0,""],
+  ["DSCF5909.jpg",1365,2048,"Venice",0,0,0,""],
+  ["DSCF6037.jpg",1638,2048,"Venice",0,0,0,""],
+  ["DSCF6083.jpg",2048,1024,"Venice",0,0,0,""],
+  ["DSCF6102.jpg",1639,2048,"Venice",0,0,0,""],
+  ["DSCF6615.jpg",2048,1638,"Venice",5,1,250,"available"],
+  ["DSCF7793.jpg",1365,2048,"Beijing",0,0,0,""],
+  ["DSCF8021.jpg",1365,2048,"Beijing",0,0,0,""],
+  ["DSCF8148.jpg",1536,2048,"Beijing",0,0,0,""],
+  ["DSCF8202.jpg",2048,1365,"Dublin",0,0,0,""],
+  ["DSCF8286.jpg",2048,1365,"Dublin",0,0,0,""],
+  ["DSCF8343.jpg",1638,2048,"Dublin",0,0,0,""],
+  ["DSCF8848.jpg",1638,2048,"Hong Kong",0,0,0,""],
+  ["DSCF8955.jpg",2048,1024,"Hong Kong",0,0,0,""],
+  ["DSCF9580.jpg",1365,2048,"Tokyo",5,5,260,"sold_out"],
+  ["DSCF9708.jpg",2048,1024,"Tokyo",0,0,0,""],
+  ["img022.jpg",1377,2048,"Lisbon on film",0,0,0,""],
+  ["img029.jpg",2048,1362,"Lisbon on film",0,0,0,""],
+  ["img034.jpg",1345,2048,"Lisbon on film",0,0,0,""]
+];
+const PHOTOS = RAW.map((r, i) => ({ n: i + 1, file: r[0], w: r[1], h: r[2], loc: r[3], ed: r[4], sold: r[5], price: r[6], status: r[7] }));
+
+const SRC = (f) => "../public/photos/Faves/" + encodeURIComponent(f);
+const pad = (n) => String(n).padStart(2, "0");
+const orientation = (p) => (p.w > p.h ? (p.w / p.h > 1.9 ? "Pano" : "Horizontal") : "Vertical");
+
+const sheet = document.getElementById("sheet");
+const countEl = document.getElementById("count");
+const filtersEl = document.getElementById("filters");
+
+const locations = ["All", ...Array.from(new Set(PHOTOS.map((p) => p.loc))).sort()];
+let activeFilter = "All";
+
+function renderFilters() {
+  filtersEl.innerHTML = "";
+  locations.forEach((loc) => {
+    const b = document.createElement("button");
+    b.className = "filter";
+    b.textContent = loc;
+    b.dataset.active = String(loc === activeFilter);
+    b.addEventListener("click", () => {
+      activeFilter = loc;
+      renderFilters();
+      renderSheet();
+    });
+    filtersEl.appendChild(b);
+  });
+}
+
+let observer;
+
+function renderSheet() {
+  const list = PHOTOS.filter((p) => activeFilter === "All" || p.loc === activeFilter);
+  countEl.textContent = list.length + (list.length === 1 ? " Frame" : " Frames");
+  sheet.innerHTML = "";
+
+  if (!list.length) {
+    const e = document.createElement("div");
+    e.className = "empty";
+    e.textContent = "No frames from this location.";
+    sheet.appendChild(e);
+    return;
+  }
+
+  list.forEach((p) => {
+    const cell = document.createElement("div");
+    cell.className = "cell";
+
+    const frame = document.createElement("div");
+    frame.className = "frame";
+    const img = document.createElement("img");
+    img.src = SRC(p.file);
+    img.alt = p.loc;
+    img.loading = "lazy";
+    frame.appendChild(img);
+
+    const cap = document.createElement("div");
+    cap.className = "caption";
+
+    const num = document.createElement("span");
+    num.className = "num";
+    num.textContent = pad(p.n);
+
+    const loc = document.createElement("span");
+    loc.className = "loc";
+    loc.textContent = p.loc;
+
+    cap.appendChild(num);
+    cap.appendChild(loc);
+
+    if (p.ed) {
+      const ed = document.createElement("span");
+      ed.className = "edition";
+      ed.dataset.sold = String(p.status === "sold_out");
+      ed.textContent = p.status === "sold_out" ? "Sold out" : p.ed - p.sold + " left";
+      cap.appendChild(ed);
+    } else {
+      const o = document.createElement("span");
+      o.className = "orient";
+      o.textContent = orientation(p);
+      cap.appendChild(o);
+    }
+
+    cell.appendChild(frame);
+    cell.appendChild(cap);
+    sheet.appendChild(cell);
+    observer.observe(cell);
+  });
+}
+
+observer = new IntersectionObserver(
+  (entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.dataset.in = "true";
+        observer.unobserve(entry.target);
+      }
+    });
+  },
+  { rootMargin: "0px 0px -8% 0px" }
+);
+
+sheet.addEventListener("mouseenter", () => (sheet.dataset.hovering = "true"));
+sheet.addEventListener("mouseleave", () => (sheet.dataset.hovering = "false"));
+
+renderFilters();
+renderSheet();
+
+// Sticky rail
+const rail = document.getElementById("rail");
+const railProgress = document.getElementById("railProgress");
+const railCount = document.getElementById("railCount");
+
+function onScroll() {
+  const y = window.scrollY;
+  rail.dataset.visible = String(y > 320);
+  const max = document.body.scrollHeight - window.innerHeight;
+  const ratio = max > 0 ? Math.min(1, y / max) : 0;
+  railProgress.style.width = ratio * 100 + "%";
+  const total = sheet.querySelectorAll(".cell").length;
+  railCount.textContent = pad(Math.max(1, Math.round(ratio * total))) + " / " + pad(total);
+}
+window.addEventListener("scroll", onScroll, { passive: true });
+onScroll();
+
+// Theme
+const toggle = document.getElementById("themeToggle");
+toggle.addEventListener("click", () => {
+  const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+  document.documentElement.dataset.theme = next;
+  toggle.textContent = next === "dark" ? "Light" : "Dark";
+});
+</script>
+</body>
+</html>

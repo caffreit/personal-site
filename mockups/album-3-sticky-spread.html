@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Album Redesign — 03 Sticky Spread</title>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --yellow: #F4CA16;
+    --bg: #FFFFFF;
+    --fg: #0A0A0A;
+    --muted: rgba(0,0,0,0.45);
+    --faint: rgba(0,0,0,0.32);
+    --rule: #d4d0c8;
+    --ease: cubic-bezier(0.25, 1, 0.5, 1);
+    --dur: 0.7s;
+  }
+
+  [data-theme="dark"] {
+    --bg: #0A0A0A;
+    --fg: #FFFFFF;
+    --muted: rgba(255,255,255,0.5);
+    --faint: rgba(255,255,255,0.36);
+    --rule: #222;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Newsreader', Georgia, serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    transition: background 0.4s ease, color 0.4s ease;
+  }
+
+  .theme-toggle {
+    position: fixed;
+    right: 32px;
+    bottom: 28px;
+    z-index: 60;
+    background: var(--bg);
+    border: 1px solid var(--rule);
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.55rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    padding: 9px 14px;
+    cursor: pointer;
+    transition: color 0.3s, border-color 0.3s;
+  }
+  .theme-toggle:hover { color: var(--fg); border-color: var(--yellow); }
+
+  /* ---------- Spread ---------- */
+
+  .spread {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 64px;
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 0 40px 140px;
+  }
+
+  /* ---------- Sticky rail ---------- */
+
+  .rail {
+    position: sticky;
+    top: 0;
+    align-self: start;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 56px 0 34px;
+    border-right: 1px solid var(--rule);
+    padding-right: 28px;
+    margin-right: -28px;
+  }
+
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--faint);
+    text-decoration: none;
+    margin-bottom: 34px;
+    transition: color 0.3s;
+    align-self: flex-start;
+  }
+  .back:hover { color: var(--fg); }
+  .back .arrow { display: inline-block; transition: transform 0.3s var(--ease); }
+  .back:hover .arrow { transform: translateX(-5px); }
+
+  .rail h1 {
+    font-size: clamp(2.2rem, 3.2vw, 3.2rem);
+    font-weight: 300;
+    line-height: 0.98;
+    letter-spacing: -0.02em;
+  }
+
+  .rail .intro {
+    margin-top: 14px;
+    font-size: 0.98rem;
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+
+  .rail .stats {
+    margin-top: 20px;
+    padding-top: 14px;
+    border-top: 1px solid var(--rule);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.55rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    line-height: 2.1;
+  }
+  .rail .stats b { color: var(--fg); font-weight: 400; }
+
+  .index-label {
+    margin-top: 26px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--rule);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.55rem;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--faint);
+  }
+
+  .index {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    margin-top: 10px;
+    padding-right: 8px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--rule) transparent;
+  }
+  .index::-webkit-scrollbar { width: 3px; }
+  .index::-webkit-scrollbar-thumb { background: var(--rule); }
+
+  .index-item {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    width: 100%;
+    background: none;
+    border: none;
+    border-left: 1px solid transparent;
+    padding: 5px 0 5px 12px;
+    margin-left: -13px;
+    cursor: pointer;
+    text-align: left;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.55rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--faint);
+    transition: color 0.35s var(--ease), border-color 0.35s var(--ease);
+  }
+  .index-item:hover { color: var(--fg); }
+  .index-item[data-active="true"] {
+    color: var(--fg);
+    border-left-color: var(--yellow);
+  }
+  .index-item .num { flex-shrink: 0; }
+  .index-item .loc { flex: 1; }
+  .index-item .dot {
+    width: 4px; height: 4px;
+    background: var(--yellow);
+    flex-shrink: 0;
+    opacity: 0;
+  }
+  .index-item[data-print="true"] .dot { opacity: 1; }
+
+  /* ---------- Image column ---------- */
+
+  .column {
+    padding-top: 56px;
+    display: flex;
+    flex-direction: column;
+    gap: 110px;
+  }
+
+  .figure {
+    scroll-margin-top: 56px;
+  }
+
+  .figure-media {
+    overflow: hidden;
+    background: transparent;
+  }
+
+  .figure-media img {
+    display: block;
+    width: 100%;
+    height: auto;
+    opacity: 0;
+    transform: scale(1.04);
+    transition: opacity 0.9s var(--ease), transform 1.6s var(--ease);
+  }
+
+  .figure[data-in="true"] .figure-media img {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .figure-cap {
+    display: flex;
+    align-items: baseline;
+    gap: 18px;
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid var(--rule);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    transition: border-color var(--dur) var(--ease);
+  }
+  .figure[data-current="true"] .figure-cap { border-top-color: var(--yellow); }
+
+  .figure-cap .num { color: var(--fg); }
+  .figure-cap .loc { flex: 1; color: var(--fg); }
+  .figure-cap .dims { color: var(--faint); }
+
+  .figure-print {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-top: 10px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.55rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--muted);
+  }
+  .figure-print .price { color: var(--yellow); }
+  .figure-print[data-sold="true"] .price { color: var(--faint); text-decoration: line-through; }
+  .figure-print a {
+    color: var(--fg);
+    text-decoration: none;
+    border-bottom: 1px solid var(--yellow);
+    padding-bottom: 2px;
+  }
+
+  /* Wide frames break the measure for emphasis */
+  .figure[data-wide="true"] .figure-media { margin-right: -40px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition-duration: 0.01ms !important; }
+    .figure-media img { opacity: 1; transform: none; }
+  }
+
+  @media (max-width: 1000px) {
+    .spread {
+      grid-template-columns: 1fr;
+      gap: 0;
+      padding: 0 20px 100px;
+    }
+    .rail {
+      position: static;
+      height: auto;
+      border-right: none;
+      border-bottom: 1px solid var(--rule);
+      padding: 48px 0 28px;
+      margin-right: 0;
+    }
+    .index-label, .index { display: none; }
+    .column { padding-top: 48px; gap: 72px; }
+    .figure[data-wide="true"] .figure-media { margin-right: -20px; }
+    .theme-toggle { right: 20px; bottom: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle">Dark</button>
+
+<div class="spread">
+  <aside class="rail">
+    <a class="back" href="album-redesign-index.html"><span class="arrow">&larr;</span> Back to Albums</a>
+    <h1>Favourites</h1>
+    <p class="intro">A curated selection of my best shots across all locations and themes.</p>
+    <div class="stats">
+      <div><b>43</b> Photographs</div>
+      <div><b>14</b> Locations</div>
+      <div><b>6</b> Available editions</div>
+    </div>
+    <div class="index-label">Index</div>
+    <div class="index" id="index"></div>
+  </aside>
+
+  <main class="column" id="column"></main>
+</div>
+
+<script>
+const RAW = [
+  ["000160980007.jpg",1358,2048,"Home",0,0,0,""],
+  ["000160980013.jpg",1358,2048,"Home",5,1,180,"available"],
+  ["000160990012.jpg",2048,1358,"Home",0,0,0,""],
+  ["000226830008.jpg",2048,1358,"Home",0,0,0,""],
+  ["000361140009.jpg",1358,2048,"Dublin",5,2,230,"available"],
+  ["DSCF0032.jpg",2048,1638,"Chengdu",0,0,0,""],
+  ["DSCF0578.jpg",1638,2048,"Kyoto",0,0,0,""],
+  ["DSCF0752.jpg",2048,1638,"Kyoto",0,0,0,""],
+  ["DSCF0776.jpg",2048,1365,"Kyoto",0,0,0,""],
+  ["DSCF0818.jpg",1366,2048,"Kyoto",0,0,0,""],
+  ["DSCF1317.jpg",1639,2048,"Osaka",0,0,0,""],
+  ["DSCF1364.jpg",1638,2048,"Osaka",0,0,0,""],
+  ["DSCF1703.jpg",2048,1638,"Chengdu",0,0,0,""],
+  ["DSCF2458.jpg",1365,2048,"Home",0,0,0,""],
+  ["DSCF3535.jpg",2048,1638,"Amsterdam",5,4,280,"available"],
+  ["DSCF4457.jpg",2048,931,"Bordeaux",0,0,0,""],
+  ["DSCF4590.jpg",2048,1024,"Bordeaux",0,0,0,""],
+  ["DSCF4666.jpg",1365,2048,"Bordeaux",5,0,240,"available"],
+  ["DSCF4846.jpg",1638,2048,"Lisbon",0,0,0,""],
+  ["DSCF4919.jpg",2048,1365,"Eastern Europe",0,0,0,""],
+  ["DSCF4935.jpg",2048,1638,"Eastern Europe",0,0,0,""],
+  ["DSCF5109.jpg",1536,2048,"Lisbon",0,0,0,""],
+  ["DSCF5444.jpg",2048,864,"Lisbon",0,0,0,""],
+  ["DSCF5712.jpg",1365,2048,"Venice",0,0,0,""],
+  ["DSCF5866.jpg",2048,864,"Lisbon",0,0,0,""],
+  ["DSCF5909.jpg",1365,2048,"Venice",0,0,0,""],
+  ["DSCF6037.jpg",1638,2048,"Venice",0,0,0,""],
+  ["DSCF6083.jpg",2048,1024,"Venice",0,0,0,""],
+  ["DSCF6102.jpg",1639,2048,"Venice",0,0,0,""],
+  ["DSCF6615.jpg",2048,1638,"Venice",5,1,250,"available"],
+  ["DSCF7793.jpg",1365,2048,"Beijing",0,0,0,""],
+  ["DSCF8021.jpg",1365,2048,"Beijing",0,0,0,""],
+  ["DSCF8148.jpg",1536,2048,"Beijing",0,0,0,""],
+  ["DSCF8202.jpg",2048,1365,"Dublin",0,0,0,""],
+  ["DSCF8286.jpg",2048,1365,"Dublin",0,0,0,""],
+  ["DSCF8343.jpg",1638,2048,"Dublin",0,0,0,""],
+  ["DSCF8848.jpg",1638,2048,"Hong Kong",0,0,0,""],
+  ["DSCF8955.jpg",2048,1024,"Hong Kong",0,0,0,""],
+  ["DSCF9580.jpg",1365,2048,"Tokyo",5,5,260,"sold_out"],
+  ["DSCF9708.jpg",2048,1024,"Tokyo",0,0,0,""],
+  ["img022.jpg",1377,2048,"Lisbon on film",0,0,0,""],
+  ["img029.jpg",2048,1362,"Lisbon on film",0,0,0,""],
+  ["img034.jpg",1345,2048,"Lisbon on film",0,0,0,""]
+];
+const PHOTOS = RAW.map((r, i) => ({ n: i + 1, file: r[0], w: r[1], h: r[2], loc: r[3], ed: r[4], sold: r[5], price: r[6], status: r[7] }));
+
+const SRC = (f) => "../public/photos/Faves/" + encodeURIComponent(f);
+const pad = (n) => String(n).padStart(2, "0");
+const money = (v) => new Intl.NumberFormat("en-IE", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(v);
+
+const columnEl = document.getElementById("column");
+const indexEl = document.getElementById("index");
+const indexItems = [];
+
+PHOTOS.forEach((p) => {
+  // Portrait frames sit in a narrower measure; wide frames break out to the right.
+  const isPortrait = p.h > p.w;
+  const isWide = p.w / p.h > 1.9;
+
+  const fig = document.createElement("figure");
+  fig.className = "figure";
+  fig.id = "frame-" + p.n;
+  fig.dataset.index = String(p.n);
+  fig.dataset.wide = String(isWide);
+  if (isPortrait) fig.style.maxWidth = "min(100%, 620px)";
+
+  const media = document.createElement("div");
+  media.className = "figure-media";
+  const img = document.createElement("img");
+  img.src = SRC(p.file);
+  img.alt = p.loc;
+  img.width = p.w;
+  img.height = p.h;
+  img.loading = "lazy";
+  media.appendChild(img);
+
+  const cap = document.createElement("figcaption");
+  cap.className = "figure-cap";
+  cap.innerHTML =
+    '<span class="num">' + pad(p.n) + "</span>" +
+    '<span class="loc">' + p.loc + "</span>" +
+    '<span class="dims">' + p.w + " &times; " + p.h + "</span>";
+
+  fig.appendChild(media);
+  fig.appendChild(cap);
+
+  if (p.ed) {
+    const sold = p.status === "sold_out";
+    const print = document.createElement("div");
+    print.className = "figure-print";
+    print.dataset.sold = String(sold);
+    print.innerHTML =
+      '<span class="price">' + money(p.price) + "</span>" +
+      "<span>Edition of " + p.ed + " &middot; " + p.sold + " sold</span>" +
+      (sold ? "<span>Sold out</span>" : '<a href="#">Enquire</a>');
+    fig.appendChild(print);
+  }
+
+  columnEl.appendChild(fig);
+
+  const item = document.createElement("button");
+  item.className = "index-item";
+  item.dataset.print = String(Boolean(p.ed));
+  item.innerHTML =
+    '<span class="num">' + pad(p.n) + "</span>" +
+    '<span class="loc">' + p.loc + "</span>" +
+    '<span class="dot"></span>';
+  item.addEventListener("click", () => {
+    fig.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+  indexEl.appendChild(item);
+  indexItems.push(item);
+});
+
+const figures = Array.from(document.querySelectorAll(".figure"));
+
+const revealObserver = new IntersectionObserver(
+  (entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.dataset.in = "true";
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  },
+  { rootMargin: "0px 0px -10% 0px" }
+);
+figures.forEach((f) => revealObserver.observe(f));
+
+let activeIndex = -1;
+function setActive(i) {
+  if (i === activeIndex) return;
+  activeIndex = i;
+  indexItems.forEach((item, j) => (item.dataset.active = String(j === i)));
+  figures.forEach((f, j) => (f.dataset.current = String(j === i)));
+  const item = indexItems[i];
+  if (item && indexEl.scrollHeight > indexEl.clientHeight) {
+    const top = item.offsetTop - indexEl.clientHeight / 2 + item.clientHeight / 2;
+    indexEl.scrollTo({ top, behavior: "smooth" });
+  }
+}
+
+const currentObserver = new IntersectionObserver(
+  (entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) setActive(figures.indexOf(entry.target));
+    });
+  },
+  { rootMargin: "-40% 0px -50% 0px" }
+);
+figures.forEach((f) => currentObserver.observe(f));
+
+const toggle = document.getElementById("themeToggle");
+toggle.addEventListener("click", () => {
+  const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+  document.documentElement.dataset.theme = next;
+  toggle.textContent = next === "dark" ? "Light" : "Dark";
+});
+</script>
+</body>
+</html>
