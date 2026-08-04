@@ -1,0 +1,25 @@
+{
+  "groups": [
+    { "layout": "bleed", "files": ["000160990012.jpg"] },
+    { "layout": "pair", "files": ["000160980013.jpg", "000226830008.jpg"] },
+    { "layout": "bleed", "files": ["DSCF0776.jpg"] },
+    { "layout": "inset", "files": ["DSCF0818.jpg"], "size": "large" },
+    { "layout": "pair", "files": ["DSCF0578.jpg", "DSCF0752.jpg"] },
+    { "layout": "pair", "files": ["DSCF7793.jpg", "DSCF8148.jpg"] },
+    { "layout": "pair", "files": ["DSCF8021.jpg", "000361140009.jpg"] },
+    { "layout": "bleed", "files": ["DSCF8202.jpg"] },
+    { "layout": "pair", "files": ["DSCF1317.jpg", "DSCF1364.jpg"] },
+    { "layout": "bleed", "files": ["DSCF4457.jpg"] },
+    { "layout": "pair", "files": ["DSCF4666.jpg", "DSCF4935.jpg"] },
+    { "layout": "inset", "files": ["DSCF4846.jpg"], "size": "large" },
+    { "layout": "pair", "files": ["DSCF5909.jpg", "DSCF6037.jpg"] },
+    { "layout": "bleed", "files": ["DSCF6083.jpg"] },
+    { "layout": "pair", "files": ["DSCF6102.jpg", "DSCF6615.jpg"] },
+    { "layout": "pair", "files": ["DSCF9580.jpg", "DSCF8848.jpg"] },
+    { "layout": "pair", "files": ["DSCF8286.jpg", "DSCF8343.jpg"] },
+    { "layout": "bleed", "files": ["DSCF9708.jpg"] },
+    { "layout": "bleed", "files": ["DSCF5444.jpg"] },
+    { "layout": "pair", "files": ["DSCF5109.jpg", "DSCF5712.jpg"] },
+    { "layout": "pair", "files": ["img022.jpg", "img034.jpg"] }
+  ]
+}

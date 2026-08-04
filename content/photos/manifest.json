@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-25T11:55:44.561Z",
+  "generatedAt": "2026-08-04T12:00:24.164Z",
   "albums": [
     {
       "id": "Faves",
@@ -7,6 +7,13 @@
       "description": "A curated selection of my best shots across all locations and themes",
       "cover": "DSCF3535.jpg",
       "images": [
+        {
+          "filename": "000160990012.jpg",
+          "width": 2048,
+          "height": 1358,
+          "isFeatured": false,
+          "location": "Home"
+        },
         {
           "filename": "000160980007.jpg",
           "width": 1358,
@@ -39,13 +46,6 @@
           }
         },
         {
-          "filename": "000160990012.jpg",
-          "width": 2048,
-          "height": 1358,
-          "isFeatured": false,
-          "location": "Home"
-        },
-        {
           "filename": "000226830008.jpg",
           "width": 2048,
           "height": 1358,
@@ -53,50 +53,11 @@
           "location": "Home"
         },
         {
-          "filename": "000361140009.jpg",
-          "width": 1358,
+          "filename": "DSCF2458.jpg",
+          "width": 1365,
           "height": 2048,
           "isFeatured": false,
-          "location": "Dublin",
-          "print": {
-            "available": true,
-            "editionSize": 5,
-            "sold": 2,
-            "status": "available",
-            "price": 230,
-            "currency": "EUR",
-            "sizes": [
-              "30x40cm",
-              "40x60cm"
-            ],
-            "paper": "Canson Platine Fibre Rag",
-            "signed": true,
-            "leadTime": "2-3 weeks",
-            "requestUrl": "mailto:ivan.caffrey@gmail.com?subject=Print%20request%3A%20000361140009",
-            "quote": "Dublin doesn't perform for the camera — you have to catch it unaware.",
-            "description": "Shot on 35mm film through the streets of Dublin's north side. The Canson Platine Fibre Rag gives this image a pearl-like lustre that suits the soft Irish light, with a fibre base that lends the print a weight and presence."
-          }
-        },
-        {
-          "filename": "DSCF0032.jpg",
-          "width": 2048,
-          "height": 1638,
-          "isFeatured": false,
-          "location": "Chengdu"
-        },
-        {
-          "filename": "DSCF0578.jpg",
-          "width": 1638,
-          "height": 2048,
-          "isFeatured": false,
-          "location": "Kyoto"
-        },
-        {
-          "filename": "DSCF0752.jpg",
-          "width": 2048,
-          "height": 1638,
-          "isFeatured": false,
-          "location": "Kyoto"
+          "location": "Home"
         },
         {
           "filename": "DSCF0776.jpg",
@@ -109,6 +70,20 @@
           "filename": "DSCF0818.jpg",
           "width": 1366,
           "height": 2048,
+          "isFeatured": false,
+          "location": "Kyoto"
+        },
+        {
+          "filename": "DSCF0578.jpg",
+          "width": 1638,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Kyoto"
+        },
+        {
+          "filename": "DSCF0752.jpg",
+          "width": 2048,
+          "height": 1638,
           "isFeatured": false,
           "location": "Kyoto"
         },
@@ -134,11 +109,11 @@
           "location": "Chengdu"
         },
         {
-          "filename": "DSCF2458.jpg",
-          "width": 1365,
-          "height": 2048,
+          "filename": "DSCF0032.jpg",
+          "width": 2048,
+          "height": 1638,
           "isFeatured": false,
-          "location": "Home"
+          "location": "Chengdu"
         },
         {
           "filename": "DSCF3535.jpg",
@@ -212,13 +187,6 @@
           "location": "Lisbon"
         },
         {
-          "filename": "DSCF4919.jpg",
-          "width": 2048,
-          "height": 1365,
-          "isFeatured": false,
-          "location": "Eastern Europe"
-        },
-        {
           "filename": "DSCF4935.jpg",
           "width": 2048,
           "height": 1638,
@@ -233,25 +201,11 @@
           "location": "Lisbon"
         },
         {
-          "filename": "DSCF5444.jpg",
-          "width": 2048,
-          "height": 864,
-          "isFeatured": false,
-          "location": "Lisbon"
-        },
-        {
           "filename": "DSCF5712.jpg",
           "width": 1365,
           "height": 2048,
           "isFeatured": false,
           "location": "Venice"
-        },
-        {
-          "filename": "DSCF5866.jpg",
-          "width": 2048,
-          "height": 864,
-          "isFeatured": false,
-          "location": "Lisbon"
         },
         {
           "filename": "DSCF5909.jpg",
@@ -321,6 +275,31 @@
           "location": "Beijing"
         },
         {
+          "filename": "000361140009.jpg",
+          "width": 1358,
+          "height": 2048,
+          "isFeatured": false,
+          "location": "Dublin",
+          "print": {
+            "available": true,
+            "editionSize": 5,
+            "sold": 2,
+            "status": "available",
+            "price": 230,
+            "currency": "EUR",
+            "sizes": [
+              "30x40cm",
+              "40x60cm"
+            ],
+            "paper": "Canson Platine Fibre Rag",
+            "signed": true,
+            "leadTime": "2-3 weeks",
+            "requestUrl": "mailto:ivan.caffrey@gmail.com?subject=Print%20request%3A%20000361140009",
+            "quote": "Dublin doesn't perform for the camera — you have to catch it unaware.",
+            "description": "Shot on 35mm film through the streets of Dublin's north side. The Canson Platine Fibre Rag gives this image a pearl-like lustre that suits the soft Irish light, with a fibre base that lends the print a weight and presence."
+          }
+        },
+        {
           "filename": "DSCF8148.jpg",
           "width": 1536,
           "height": 2048,
@@ -347,6 +326,13 @@
           "height": 2048,
           "isFeatured": false,
           "location": "Dublin"
+        },
+        {
+          "filename": "DSCF9708.jpg",
+          "width": 2048,
+          "height": 1024,
+          "isFeatured": false,
+          "location": "Tokyo"
         },
         {
           "filename": "DSCF8848.jpg",
@@ -386,11 +372,18 @@
           }
         },
         {
-          "filename": "DSCF9708.jpg",
+          "filename": "DSCF5444.jpg",
           "width": 2048,
-          "height": 1024,
+          "height": 864,
           "isFeatured": false,
-          "location": "Tokyo"
+          "location": "Lisbon"
+        },
+        {
+          "filename": "DSCF5866.jpg",
+          "width": 2048,
+          "height": 864,
+          "isFeatured": false,
+          "location": "Lisbon"
         },
         {
           "filename": "img022.jpg",
@@ -400,16 +393,16 @@
           "location": "Lisbon on film"
         },
         {
-          "filename": "img029.jpg",
-          "width": 2048,
-          "height": 1362,
+          "filename": "img034.jpg",
+          "width": 1345,
+          "height": 2048,
           "isFeatured": false,
           "location": "Lisbon on film"
         },
         {
-          "filename": "img034.jpg",
-          "width": 1345,
-          "height": 2048,
+          "filename": "img029.jpg",
+          "width": 2048,
+          "height": 1362,
           "isFeatured": false,
           "location": "Lisbon on film"
         }
@@ -2782,7 +2775,7 @@
     {
       "id": "Eastern Europe",
       "name": "Eastern Europe",
-      "photoCount": 4,
+      "photoCount": 3,
       "cover": "DSCF5162.jpg",
       "coverAlbum": "Animals"
     },
