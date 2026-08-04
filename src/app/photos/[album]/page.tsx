@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { findAlbumById, normalizePhotoPrint, readPhotoManifest } from "@/lib/photos";
-import { AlbumView } from "@/components/gallery/AlbumView";
+import { CuratorsWall } from "@/components/gallery/CuratorsWall";
+import { buildAlbumWallPlates } from "@/lib/albumWall";
 
 export const dynamicParams = true;
 
@@ -32,26 +33,17 @@ export default async function AlbumPage({ params }: { params: Promise<AlbumParam
   const album = findAlbumById(decodedId);
   if (!album) return notFound();
 
-  // Transform existing images to match AlbumView expected format
-  const images = album.images.map((img) => ({
-    id: img.filename,
-    url: `/photos/${encodeURIComponent(album.id)}/${encodeURIComponent(img.filename)}`,
-    title: img.caption || "Untitled",
-    location: img.location,
-    iso: "400",
-    aperture: "f/1.8",
-    shutter: "1/125",
-    width: img.width,
-    height: img.height,
+  const wallImages = album.images.map((img) => ({
+    ...img,
     print: img.print ? normalizePhotoPrint(img.print) : undefined,
   }));
+  const plates = buildAlbumWallPlates(album.id, wallImages);
 
   return (
-    <AlbumView 
-      album={album.title} 
-      albumId={album.id}
+    <CuratorsWall
+      title={album.title}
       description={album.description}
-      images={images}
+      plates={plates}
     />
   );
 }

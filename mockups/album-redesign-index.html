@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Album Page Redesign — Four Directions</title>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --yellow: #F4CA16;
+    --bg: #FFFFFF;
+    --fg: #0A0A0A;
+    --muted: rgba(0,0,0,0.45);
+    --faint: rgba(0,0,0,0.32);
+    --rule: #d4d0c8;
+    --ease: cubic-bezier(0.25, 1, 0.5, 1);
+    --dur: 0.7s;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Newsreader', Georgia, serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 88px 40px 120px;
+  }
+
+  .eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.24em;
+    color: var(--yellow);
+    margin-bottom: 20px;
+  }
+
+  h1 {
+    font-size: clamp(3rem, 7vw, 5.5rem);
+    font-weight: 300;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+  }
+
+  .intro {
+    margin-top: 20px;
+    max-width: 620px;
+    font-size: 1.05rem;
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1.7;
+    color: var(--muted);
+  }
+
+  .note {
+    margin-top: 26px;
+    max-width: 620px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    line-height: 2;
+    color: var(--faint);
+  }
+
+  .list {
+    margin-top: 64px;
+    border-top: 1px solid var(--rule);
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 44px;
+    align-items: start;
+    padding: 34px 0;
+    border-bottom: 1px solid var(--rule);
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .thumb {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+    background: var(--rule);
+  }
+  .thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    filter: grayscale(0.4);
+    transform: scale(1.03);
+    transition: transform 1.6s var(--ease), filter var(--dur) var(--ease);
+  }
+  .row:hover .thumb img { transform: scale(1); filter: grayscale(0); }
+
+  .meta {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+  }
+  .meta .no { color: var(--yellow); }
+
+  h2 {
+    margin-top: 12px;
+    font-size: clamp(1.6rem, 2.4vw, 2.15rem);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    line-height: 1.12;
+  }
+
+  .desc {
+    margin-top: 12px;
+    max-width: 620px;
+    font-size: 1rem;
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1.65;
+    color: var(--muted);
+  }
+
+  .tradeoff {
+    margin-top: 14px;
+    max-width: 620px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.55rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    line-height: 1.9;
+    color: var(--faint);
+  }
+  .tradeoff b { color: var(--muted); font-weight: 400; }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    margin-top: 18px;
+  }
+  .tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.54rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--faint);
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 2px;
+  }
+
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 22px;
+    padding-bottom: 3px;
+    border-bottom: 1px solid var(--yellow);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+  }
+  .cta .arrow { display: inline-block; transition: transform 0.3s var(--ease); }
+  .row:hover .cta .arrow { transform: translateX(5px); }
+
+  .footer-note {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    line-height: 2;
+    color: var(--faint);
+  }
+
+  @media (max-width: 800px) {
+    .page { padding: 60px 20px 90px; }
+    .row { grid-template-columns: 1fr; gap: 22px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="eyebrow">Album Page Redesign</div>
+  <h1>Four Directions</h1>
+  <p class="intro">
+    The album detail page is the last surface still using the pre-redesign language — rounded tiles,
+    soft shadows, a glass top bar, and a hardcoded stone palette with no dark mode. Each direction below
+    rebuilds it in the sharp editorial system the blog and labs indexes already share.
+  </p>
+  <p class="note">
+    All four use the real Favourites album: 43 photographs, 14 locations, 6 print editions.<br>
+    Shared constraints — zero border radius, hairline rules only, Newsreader 300 headings, Space Mono metadata,
+    one yellow accent, 0.7s cubic-bezier(0.25, 1, 0.5, 1). Every direction has a light/dark toggle in the corner.
+  </p>
+
+  <div class="list">
+
+    <a class="row" href="album-1-contact-sheet.html">
+      <div class="thumb"><img src="../public/photos/Faves/DSCF0752.jpg" alt=""></div>
+      <div>
+        <div class="meta"><span class="no">Direction 01</span><span>Grid</span><span>Lowest risk</span></div>
+        <h2>Contact Sheet</h2>
+        <p class="desc">
+          A uniform hairline grid where every photograph sits inside its own cell, letterboxed rather than cropped,
+          with a mono caption bar beneath carrying the frame number, location, and orientation. Hovering one frame
+          drops its neighbours to 28% so the sheet reads like a light table. Location filters run along the top rule.
+        </p>
+        <p class="tradeoff">
+          <b>Strength:</b> the closest sibling to the labs index; scales cleanly to 43 frames and stays scannable.<br>
+          <b>Risk:</b> the most restrained of the four — uniform cells give every photo equal weight, which is honest but flat.
+        </p>
+        <div class="tags">
+          <span class="tag">Uniform Grid</span>
+          <span class="tag">Sibling Dim</span>
+          <span class="tag">Location Filters</span>
+          <span class="tag">Contain, Not Crop</span>
+        </div>
+        <span class="cta">Open prototype <span class="arrow">&rarr;</span></span>
+      </div>
+    </a>
+
+    <a class="row" href="album-2-filmstrip.html">
+      <div class="thumb"><img src="../public/photos/Faves/DSCF5444.jpg" alt=""></div>
+      <div>
+        <div class="meta"><span class="no">Direction 02</span><span>Sequential</span><span>Most immersive</span></div>
+        <h2>Filmstrip Essay</h2>
+        <p class="desc">
+          One photograph per viewport, alternating left and right against open space, each revealed on scroll with a
+          slow 1.6s settle from 1.06 scale. The caption lives in the margin beside the frame as a mono note block.
+          A hairline yellow rule at the top tracks position, and the header swaps in the current location as you pass it.
+        </p>
+        <p class="tradeoff">
+          <b>Strength:</b> gives each photograph real weight and matches the homepage hero's cinematic register.<br>
+          <b>Risk:</b> 43 frames becomes a very long scroll with no way to skim or jump.
+        </p>
+        <div class="tags">
+          <span class="tag">Full Viewport</span>
+          <span class="tag">Scroll Reveal</span>
+          <span class="tag">Marginalia</span>
+          <span class="tag">Progress Rule</span>
+        </div>
+        <span class="cta">Open prototype <span class="arrow">&rarr;</span></span>
+      </div>
+    </a>
+
+    <a class="row" href="album-3-sticky-spread.html">
+      <div class="thumb"><img src="../public/photos/Faves/DSCF6615.jpg" alt=""></div>
+      <div>
+        <div class="meta"><span class="no">Direction 03</span><span>Navigable</span><span>Best orientation</span></div>
+        <h2>Sticky Spread</h2>
+        <p class="desc">
+          A sticky left rail holds the album title, description, and counts above a scrollable numbered index of every
+          frame. As images pass the midpoint of the viewport their index entry takes a yellow left rule and scrolls itself
+          into view; clicking any entry jumps to that frame. Images run down a single measure on the right, portraits held
+          narrow and panoramas breaking out to the edge.
+        </p>
+        <p class="tradeoff">
+          <b>Strength:</b> the only direction that solves wayfinding in a 43-photo album, and it sharpens the marginalia
+          motif already in the blog post layout.<br>
+          <b>Risk:</b> the rail has to collapse entirely on mobile, so small screens fall back to a plainer column.
+        </p>
+        <div class="tags">
+          <span class="tag">Sticky Rail</span>
+          <span class="tag">Live Index</span>
+          <span class="tag">Scroll Spy</span>
+          <span class="tag">Variable Measure</span>
+        </div>
+        <span class="cta">Open prototype <span class="arrow">&rarr;</span></span>
+      </div>
+    </a>
+
+    <a class="row" href="album-4-curators-wall.html">
+      <div class="thumb"><img src="../public/photos/Faves/DSCF3535.jpg" alt=""></div>
+      <div>
+        <div class="meta"><span class="no">Direction 04</span><span>Composed</span><span>Best for prints</span></div>
+        <h2>Curator's Wall</h2>
+        <p class="desc">
+          A printed rhythm rather than a grid: a full-bleed opener, then a pair matched on aspect ratio, then a single
+          inset frame alternating left and right — repeating down the page, each spread opening on a hairline rule marked
+          with its plate number and places. Edition data is typeset into the caption block on the rule
+          (<em>&euro;280 &middot; Edition of 5 &middot; 4 sold &middot; Enquire</em>) instead of floating over the image as a pill.
+        </p>
+        <p class="tradeoff">
+          <b>Strength:</b> the most designed of the four, and the only one that makes the prints funnel feel deliberate.<br>
+          <b>Risk:</b> the rhythm is imposed by an algorithm, not by editing — some pairings will land better than others.
+        </p>
+        <div class="tags">
+          <span class="tag">Asymmetric</span>
+          <span class="tag">Plate Numbers</span>
+          <span class="tag">Full Bleed Opener</span>
+          <span class="tag">Typeset Editions</span>
+        </div>
+        <span class="cta">Open prototype <span class="arrow">&rarr;</span></span>
+      </div>
+    </a>
+
+  </div>
+
+  <div class="footer-note">
+    Scope: album grid and header only. The lightbox, location albums, and the Diptych special case
+    stay as they are until a direction is chosen.<br>
+    Metadata is limited to what actually exists today — location, dimensions, and print editions.
+    There is no EXIF, no capture date, and no captions in the manifest.
+  </div>
+</div>
+</body>
+</html>
