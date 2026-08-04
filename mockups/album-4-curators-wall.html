@@ -193,49 +193,82 @@
     object-fit: cover;
   }
 
-  /* Caption block: typeset on the rule, not floating on the image */
+  /* Caption: filmstrip essay structure under each frame —
+     mono N / total, larger Newsreader location, small mono meta. */
 
   .cap {
-    margin-top: 14px;
-    padding-top: 11px;
+    margin-top: 16px;
+    padding-top: 12px;
     border-top: 1px solid var(--rule);
-    font-family: 'Space Mono', monospace;
-    font-size: 0.56rem;
-    text-transform: uppercase;
-    letter-spacing: 0.17em;
-    color: var(--muted);
-    transition: border-color var(--dur) var(--ease), color var(--dur) var(--ease);
+    transition: border-color var(--dur) var(--ease);
   }
-  .cap-line {
+
+  .cap-head {
     display: flex;
     align-items: baseline;
+    justify-content: space-between;
     gap: 14px;
+    margin-bottom: 10px;
   }
-  .cap .num { color: var(--fg); }
-  .cap .loc { flex: 1; color: var(--fg); }
-  .cap .dims { color: var(--faint); }
+
+  .cap-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--fg);
+  }
+
+  .cap-edition {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.54rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .cap-edition[data-sold="true"] {
+    color: var(--faint);
+  }
+
+  .cap-loc {
+    font-family: 'Newsreader', Georgia, serif;
+    font-size: clamp(1.25rem, 1.8vw, 1.55rem);
+    font-weight: 300;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: var(--fg);
+  }
+  /* Pair columns are narrower — keep the serif location readable without wrapping hard. */
+  .plate[data-layout="pair"] .cap-loc {
+    font-size: clamp(1.15rem, 1.5vw, 1.35rem);
+  }
 
   .cap-print {
-    margin-top: 7px;
-    display: flex;
-    align-items: baseline;
-    gap: 14px;
-    flex-wrap: wrap;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 2px solid var(--yellow);
+    font-family: 'Space Mono', monospace;
     font-size: 0.54rem;
-    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    line-height: 2;
   }
-  .cap-print .price { color: var(--yellow); }
-  .cap-print .state { color: var(--muted); }
+  .cap-print .price { color: var(--fg); display: block; }
+  .cap-print .avail { color: var(--muted); display: block; }
+  .cap-print[data-sold="true"] { border-top-color: var(--rule); }
+  .cap-print[data-sold="true"] .price { color: var(--faint); }
   .cap-print a {
+    display: inline-block;
+    margin-top: 8px;
     color: var(--fg);
     text-decoration: none;
     border-bottom: 1px solid var(--yellow);
     padding-bottom: 2px;
   }
-  .cap-print[data-sold="true"] .price { color: var(--faint); text-decoration: line-through; }
 
-  /* Hovering a frame lifts its caption rule to yellow */
-  .unit:hover .cap { border-top-color: var(--yellow); color: var(--fg); }
+  .unit:hover .cap { border-top-color: var(--yellow); }
 
   /* ---------- Colophon footer ---------- */
 
@@ -375,9 +408,9 @@ window.addEventListener("resize", setScrollbarWidth);
 
 const SRC = (f) => "../public/photos/Faves/" + encodeURIComponent(f);
 const pad = (n) => String(n).padStart(2, "0");
+const total = PHOTOS.length;
 const money = (v) => new Intl.NumberFormat("en-IE", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(v);
 const ratio = (p) => p.w / p.h;
-const form = (p) => (ratio(p) > 1.9 ? "Panoramic" : p.w > p.h ? "Landscape" : "Portrait");
 
 // Build the printed rhythm: opener, pair, inset, pair — repeating.
 // Landscape frames are preferred for full-bleed openers so nothing is badly cropped.
@@ -444,12 +477,32 @@ plates.forEach((plate, i) => {
 
     const cap = document.createElement("div");
     cap.className = "cap";
-    cap.innerHTML =
-      '<div class="cap-line">' +
-      '<span class="num">' + pad(p.n) + "</span>" +
-      '<span class="loc">' + p.loc + "</span>" +
-      '<span class="dims">' + form(p) + "</span>" +
-      "</div>";
+
+    const head = document.createElement("div");
+    head.className = "cap-head";
+
+    const num = document.createElement("span");
+    num.className = "cap-num";
+    num.textContent = pad(p.n) + " / " + pad(total);
+    head.appendChild(num);
+
+    if (p.ed) {
+      const sold = p.status === "sold_out";
+      const edition = document.createElement("span");
+      edition.className = "cap-edition";
+      edition.dataset.sold = String(sold);
+      edition.textContent = sold
+        ? "Sold out"
+        : "Edition of " + p.ed + " · " + p.sold + " sold";
+      head.appendChild(edition);
+    }
+
+    const loc = document.createElement("div");
+    loc.className = "cap-loc";
+    loc.textContent = p.loc;
+
+    cap.appendChild(head);
+    cap.appendChild(loc);
 
     if (p.ed) {
       const sold = p.status === "sold_out";
@@ -457,9 +510,13 @@ plates.forEach((plate, i) => {
       print.className = "cap-print";
       print.dataset.sold = String(sold);
       print.innerHTML =
-        '<span class="price">' + money(p.price) + "</span>" +
-        '<span class="state">Edition of ' + p.ed + " &middot; " + p.sold + " sold</span>" +
-        (sold ? '<span class="state">Sold out</span>' : '<a href="#">Enquire</a>');
+        '<span class="price">' + (sold ? "Sold out" : money(p.price)) + "</span>";
+      if (!sold) {
+        const cta = document.createElement("a");
+        cta.href = "#";
+        cta.textContent = "Enquire →";
+        print.appendChild(cta);
+      }
       cap.appendChild(print);
     }
 
