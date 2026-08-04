@@ -203,6 +203,22 @@
     transition: border-color var(--dur) var(--ease);
   }
 
+  /* Mobile: caption pushes up from below, same settle as the filmstrip essay. */
+  @media (max-width: 900px) {
+    .cap {
+      opacity: 0;
+      transform: translateY(18px);
+      transition:
+        border-color var(--dur) var(--ease),
+        opacity var(--dur) var(--ease) 0.14s,
+        transform var(--dur) var(--ease) 0.14s;
+    }
+    .plate[data-in="true"] .cap {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   .cap-head {
     display: flex;
     align-items: baseline;
@@ -312,7 +328,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     * { transition-duration: 0.01ms !important; }
-    .plate, .frame img { opacity: 1; transform: none; }
+    .plate, .frame img, .cap { opacity: 1; transform: none; }
   }
 
   @media (max-width: 900px) {
