@@ -134,19 +134,13 @@
   }
 
   .plate-mark {
-    display: flex;
-    align-items: baseline;
-    gap: 18px;
     margin-bottom: 30px;
     font-family: 'Space Mono', monospace;
     font-size: 0.55rem;
     text-transform: uppercase;
     letter-spacing: 0.22em;
-    color: var(--faint);
+    color: var(--yellow);
   }
-  .plate-mark .no { color: var(--yellow); }
-  .plate-mark .where { flex: 1; color: var(--muted); }
-  .plate-mark .form { color: var(--faint); }
 
   /* Layout variants */
 
@@ -164,6 +158,7 @@
   .plate[data-layout="inset"] .unit { width: min(46%, 560px); }
   .plate[data-layout="inset"][data-orient="landscape"] .unit { width: min(82%, 1100px); }
   .plate[data-layout="inset"][data-orient="pano"] .unit { width: 100%; }
+  .plate[data-layout="inset"][data-size="large"] .unit { width: min(68%, 780px); }
   .plate[data-layout="triple"] .row { gap: 16px; }
 
   .frame {
@@ -372,15 +367,15 @@ const RAW = [
   ["000160980007.jpg",1358,2048,"Home",0,0,0,""],
   ["000160980013.jpg",1358,2048,"Home",5,1,180,"available"],
   ["000226830008.jpg",2048,1358,"Home",0,0,0,""],
-  ["DSCF0032.jpg",2048,1638,"Chengdu",0,0,0,""],
-  ["DSCF0578.jpg",1638,2048,"Kyoto",0,0,0,""],
-  ["DSCF0752.jpg",2048,1638,"Kyoto",0,0,0,""],
+  ["DSCF2458.jpg",1365,2048,"Home",0,0,0,""],
   ["DSCF0776.jpg",2048,1365,"Kyoto",0,0,0,""],
   ["DSCF0818.jpg",1366,2048,"Kyoto",0,0,0,""],
+  ["DSCF0578.jpg",1638,2048,"Kyoto",0,0,0,""],
+  ["DSCF0752.jpg",2048,1638,"Kyoto",0,0,0,""],
   ["DSCF1317.jpg",1639,2048,"Osaka",0,0,0,""],
   ["DSCF1364.jpg",1638,2048,"Osaka",0,0,0,""],
   ["DSCF1703.jpg",2048,1638,"Chengdu",0,0,0,""],
-  ["DSCF2458.jpg",1365,2048,"Home",0,0,0,""],
+  ["DSCF0032.jpg",2048,1638,"Chengdu",0,0,0,""],
   ["DSCF3535.jpg",2048,1638,"Amsterdam",5,4,280,"available"],
   ["DSCF4457.jpg",2048,931,"Bordeaux",0,0,0,""],
   ["DSCF4590.jpg",2048,1024,"Bordeaux",0,0,0,""],
@@ -427,15 +422,22 @@ const ratio = (p) => p.w / p.h;
 
 // No auto rhythm. Page order is exactly PHOTOS order.
 // Only explicit groups below change layout; everything else is a smart single.
-const LAYOUT_LABEL = { bleed: "Opener", pair: "Pair", triple: "Triptych", inset: "Single" };
 const FORCED_GROUPS = [
   { layout: "bleed", frames: [1] },
-  { layout: "pair", frames: [2, 3] },
+  { layout: "pair", frames: [3, 4] },
+  { layout: "bleed", frames: [6] },
+  { layout: "inset", frames: [7], size: "large" },
+  { layout: "pair", frames: [8, 9] },
   { layout: "pair", frames: [27, 30] },
   { layout: "pair", frames: [28, 29] },
+  { layout: "bleed", frames: [31] },
   { layout: "pair", frames: [10, 11] },
-  { layout: "pair", frames: [18, 19] },
+  { layout: "bleed", frames: [15] },
+  { layout: "pair", frames: [17, 19] },
+  { layout: "inset", frames: [18], size: "large" },
   { layout: "pair", frames: [22, 23] },
+  { layout: "bleed", frames: [24] },
+  { layout: "pair", frames: [25, 26] },
   { layout: "pair", frames: [37, 35] },
   { layout: "pair", frames: [32, 33] },
   { layout: "bleed", frames: [34] },
@@ -464,7 +466,7 @@ PHOTOS.forEach((photo) => {
     const photos = group.frames.map((n) => byNumber.get(n)).filter(Boolean);
     if (photos.length !== group.frames.length) return;
     photos.forEach((p) => used.add(p.n));
-    plates.push({ layout: group.layout, photos });
+    plates.push({ layout: group.layout, photos, size: group.size });
     return;
   }
 
@@ -495,17 +497,14 @@ plates.forEach((plate, i) => {
   if (plate.layout === "inset" && plate.photos[0]) {
     section.dataset.orient = orientOf(plate.photos[0]);
   }
+  if (plate.size) section.dataset.size = plate.size;
 
   const wrap = document.createElement("div");
   wrap.className = "wrap";
 
   const mark = document.createElement("div");
   mark.className = "plate-mark";
-  const places = Array.from(new Set(plate.photos.map((p) => p.loc))).join(" / ");
-  mark.innerHTML =
-    '<span class="no">Plate ' + pad(i + 1) + "</span>" +
-    '<span class="where">' + places + "</span>" +
-    '<span class="form">' + LAYOUT_LABEL[plate.layout] + "</span>";
+  mark.textContent = "Plate " + pad(i + 1);
   wrap.appendChild(mark);
 
   const row = document.createElement("div");
