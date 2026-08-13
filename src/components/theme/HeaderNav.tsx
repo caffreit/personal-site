@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import ThemeToggle from "./ThemeToggle";
 
 const SITE_NAV_ITEMS = [
@@ -22,6 +22,10 @@ function isActive(pathname: string, href: string) {
 export default function HeaderNav() {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
+  const [headerHeight, setHeaderHeight] = useState(61);
+  const lastScrollY = useRef(0);
+  const headerRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     if (isMenuOpen) {
@@ -34,6 +38,49 @@ export default function HeaderNav() {
     };
   }, [isMenuOpen]);
 
+  useEffect(() => {
+    setIsHidden(false);
+    lastScrollY.current = window.scrollY;
+  }, [pathname]);
+
+  useEffect(() => {
+    const header = headerRef.current;
+    if (!header) return;
+
+    const updateHeight = () => setHeaderHeight(header.offsetHeight);
+    updateHeight();
+
+    const observer = new ResizeObserver(updateHeight);
+    observer.observe(header);
+    return () => observer.disconnect();
+  }, [pathname]);
+
+  useEffect(() => {
+    lastScrollY.current = window.scrollY;
+
+    const onScroll = () => {
+      const currentY = window.scrollY;
+
+      if (isMenuOpen || currentY < 8) {
+        setIsHidden(false);
+        lastScrollY.current = currentY;
+        return;
+      }
+
+      const delta = currentY - lastScrollY.current;
+      if (delta > 6) {
+        setIsHidden(true);
+      } else if (delta < -6) {
+        setIsHidden(false);
+      }
+
+      lastScrollY.current = currentY;
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [isMenuOpen]);
+
   const isBlogPost = pathname.startsWith("/blog/") && pathname !== "/blog";
   const hideNav = isBlogPost || pathname === "/three-stations";
 
@@ -43,7 +90,17 @@ export default function HeaderNav() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 flex w-full items-center justify-between border-b border-[var(--rule-color)] bg-[var(--nav-bg)] px-6 py-3 backdrop-blur-xl transition-[background,border-color] duration-400">
+      <div aria-hidden style={{ height: headerHeight }} />
+      <header
+        ref={headerRef}
+        className={`fixed inset-x-0 top-0 z-50 flex w-full items-center justify-between border-b border-[var(--rule-color)] bg-[var(--nav-bg)] px-6 py-3 backdrop-blur-xl ${
+          isHidden ? "pointer-events-none" : ""
+        }`}
+        style={{
+          transform: isHidden ? "translateY(-100%)" : "translateY(0)",
+          transition: "transform 500ms cubic-bezier(0.22, 1, 0.36, 1)",
+        }}
+      >
         {/* Masthead / Logo */}
         <Link href="/" className="flex items-center">
           <Image
