@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tax Lab — 05 Synthesized</title>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --yellow: #F4CA16;
+    --bg: #FFFFFF;
+    --fg: #0A0A0A;
+    --muted: rgba(0,0,0,0.45);
+    --faint: rgba(0,0,0,0.32);
+    --body: #555;
+    --rule: #d4d0c8;
+    --emerald: #10b981;
+    --amber: #f59e0b;
+    --rose: #f43f5e;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Newsreader', Georgia, serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .note {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--fg);
+    color: #fff;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    padding: 10px 40px;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .note a { color: var(--yellow); text-decoration: none; }
+
+  .page {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 56px 48px 140px;
+  }
+
+  .back {
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--faint);
+    text-decoration: none;
+    margin-bottom: 48px;
+  }
+  .back:hover { color: var(--fg); }
+
+  /* Masthead */
+  .mast {
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 48px;
+  }
+
+  .eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--faint);
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-size: clamp(3rem, 6vw, 5.2rem);
+    font-weight: 300;
+    line-height: 0.94;
+    letter-spacing: -0.02em;
+    margin-bottom: 22px;
+  }
+
+  .dek {
+    font-size: 1.1rem;
+    font-style: italic;
+    font-weight: 300;
+    color: var(--muted);
+    max-width: 640px;
+    line-height: 1.7;
+  }
+
+  /* Item + salary side by side */
+  .item-block {
+    display: grid;
+    grid-template-columns: minmax(220px, 0.9fr) minmax(0, 1.4fr);
+    gap: 40px;
+    align-items: start;
+  }
+
+  .salary-inline {
+    padding-right: 32px;
+    border-right: 1px solid var(--rule);
+  }
+  .salary-inline .k {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--faint);
+  }
+  .salary-inline .v {
+    font-size: 2.4rem;
+    font-weight: 300;
+    letter-spacing: -0.03em;
+    margin: 8px 0 18px;
+  }
+  .salary-inline input[type="range"] {
+    width: 100%;
+    accent-color: var(--fg);
+    margin-bottom: 22px;
+  }
+  .mini {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    padding-top: 18px;
+    border-top: 1px solid var(--rule);
+  }
+  .mini .k {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.55rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--faint);
+    margin-bottom: 6px;
+  }
+  .mini .v { font-size: 1.7rem; font-weight: 400; letter-spacing: -0.02em; }
+
+  .item-copy { min-width: 0; }
+
+  /* Spread + purchase rail — from 02 */
+  .spread {
+    display: grid;
+    grid-template-columns: 136px minmax(0, 1fr);
+    gap: 0;
+  }
+
+  .rail {
+    width: 104px;
+    padding-right: 32px;
+    box-sizing: content-box;
+    border-right: 1px solid var(--rule);
+    align-self: start;
+  }
+
+  .rail-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--faint);
+    margin-bottom: 12px;
+  }
+
+  .rail-item {
+    display: block;
+    width: 104px;
+    background: none;
+    border: none;
+    border-bottom: 1px solid transparent;
+    text-align: left;
+    padding: 10px 0;
+    cursor: pointer;
+    color: var(--muted);
+    font: inherit;
+    transition: color 0.25s, border-color 0.25s;
+  }
+  .rail-item + .rail-item { border-top: 1px solid var(--rule); }
+  .rail-item img {
+    width: 104px;
+    height: 104px;
+    aspect-ratio: 1 / 1;
+    object-fit: contain;
+    object-position: center;
+    display: block;
+    margin-bottom: 8px;
+    opacity: 0.55;
+    transition: opacity 0.25s;
+  }
+  .rail-item .name {
+    display: block;
+    font-size: 0.9rem;
+    line-height: 1.25;
+    color: inherit;
+  }
+  .rail-item.is-on {
+    color: var(--fg);
+    border-bottom-color: var(--yellow);
+  }
+  .rail-item.is-on img { opacity: 1; }
+  .rail-item:hover { color: var(--fg); }
+  .rail-item:hover img { opacity: 0.85; }
+
+  .article {
+    padding-left: 48px;
+    min-width: 0;
+  }
+
+  .cat {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--faint);
+    margin-bottom: 12px;
+  }
+  .section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 8px;
+  }
+  .section-head h3 { margin-bottom: 0; }
+  .share {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--yellow);
+    padding: 0 0 3px;
+    cursor: pointer;
+    color: var(--fg);
+    flex-shrink: 0;
+  }
+
+  h2 {
+    font-size: clamp(2.8rem, 5vw, 4.5rem);
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.025em;
+    margin-bottom: 20px;
+  }
+
+  .desc {
+    font-size: 1.2rem;
+    color: var(--body);
+    line-height: 1.75;
+    max-width: 520px;
+  }
+  .assume {
+    margin-top: 12px;
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.55;
+    max-width: 520px;
+  }
+
+  .section {
+    margin-top: 36px;
+    padding-top: 28px;
+    border-top: 1px solid var(--rule);
+  }
+  .section + .section {
+    border-top: none;
+    margin-top: 40px;
+    padding-top: 0;
+  }
+  .section h3 {
+    font-size: 1.6rem;
+    font-weight: 400;
+    letter-spacing: -0.015em;
+    margin-bottom: 8px;
+  }
+  .section .sub {
+    font-size: 0.98rem;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 28px;
+  }
+
+  /* Hero number + bar — from 02 */
+  .hero-num {
+    display: flex;
+    align-items: last baseline;
+    gap: 24px;
+    margin: 28px 0 32px;
+  }
+  .hero-num .euro {
+    font-size: clamp(3.2rem, 6vw, 5rem);
+    font-weight: 300;
+    letter-spacing: -0.04em;
+    line-height: 0.9;
+  }
+  .hero-num .meta {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--faint);
+    line-height: 1.35;
+  }
+
+  .bar {
+    display: flex;
+    height: 10px;
+    margin-bottom: 14px;
+  }
+  .bar span { display: block; height: 100%; }
+  .bar .a { width: 54.4%; background: var(--emerald); }
+  .bar .b { width: 20.4%; background: var(--amber); }
+  .bar .c { width: 25.2%; background: var(--rose); }
+
+  /* Two overlapping sums under the bar: price = a+b, tax = b+c */
+  .bar-sums {
+    position: relative;
+    height: 3.6rem;
+    margin-bottom: 36px;
+  }
+  .sum {
+    position: absolute;
+    top: 0;
+    padding-top: 8px;
+    border-top: 1px solid var(--rule);
+  }
+  .sum-price {
+    left: 0;
+    width: 74.8%; /* item + purchase tax */
+    border-top-color: color-mix(in srgb, var(--emerald) 55%, var(--amber));
+  }
+  .sum-tax {
+    right: 0;
+    width: 45.6%; /* purchase tax + income tax */
+    text-align: right;
+    border-top-color: color-mix(in srgb, var(--amber) 55%, var(--rose));
+  }
+  .sum .k {
+    display: block;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.55rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    margin-bottom: 4px;
+  }
+  .sum-price .k { color: color-mix(in srgb, var(--emerald) 70%, #000); }
+  .sum-tax .k { color: color-mix(in srgb, var(--rose) 65%, #000); }
+  .sum .v {
+    font-size: 1.05rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    margin-right: 8px;
+  }
+  .sum-tax .v { margin-right: 0; margin-left: 8px; }
+  .sum .eq {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.06em;
+    color: var(--faint);
+  }
+
+  /* Horizontal ledger — 01 dots + 01/03 row style; % demoted */
+  .ledger {
+    border-top: 1px solid var(--rule);
+    display: grid;
+    grid-template-columns: 14px minmax(0, 1fr) 5.5rem 5rem 5rem;
+    column-gap: 14px;
+  }
+  .ledger-head,
+  .ledger-row {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: 1 / -1;
+    align-items: baseline;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .ledger-head {
+    padding-bottom: 10px;
+  }
+  .ledger-head span {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.55rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--faint);
+  }
+  .ledger-head .r,
+  .ledger-row .euro,
+  .ledger-row .pct,
+  .ledger-row .time { text-align: right; }
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    align-self: center;
+  }
+  .dot.a { background: var(--emerald); }
+  .dot.b { background: var(--amber); }
+  .dot.c { background: var(--rose); }
+  .ledger-row .label { font-size: 1.05rem; }
+  .ledger-row .euro {
+    font-size: 1.15rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+  .ledger-row .pct {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    color: rgba(0,0,0,0.32);
+    font-variant-numeric: tabular-nums;
+  }
+  .ledger-row .time {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+
+  /* State equivalents — from 02 */
+  .equivs {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+  }
+  .eq {
+    padding-top: 22px;
+  }
+  .eq + .eq {
+    padding-left: 28px;
+    border-left: 1px solid var(--rule);
+  }
+  .eq .bucket {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.55rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--faint);
+    margin-bottom: 8px;
+  }
+  .eq .label { font-size: 1.1rem; margin-bottom: 14px; }
+  .eq .value {
+    font-size: 1.55rem;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+  }
+
+  details {
+    margin-top: 64px;
+    border-top: 1px solid var(--rule);
+  }
+  summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 28px 0;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary h3 { font-size: 1.4rem; font-weight: 400; }
+  summary p { color: var(--muted); margin-top: 6px; }
+  summary .chev {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--faint);
+    align-self: center;
+  }
+  .detail-body { padding-bottom: 40px; }
+  .detail-body h4 {
+    font-size: 1.15rem;
+    font-weight: 400;
+    margin: 32px 0 12px;
+  }
+  .detail-body .hint {
+    color: var(--muted);
+    margin-bottom: 16px;
+    line-height: 1.55;
+  }
+  .cols2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 40px;
+  }
+  .line {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: 0.95rem;
+  }
+  .line .sm {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+  .disclaimer {
+    margin-top: 36px;
+    padding-top: 24px;
+    border-top: 2px solid var(--yellow);
+  }
+  .disclaimer p { color: var(--body); line-height: 1.7; margin-top: 10px; max-width: 720px; }
+  .grid3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+    margin-top: 20px;
+    font-size: 0.92rem;
+    color: var(--body);
+    line-height: 1.55;
+  }
+  .grid3 strong { color: var(--fg); font-weight: 500; }
+
+  @media (max-width: 960px) {
+    .page { padding: 40px 24px 100px; }
+    .spread { grid-template-columns: 1fr; gap: 32px; }
+    .item-block { grid-template-columns: 1fr; gap: 28px; }
+    .salary-inline {
+      padding-right: 0;
+      border-right: none;
+      padding-bottom: 28px;
+      border-bottom: 1px solid var(--rule);
+    }
+    .rail {
+      width: auto;
+      padding-right: 0;
+      border-right: none;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--rule);
+    }
+    .rail-label { grid-column: 1 / -1; }
+    .rail-item {
+      width: auto;
+      border: none !important;
+      padding: 0;
+    }
+    .rail-item img {
+      width: 100%;
+      height: auto;
+    }
+    .article { padding-left: 0; }
+    .equivs, .cols2, .grid3 { grid-template-columns: 1fr; }
+    .eq + .eq { border-left: none; padding-left: 0; padding-top: 22px; }
+    .ledger {
+      grid-template-columns: 14px minmax(0, 1fr) 5rem 5rem;
+    }
+    .ledger-head .pct-h,
+    .ledger-row .pct { display: none; }
+    .bar-sums {
+      position: static;
+      height: auto;
+      display: grid;
+      gap: 14px;
+    }
+    .sum {
+      position: static;
+      width: auto !important;
+      text-align: left;
+    }
+    .sum-tax .v { margin-left: 0; margin-right: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="note">
+  <span>05 — Synthesized · Frozen: €60,000 · Pint in a pub</span>
+  <a href="tax-redesign-index.html">← All directions</a>
+</div>
+
+<div class="page">
+  <a class="back" href="#">← Back to Labs</a>
+
+  <header class="mast">
+    <p class="eyebrow">Irish Tax Lens - 2026 assumptions</p>
+    <h1>What Did That Really Cost?</h1>
+    <p class="dek">See how much working time goes to the thing itself, the tax charged when you buy it, and the income taxes paid before your wages became spending money.</p>
+  </header>
+
+  <div class="spread">
+    <nav class="rail" aria-label="Purchases">
+      <p class="rail-label">Purchases</p>
+      <button class="rail-item" type="button">
+        <img src="../public/labs/irish-purchase-tax-time-2026/roll.png" alt="">
+        <span class="name">Chicken fillet roll</span>
+      </button>
+      <button class="rail-item is-on" type="button">
+        <img src="../public/labs/irish-purchase-tax-time-2026/pint.png" alt="">
+        <span class="name">Pint in a pub</span>
+      </button>
+      <button class="rail-item" type="button">
+        <img src="../public/labs/irish-purchase-tax-time-2026/petrol.png" alt="">
+        <span class="name">Tank of petrol</span>
+      </button>
+      <button class="rail-item" type="button">
+        <img src="../public/labs/irish-purchase-tax-time-2026/camera.png" alt="">
+        <span class="name">Mirrorless camera</span>
+      </button>
+      <button class="rail-item" type="button">
+        <img src="../public/labs/irish-purchase-tax-time-2026/car.png" alt="">
+        <span class="name">New family car</span>
+      </button>
+      <button class="rail-item" type="button">
+        <img src="../public/labs/irish-purchase-tax-time-2026/house.png" alt="">
+        <span class="name">Home purchase</span>
+      </button>
+    </nav>
+
+    <article class="article">
+      <div class="item-block">
+        <aside class="salary-inline">
+          <div class="k">Gross salary</div>
+          <div class="v">€60,000</div>
+          <input type="range" min="20000" max="250000" step="1000" value="60000" aria-label="Gross salary">
+          <div class="mini">
+            <div>
+              <div class="k">Taxed fraction</div>
+              <div class="v">25%</div>
+            </div>
+            <div>
+              <div class="k">Gross hourly</div>
+              <div class="v">€30.77</div>
+            </div>
+          </div>
+        </aside>
+        <div class="item-copy">
+          <p class="cat">Hospitality</p>
+          <h2>Pint in a pub</h2>
+          <p class="desc">A small purchase with a surprisingly tax-heavy tail.</p>
+          <p class="assume">* Assumes on-premise alcohol at 23% VAT plus a simplified excise estimate.</p>
+        </div>
+      </div>
+
+      <section class="section">
+        <div class="section-head">
+          <h3>Where your earnings go</h3>
+          <button class="share" type="button">Share result</button>
+        </div>
+        <div class="hero-num">
+          <span class="euro">€8.69</span>
+          <span class="meta">Total earnings<br>17 min of work</span>
+        </div>
+
+        <div class="bar" aria-hidden="true">
+          <span class="a"></span><span class="b"></span><span class="c"></span>
+        </div>
+        <div class="bar-sums">
+          <div class="sum sum-price">
+            <span class="k">Purchase price</span>
+            <span class="v">€6.50</span>
+            <span class="eq">Item + purchase tax</span>
+          </div>
+          <div class="sum sum-tax">
+            <span class="k">Total tax</span>
+            <span class="v">€3.96</span>
+            <span class="eq">Purchase tax + income tax</span>
+          </div>
+        </div>
+
+        <div class="ledger" role="table" aria-label="Earnings breakdown">
+          <div class="ledger-head" role="row">
+            <span aria-hidden="true"></span>
+            <span>Segment</span>
+            <span class="r">Cost</span>
+            <span class="r pct-h">Share</span>
+            <span class="r">Time</span>
+          </div>
+          <div class="ledger-row" role="row">
+            <span class="dot a" aria-hidden="true"></span>
+            <span class="label">Item</span>
+            <span class="euro">€4.73</span>
+            <span class="pct">54.4%</span>
+            <span class="time">9 min</span>
+          </div>
+          <div class="ledger-row" role="row">
+            <span class="dot b" aria-hidden="true"></span>
+            <span class="label">Purchase tax</span>
+            <span class="euro">€1.77</span>
+            <span class="pct">20.4%</span>
+            <span class="time">3 min</span>
+          </div>
+          <div class="ledger-row" role="row">
+            <span class="dot c" aria-hidden="true"></span>
+            <span class="label">Income tax</span>
+            <span class="euro">€2.19</span>
+            <span class="pct">25.2%</span>
+            <span class="time">4 min</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h3>What could the state buy with this tax?</h3>
+        <p class="sub">Very rough scale comparisons, not earmarked spending.</p>
+        <div class="equivs">
+          <div class="eq">
+            <p class="bucket">Public service</p>
+            <p class="label">Nurse time</p>
+            <p class="value">4.3 minutes</p>
+          </div>
+          <div class="eq">
+            <p class="bucket">Welfare</p>
+            <p class="label">Jobseeker payment</p>
+            <p class="value">0.1 days of Jobseeker payment</p>
+          </div>
+          <div class="eq">
+            <p class="bucket">Mega project</p>
+            <p class="label">Children's hospital</p>
+            <p class="value">0.00000018% of Children's hospital</p>
+          </div>
+        </div>
+      </section>
+
+      <details>
+        <summary>
+          <div>
+            <h3>Additional detail</h3>
+            <p>Show the tax line items and model assumptions.</p>
+          </div>
+          <span class="chev">Expand</span>
+        </summary>
+        <div class="detail-body">
+          <h4>State-equivalent assumptions</h4>
+          <p class="hint">These are order-of-magnitude comparisons used for the state-scale cards.</p>
+          <div class="cols2">
+            <div class="line"><span>Nurse time <span class="sm">Public service · Using a rough EUR55/hour fully-loaded cost.</span></span><span>€0.92 / minute</span></div>
+            <div class="line"><span>Teacher time <span class="sm">Public service · Using a rough EUR50/hour fully-loaded cost.</span></span><span>€0.83 / minute</span></div>
+            <div class="line"><span>GP subsidy equivalent <span class="sm">Public service · Treats a subsidised GP visit as roughly EUR60.</span></span><span>€60 / visit</span></div>
+            <div class="line"><span>State Pension <span class="sm">Welfare · Based on the 2026 weekly contributory rate.</span></span><span>€42.76 / day</span></div>
+            <div class="line"><span>Jobseeker payment <span class="sm">Welfare · Based on the 2026 weekly adult rate.</span></span><span>€36.29 / day</span></div>
+            <div class="line"><span>City bus route <span class="sm">Transport · Uses a broad EUR125/hour operating-cost placeholder.</span></span><span>€2.08 / minute</span></div>
+            <div class="line"><span>Urban cycle lane <span class="sm">Transport · Based on a rough EUR2m/km urban scheme.</span></span><span>€2,000 / metre</span></div>
+            <div class="line"><span>Luas-style track <span class="sm">Transport · Uses a round EUR100m/km light-rail estimate.</span></span><span>€100,000 / metre</span></div>
+            <div class="line"><span>M50-style works <span class="sm">Transport · Uses a rough EUR30m/km motorway-works estimate.</span></span><span>€30,000 / metre</span></div>
+            <div class="line"><span>Traffic light crossing <span class="sm">Civic oddity · Compared with a rough EUR125k signalised crossing.</span></span><span>€125,000 / project</span></div>
+            <div class="line"><span>White road paint <span class="sm">Civic oddity · Very rough EUR3/metre line-paint placeholder.</span></span><span>€3 / metre</span></div>
+            <div class="line"><span>Children's hospital <span class="sm">Mega project · Compared with the roughly EUR2.24bn approved budget.</span></span><span>€2,240,000,000 / project</span></div>
+          </div>
+
+          <div class="cols2" style="margin-top:8px">
+            <div>
+              <h4>Purchase tax detail</h4>
+              <div class="line"><span>Item before these direct taxes</span><span>€4.73</span></div>
+              <div class="line"><span>VAT at 23% <span class="sm">Estimated VAT included in the displayed purchase price.</span></span><span>€1.22</span></div>
+              <div class="line"><span>Alcohol excise <span class="sm">Illustrative duty estimate for one pint.</span></span><span>€0.55</span></div>
+            </div>
+            <div>
+              <h4>Income tax detail</h4>
+              <div class="line"><span>Income tax <span class="sm">PAYE income tax allocated across the gross earnings needed for this purchase.</span></span><span>€1.62</span></div>
+              <div class="line"><span>USC <span class="sm">USC allocated across the gross earnings needed for this purchase.</span></span><span>€0.19</span></div>
+              <div class="line"><span>PRSI <span class="sm">Employee PRSI allocated across the gross earnings needed for this purchase.</span></span><span>€0.38</span></div>
+            </div>
+          </div>
+
+          <div class="disclaimer">
+            <h4>What this model leaves out</h4>
+            <p>These are illustrative direct taxes only. The model does not estimate supplier VAT, corporate tax, employer PRSI, import duties, local charges, discounts, deductions, pension contributions, or product-specific reliefs. It is meant to make the time trade-off legible, not to produce a tax bill.</p>
+            <div class="grid3">
+              <p><strong>Income:</strong> single PAYE employee, 2026 illustrative PAYE, USC, and employee PRSI.</p>
+              <p><strong>Time:</strong> 37.5 paid hours per week for 52 weeks, before holidays or unpaid time.</p>
+              <p><strong>Purchases:</strong> direct transaction taxes are simplified and displayed beside each item.</p>
+            </div>
+          </div>
+        </div>
+      </details>
+    </article>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.rail-item').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.rail-item').forEach((b) => b.classList.remove('is-on'));
+      btn.classList.add('is-on');
+    });
+  });
+</script>
+</body>
+</html>
