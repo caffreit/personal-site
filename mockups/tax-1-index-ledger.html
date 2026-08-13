@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tax Lab — 01 Index Ledger</title>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --yellow: #F4CA16;
+    --bg: #FFFFFF;
+    --fg: #0A0A0A;
+    --muted: rgba(0,0,0,0.45);
+    --faint: rgba(0,0,0,0.32);
+    --body: #555;
+    --rule: #d4d0c8;
+    --emerald: #10b981;
+    --amber: #f59e0b;
+    --rose: #f43f5e;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Newsreader', Georgia, serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .note {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--fg);
+    color: #fff;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    padding: 10px 40px;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .note a { color: var(--yellow); text-decoration: none; }
+
+  .wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 48px 40px 120px;
+  }
+
+  .back {
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--faint);
+    text-decoration: none;
+    margin-bottom: 40px;
+  }
+  .back:hover { color: var(--fg); }
+
+  .eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--faint);
+    margin-bottom: 14px;
+  }
+
+  h1 {
+    font-size: clamp(2.8rem, 6vw, 4.8rem);
+    font-weight: 300;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    margin-bottom: 18px;
+  }
+
+  .dek {
+    font-size: 1.05rem;
+    font-style: italic;
+    font-weight: 300;
+    color: var(--muted);
+    max-width: 620px;
+    line-height: 1.65;
+    margin-bottom: 40px;
+  }
+
+  /* Salary meta strip */
+  .salary {
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    padding: 18px 0;
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: 24px;
+    align-items: end;
+    margin-bottom: 48px;
+  }
+  .salary .k {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--faint);
+    margin-bottom: 6px;
+  }
+  .salary .v {
+    font-size: 1.5rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+  .salary input[type="range"] {
+    width: 100%;
+    margin-top: 10px;
+    accent-color: var(--fg);
+    cursor: pointer;
+  }
+
+  /* Purchase index */
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--faint);
+    margin-bottom: 4px;
+  }
+
+  .purchases { border-top: 1px solid var(--rule); margin-bottom: 56px; }
+
+  .purchase {
+    display: grid;
+    grid-template-columns: 48px 1fr auto auto;
+    gap: 16px;
+    align-items: center;
+    width: 100%;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--rule);
+    background: none;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    text-align: left;
+    cursor: pointer;
+    color: inherit;
+    font: inherit;
+    transition: border-color 0.25s;
+  }
+  .purchase img {
+    width: 48px;
+    height: 40px;
+    object-fit: cover;
+    display: block;
+  }
+  .purchase .name { font-size: 1.05rem; font-weight: 500; }
+  .purchase .meta,
+  .purchase .price,
+  .purchase .idx {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--faint);
+  }
+  .purchase.is-on {
+    border-bottom-color: var(--yellow);
+    border-bottom-width: 2px;
+  }
+  .purchase.is-on .name { color: var(--fg); }
+  .purchase:hover .name { color: var(--fg); }
+
+  /* Article */
+  .article-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+  .cat {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--faint);
+  }
+  .share {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--yellow);
+    padding: 0 0 3px;
+    cursor: pointer;
+    color: var(--fg);
+  }
+
+  h2 {
+    font-size: clamp(2.2rem, 4vw, 3.4rem);
+    font-weight: 500;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 14px;
+  }
+
+  .desc {
+    font-size: 1.1rem;
+    color: var(--body);
+    line-height: 1.7;
+    max-width: 640px;
+  }
+  .assume {
+    margin-top: 10px;
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.55;
+    max-width: 640px;
+  }
+
+  .block {
+    margin-top: 48px;
+    border-top: 1px solid var(--rule);
+    padding-top: 28px;
+  }
+
+  .block-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 22px;
+  }
+  .block h3 {
+    font-size: 1.45rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .total .k {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--faint);
+    text-align: right;
+  }
+  .total .row {
+    display: flex;
+    gap: 20px;
+    align-items: baseline;
+    margin-top: 4px;
+  }
+  .total .euro { font-size: 2rem; font-weight: 500; letter-spacing: -0.02em; }
+  .total .time { font-family: 'Space Mono', monospace; font-size: 0.7rem; letter-spacing: 0.1em; color: var(--muted); }
+
+  /* Bar */
+  .bar {
+    display: flex;
+    height: 14px;
+    border: 1px solid var(--rule);
+    margin-bottom: 8px;
+  }
+  .bar span { display: block; height: 100%; }
+  .bar .a { width: 54.4%; background: var(--emerald); }
+  .bar .b { width: 20.4%; background: var(--amber); }
+  .bar .c { width: 25.2%; background: var(--rose); }
+  .bar-labels {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.55rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--faint);
+    margin-bottom: 28px;
+  }
+
+  /* Ledger rows */
+  .ledger { border-top: 1px solid var(--rule); }
+  .ledger-row {
+    display: grid;
+    grid-template-columns: 14px 1fr auto auto;
+    gap: 14px;
+    align-items: baseline;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; align-self: center; }
+  .dot.a { background: var(--emerald); }
+  .dot.b { background: var(--amber); }
+  .dot.c { background: var(--rose); }
+  .ledger-row .label { font-size: 1.05rem; }
+  .ledger-row .euro { font-size: 1.15rem; font-weight: 500; font-variant-numeric: tabular-nums; }
+  .ledger-row .time {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+    color: var(--faint);
+    min-width: 4.5rem;
+    text-align: right;
+  }
+
+  .sub {
+    margin-top: 8px;
+    font-size: 0.95rem;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+
+  .equiv .ledger-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .equiv .bucket {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.55rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--faint);
+  }
+  .equiv .value {
+    font-size: 1.35rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  details {
+    margin-top: 48px;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 22px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary h3 { font-size: 1.25rem; font-weight: 500; }
+  summary p { font-size: 0.95rem; color: var(--muted); margin-top: 4px; }
+  summary .chev {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.14em;
+    color: var(--faint);
+    text-transform: uppercase;
+  }
+  .detail-body { padding-bottom: 28px; }
+  .detail-body h4 {
+    font-size: 1.05rem;
+    font-weight: 500;
+    margin: 28px 0 10px;
+  }
+  .detail-body .hint {
+    font-size: 0.9rem;
+    color: var(--muted);
+    margin-bottom: 14px;
+    line-height: 1.55;
+  }
+  .line {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: 0.95rem;
+  }
+  .line .note-sm {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+  .assumptions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 32px;
+  }
+  .assumptions .line { flex-direction: column; align-items: flex-start; }
+  .disclaimer {
+    margin-top: 28px;
+    padding-top: 22px;
+    border-top: 2px solid var(--yellow);
+  }
+  .disclaimer h4 { margin-top: 0; }
+  .disclaimer p { color: var(--body); line-height: 1.7; margin-top: 10px; }
+  .disclaimer .grid3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin-top: 18px;
+    font-size: 0.9rem;
+    color: var(--body);
+    line-height: 1.55;
+  }
+  .disclaimer strong { color: var(--fg); font-weight: 500; }
+
+  @media (max-width: 800px) {
+    .wrap { padding: 36px 20px 80px; }
+    .salary { grid-template-columns: 1fr; gap: 18px; }
+    .purchase { grid-template-columns: 40px 1fr auto; }
+    .purchase .idx { display: none; }
+    .assumptions, .disclaimer .grid3 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="note">
+  <span>01 — Index Ledger · Frozen: €60,000 · Pint in a pub</span>
+  <a href="tax-redesign-index.html">← All directions</a>
+</div>
+
+<div class="wrap">
+  <a class="back" href="#">← Back to Labs</a>
+
+  <p class="eyebrow">Irish Tax Lens - 2026 assumptions</p>
+  <h1>What Did That Really Cost?</h1>
+  <p class="dek">See how much working time goes to the thing itself, the tax charged when you buy it, and the income taxes paid before your wages became spending money.</p>
+
+  <div class="salary">
+    <div>
+      <div class="k">Gross salary</div>
+      <div class="v">€60,000</div>
+      <input type="range" min="20000" max="250000" step="1000" value="60000" aria-label="Gross salary">
+    </div>
+    <div>
+      <div class="k">Take-home ratio</div>
+      <div class="v">75%</div>
+    </div>
+    <div>
+      <div class="k">Gross hourly</div>
+      <div class="v">€30.77</div>
+    </div>
+  </div>
+
+  <p class="section-label">Purchases · 02 / 06</p>
+  <div class="purchases" role="list">
+    <button class="purchase" type="button">
+      <img src="../public/labs/irish-purchase-tax-time-2026/roll.png" alt="">
+      <span class="name">Chicken fillet roll</span>
+      <span class="meta">Lunch</span>
+      <span class="price">€6.00</span>
+    </button>
+    <button class="purchase is-on" type="button">
+      <img src="../public/labs/irish-purchase-tax-time-2026/pint.png" alt="">
+      <span class="name">Pint in a pub</span>
+      <span class="meta">Hospitality</span>
+      <span class="price">€6.50</span>
+    </button>
+    <button class="purchase" type="button">
+      <img src="../public/labs/irish-purchase-tax-time-2026/petrol.png" alt="">
+      <span class="name">Tank of petrol</span>
+      <span class="meta">Transport</span>
+      <span class="price">€108</span>
+    </button>
+    <button class="purchase" type="button">
+      <img src="../public/labs/irish-purchase-tax-time-2026/camera.png" alt="">
+      <span class="name">Mirrorless camera</span>
+      <span class="meta">Gear</span>
+      <span class="price">€1,600</span>
+    </button>
+    <button class="purchase" type="button">
+      <img src="../public/labs/irish-purchase-tax-time-2026/car.png" alt="">
+      <span class="name">New family car</span>
+      <span class="meta">Motoring</span>
+      <span class="price">€38,000</span>
+    </button>
+    <button class="purchase" type="button">
+      <img src="../public/labs/irish-purchase-tax-time-2026/house.png" alt="">
+      <span class="name">Home purchase</span>
+      <span class="meta">Housing</span>
+      <span class="price">€424,200</span>
+    </button>
+  </div>
+
+  <div class="article-head">
+    <p class="cat">Hospitality</p>
+    <button class="share" type="button">Share result</button>
+  </div>
+  <h2>Pint in a pub</h2>
+  <p class="desc">A small purchase with a surprisingly tax-heavy tail.</p>
+  <p class="assume">* Assumes on-premise alcohol at 23% VAT plus a simplified excise estimate.</p>
+
+  <section class="block">
+    <div class="block-head">
+      <h3>Where your earnings go</h3>
+      <div class="total">
+        <div class="k">Total earnings</div>
+        <div class="row">
+          <span class="euro">€8.69</span>
+          <span class="time">17 min</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="bar" aria-hidden="true">
+      <span class="a"></span><span class="b"></span><span class="c"></span>
+    </div>
+    <div class="bar-labels">
+      <span>Item €4.73</span>
+      <span>Total tax €3.96</span>
+    </div>
+
+    <div class="ledger">
+      <div class="ledger-row">
+        <span class="dot a"></span>
+        <span class="label">Item</span>
+        <span class="euro">€4.73</span>
+        <span class="time">9 min</span>
+      </div>
+      <div class="ledger-row">
+        <span class="dot b"></span>
+        <span class="label">Purchase tax</span>
+        <span class="euro">€1.77</span>
+        <span class="time">3 min</span>
+      </div>
+      <div class="ledger-row">
+        <span class="dot c"></span>
+        <span class="label">Income tax</span>
+        <span class="euro">€2.19</span>
+        <span class="time">4 min</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="block equiv">
+    <h3>What could the state buy with this tax?</h3>
+    <p class="sub">Very rough scale comparisons, not earmarked spending.</p>
+    <div class="ledger" style="margin-top:22px">
+      <div class="ledger-row">
+        <span class="bucket">Public service</span>
+        <span class="label">Nurse time</span>
+        <span class="value">4.3 minutes</span>
+      </div>
+      <div class="ledger-row">
+        <span class="bucket">Welfare</span>
+        <span class="label">Jobseeker payment</span>
+        <span class="value">0.1 days of Jobseeker payment</span>
+      </div>
+      <div class="ledger-row">
+        <span class="bucket">Mega project</span>
+        <span class="label">Children's hospital</span>
+        <span class="value">0.00000018% of Children's hospital</span>
+      </div>
+    </div>
+  </section>
+
+  <details>
+    <summary>
+      <div>
+        <h3>Additional detail</h3>
+        <p>Show the tax line items and model assumptions.</p>
+      </div>
+      <span class="chev">Expand</span>
+    </summary>
+    <div class="detail-body">
+      <h4>State-equivalent assumptions</h4>
+      <p class="hint">These are order-of-magnitude comparisons used for the state-scale cards.</p>
+      <div class="assumptions">
+        <div class="line"><span>Nurse time <span class="note-sm">Public service · Using a rough EUR55/hour fully-loaded cost.</span></span><span>€0.92 / minute</span></div>
+        <div class="line"><span>Teacher time <span class="note-sm">Public service · Using a rough EUR50/hour fully-loaded cost.</span></span><span>€0.83 / minute</span></div>
+        <div class="line"><span>GP subsidy equivalent <span class="note-sm">Public service · Treats a subsidised GP visit as roughly EUR60.</span></span><span>€60 / visit</span></div>
+        <div class="line"><span>State Pension <span class="note-sm">Welfare · Based on the 2026 weekly contributory rate.</span></span><span>€42.76 / day</span></div>
+        <div class="line"><span>Jobseeker payment <span class="note-sm">Welfare · Based on the 2026 weekly adult rate.</span></span><span>€36.29 / day</span></div>
+        <div class="line"><span>City bus route <span class="note-sm">Transport · Uses a broad EUR125/hour operating-cost placeholder.</span></span><span>€2.08 / minute</span></div>
+        <div class="line"><span>Urban cycle lane <span class="note-sm">Transport · Based on a rough EUR2m/km urban scheme.</span></span><span>€2,000 / metre</span></div>
+        <div class="line"><span>Luas-style track <span class="note-sm">Transport · Uses a round EUR100m/km light-rail estimate.</span></span><span>€100,000 / metre</span></div>
+        <div class="line"><span>M50-style works <span class="note-sm">Transport · Uses a rough EUR30m/km motorway-works estimate.</span></span><span>€30,000 / metre</span></div>
+        <div class="line"><span>Traffic light crossing <span class="note-sm">Civic oddity · Compared with a rough EUR125k signalised crossing.</span></span><span>€125,000 / project</span></div>
+        <div class="line"><span>White road paint <span class="note-sm">Civic oddity · Very rough EUR3/metre line-paint placeholder.</span></span><span>€3 / metre</span></div>
+        <div class="line"><span>Children's hospital <span class="note-sm">Mega project · Compared with the roughly EUR2.24bn approved budget.</span></span><span>€2,240,000,000 / project</span></div>
+      </div>
+
+      <h4>Purchase tax detail</h4>
+      <div class="line"><span>Item before these direct taxes</span><span>€4.73</span></div>
+      <div class="line"><span>VAT at 23% <span class="note-sm">Estimated VAT included in the displayed purchase price.</span></span><span>€1.22</span></div>
+      <div class="line"><span>Alcohol excise <span class="note-sm">Illustrative duty estimate for one pint.</span></span><span>€0.55</span></div>
+
+      <h4>Income tax detail</h4>
+      <div class="line"><span>Income tax <span class="note-sm">PAYE income tax allocated across the gross earnings needed for this purchase.</span></span><span>€1.62</span></div>
+      <div class="line"><span>USC <span class="note-sm">USC allocated across the gross earnings needed for this purchase.</span></span><span>€0.19</span></div>
+      <div class="line"><span>PRSI <span class="note-sm">Employee PRSI allocated across the gross earnings needed for this purchase.</span></span><span>€0.38</span></div>
+
+      <div class="disclaimer">
+        <h4>What this model leaves out</h4>
+        <p>These are illustrative direct taxes only. The model does not estimate supplier VAT, corporate tax, employer PRSI, import duties, local charges, discounts, deductions, pension contributions, or product-specific reliefs. It is meant to make the time trade-off legible, not to produce a tax bill.</p>
+        <div class="grid3">
+          <p><strong>Income:</strong> single PAYE employee, 2026 illustrative PAYE, USC, and employee PRSI.</p>
+          <p><strong>Time:</strong> 37.5 paid hours per week for 52 weeks, before holidays or unpaid time.</p>
+          <p><strong>Purchases:</strong> direct transaction taxes are simplified and displayed beside each item.</p>
+        </div>
+      </div>
+    </div>
+  </details>
+</div>
+
+<script>
+  document.querySelectorAll('.purchase').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.purchase').forEach((b) => b.classList.remove('is-on'));
+      btn.classList.add('is-on');
+    });
+  });
+</script>
+</body>
+</html>

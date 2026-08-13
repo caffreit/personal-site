@@ -2,9 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { motion, useReducedMotion } from "framer-motion";
-import { ArrowLeft, ChevronDown, Info, Share2 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Info } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 
 type TaxRules = {
   srcop: number;
@@ -342,17 +341,19 @@ function formatApproxNumber(value: number, maximumFractionDigits = 1) {
   });
 }
 
-function formatEquivalentTime(minutes: number) {
+function formatEquivalentTime(minutes: number, label?: string) {
+  const ofLabel = label ? ` of ${label.toLowerCase()}` : "";
+
   if (minutes < 1) {
-    return "less than 1 minute";
+    return `less than 1 minute${ofLabel}`;
   }
 
   if (minutes < 60) {
-    return `${formatApproxNumber(minutes, minutes < 10 ? 1 : 0)} minutes`;
+    return `${formatApproxNumber(minutes, minutes < 10 ? 1 : 0)} minutes${ofLabel}`;
   }
 
   const hours = minutes / 60;
-  return `${formatApproxNumber(hours, hours < 10 ? 1 : 0)} hours`;
+  return `${formatApproxNumber(hours, hours < 10 ? 1 : 0)} hours${ofLabel}`;
 }
 
 function formatEquivalentDays(days: number, label: string) {
@@ -398,7 +399,7 @@ function getEquivalentValue(equivalent: StateEquivalent, totalTax: number) {
   const units = totalTax / equivalent.unitCost;
 
   if (equivalent.kind === "time") {
-    return formatEquivalentTime(units);
+    return formatEquivalentTime(units, equivalent.label);
   }
 
   if (equivalent.kind === "days") {
@@ -627,43 +628,32 @@ function drawWrappedText(
   });
 }
 
-function buildCurlyBrace(x0: number, x1: number, spineY: number, depth: number) {
-  const xc = (x0 + x1) / 2;
-  const shoulder = depth * 0.6;
-
-  return (
-    `M ${x0} ${spineY} ` +
-    `Q ${x0} ${spineY + shoulder} ${(x0 + xc) / 2} ${spineY + shoulder} ` +
-    `T ${xc} ${spineY + depth} ` +
-    `M ${x1} ${spineY} ` +
-    `Q ${x1} ${spineY + shoulder} ${(x1 + xc) / 2} ${spineY + shoulder} ` +
-    `T ${xc} ${spineY + depth}`
-  );
-}
-
-function drawCurlyBrace(
+function drawTickBracket(
   context: CanvasRenderingContext2D,
-  x0: number,
-  x1: number,
-  spineY: number,
-  depth: number,
-  color: string,
+  x: number,
+  y: number,
+  width: number,
+  side: "above" | "below",
 ) {
-  const xc = (x0 + x1) / 2;
-  const shoulder = depth * 0.6;
+  const tick = 8;
+  const line = "rgba(10, 10, 10, 0.4)";
+  const mark = "rgba(10, 10, 10, 0.45)";
 
+  context.strokeStyle = line;
+  context.lineWidth = 1;
   context.beginPath();
-  context.moveTo(x0, spineY);
-  context.quadraticCurveTo(x0, spineY + shoulder, (x0 + xc) / 2, spineY + shoulder);
-  context.quadraticCurveTo(xc, spineY + shoulder, xc, spineY + depth);
-  context.moveTo(x1, spineY);
-  context.quadraticCurveTo(x1, spineY + shoulder, (x1 + xc) / 2, spineY + shoulder);
-  context.quadraticCurveTo(xc, spineY + shoulder, xc, spineY + depth);
-  context.strokeStyle = color;
-  context.lineWidth = 3;
-  context.lineCap = "round";
-  context.lineJoin = "round";
+  context.moveTo(x, y);
+  context.lineTo(x + width, y);
   context.stroke();
+
+  context.fillStyle = mark;
+  if (side === "above") {
+    context.fillRect(x, y - tick, 1, tick);
+    context.fillRect(x + width - 1, y - tick, 1, tick);
+  } else {
+    context.fillRect(x, y, 1, tick);
+    context.fillRect(x + width - 1, y, 1, tick);
+  }
 }
 
 function downloadBlob(blob: Blob, filename: string) {
@@ -683,11 +673,7 @@ type EarningsBarProps = {
   currencyDigits: number;
   itemPriceShare: number;
   taxStartShare: number;
-  showItemLabel: boolean;
-  showTaxLabel: boolean;
 };
-
-const BAR_VIEW_HEIGHT = 154;
 
 function EarningsBar({
   segments,
@@ -697,138 +683,65 @@ function EarningsBar({
   currencyDigits,
   itemPriceShare,
   taxStartShare,
-  showItemLabel,
-  showTaxLabel,
 }: EarningsBarProps) {
-  const reduceMotion = useReducedMotion();
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [width, setWidth] = useState(0);
-
-  useEffect(() => {
-    const element = containerRef.current;
-    if (!element) {
-      return;
-    }
-
-    setWidth(element.clientWidth);
-
-    const observer = new ResizeObserver((entries) => {
-      const measured = entries[0]?.contentRect.width;
-      if (typeof measured === "number") {
-        setWidth(measured);
-      }
-    });
-
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, []);
-
-  const barY = 56;
-  const barHeight = 40;
-  const gap = 3;
-  const radius = 9;
-  const topSpineY = 42;
-  const bottomSpineY = 108;
-  const braceDepth = 10;
-  const topLabelY = 24;
-  const bottomLabelY = 132;
-
-  const toPx = (share: number) => (Math.max(0, Math.min(100, share)) / 100) * width;
-
-  const segmentRects = segments.map((segment, index) => {
-    const segmentWidth = (segment.value / grossRequired) * width;
-    const offset = segments
-      .slice(0, index)
-      .reduce((sum, previous) => sum + (previous.value / grossRequired) * width, 0);
-    return { segment, x: offset, width: segmentWidth };
-  });
-
-  const itemBraceX1 = toPx(itemPriceShare);
-  const taxBraceX0 = toPx(taxStartShare);
-  const taxBraceX1 = width;
-  const itemLabelCenter = itemBraceX1 / 2;
-  const taxLabelCenter = (taxBraceX0 + taxBraceX1) / 2;
-
-  const transition = reduceMotion
-    ? { duration: 0 }
-    : { type: "spring" as const, stiffness: 140, damping: 22, mass: 0.9 };
+  const priceWidth = Math.max(0, Math.min(100, itemPriceShare));
+  const taxWidth = Math.max(0, Math.min(100, 100 - taxStartShare));
 
   return (
-    <div ref={containerRef} className="w-full">
-      <svg
-        width="100%"
-        height={BAR_VIEW_HEIGHT}
-        viewBox={`0 0 ${Math.max(1, width)} ${BAR_VIEW_HEIGHT}`}
-        className="overflow-visible"
-        role="img"
-        aria-label={`Earnings breakdown: item price ${formatCurrency(itemPrice, currencyDigits)} and total tax ${formatCurrency(totalTax, currencyDigits)} out of ${formatCurrency(grossRequired, getCurrencyFractionDigits(grossRequired))} gross earnings.`}
-      >
-        {width > 0 ? (
-          <>
-            <motion.path
-              initial={false}
-              animate={{ d: buildCurlyBrace(0, itemBraceX1, topSpineY, -braceDepth) }}
-              transition={transition}
-              fill="none"
-              stroke="#b45309"
-              strokeWidth={2}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <motion.g
-              initial={false}
-              animate={{ x: itemLabelCenter, opacity: showItemLabel ? 1 : 0 }}
-              transition={transition}
-            >
-              <text textAnchor="middle" y={topLabelY} fontSize={14} fill="#b45309" letterSpacing={0.2}>
-                <tspan fontWeight={600}>Item price</tspan>
-                <tspan fontWeight={800} dx={7}>
-                  {formatCurrency(itemPrice, currencyDigits)}
-                </tspan>
-              </text>
-            </motion.g>
+    <div
+      className="mb-9"
+      role="img"
+      aria-label={`Earnings breakdown: purchase price ${formatCurrency(itemPrice, currencyDigits)} and total tax ${formatCurrency(totalTax, currencyDigits)} out of ${formatCurrency(grossRequired, getCurrencyFractionDigits(grossRequired))} gross earnings.`}
+    >
+      <div className="relative mb-1.5 h-12">
+        <div
+          className="absolute top-0 left-0 box-border h-full border-b border-[color:var(--foreground)]/40"
+          style={{ width: `${priceWidth}%` }}
+        >
+          <span className="absolute bottom-[-1px] left-0 h-2 w-px bg-[color:var(--foreground)]/45" aria-hidden="true" />
+          <span className="absolute right-0 bottom-[-1px] h-2 w-px bg-[color:var(--foreground)]/45" aria-hidden="true" />
+          <div className="absolute inset-x-0 top-0 flex items-baseline gap-3">
+            <span className="text-[1.35rem] font-medium tracking-tight text-[color:var(--foreground)]">
+              {formatCurrency(itemPrice, currencyDigits)}
+            </span>
+            <span className="font-mono text-[0.72rem] uppercase tracking-[0.12em] text-[color:var(--foreground)]">
+              Purchase price
+            </span>
+          </div>
+        </div>
+      </div>
 
-            {segmentRects.map(({ segment, x, width: segmentWidth }) => (
-              <motion.rect
-                key={segment.label}
-                x={0}
-                y={barY}
-                height={barHeight}
-                rx={radius}
-                fill={segment.fill}
-                initial={false}
-                animate={{ x: x + gap / 2, width: Math.max(0, segmentWidth - gap) }}
-                transition={transition}
-              >
-                <title>{`${segment.label}: ${formatCurrency(segment.value, currencyDigits)}`}</title>
-              </motion.rect>
-            ))}
+      <div className="flex h-3 w-full" aria-hidden="true">
+        {segments.map((segment) => (
+          <span
+            key={segment.label}
+            className="block h-full"
+            style={{
+              width: `${(segment.value / Math.max(grossRequired, 0.01)) * 100}%`,
+              background: segment.fill,
+            }}
+            title={`${segment.label}: ${formatCurrency(segment.value, currencyDigits)}`}
+          />
+        ))}
+      </div>
 
-            <motion.path
-              initial={false}
-              animate={{ d: buildCurlyBrace(taxBraceX0, taxBraceX1, bottomSpineY, braceDepth) }}
-              transition={transition}
-              fill="none"
-              stroke="#be123c"
-              strokeWidth={2}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <motion.g
-              initial={false}
-              animate={{ x: taxLabelCenter, opacity: showTaxLabel ? 1 : 0 }}
-              transition={transition}
-            >
-              <text textAnchor="middle" y={bottomLabelY} fontSize={14} fill="#be123c" letterSpacing={0.2}>
-                <tspan fontWeight={600}>Total tax</tspan>
-                <tspan fontWeight={800} dx={7}>
-                  {formatCurrency(totalTax, currencyDigits)}
-                </tspan>
-              </text>
-            </motion.g>
-          </>
-        ) : null}
-      </svg>
+      <div className="relative mt-1.5 h-12">
+        <div
+          className="absolute top-0 right-0 box-border h-full border-t border-[color:var(--foreground)]/40"
+          style={{ width: `${taxWidth}%` }}
+        >
+          <span className="absolute top-[-1px] left-0 h-2 w-px bg-[color:var(--foreground)]/45" aria-hidden="true" />
+          <span className="absolute top-[-1px] right-0 h-2 w-px bg-[color:var(--foreground)]/45" aria-hidden="true" />
+          <div className="absolute inset-x-0 bottom-0 flex items-baseline justify-end gap-3">
+            <span className="font-mono text-[0.72rem] uppercase tracking-[0.12em] text-[color:var(--foreground)]">
+              Total tax
+            </span>
+            <span className="text-[1.35rem] font-medium tracking-tight text-[color:var(--foreground)]">
+              {formatCurrency(totalTax, currencyDigits)}
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -946,9 +859,7 @@ export default function IrishPurchaseTaxTime2026() {
   const grossRequiredCurrencyDigits = getCurrencyFractionDigits(result.grossRequired);
   const itemShare = (result.preTaxItemPrice / result.grossRequired) * 100;
   const transactionPriceShare = (selectedItem.price / result.grossRequired) * 100;
-  const totalTaxShare = (result.totalTax / result.grossRequired) * 100;
-  const showTransactionBraceLabel = transactionPriceShare >= 24;
-  const showTotalTaxBraceLabel = totalTaxShare >= 24;
+  const taxedFraction = (1 - result.netRate) * 100;
   const stateEquivalents = getStateEquivalents(result.totalTax);
 
   const getShareUrl = () => {
@@ -1071,63 +982,49 @@ export default function IrishPurchaseTaxTime2026() {
     const barY = 538;
     const barWidth = 880;
     const barHeight = 48;
-    const canvasItemShare = result.preTaxItemPrice / result.grossRequired;
     const canvasTransactionPriceShare = selectedItem.price / result.grossRequired;
     const canvasTotalTaxShare = result.totalTax / result.grossRequired;
+    const priceWidth = Math.max(0, Math.min(barWidth, canvasTransactionPriceShare * barWidth));
+    const taxWidth = Math.max(0, Math.min(barWidth, canvasTotalTaxShare * barWidth));
+    const taxX = barX + barWidth - taxWidth;
 
-    if (showTransactionBraceLabel) {
-      drawFittedText(
-        context,
-        `Item price ${formatCurrency(selectedItem.price, selectedCurrencyDigits)}`,
-        barX + (canvasTransactionPriceShare * barWidth) / 2,
-        506,
-        Math.max(160, canvasTransactionPriceShare * barWidth - 24),
-        {
-          fontSize: 21,
-          minFontSize: 16,
-          fontWeight: 600,
-          color: "#92400e",
-          align: "center",
-        },
-      );
-      drawCurlyBrace(context, barX, barX + canvasTransactionPriceShare * barWidth, 522, -12, "#92400e");
-    }
+    const purchasePriceLabel = formatCurrency(selectedItem.price, selectedCurrencyDigits);
+    drawFittedText(context, purchasePriceLabel, barX, 492, Math.max(120, priceWidth * 0.58), {
+      fontSize: 28,
+      minFontSize: 18,
+      fontWeight: 500,
+      color: "#1c1917",
+    });
+    const purchasePriceWidth = context.measureText(purchasePriceLabel).width;
+    drawText(context, "PURCHASE PRICE", barX + purchasePriceWidth + 16, 490, {
+      font: `400 13px ${CANVAS_MONO_FONT}`,
+      color: "#1c1917",
+    });
+    drawTickBracket(context, barX, 522, priceWidth, "above");
 
-    const canvasGap = 6;
     let segmentX = barX;
     for (const segment of result.segments) {
       const segmentWidth = (segment.value / result.grossRequired) * barWidth;
-      const drawWidth = Math.max(0, segmentWidth - canvasGap);
-      drawRoundedRect(context, segmentX + canvasGap / 2, barY, drawWidth, barHeight, 12);
       context.fillStyle = segment.fill;
-      context.fill();
+      context.fillRect(segmentX, barY, segmentWidth, barHeight);
       segmentX += segmentWidth;
     }
 
-    if (showTotalTaxBraceLabel) {
-      drawCurlyBrace(
-        context,
-        barX + canvasItemShare * barWidth,
-        barX + canvasItemShare * barWidth + canvasTotalTaxShare * barWidth,
-        604,
-        12,
-        "#be123c",
-      );
-      drawFittedText(
-        context,
-        `Total tax ${formatCurrency(result.totalTax, selectedCurrencyDigits)}`,
-        barX + canvasItemShare * barWidth + (canvasTotalTaxShare * barWidth) / 2,
-        646,
-        Math.max(160, canvasTotalTaxShare * barWidth - 24),
-        {
-          fontSize: 21,
-          minFontSize: 16,
-          fontWeight: 600,
-          color: "#be123c",
-          align: "center",
-        },
-      );
-    }
+    drawTickBracket(context, taxX, 598, taxWidth, "below");
+    const totalTaxLabel = formatCurrency(result.totalTax, selectedCurrencyDigits);
+    drawFittedText(context, totalTaxLabel, taxX + taxWidth, 640, Math.max(120, taxWidth * 0.58), {
+      fontSize: 28,
+      minFontSize: 18,
+      fontWeight: 500,
+      color: "#1c1917",
+      align: "right",
+    });
+    const totalTaxWidth = context.measureText(totalTaxLabel).width;
+    drawText(context, "TOTAL TAX", taxX + taxWidth - totalTaxWidth - 16, 638, {
+      font: `400 13px ${CANVAS_MONO_FONT}`,
+      color: "#1c1917",
+      align: "right",
+    });
 
     result.segments.forEach((segment, index) => {
       const x = 160 + index * 296;
@@ -1217,79 +1114,37 @@ export default function IrishPurchaseTaxTime2026() {
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-4 pt-10 pb-24 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-[1280px] px-6 pt-10 pb-28 sm:px-8 lg:px-12">
       <Link
         href="/labs"
-        className="mb-8 inline-flex items-center gap-2 text-stone-500 transition-colors hover:text-stone-900"
+        className="mb-12 inline-block font-mono text-[0.62rem] uppercase tracking-[0.2em] text-[color:var(--text-muted)] transition-colors hover:text-[color:var(--foreground)]"
       >
-        <ArrowLeft className="h-4 w-4" />
-        <span className="font-mono text-sm font-medium uppercase tracking-[0.2em]">Back to Labs</span>
+        ← Back to Labs
       </Link>
 
-      <header className="mb-10 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
-        <div className="space-y-4">
-          <p className="font-mono text-xs font-semibold uppercase tracking-[0.3em] text-stone-500">
-            Irish Tax Lens - 2026 assumptions
-          </p>
-          <h1 className="text-5xl font-black uppercase leading-[0.9] tracking-tight text-stone-900 sm:text-7xl">
-            What Did That Really Cost?
-          </h1>
-          <p className="max-w-4xl text-lg leading-relaxed text-stone-600 sm:text-xl">
-            See how much working time goes to the thing itself, the tax
-            charged when you buy it, and the income taxes paid before your wages became spending
-            money.
-          </p>
-        </div>
-
-        <aside className="h-fit rounded-[2rem] border border-stone-200 bg-white p-5 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)]">
-          <div className="flex items-center justify-between gap-4">
-            <span className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">
-              Gross salary
-            </span>
-            <span className="text-lg font-black text-stone-900">{formatCurrency(grossIncome)}</span>
-          </div>
-          <div className="mt-5 grid grid-cols-2 gap-3">
-            <div className="rounded-2xl border border-stone-200 bg-stone-50 p-4">
-              <p className="text-2xl font-black text-stone-900">
-                {formatPercent(result.netRate * 100)}
-              </p>
-              <p className="mt-1 text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
-                Take-home ratio
-              </p>
-            </div>
-            <div className="rounded-2xl border border-stone-200 bg-stone-50 p-4">
-              <p className="text-2xl font-black text-stone-900">
-                {formatCurrency(result.grossHourly, 2)}
-              </p>
-              <p className="mt-1 text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
-                Gross hourly
-              </p>
-            </div>
-          </div>
-          <label className="mt-5 block">
-            <input
-              type="range"
-              min={MIN_INCOME}
-              max={MAX_INCOME}
-              step={INCOME_STEP}
-              value={grossIncome}
-              onChange={(event) => setGrossIncome(clampIncome(Number(event.target.value)))}
-              className="h-2 w-full cursor-pointer appearance-none rounded-full bg-stone-200 accent-stone-900"
-            />
-          </label>
-        </aside>
+      <header className="mb-12 border-b border-[color:var(--rule-color)] pb-10">
+        <p className="mb-4 font-mono text-[0.62rem] uppercase tracking-[0.22em] text-[color:var(--text-muted)]">
+          Irish Tax Lens - 2026 assumptions
+        </p>
+        <h1 className="mb-5 text-[clamp(3rem,6vw,5.2rem)] font-light leading-[0.94] tracking-[-0.02em] text-[color:var(--foreground)]">
+          What Did That Really Cost?
+        </h1>
+        <p className="max-w-[640px] text-[1.1rem] font-light leading-[1.7] text-[color:var(--text-muted)] italic">
+          See how much working time goes to the thing itself, the tax charged when you buy it, and
+          the income taxes paid before your wages became spending money.
+        </p>
       </header>
 
-      <section className="grid gap-6 lg:grid-cols-[19rem_minmax(0,1fr)]">
+      <div className="grid gap-8 lg:grid-cols-[136px_minmax(0,1fr)] lg:gap-0">
         <nav
-          className="h-fit rounded-[2rem] border border-stone-200 bg-white p-4 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)] lg:sticky lg:top-6"
+          className="box-content w-full border-[color:var(--rule-color)] lg:w-[104px] lg:border-r lg:pr-8"
           aria-label="Purchases"
         >
-          <h2 className="mb-3 px-2 font-mono text-xs font-semibold uppercase tracking-[0.3em] text-stone-500">
+          <p className="mb-3 font-mono text-[0.58rem] uppercase tracking-[0.2em] text-[color:var(--text-muted)]">
             Purchases
-          </h2>
-          <div className="space-y-2">
-            {ITEMS.map((item) => {
+          </p>
+          <div className="grid grid-cols-3 gap-3 lg:grid-cols-1 lg:gap-0">
+            {ITEMS.map((item, index) => {
               const isSelected = item.id === selectedItem.id;
 
               return (
@@ -1297,150 +1152,197 @@ export default function IrishPurchaseTaxTime2026() {
                   key={item.id}
                   type="button"
                   onClick={() => setSelectedId(item.id)}
-                  className={`flex w-full items-center gap-3 rounded-2xl border p-3 text-left transition ${
+                  className={`w-full border-b border-transparent py-2.5 text-left transition-colors lg:w-[104px] ${
+                    index > 0 ? "lg:border-t lg:border-[color:var(--rule-color)]" : ""
+                  } ${
                     isSelected
-                      ? "border-emerald-300 bg-emerald-50 text-emerald-950"
-                      : "border-transparent text-stone-700 hover:bg-stone-100"
+                      ? "border-b-[#F4CA16] text-[color:var(--foreground)]"
+                      : "text-[color:var(--text-muted)] hover:text-[color:var(--foreground)]"
                   }`}
                 >
-                  <span className="relative h-14 w-16 shrink-0 overflow-hidden rounded-2xl bg-stone-100 ring-1 ring-stone-200">
+                  <span className="relative mb-2 block aspect-square w-full overflow-hidden lg:w-[104px]">
                     <Image
                       src={item.image}
                       alt=""
                       fill
-                      sizes="64px"
-                      className="object-cover"
+                      sizes="104px"
+                      className={`object-contain transition-opacity ${isSelected ? "opacity-100" : "opacity-55"}`}
                     />
                   </span>
-                  <span className="min-w-0">
-                    <span className="block text-sm font-black">{item.name}</span>
-                    <span className="mt-1 block font-mono text-xs uppercase tracking-[0.16em] text-stone-500">
-                      {formatCurrency(item.price, getCurrencyFractionDigits(item.price))} - {item.category}
-                    </span>
-                  </span>
+                  <span className="block text-[0.9rem] leading-snug">{item.name}</span>
                 </button>
               );
             })}
           </div>
         </nav>
 
-        <article className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)] sm:p-8">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <p className="font-mono text-xs font-semibold uppercase tracking-[0.3em] text-emerald-700">
-              {selectedItem.category}
-            </p>
-            <div className="flex flex-col items-start gap-2 sm:items-end">
-              <button
-                type="button"
-                onClick={handleShare}
-                disabled={shareStatus === "sharing"}
-                className="inline-flex items-center gap-2 rounded-full border border-stone-200 bg-stone-50 px-4 py-2 text-sm font-bold leading-none text-stone-800 transition hover:border-stone-300 hover:bg-white disabled:cursor-wait disabled:opacity-60"
-              >
-                <Share2 className="h-4 w-4" />
-                <span className="leading-none">
-                  {shareStatus === "sharing" ? "Preparing..." : "Share result"}
-                </span>
-              </button>
-              {shareStatus !== "idle" && shareStatus !== "sharing" ? (
-                <p className="max-w-64 text-left text-xs leading-relaxed text-stone-500 sm:text-right">
-                  {shareStatus === "shared"
-                    ? "Shared with a summary image."
-                    : shareStatus === "fallback"
-                      ? "Link copied or shared, and the summary image was downloaded."
-                      : "Could not share this result. Try again."}
-                </p>
-              ) : null}
+        <article className="min-w-0 lg:pl-12">
+          <div className="grid gap-7 border-[color:var(--rule-color)] md:grid-cols-[minmax(0,1.4fr)_minmax(220px,0.9fr)] md:gap-10">
+            <div className="min-w-0 border-[color:var(--rule-color)] md:border-r md:pr-8">
+              <p className="mb-3 font-mono text-[0.62rem] uppercase tracking-[0.22em] text-[color:var(--text-muted)]">
+                {selectedItem.category}
+              </p>
+              <h2 className="mb-5 text-[clamp(2.8rem,5vw,4.5rem)] font-normal leading-none tracking-[-0.025em] text-[color:var(--foreground)]">
+                {selectedItem.name}
+              </h2>
+              <p className="max-w-[520px] text-[1.2rem] leading-[1.75] text-[color:var(--text-body-rgb)]">
+                {selectedItem.description}
+              </p>
+              <p className="mt-3 max-w-[520px] text-[0.88rem] leading-relaxed text-[color:var(--text-muted)]">
+                * {selectedItem.assumption}
+              </p>
             </div>
+
+            <aside className="min-w-0">
+              <div className="font-mono text-[0.58rem] uppercase tracking-[0.18em] text-[color:var(--text-muted)]">
+                Gross salary
+              </div>
+              <div className="mt-2 mb-4 text-[2.4rem] font-light tracking-[-0.03em] text-[color:var(--foreground)]">
+                {formatCurrency(grossIncome)}
+              </div>
+              <label className="mb-5 block">
+                <span className="sr-only">Gross salary</span>
+                <input
+                  type="range"
+                  min={MIN_INCOME}
+                  max={MAX_INCOME}
+                  step={INCOME_STEP}
+                  value={grossIncome}
+                  onChange={(event) => setGrossIncome(clampIncome(Number(event.target.value)))}
+                  className="w-full accent-[color:var(--foreground)]"
+                />
+              </label>
+              <div className="grid grid-cols-2 gap-5 border-t border-[color:var(--rule-color)] pt-4">
+                <div>
+                  <div className="mb-1.5 font-mono text-[0.55rem] uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
+                    Taxed fraction
+                  </div>
+                  <div className="text-[1.7rem] tracking-[-0.02em] text-[color:var(--foreground)]">
+                    {formatPercent(taxedFraction)}
+                  </div>
+                </div>
+                <div>
+                  <div className="mb-1.5 font-mono text-[0.55rem] uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
+                    Gross hourly
+                  </div>
+                  <div className="text-[1.7rem] tracking-[-0.02em] text-[color:var(--foreground)]">
+                    {formatCurrency(result.grossHourly, 2)}
+                  </div>
+                </div>
+              </div>
+            </aside>
           </div>
-          <h2 className="mt-3 text-4xl font-black leading-tight tracking-tight text-stone-900 sm:text-5xl">
-            {selectedItem.name}
-          </h2>
-          <p className="mt-3 max-w-2xl text-lg leading-relaxed text-stone-600">
-            {selectedItem.description}
-          </p>
-          <p className="mt-2 max-w-2xl text-xs leading-relaxed text-stone-500">
-            <span className="text-stone-400" aria-hidden="true">* </span>
-            {selectedItem.assumption}
-          </p>
 
-          <section className="mt-8 rounded-[1.5rem] border border-stone-200 bg-stone-50 p-5">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-              <div>
-                <h3 className="text-xl font-black tracking-tight text-stone-900">
-                  Where your earnings go
-                </h3>
-              </div>
-              <div className="shrink-0 min-w-[15rem] rounded-2xl bg-white px-6 pt-4 pb-3 ring-1 ring-stone-200">
-                <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">
-                  Total earnings
-                </p>
-                <div className="mt-2 flex w-full items-baseline justify-between gap-4">
-                  <p className="text-3xl font-black leading-none text-stone-900">
-                    {formatCurrency(result.grossRequired, grossRequiredCurrencyDigits)}
+          <section className="mt-9 border-t border-[color:var(--rule-color)] pt-7">
+            <div className="mb-2 flex flex-wrap items-baseline justify-between gap-4">
+              <h3 className="text-[1.6rem] font-normal tracking-[-0.015em] text-[color:var(--foreground)]">
+                Where your earnings go
+              </h3>
+              <div className="flex flex-col items-start gap-1 sm:items-end">
+                <button
+                  type="button"
+                  onClick={handleShare}
+                  disabled={shareStatus === "sharing"}
+                  className="border-b border-[#F4CA16] pb-0.5 font-mono text-[0.62rem] uppercase tracking-[0.18em] text-[color:var(--foreground)] transition-opacity hover:opacity-70 disabled:cursor-wait disabled:opacity-60"
+                >
+                  {shareStatus === "sharing" ? "Preparing..." : "Share result"}
+                </button>
+                {shareStatus !== "idle" && shareStatus !== "sharing" ? (
+                  <p className="max-w-64 text-left text-xs leading-relaxed text-[color:var(--text-muted)] sm:text-right">
+                    {shareStatus === "shared"
+                      ? "Shared with a summary image."
+                      : shareStatus === "fallback"
+                        ? "Link copied or shared, and the summary image was downloaded."
+                        : "Could not share this result. Try again."}
                   </p>
-                  <p className="text-sm font-semibold text-stone-600">
-                    {formatWorkTime(result.totalWorkHours)}
-                  </p>
-                </div>
+                ) : null}
               </div>
             </div>
 
-            <div className="mt-3">
-              <EarningsBar
-                segments={result.segments}
-                grossRequired={result.grossRequired}
-                itemPrice={selectedItem.price}
-                totalTax={result.totalTax}
-                currencyDigits={selectedCurrencyDigits}
-                itemPriceShare={transactionPriceShare}
-                taxStartShare={itemShare}
-                showItemLabel={showTransactionBraceLabel}
-                showTaxLabel={showTotalTaxBraceLabel}
-              />
+            <div className="mb-8 flex items-end gap-6">
+              <span className="text-[clamp(3.2rem,6vw,5rem)] font-light leading-[0.9] tracking-[-0.04em] text-[color:var(--foreground)]">
+                {formatCurrency(result.grossRequired, grossRequiredCurrencyDigits)}
+              </span>
+              <span className="font-mono text-[0.65rem] uppercase leading-[1.35] tracking-[0.16em] text-[color:var(--text-muted)]">
+                Total earnings
+                <br />
+                {formatWorkTime(result.totalWorkHours)} of work
+              </span>
             </div>
 
-            <div className="mt-5 grid gap-3 md:grid-cols-3">
-              {result.segments.map((segment) => (
-                <div key={segment.label} className="rounded-2xl border border-stone-200 bg-white p-4">
-                  <div className="flex items-center gap-2.5">
-                    <span className={`h-3.5 w-3.5 rounded-full ${segment.color}`} />
-                    <p className="text-base font-black tracking-tight text-stone-900">{segment.shortLabel}</p>
-                  </div>
-                  <div className="mt-2 flex w-full items-baseline justify-between gap-4">
-                    <p className="text-2xl font-black leading-none text-stone-900">
+            <EarningsBar
+              segments={result.segments}
+              grossRequired={result.grossRequired}
+              itemPrice={selectedItem.price}
+              totalTax={result.totalTax}
+              currencyDigits={selectedCurrencyDigits}
+              itemPriceShare={transactionPriceShare}
+              taxStartShare={itemShare}
+            />
+
+            <div
+              className="grid gap-x-3.5 border-t border-[color:var(--rule-color)] [grid-template-columns:14px_minmax(0,1fr)_5.5rem_5rem] sm:[grid-template-columns:14px_minmax(0,1fr)_5.5rem_5rem_5rem]"
+              role="table"
+              aria-label="Earnings breakdown"
+            >
+              <div
+                className="col-span-full grid [grid-template-columns:subgrid] border-b border-[color:var(--rule-color)] pb-2.5 pt-3.5 font-mono text-[0.55rem] uppercase tracking-[0.16em] text-[color:var(--text-muted)]"
+                role="row"
+              >
+                <span aria-hidden="true" />
+                <span>Segment</span>
+                <span className="text-right">Cost</span>
+                <span className="hidden text-right sm:block">Share</span>
+                <span className="text-right">Time</span>
+              </div>
+              {result.segments.map((segment) => {
+                const share = (segment.value / Math.max(result.grossRequired, 0.01)) * 100;
+                return (
+                  <div
+                    key={segment.label}
+                    className="col-span-full grid [grid-template-columns:subgrid] items-baseline border-b border-[color:var(--rule-color)] py-3.5"
+                    role="row"
+                  >
+                    <span
+                      className="h-2.5 w-2.5 self-center rounded-full"
+                      style={{ background: segment.fill }}
+                      aria-hidden="true"
+                    />
+                    <span className="text-[1.05rem] text-[color:var(--foreground)]">{segment.shortLabel}</span>
+                    <span className="text-right text-[1.15rem] font-medium tracking-tight text-[color:var(--foreground)] tabular-nums">
                       {formatCurrency(segment.value, selectedCurrencyDigits)}
-                    </p>
-                    <p className="text-sm font-semibold text-stone-600">
+                    </span>
+                    <span className="hidden text-right font-mono text-[0.78rem] tracking-[0.08em] text-[color:var(--text-muted)] tabular-nums sm:block">
+                      {formatPercent(share, 1)}
+                    </span>
+                    <span className="text-right font-mono text-[0.78rem] tracking-[0.08em] text-[color:var(--text-muted)] tabular-nums">
                       {formatWorkTime(segment.hours)}
-                    </p>
+                    </span>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </section>
 
-          <section className="mt-6 rounded-[1.5rem] border border-stone-200 bg-white p-5">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <h3 className="text-xl font-black tracking-tight text-stone-900">
-                  What could the state buy with this tax?
-                </h3>
-                <p className="mt-1 text-sm leading-relaxed text-stone-600">
-                  Very rough scale comparisons, not earmarked spending.
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-5 grid gap-3 md:grid-cols-3">
-              {stateEquivalents.map((equivalent) => (
-                <article key={equivalent.id} className="rounded-2xl border border-stone-200 bg-stone-50 p-4">
-                  <p className="font-mono text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
+          <section className="mt-10">
+            <h3 className="mb-2 text-[1.6rem] font-normal tracking-[-0.015em] text-[color:var(--foreground)]">
+              What could the state buy with this tax?
+            </h3>
+            <p className="mb-7 text-[0.98rem] leading-relaxed text-[color:var(--text-muted)]">
+              Very rough scale comparisons, not earmarked spending.
+            </p>
+            <div className="grid gap-6 md:grid-cols-3 md:gap-0">
+              {stateEquivalents.map((equivalent, index) => (
+                <article
+                  key={equivalent.id}
+                  className={`pt-1 md:pr-7 ${
+                    index > 0 ? "md:border-l md:border-[color:var(--rule-color)] md:pl-7" : ""
+                  }`}
+                >
+                  <p className="mb-3 font-mono text-[0.55rem] uppercase tracking-[0.16em] text-[color:var(--text-muted)]">
                     {equivalent.bucket}
                   </p>
-                  <h4 className="mt-2 text-base font-black tracking-tight text-stone-900">
-                    {equivalent.label}
-                  </h4>
-                  <p className="mt-3 text-2xl font-black leading-tight text-stone-900">
+                  <p className="text-[1.55rem] leading-snug tracking-[-0.02em] text-[color:var(--foreground)]">
                     {equivalent.value}
                   </p>
                 </article>
@@ -1448,111 +1350,113 @@ export default function IrishPurchaseTaxTime2026() {
             </div>
           </section>
 
-          <details className="group mt-6 rounded-[1.5rem] border border-stone-200 bg-white">
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-5 [&::-webkit-details-marker]:hidden">
+          <details className="group mt-16 border-t border-[color:var(--rule-color)]">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-7 [&::-webkit-details-marker]:hidden">
               <div>
-                <h3 className="text-lg font-black tracking-tight text-stone-900">Additional detail</h3>
-                <p className="mt-1 text-sm text-stone-600">
+                <h3 className="text-[1.4rem] font-normal text-[color:var(--foreground)]">Additional detail</h3>
+                <p className="mt-1.5 text-[color:var(--text-muted)]">
                   Show the tax line items and model assumptions.
                 </p>
               </div>
-              <ChevronDown className="h-5 w-5 shrink-0 text-stone-500 transition-transform group-open:rotate-180" />
+              <span className="font-mono text-[0.58rem] uppercase tracking-[0.14em] text-[color:var(--text-muted)]">
+                <span className="group-open:hidden">Expand</span>
+                <span className="hidden group-open:inline">Collapse</span>
+              </span>
             </summary>
 
-            <div className="border-t border-stone-200 p-5 pt-0">
-              <section className="mt-5 rounded-[1.5rem] border border-stone-200 bg-stone-50 p-5">
-                <h3 className="text-lg font-black tracking-tight text-stone-900">
-                  State-equivalent assumptions
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-stone-600">
-                  These are order-of-magnitude comparisons used for the state-scale cards.
-                </p>
-                <div className="mt-4 grid gap-3 text-sm text-stone-700 md:grid-cols-2">
-                  {STATE_EQUIVALENTS.map((equivalent) => (
-                    <div key={equivalent.id} className="border-b border-stone-200 pb-3 last:border-b-0 md:last:border-b">
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <p className="font-semibold text-stone-900">{equivalent.label}</p>
-                          <p className="mt-1 text-xs font-semibold uppercase tracking-[0.14em] text-stone-500">
-                            {equivalent.bucket}
-                          </p>
-                        </div>
-                        <span className="shrink-0 rounded-full bg-white px-2.5 py-1 font-mono text-xs font-semibold text-stone-500 ring-1 ring-stone-200">
-                          {formatCurrency(equivalent.unitCost, getCurrencyFractionDigits(equivalent.unitCost))} /{" "}
-                          {equivalent.unitLabel}
-                        </span>
-                      </div>
-                      <p className="mt-2 text-xs leading-relaxed text-stone-500">{equivalent.note}</p>
+            <div className="pb-10">
+              <h4 className="mt-2 mb-3 text-[1.15rem] font-normal text-[color:var(--foreground)]">
+                State-equivalent assumptions
+              </h4>
+              <p className="mb-4 text-[color:var(--text-muted)] leading-relaxed">
+                These are order-of-magnitude comparisons used for the state-scale cards.
+              </p>
+              <div className="grid gap-x-10 md:grid-cols-2">
+                {STATE_EQUIVALENTS.map((equivalent) => (
+                  <div
+                    key={equivalent.id}
+                    className="flex items-start justify-between gap-4 border-b border-[color:var(--rule-color)] py-3 text-[0.95rem]"
+                  >
+                    <span>
+                      {equivalent.label}
+                      <span className="mt-1 block text-[0.8rem] text-[color:var(--text-muted)]">
+                        {equivalent.bucket} · {equivalent.note}
+                      </span>
+                    </span>
+                    <span className="shrink-0 whitespace-nowrap">
+                      {formatCurrency(equivalent.unitCost, getCurrencyFractionDigits(equivalent.unitCost))} /{" "}
+                      {equivalent.unitLabel}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-2 grid gap-x-10 md:grid-cols-2">
+                <div>
+                  <h4 className="mt-8 mb-3 text-[1.15rem] font-normal text-[color:var(--foreground)]">
+                    Purchase tax detail
+                  </h4>
+                  <div className="flex items-center justify-between gap-4 border-b border-[color:var(--rule-color)] py-3 text-[0.95rem]">
+                    <span>Item before these direct taxes</span>
+                    <span>{formatCurrency(result.preTaxItemPrice, selectedCurrencyDigits)}</span>
+                  </div>
+                  {result.purchaseTaxes.map((line) => (
+                    <div
+                      key={line.label}
+                      className="flex items-start justify-between gap-4 border-b border-[color:var(--rule-color)] py-3 text-[0.95rem]"
+                    >
+                      <span>
+                        {line.label}
+                        <span className="mt-1 block text-[0.8rem] text-[color:var(--text-muted)]">{line.note}</span>
+                      </span>
+                      <span className="shrink-0">{formatCurrency(line.amount, selectedCurrencyDigits)}</span>
                     </div>
                   ))}
                 </div>
-              </section>
-
-              <div className="grid gap-6 pt-5 xl:grid-cols-2">
-                <section className="rounded-[1.5rem] border border-stone-200 bg-stone-50 p-5">
-                  <h3 className="text-lg font-black tracking-tight text-stone-900">Purchase tax detail</h3>
-                  <div className="mt-4 space-y-3">
-                    <div className="flex items-center justify-between gap-4 border-b border-stone-200 pb-3">
-                      <span className="text-sm text-stone-600">Item before these direct taxes</span>
-                      <span className="font-bold text-stone-900">
-                        {formatCurrency(result.preTaxItemPrice, selectedCurrencyDigits)}
+                <div>
+                  <h4 className="mt-8 mb-3 text-[1.15rem] font-normal text-[color:var(--foreground)]">
+                    Income tax detail
+                  </h4>
+                  {result.incomeTaxLines.map((line) => (
+                    <div
+                      key={line.label}
+                      className="flex items-start justify-between gap-4 border-b border-[color:var(--rule-color)] py-3 text-[0.95rem]"
+                    >
+                      <span>
+                        {line.label}
+                        <span className="mt-1 block text-[0.8rem] text-[color:var(--text-muted)]">{line.note}</span>
                       </span>
+                      <span className="shrink-0">{formatCurrency(line.amount, selectedCurrencyDigits)}</span>
                     </div>
-                    {result.purchaseTaxes.map((line) => (
-                      <div key={line.label} className="border-b border-stone-200 pb-3 last:border-b-0">
-                        <div className="flex items-center justify-between gap-4">
-                          <span className="text-sm font-semibold text-stone-700">{line.label}</span>
-                          <span className="font-bold text-stone-900">
-                            {formatCurrency(line.amount, selectedCurrencyDigits)}
-                          </span>
-                        </div>
-                        <p className="mt-1 text-xs leading-relaxed text-stone-500">{line.note}</p>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-
-                <section className="rounded-[1.5rem] border border-stone-200 bg-stone-50 p-5">
-                  <h3 className="text-lg font-black tracking-tight text-stone-900">Income tax detail</h3>
-                  <div className="mt-4 space-y-3">
-                    {result.incomeTaxLines.map((line) => (
-                      <div key={line.label} className="border-b border-stone-200 pb-3 last:border-b-0">
-                        <div className="flex items-center justify-between gap-4">
-                          <span className="text-sm font-semibold text-stone-700">{line.label}</span>
-                          <span className="font-bold text-stone-900">
-                            {formatCurrency(line.amount, selectedCurrencyDigits)}
-                          </span>
-                        </div>
-                        <p className="mt-1 text-xs leading-relaxed text-stone-500">{line.note}</p>
-                      </div>
-                    ))}
-                  </div>
-                </section>
+                  ))}
+                </div>
               </div>
 
-              <section className="mt-6 rounded-[1.5rem] border border-amber-200 bg-amber-50 p-5">
+              <section className="mt-9 border-t-2 border-[#F4CA16] pt-6">
                 <div className="flex gap-3">
-                  <Info className="mt-0.5 h-5 w-5 shrink-0 text-amber-700" />
+                  <Info className="mt-0.5 h-5 w-5 shrink-0 text-[color:var(--foreground)]" />
                   <div>
-                    <h3 className="font-black tracking-tight text-stone-900">What this model leaves out</h3>
-                    <p className="mt-2 leading-relaxed text-stone-700">
+                    <h4 className="text-[1.15rem] font-normal text-[color:var(--foreground)]">
+                      What this model leaves out
+                    </h4>
+                    <p className="mt-2.5 max-w-[720px] leading-[1.7] text-[color:var(--text-body-rgb)]">
                       These are illustrative direct taxes only. The model does not estimate supplier
                       VAT, corporate tax, employer PRSI, import duties, local charges, discounts,
                       deductions, pension contributions, or product-specific reliefs. It is meant to
                       make the time trade-off legible, not to produce a tax bill.
                     </p>
-                    <div className="mt-4 grid gap-3 text-sm text-stone-700 md:grid-cols-3">
+                    <div className="mt-5 grid gap-5 text-[0.92rem] leading-relaxed text-[color:var(--text-body-rgb)] md:grid-cols-3">
                       <p>
-                        <span className="font-bold text-stone-900">Income:</span> single PAYE employee,
-                        2026 illustrative PAYE, USC, and employee PRSI.
+                        <strong className="font-medium text-[color:var(--foreground)]">Income:</strong>{" "}
+                        single PAYE employee, 2026 illustrative PAYE, USC, and employee PRSI.
                       </p>
                       <p>
-                        <span className="font-bold text-stone-900">Time:</span> 37.5 paid hours per
-                        week for 52 weeks, before holidays or unpaid time.
+                        <strong className="font-medium text-[color:var(--foreground)]">Time:</strong>{" "}
+                        37.5 paid hours per week for 52 weeks, before holidays or unpaid time.
                       </p>
                       <p>
-                        <span className="font-bold text-stone-900">Purchases:</span> direct transaction
-                        taxes are simplified and displayed beside each item.
+                        <strong className="font-medium text-[color:var(--foreground)]">Purchases:</strong>{" "}
+                        direct transaction taxes are simplified and displayed beside each item.
                       </p>
                     </div>
                   </div>
@@ -1561,7 +1465,7 @@ export default function IrishPurchaseTaxTime2026() {
             </div>
           </details>
         </article>
-      </section>
+      </div>
     </div>
   );
 }
