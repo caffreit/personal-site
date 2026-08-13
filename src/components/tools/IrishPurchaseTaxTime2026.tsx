@@ -628,29 +628,32 @@ function drawWrappedText(
   });
 }
 
-function drawCurlyBrace(
+function drawTickBracket(
   context: CanvasRenderingContext2D,
-  x0: number,
-  x1: number,
-  spineY: number,
-  depth: number,
-  color: string,
+  x: number,
+  y: number,
+  width: number,
+  side: "above" | "below",
 ) {
-  const xc = (x0 + x1) / 2;
-  const shoulder = depth * 0.6;
+  const tick = 8;
+  const line = "rgba(10, 10, 10, 0.4)";
+  const mark = "rgba(10, 10, 10, 0.45)";
 
+  context.strokeStyle = line;
+  context.lineWidth = 1;
   context.beginPath();
-  context.moveTo(x0, spineY);
-  context.quadraticCurveTo(x0, spineY + shoulder, (x0 + xc) / 2, spineY + shoulder);
-  context.quadraticCurveTo(xc, spineY + shoulder, xc, spineY + depth);
-  context.moveTo(x1, spineY);
-  context.quadraticCurveTo(x1, spineY + shoulder, (x1 + xc) / 2, spineY + shoulder);
-  context.quadraticCurveTo(xc, spineY + shoulder, xc, spineY + depth);
-  context.strokeStyle = color;
-  context.lineWidth = 3;
-  context.lineCap = "round";
-  context.lineJoin = "round";
+  context.moveTo(x, y);
+  context.lineTo(x + width, y);
   context.stroke();
+
+  context.fillStyle = mark;
+  if (side === "above") {
+    context.fillRect(x, y - tick, 1, tick);
+    context.fillRect(x + width - 1, y - tick, 1, tick);
+  } else {
+    context.fillRect(x, y, 1, tick);
+    context.fillRect(x + width - 1, y, 1, tick);
+  }
 }
 
 function downloadBlob(blob: Blob, filename: string) {
@@ -979,63 +982,49 @@ export default function IrishPurchaseTaxTime2026() {
     const barY = 538;
     const barWidth = 880;
     const barHeight = 48;
-    const canvasItemShare = result.preTaxItemPrice / result.grossRequired;
     const canvasTransactionPriceShare = selectedItem.price / result.grossRequired;
     const canvasTotalTaxShare = result.totalTax / result.grossRequired;
+    const priceWidth = Math.max(0, Math.min(barWidth, canvasTransactionPriceShare * barWidth));
+    const taxWidth = Math.max(0, Math.min(barWidth, canvasTotalTaxShare * barWidth));
+    const taxX = barX + barWidth - taxWidth;
 
-    if (showTransactionBraceLabel) {
-      drawFittedText(
-        context,
-        `Item price ${formatCurrency(selectedItem.price, selectedCurrencyDigits)}`,
-        barX + (canvasTransactionPriceShare * barWidth) / 2,
-        506,
-        Math.max(160, canvasTransactionPriceShare * barWidth - 24),
-        {
-          fontSize: 21,
-          minFontSize: 16,
-          fontWeight: 600,
-          color: "#92400e",
-          align: "center",
-        },
-      );
-      drawCurlyBrace(context, barX, barX + canvasTransactionPriceShare * barWidth, 522, -12, "#92400e");
-    }
+    const purchasePriceLabel = formatCurrency(selectedItem.price, selectedCurrencyDigits);
+    drawFittedText(context, purchasePriceLabel, barX, 492, Math.max(120, priceWidth * 0.58), {
+      fontSize: 28,
+      minFontSize: 18,
+      fontWeight: 500,
+      color: "#1c1917",
+    });
+    const purchasePriceWidth = context.measureText(purchasePriceLabel).width;
+    drawText(context, "PURCHASE PRICE", barX + purchasePriceWidth + 16, 490, {
+      font: `400 13px ${CANVAS_MONO_FONT}`,
+      color: "#1c1917",
+    });
+    drawTickBracket(context, barX, 522, priceWidth, "above");
 
-    const canvasGap = 6;
     let segmentX = barX;
     for (const segment of result.segments) {
       const segmentWidth = (segment.value / result.grossRequired) * barWidth;
-      const drawWidth = Math.max(0, segmentWidth - canvasGap);
-      drawRoundedRect(context, segmentX + canvasGap / 2, barY, drawWidth, barHeight, 12);
       context.fillStyle = segment.fill;
-      context.fill();
+      context.fillRect(segmentX, barY, segmentWidth, barHeight);
       segmentX += segmentWidth;
     }
 
-    if (showTotalTaxBraceLabel) {
-      drawCurlyBrace(
-        context,
-        barX + canvasItemShare * barWidth,
-        barX + canvasItemShare * barWidth + canvasTotalTaxShare * barWidth,
-        604,
-        12,
-        "#be123c",
-      );
-      drawFittedText(
-        context,
-        `Total tax ${formatCurrency(result.totalTax, selectedCurrencyDigits)}`,
-        barX + canvasItemShare * barWidth + (canvasTotalTaxShare * barWidth) / 2,
-        646,
-        Math.max(160, canvasTotalTaxShare * barWidth - 24),
-        {
-          fontSize: 21,
-          minFontSize: 16,
-          fontWeight: 600,
-          color: "#be123c",
-          align: "center",
-        },
-      );
-    }
+    drawTickBracket(context, taxX, 598, taxWidth, "below");
+    const totalTaxLabel = formatCurrency(result.totalTax, selectedCurrencyDigits);
+    drawFittedText(context, totalTaxLabel, taxX + taxWidth, 640, Math.max(120, taxWidth * 0.58), {
+      fontSize: 28,
+      minFontSize: 18,
+      fontWeight: 500,
+      color: "#1c1917",
+      align: "right",
+    });
+    const totalTaxWidth = context.measureText(totalTaxLabel).width;
+    drawText(context, "TOTAL TAX", taxX + taxWidth - totalTaxWidth - 16, 638, {
+      font: `400 13px ${CANVAS_MONO_FONT}`,
+      color: "#1c1917",
+      align: "right",
+    });
 
     result.segments.forEach((segment, index) => {
       const x = 160 + index * 296;
