@@ -8,7 +8,6 @@ import type { Lab } from "@/lib/labs";
 import Rolodex, {
   FilterLink,
   ListingEmptyState,
-  formatListingDate,
   type RolodexItem,
 } from "@/components/shared/Rolodex";
 import { getBadgeAccentVars, getTileGradient } from "./labBadgeColors";
@@ -69,19 +68,19 @@ export default function LabsListing({ labs }: LabsListingProps) {
       cta: "Open lab",
       meta: (
         <>
-          <span>{position}</span>
-          <span>{formatListingDate(lab.publishedAt)}</span>
           <span className="badge-accent" style={getBadgeAccentVars(lab.badge)}>
             {lab.badge}
           </span>
           <span>{lab.meta}</span>
           {lab.isPinned && (
-            <span className="inline-flex items-center gap-[6px] text-[var(--foreground)]">
+            <span
+              className="inline-flex items-center gap-[6px] text-[var(--foreground)]"
+              aria-label="Pinned"
+            >
               <Star
                 className="h-3 w-3 fill-[var(--color-yellow)] text-[var(--color-yellow)]"
                 aria-hidden
               />
-              Pinned
             </span>
           )}
         </>
