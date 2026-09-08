@@ -1,16 +1,18 @@
 "use client";
 
 import { useMemo, useState, useSyncExternalStore } from "react";
-import Link from "next/link";
-import { ArrowLeft, RotateCcw } from "lucide-react";
+import { RotateCcw } from "lucide-react";
+import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
+
+import { LabDetails, LabHeader, LabSection, LabShell } from "@/components/labs/LabChrome";
+import { LabLegend, LabTooltip } from "@/components/labs/labChartTheme";
 import {
-  Cell,
-  Legend,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-} from "recharts";
+  labFootnote,
+  labLink,
+  labMicroLabel,
+  labQuietButton,
+  labTextButton,
+} from "@/components/labs/labTokens";
 
 type QuizOption = {
   id: string;
@@ -587,6 +589,27 @@ function getMaxDepth(node: BudgetNode): number {
 
 const MAX_DRILL_LEVEL = getMaxDepth(chartHierarchy);
 
+type QuizSliceTooltipProps = {
+  active?: boolean;
+  payload?: Array<{
+    payload: { name: string; value: number; description: string; color: string };
+    value: number;
+  }>;
+};
+
+function QuizSliceTooltip({ active, payload }: QuizSliceTooltipProps) {
+  if (!active || !payload?.length) return null;
+  const slice = payload[0].payload;
+
+  return (
+    <LabTooltip
+      label={slice.name}
+      rows={[{ key: "share", name: "Share of total", value: formatShare(slice.value) }]}
+      note={slice.description}
+    />
+  );
+}
+
 export default function IrishBudgetQuiz() {
   const [quizData, setQuizData] = useState<QuizQuestion[]>(questions);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -654,17 +677,28 @@ export default function IrishBudgetQuiz() {
     setHasAnswered(false);
   }
 
-  function getButtonClass(optionId: string) {
+  /**
+   * Answer state is carried by the left accent rule rather than a fill, so the
+   * option rows keep reading as a single ruled list once answered.
+   */
+  function getOptionClass(optionId: string) {
     if (!hasAnswered || !currentQuestion) {
-      return "border-stone-300 bg-white text-stone-900 hover:border-yellow-500 hover:-translate-y-0.5";
+      return "border-l-transparent text-[color:var(--foreground)] hover:border-l-[#F4CA16]";
     }
     if (optionId === currentQuestion.correctOptionId) {
-      return "border-emerald-500 bg-emerald-50 text-emerald-900";
+      return "border-l-emerald-600 text-[color:var(--foreground)] dark:border-l-emerald-400";
     }
     if (optionId === selectedOptionId) {
-      return "border-rose-500 bg-rose-50 text-rose-900";
+      return "border-l-rose-600 text-[color:var(--foreground)] dark:border-l-rose-400";
     }
-    return "border-stone-300 bg-stone-100 text-stone-500";
+    return "border-l-transparent text-[color:var(--text-muted)]";
+  }
+
+  function getOptionTag(optionId: string) {
+    if (!hasAnswered || !currentQuestion) return null;
+    if (optionId === currentQuestion.correctOptionId) return "Correct";
+    if (optionId === selectedOptionId) return "Your answer";
+    return null;
   }
 
   function enterDrilldown(index: number) {
@@ -678,108 +712,84 @@ export default function IrishBudgetQuiz() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 pt-10 pb-24 sm:px-6 lg:px-8">
-      <Link
-        href="/labs"
-        className="mb-8 inline-flex items-center gap-2 text-stone-500 transition-colors hover:text-stone-900"
+    <LabShell>
+      <LabHeader
+        eyebrow="Public Spending - Ireland 2024"
+        title="The Irish Budget Quiz"
+        lede="Guess where public money goes, then compare your intuition against the published 2024 allocations. Figures are rounded for readability and used as an explainer rather than a full accounting model."
+      />
+
+      <LabSection
+        heading="Quiz"
+        action={
+          <span className={labMicroLabel}>
+            Current {score} / Best {bestScore}
+          </span>
+        }
       >
-        <ArrowLeft className="h-4 w-4" />
-        <span className="font-mono text-sm font-medium uppercase tracking-[0.2em]">
-          Back to Labs
-        </span>
-      </Link>
-
-      <header className="mb-10 space-y-4">
-        <p className="font-mono text-xs font-semibold uppercase tracking-[0.3em] text-stone-500">
-          Public Spending • Ireland 2024
-        </p>
-        <h1 className="max-w-4xl text-5xl font-black uppercase leading-[0.9] tracking-tight text-stone-900 sm:text-7xl">
-          The Irish Budget Quiz
-        </h1>
-        <p className="max-w-3xl text-lg leading-relaxed text-stone-600 sm:text-xl">
-          Guess where public money goes, then compare your intuition against
-          the published 2024 allocations. Figures are rounded for readability
-          and used as an explainer rather than a full accounting model.
-        </p>
-      </header>
-
-      <section className="mb-8 rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)] sm:p-8">
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-          <h2 className="text-2xl font-black tracking-tight text-stone-900 sm:text-3xl">
-            Quiz
-          </h2>
-          <div className="flex flex-wrap items-center gap-2 text-xs font-bold uppercase tracking-[0.2em]">
-            <span className="rounded-full border border-stone-200 px-3 py-1 text-stone-700">
-              Current {score}
-            </span>
-            <span className="rounded-full border border-stone-200 px-3 py-1 text-stone-700">
-              Best {bestScore}
-            </span>
-          </div>
-        </div>
-
         {!isComplete && currentQuestion && (
           <>
-            <div className="mb-4 flex items-center justify-between text-sm text-stone-600">
-              <span className="font-mono uppercase tracking-[0.16em]">
-                Question {currentIndex + 1} / {quizData.length}
+            <div className={`flex items-baseline justify-between gap-4 ${labMicroLabel}`}>
+              <span>
+                Question {currentIndex + 1} of {quizData.length}
               </span>
-              <span>{Math.round(((currentIndex + 1) / quizData.length) * 100)}%</span>
+              <span className="tabular-nums">
+                {Math.round(((currentIndex + 1) / quizData.length) * 100)}%
+              </span>
             </div>
-            <div className="mb-6 h-2 overflow-hidden rounded-full bg-stone-200">
+            <div className="mt-2 mb-8 h-[2px] w-full bg-[color:var(--rule-color)]">
               <div
-                className="h-full rounded-full bg-yellow-500 transition-all duration-300"
+                className="h-full bg-[#F4CA16] transition-all duration-300"
                 style={{
                   width: `${((currentIndex + 1) / quizData.length) * 100}%`,
                 }}
               />
             </div>
 
-            <h3 className="mb-6 text-2xl font-bold leading-snug text-stone-900">
+            <h3 className="mb-7 max-w-[760px] text-[1.7rem] font-normal leading-snug tracking-[-0.015em] text-[color:var(--foreground)]">
               {currentQuestion.prompt}
             </h3>
-            <div className="space-y-3">
-              {currentQuestion.options.map((option) => (
-                <button
-                  key={option.id}
-                  type="button"
-                  disabled={hasAnswered}
-                  onClick={() => handleAnswer(option.id)}
-                  className={`w-full rounded-2xl border p-4 text-left text-base font-semibold transition ${getButtonClass(option.id)} disabled:cursor-not-allowed disabled:translate-y-0`}
-                >
-                  {option.label}
-                </button>
-              ))}
+            <div className="border-t border-[color:var(--rule-color)]">
+              {currentQuestion.options.map((option) => {
+                const tag = getOptionTag(option.id);
+
+                return (
+                  <button
+                    key={option.id}
+                    type="button"
+                    disabled={hasAnswered}
+                    onClick={() => handleAnswer(option.id)}
+                    className={`flex w-full items-baseline justify-between gap-5 border-b border-l-2 border-b-[color:var(--rule-color)] py-4 pl-4 text-left text-[1.05rem] transition-colors disabled:cursor-not-allowed ${getOptionClass(option.id)}`}
+                  >
+                    <span>{option.label}</span>
+                    {tag ? (
+                      <span className={`shrink-0 ${labMicroLabel}`}>{tag}</span>
+                    ) : null}
+                  </button>
+                );
+              })}
             </div>
 
             {hasAnswered && (
-              <div className="mt-6 rounded-2xl border border-stone-200 bg-stone-50 p-5">
-                <p className="text-base leading-relaxed text-stone-800">
+              <div className="mt-8 border-l-2 border-[#F4CA16] pl-5">
+                <p className="max-w-[720px] text-[1.05rem] leading-[1.7] text-[color:var(--text-body-rgb)]">
                   {currentQuestion.feedback}
                 </p>
-                <div className="mt-3 flex flex-wrap gap-2 text-xs text-stone-600">
+                <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2">
                   {currentQuestion.sources.map((source) => (
                     <a
                       key={source.href}
                       href={source.href}
                       target="_blank"
                       rel="noreferrer"
-                      className="pill-control rounded-full border border-stone-300 bg-white px-3 py-1 underline decoration-stone-400 underline-offset-4 transition hover:border-stone-800 hover:decoration-stone-800"
+                      className={labQuietButton}
                     >
-                      <span className="pill-label">Source: {source.label}</span>
+                      Source: {source.label}
                     </a>
                   ))}
                 </div>
-                <button
-                  type="button"
-                  onClick={goNext}
-                  className="pill-control mt-4 rounded-full bg-stone-900 px-6 py-2 text-sm font-semibold text-white transition hover:bg-stone-700"
-                >
-                  <span className="pill-label">
-                    {currentIndex + 1 === quizData.length
-                      ? "See Results"
-                      : "Next Question"}
-                  </span>
+                <button type="button" onClick={goNext} className={`mt-6 ${labTextButton}`}>
+                  {currentIndex + 1 === quizData.length ? "See results" : "Next question"}
                 </button>
               </div>
             )}
@@ -787,129 +797,122 @@ export default function IrishBudgetQuiz() {
         )}
 
         {isComplete && (
-          <div className="rounded-2xl border border-stone-200 bg-stone-50 p-6 text-center sm:p-8">
-            <p className="font-mono text-xs font-semibold uppercase tracking-[0.3em] text-stone-500">
-              Quiz Complete
-            </p>
-            <h3 className="mt-2 text-4xl font-black tracking-tight text-stone-900">
+          <div>
+            <p className={labMicroLabel}>Quiz complete</p>
+            <h3 className="mt-3 text-[clamp(3rem,6vw,4.5rem)] font-light leading-[0.9] tracking-[-0.04em] tabular-nums text-[color:var(--foreground)]">
               {score} / {quizData.length}
             </h3>
-            <p className="mt-3 text-stone-700">
+            <p className={`mt-4 ${labFootnote}`}>
               Best score in this browser:{" "}
-              <span className="font-bold text-stone-900">{bestScore}</span>
+              <span className="text-[color:var(--foreground)] tabular-nums">{bestScore}</span>
             </p>
             <button
               type="button"
               onClick={resetQuiz}
-              className="pill-control mt-6 gap-2 rounded-full border border-stone-300 bg-white px-5 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900"
+              className={`mt-7 inline-flex items-center gap-2 ${labQuietButton}`}
             >
-              <RotateCcw className="h-4 w-4" />
-              <span className="pill-label">Play Again</span>
+              <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
+              Play again
             </button>
           </div>
         )}
-      </section>
+      </LabSection>
 
       {isComplete && (
         <>
-      <section className="mb-8 rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)] sm:p-8">
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-              <h2 className="text-2xl font-black tracking-tight text-stone-900 sm:text-3xl">
-                Budget Breakdown Explorer
-              </h2>
-              <span className="rounded-full border border-stone-300 bg-stone-50 px-3 py-1 text-xs font-bold uppercase tracking-[0.16em] text-stone-700">
+          <LabSection
+            heading="Budget Breakdown Explorer"
+            intro="Click a chart segment to drill into more detail, then use Back one level to return."
+            action={
+              <span className={labMicroLabel}>
                 Detail level {currentDetailLevel} of {maxDetailLevel}
               </span>
-            </div>
-            <p className="mb-4 text-sm text-stone-600">
-              Total: <span className="font-semibold">{formatShare(chartNode.value)}</span>
-            </p>
-            <div className="mb-6 rounded-xl border border-yellow-300 bg-yellow-50 p-3 text-sm font-medium text-stone-800">
-              Tip: click a chart segment to drill into more detail. Use Back on
-              the chart to return to the previous level.
+            }
+          >
+            <div className="flex flex-wrap items-baseline justify-between gap-4 border-b border-[color:var(--rule-color)] pb-4">
+              <div>
+                <p className={labMicroLabel}>{chartNode.label}</p>
+                <p className="mt-1.5 text-[2rem] font-light tracking-[-0.03em] tabular-nums text-[color:var(--foreground)]">
+                  {formatShare(chartNode.value)}
+                </p>
+              </div>
+              {drilldownPath.length > 1 && (
+                <button type="button" onClick={goBackDrilldown} className={labQuietButton}>
+                  Back one level
+                </button>
+              )}
             </div>
 
-        <div className="relative h-[26rem] w-full">
-          {drilldownPath.length > 1 && (
-            <button
-              type="button"
-              onClick={goBackDrilldown}
-              className="absolute left-3 top-3 z-10 rounded-full border border-stone-400 bg-white px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-stone-800 shadow-sm transition hover:border-stone-900 hover:text-stone-900"
-            >
-              Back
-            </button>
-          )}
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={chartData}
-                dataKey="value"
-                nameKey="name"
-                cx="50%"
-                cy="50%"
-                innerRadius={68}
-                outerRadius={140}
-                paddingAngle={2}
-                onClick={(_, index) => {
-                  if (typeof index === "number") {
-                    enterDrilldown(index);
-                  }
-                }}
-              >
-                {chartData.map((entry) => (
-                  <Cell key={entry.name} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip
-                formatter={(value: number, _name, item) => {
-                      const share = formatShare(value);
-                      return [share, item.payload?.name ?? "Share"];
-                }}
-                contentStyle={{
-                  borderRadius: "12px",
-                  borderColor: "#d6d3d1",
-                }}
-                labelFormatter={(_label, payload) =>
-                  payload?.[0]?.payload?.description ?? ""
-                }
-              />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-      </section>
+            <div className="mt-6 h-[26rem] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={chartData}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={68}
+                    outerRadius={140}
+                    paddingAngle={2}
+                    stroke="none"
+                    onClick={(_, index) => {
+                      if (typeof index === "number") {
+                        enterDrilldown(index);
+                      }
+                    }}
+                  >
+                    {chartData.map((entry) => (
+                      <Cell key={entry.name} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip content={<QuizSliceTooltip />} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
 
-      <section className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)] sm:p-8">
-        <h2 className="text-2xl font-black tracking-tight text-stone-900 sm:text-3xl">
-          Sources
-        </h2>
-        <ul className="mt-4 space-y-2 text-stone-700">
-          <li>
-            Department of Public Expenditure:{" "}
-            <a
-              href={SOURCES.rev2024.href}
-              target="_blank"
-              rel="noreferrer"
-              className="underline decoration-stone-400 underline-offset-4 transition hover:decoration-stone-900"
-            >
-              Revised Estimates for Public Services 2024 release
-            </a>
-          </li>
-          <li>
-            Oireachtas Parliamentary Budget Office:{" "}
-            <a
-              href={SOURCES.pboOverview.href}
-              target="_blank"
-              rel="noreferrer"
-              className="underline decoration-stone-400 underline-offset-4 transition hover:decoration-stone-900"
-            >
-              Overview of the Revised Estimates for Public Services 2024
-            </a>
-          </li>
-        </ul>
-      </section>
+            <LabLegend
+              className="mt-6 border-t border-[color:var(--rule-color)] pt-5"
+              items={chartChildren.map((child) => ({
+                key: child.id,
+                label: child.label,
+                color: child.color,
+                dimmed: !child.children?.length,
+              }))}
+              onSelect={(key) =>
+                enterDrilldown(chartChildren.findIndex((child) => child.id === key))
+              }
+            />
+          </LabSection>
+
+          <LabDetails heading="Sources" summary="The published material behind these figures.">
+            <ul className="max-w-[720px] space-y-3 text-[1rem] leading-[1.7] text-[color:var(--text-body-rgb)]">
+              <li>
+                Department of Public Expenditure:{" "}
+                <a
+                  href={SOURCES.rev2024.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={labLink}
+                >
+                  Revised Estimates for Public Services 2024 release
+                </a>
+              </li>
+              <li>
+                Oireachtas Parliamentary Budget Office:{" "}
+                <a
+                  href={SOURCES.pboOverview.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={labLink}
+                >
+                  Overview of the Revised Estimates for Public Services 2024
+                </a>
+              </li>
+            </ul>
+          </LabDetails>
         </>
       )}
-    </div>
+    </LabShell>
   );
 }

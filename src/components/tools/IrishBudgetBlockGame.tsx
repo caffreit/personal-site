@@ -1,8 +1,15 @@
 "use client";
 
-import Link from "next/link";
-import { ArrowLeft, RotateCcw } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 import { useMemo, useState } from "react";
+
+import { LabDetails, LabHeader, LabSection, LabShell } from "@/components/labs/LabChrome";
+import {
+  labFootnote,
+  labMicroLabel,
+  labQuietButton,
+  labTextButton,
+} from "@/components/labs/labTokens";
 
 type BudgetCategory = {
   id: string;
@@ -168,203 +175,189 @@ export default function IrishBudgetBlockGame() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 pt-10 pb-24 sm:px-6 lg:px-8">
-      <Link
-        href="/labs"
-        className="mb-8 inline-flex items-center gap-2 text-stone-500 transition-colors hover:text-stone-900"
+    <LabShell>
+      <LabHeader
+        eyebrow="Public Spending - Ireland 2024"
+        title="Irish Budget Block Game"
+        lede="Drag each block into the category you think gets the money. Every block is 5% of expenditure, so your full set of 20 blocks represents the whole budget."
+      />
+
+      <LabSection
+        heading="Your budget blocks"
+        intro="Drag blocks to categories, or use the add and remove controls on touch devices."
+        action={
+          <span className={labMicroLabel}>
+            {remainingBlocks} of {TOTAL_BLOCKS} left
+          </span>
+        }
       >
-        <ArrowLeft className="h-4 w-4" />
-        <span className="font-mono text-sm font-medium uppercase tracking-[0.2em]">
-          Back to Labs
-        </span>
-      </Link>
-
-      <header className="mb-10 space-y-4">
-        <p className="font-mono text-xs font-semibold uppercase tracking-[0.3em] text-stone-500">
-          Public Spending • Ireland 2024
-        </p>
-        <h1 className="max-w-4xl text-5xl font-black uppercase leading-[0.9] tracking-tight text-stone-900 sm:text-7xl">
-          Irish Budget Block Game
-        </h1>
-        <p className="max-w-3xl text-lg leading-relaxed text-stone-600 sm:text-xl">
-          Drag each block into the category you think gets the money. Every
-          block is 5% of expenditure, so your full set of 20 blocks represents
-          the whole budget.
-        </p>
-      </header>
-
-      <section className="mb-8 rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)] sm:p-8">
-        <div className="mb-6">
-          <h2 className="text-center text-2xl font-black tracking-tight text-stone-900 sm:text-3xl">
-            Your Budget Blocks ({remainingBlocks} left)
-          </h2>
-          <p className="mt-2 text-center text-sm text-stone-600 sm:text-base">
-            Drag blocks to categories, or use + / - controls for touch devices.
-          </p>
-          <div
-            onDragOver={(event) => event.preventDefault()}
-            onDrop={(event) => {
-              event.preventDefault();
-              if (draggedBlockId !== null) {
-                returnBlockToBank(draggedBlockId);
-              }
-              setDraggedBlockId(null);
-            }}
-            className="mx-auto mt-4 flex min-h-[7rem] max-w-3xl flex-wrap items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-stone-300 bg-stone-100 p-4"
-          >
-            {unallocatedBlockIds.length === 0 && (
-              <p className="text-sm text-stone-500">
-                All blocks allocated. Check your guess below.
-              </p>
-            )}
-            {unallocatedBlockIds.map((blockId) => (
-              <div
-                key={blockId}
-                draggable={!checked}
-                onDragStart={() => setDraggedBlockId(blockId)}
-                onDragEnd={() => setDraggedBlockId(null)}
-                className="h-10 w-10 rounded-md border border-amber-500 bg-yellow-400 shadow-sm transition hover:-translate-y-0.5"
-                aria-label={`Budget block ${blockId + 1}`}
-              />
-            ))}
-          </div>
+        <div
+          onDragOver={(event) => event.preventDefault()}
+          onDrop={(event) => {
+            event.preventDefault();
+            if (draggedBlockId !== null) {
+              returnBlockToBank(draggedBlockId);
+            }
+            setDraggedBlockId(null);
+          }}
+          className="flex min-h-[5.5rem] flex-wrap content-start items-start gap-2 border-y border-[color:var(--rule-color)] py-5"
+        >
+          {unallocatedBlockIds.length === 0 && (
+            <p className={labFootnote}>All blocks allocated. Check your guess below.</p>
+          )}
+          {unallocatedBlockIds.map((blockId) => (
+            <div
+              key={blockId}
+              draggable={!checked}
+              onDragStart={() => setDraggedBlockId(blockId)}
+              onDragEnd={() => setDraggedBlockId(null)}
+              className="h-9 w-9 cursor-grab bg-[#F4CA16] transition-transform hover:-translate-y-0.5"
+              aria-label={`Budget block ${blockId + 1}`}
+            />
+          ))}
         </div>
+      </LabSection>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {CATEGORIES.map((category) => {
-            const count = categoryCounts[category.id];
-            const assignedBlockIds = BLOCK_IDS.filter(
-              (blockId) => allocations[blockId] === category.id,
-            );
-            const isInfoOpen = expandedInfoIds.includes(category.id);
-            const userPercentage = count * BLOCK_PERCENTAGE;
-            const isCorrect = count === category.correctBlocks;
+      <section className="mt-9 grid grid-cols-1 gap-x-8 gap-y-9 sm:grid-cols-2 lg:grid-cols-4">
+        {CATEGORIES.map((category) => {
+          const count = categoryCounts[category.id];
+          const assignedBlockIds = BLOCK_IDS.filter(
+            (blockId) => allocations[blockId] === category.id,
+          );
+          const isInfoOpen = expandedInfoIds.includes(category.id);
+          const userPercentage = count * BLOCK_PERCENTAGE;
+          const isCorrect = count === category.correctBlocks;
 
-            return (
-              <div
-                key={category.id}
-                onDragOver={(event) => event.preventDefault()}
-                onDrop={(event) => {
-                  event.preventDefault();
-                  if (draggedBlockId !== null) {
-                    assignBlockToCategory(draggedBlockId, category.id);
-                  }
-                  setDraggedBlockId(null);
-                }}
-                className="rounded-2xl border border-stone-200 bg-stone-50 p-4"
-              >
-                <h3
-                  className="text-center text-lg font-black"
-                  style={{ color: category.color }}
-                >
-                  {category.name}
-                </h3>
+          return (
+            <div
+              key={category.id}
+              onDragOver={(event) => event.preventDefault()}
+              onDrop={(event) => {
+                event.preventDefault();
+                if (draggedBlockId !== null) {
+                  assignBlockToCategory(draggedBlockId, category.id);
+                }
+                setDraggedBlockId(null);
+              }}
+              className="border-t border-[color:var(--rule-color)] pt-4"
+            >
+              {/* Fixed height so every category's figure sits on one baseline,
+                  including the one carrying a footnote. */}
+              <div className="min-h-[3.25rem]">
+                <div className="flex items-baseline gap-2">
+                  <span
+                    className="mt-[0.35em] h-2.5 w-2.5 shrink-0 self-start rounded-full"
+                    style={{ background: category.color }}
+                    aria-hidden="true"
+                  />
+                  <h3 className="text-[1.05rem] font-normal leading-snug text-[color:var(--foreground)]">
+                    {category.name}
+                  </h3>
+                </div>
                 {category.id === "other" && (
-                  <p className="text-center text-xs text-stone-500">
+                  <p className={`mt-1 pl-[1.125rem] ${labFootnote}`}>
                     *Justice, Defence, etc.
                   </p>
                 )}
-                <p className="my-2 text-center text-3xl font-black text-stone-900">
-                  {userPercentage}%
-                </p>
-
-                <div className="min-h-[4rem] rounded-xl bg-stone-200 p-2">
-                  <div className="flex flex-wrap gap-2">
-                    {assignedBlockIds.map((blockId) => (
-                      <button
-                        key={blockId}
-                        type="button"
-                        draggable={!checked}
-                        onDragStart={() => setDraggedBlockId(blockId)}
-                        onDragEnd={() => setDraggedBlockId(null)}
-                        onClick={() => returnBlockToBank(blockId)}
-                        disabled={checked}
-                        className="h-8 w-8 rounded border border-amber-500 bg-yellow-400 shadow-sm disabled:cursor-not-allowed disabled:opacity-70"
-                        aria-label={`Remove block ${blockId + 1} from ${category.name}`}
-                      />
-                    ))}
-                  </div>
-                </div>
-
-                <div className="mt-3 grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => addBlockViaButton(category.id)}
-                    disabled={checked || remainingBlocks === 0}
-                    className="pill-control rounded-full border border-stone-300 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-stone-800 transition hover:border-stone-900 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    <span className="pill-label">+ Add</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => removeBlockViaButton(category.id)}
-                    disabled={checked || count === 0}
-                    className="pill-control rounded-full border border-stone-300 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-stone-800 transition hover:border-stone-900 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    <span className="pill-label">- Remove</span>
-                  </button>
-                </div>
-
-                {checked && (
-                  <div className="mt-3">
-                    <p
-                      className={`text-sm font-semibold ${isCorrect ? "text-emerald-700" : "text-rose-700"}`}
-                    >
-                      {isCorrect
-                        ? `Spot On! (${roundedPercent(category.correctPercentage)})`
-                        : `True Spend: ${roundedPercent(category.correctPercentage)}`}
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => toggleInfo(category.id)}
-                      className="mt-2 w-full rounded-md border border-stone-300 bg-stone-100 px-3 py-1.5 text-sm font-semibold text-stone-800 transition hover:bg-stone-200"
-                    >
-                      {isInfoOpen ? "Hide Info" : "More Info"}
-                    </button>
-                    {isInfoOpen && (
-                      <p className="mt-2 rounded-md bg-stone-200 px-3 py-2 text-sm leading-relaxed text-stone-700">
-                        {category.info}
-                      </p>
-                    )}
-                  </div>
-                )}
               </div>
-            );
-          })}
-        </div>
 
-        {remainingBlocks === 0 && !checked && (
-          <div className="mt-8 text-center">
-            <button
-              type="button"
-              onClick={() => setChecked(true)}
-              className="pill-control rounded-full bg-stone-900 px-8 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-stone-700"
-            >
-              <span className="pill-label">Check My Guess</span>
-            </button>
-          </div>
-        )}
+              <p className="text-[2.2rem] font-light leading-none tracking-[-0.03em] tabular-nums text-[color:var(--foreground)]">
+                {userPercentage}%
+              </p>
 
-        {checked && (
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <button
-              type="button"
-              onClick={handleReset}
-              className="pill-control gap-2 rounded-full border border-stone-300 bg-white px-5 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900"
-            >
-              <RotateCcw className="h-4 w-4" />
-              <span className="pill-label">Play Again</span>
-            </button>
-          </div>
-        )}
+              <div className="mt-4 flex min-h-[3.25rem] flex-wrap content-start gap-2 border-t border-[color:var(--rule-color)] pt-3">
+                {assignedBlockIds.map((blockId) => (
+                  <button
+                    key={blockId}
+                    type="button"
+                    draggable={!checked}
+                    onDragStart={() => setDraggedBlockId(blockId)}
+                    onDragEnd={() => setDraggedBlockId(null)}
+                    onClick={() => returnBlockToBank(blockId)}
+                    disabled={checked}
+                    className="h-7 w-7 bg-[#F4CA16] disabled:cursor-not-allowed disabled:opacity-60"
+                    aria-label={`Remove block ${blockId + 1} from ${category.name}`}
+                  />
+                ))}
+              </div>
+
+              <div className="mt-4 flex gap-5">
+                <button
+                  type="button"
+                  onClick={() => addBlockViaButton(category.id)}
+                  disabled={checked || remainingBlocks === 0}
+                  className={labQuietButton}
+                >
+                  + Add
+                </button>
+                <button
+                  type="button"
+                  onClick={() => removeBlockViaButton(category.id)}
+                  disabled={checked || count === 0}
+                  className={labQuietButton}
+                >
+                  - Remove
+                </button>
+              </div>
+
+              {checked && (
+                <div className="mt-5 border-t border-[color:var(--rule-color)] pt-3">
+                  <p
+                    className={`font-mono text-[0.58rem] uppercase tracking-[0.16em] ${
+                      isCorrect
+                        ? "text-emerald-700 dark:text-emerald-400"
+                        : "text-rose-700 dark:text-rose-400"
+                    }`}
+                  >
+                    {isCorrect ? "Spot on" : "True spend"}
+                  </p>
+                  <p className="mt-1.5 text-[1.3rem] font-light tabular-nums text-[color:var(--foreground)]">
+                    {roundedPercent(category.correctPercentage)}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => toggleInfo(category.id)}
+                    className={`mt-3 ${labQuietButton}`}
+                  >
+                    {isInfoOpen ? "Hide info" : "More info"}
+                  </button>
+                  {isInfoOpen && (
+                    <p className={`mt-3 ${labFootnote}`}>{category.info}</p>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </section>
 
-      <footer className="text-center text-sm text-stone-500">
-        <p>
-          Data sourced and aggregated from Department of Public Expenditure and
-          Oireachtas Parliamentary Budget Office material for 2024.
+      {remainingBlocks === 0 && !checked && (
+        <div className="mt-10 border-t border-[color:var(--rule-color)] pt-7">
+          <button type="button" onClick={() => setChecked(true)} className={labTextButton}>
+            Check my guess
+          </button>
+        </div>
+      )}
+
+      {checked && (
+        <div className="mt-10 border-t border-[color:var(--rule-color)] pt-7">
+          <button
+            type="button"
+            onClick={handleReset}
+            className={`inline-flex items-center gap-2 ${labQuietButton}`}
+          >
+            <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
+            Play again
+          </button>
+        </div>
+      )}
+
+      <LabDetails heading="Notes and sources" summary="Where these figures come from.">
+        <p className="max-w-[720px] text-[1rem] leading-[1.7] text-[color:var(--text-body-rgb)]">
+          Data sourced and aggregated from Department of Public Expenditure and Oireachtas
+          Parliamentary Budget Office material for 2024.
         </p>
-      </footer>
-    </div>
+      </LabDetails>
+    </LabShell>
   );
 }

@@ -11,6 +11,19 @@ import {
   YAxis,
 } from "recharts";
 
+import { LabDetails, LabHeader, LabSection, LabShell } from "@/components/labs/LabChrome";
+import {
+  LabTooltip,
+  labAxisProps,
+  labGridProps,
+  useLabChartTheme,
+} from "@/components/labs/labChartTheme";
+import {
+  labFootnote,
+  labMicroLabel,
+  labSlider,
+} from "@/components/labs/labTokens";
+
 type ChartRow = {
   year: number;
   housePrice: number;
@@ -295,40 +308,31 @@ const getYearColor = (year: number) => {
   return `hsl(${hue}, 80%, 50%)`;
 };
 
-const CustomTooltipBurden = ({
-  active,
-  payload,
-}: any) => {
-  if (active && payload && payload.length) {
-    const data = payload[0]?.payload as ChartRow | undefined;
-    if (!data) return null;
+type BurdenTooltipProps = {
+  active?: boolean;
+  payload?: Array<{ payload: ChartRow }>;
+};
 
-    return (
-      <div className="rounded-lg border border-gray-300 bg-white p-3 shadow-lg">
-        <p
-          className="text-lg font-bold"
-          style={{ color: getYearColor(data.year) }}
-        >
-          {data.year}
-        </p>
-        <p className="text-sm font-medium">
-          Mortgage Burden:{" "}
-          <span className="font-normal">
-            {data.mortgageAsPercentOfEarningsNum.toFixed(1)}%
-          </span>
-        </p>
-        <p className="text-sm font-medium">
-          Price/Wage:{" "}
-          <span className="font-normal">{data.priceToWageRatio}x</span>
-        </p>
-        <p className="text-sm font-medium">
-          Inflation:{" "}
-          <span className="font-normal">{data.inflationNum.toFixed(1)}%</span>
-        </p>
-      </div>
-    );
-  }
-  return null;
+const CustomTooltipBurden = ({ active, payload }: BurdenTooltipProps) => {
+  if (!active || !payload?.length) return null;
+  const data = payload[0]?.payload;
+  if (!data) return null;
+
+  return (
+    <LabTooltip
+      label={String(data.year)}
+      rows={[
+        {
+          key: "burden",
+          name: "Mortgage burden",
+          value: `${data.mortgageAsPercentOfEarningsNum.toFixed(1)}%`,
+          color: getYearColor(data.year),
+        },
+        { key: "ratio", name: "Price/wage", value: `${data.priceToWageRatio}x` },
+        { key: "inflation", name: "Inflation", value: `${data.inflationNum.toFixed(1)}%` },
+      ]}
+    />
+  );
 };
 
 const calculateMonthlyPayment = (
@@ -413,6 +417,7 @@ const HousingMarketAnalysis = () => {
   );
   const [loanToValue, setLoanToValue] = useState(90);
   const [mortgageTerm, setMortgageTerm] = useState(25);
+  const chartTheme = useLabChartTheme();
 
   const chartData = useMemo<ChartRow[]>(() => {
     const years = Object.keys(housePrices)
@@ -502,194 +507,172 @@ const HousingMarketAnalysis = () => {
   }, [depositMethod, loanToValue, mortgageTerm]);
 
   return (
-    <div className="min-h-screen max-w-7xl bg-gray-50 p-4 font-sans md:p-6">
-      <h1 className="mb-2 text-3xl font-bold text-gray-900">
-        Ireland Housing Market Analysis
-      </h1>
-      <p className="mb-6 text-lg text-gray-600">
-        Mortgage Payments as a Fraction of Lifetime Earnings (Variable Rates)
-      </p>
+    <LabShell>
+      <LabHeader
+        eyebrow="Irish Housing - Historical model"
+        title="Ireland Housing Market Analysis"
+        lede="Mortgage payments as a fraction of lifetime earnings, under historical variable rates."
+      />
 
-      <div className="mb-6 rounded-lg border border-gray-200 bg-white p-4 shadow-lg md:p-6">
-        <h2 className="mb-4 text-xl font-semibold text-gray-800">
-          Mortgage Parameters
-        </h2>
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">
-              Deposit Method
-            </label>
-            <div className="flex flex-col space-y-2">
-              <label className="has-[:checked]:border-blue-400 has-[:checked]:bg-blue-100 flex cursor-pointer items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 p-3 transition-all">
-                <input
-                  type="radio"
-                  value="annual-wage"
-                  checked={depositMethod === "annual-wage"}
-                  onChange={(event) =>
-                    setDepositMethod(event.target.value as "annual-wage")
-                  }
-                  className="h-4 w-4 text-blue-600"
-                />
-                <span className="font-medium text-gray-800">
-                  Deposit = 1x Annual Wage
-                </span>
-              </label>
-              <label className="has-[:checked]:border-blue-400 has-[:checked]:bg-blue-100 flex cursor-pointer items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 p-3 transition-all">
-                <input
-                  type="radio"
-                  value="percentage"
-                  checked={depositMethod === "percentage"}
-                  onChange={(event) =>
-                    setDepositMethod(event.target.value as "percentage")
-                  }
-                  className="h-4 w-4 text-blue-600"
-                />
-                <span className="font-medium text-gray-800">
-                  Fixed Percentage LTV
-                </span>
-              </label>
-            </div>
-          </div>
-
-          <div>
-            {depositMethod === "percentage" && (
-              <div className="mb-4">
-                <label className="mb-2 block text-sm font-medium text-gray-700">
-                  Loan-to-Value Ratio:{" "}
-                  <span className="font-bold text-blue-600">
-                    {loanToValue}%
+      <LabSection heading="Mortgage parameters">
+        <div className="grid gap-10 md:grid-cols-2 md:gap-0">
+          <fieldset className="border-[color:var(--rule-color)] md:border-r md:pr-10">
+            <legend className={labMicroLabel}>Deposit method</legend>
+            <div className="mt-3 border-t border-[color:var(--rule-color)]">
+              {(
+                [
+                  { value: "annual-wage", label: "Deposit = 1x annual wage" },
+                  { value: "percentage", label: "Fixed percentage LTV" },
+                ] as const
+              ).map((option) => (
+                <label
+                  key={option.value}
+                  className="flex cursor-pointer items-center gap-3 border-b border-l-2 border-b-[color:var(--rule-color)] border-l-transparent py-3.5 pl-3.5 transition-colors has-[:checked]:border-l-[#F4CA16]"
+                >
+                  <input
+                    type="radio"
+                    value={option.value}
+                    checked={depositMethod === option.value}
+                    onChange={(event) =>
+                      setDepositMethod(event.target.value as typeof depositMethod)
+                    }
+                    className="h-3.5 w-3.5 accent-[color:var(--foreground)]"
+                  />
+                  <span className="text-[0.98rem] text-[color:var(--foreground)]">
+                    {option.label}
                   </span>
                 </label>
+              ))}
+            </div>
+          </fieldset>
+
+          <div className="md:pl-10">
+            {depositMethod === "percentage" && (
+              <label className="mb-7 block border-t border-[color:var(--rule-color)] pt-4">
+                <div className="flex items-baseline justify-between gap-3">
+                  <span className={labMicroLabel}>Loan-to-value ratio</span>
+                  <span className="text-[1.15rem] font-light tabular-nums text-[color:var(--foreground)]">
+                    {loanToValue}%
+                  </span>
+                </div>
                 <input
                   type="range"
                   min={50}
                   max={100}
                   value={loanToValue}
-                  onChange={(event) =>
-                    setLoanToValue(Number(event.target.value))
-                  }
-                  className="w-full accent-blue-600"
+                  onChange={(event) => setLoanToValue(Number(event.target.value))}
+                  className={`mt-3 ${labSlider}`}
                 />
-              </div>
+              </label>
             )}
 
-            <div className="mt-4">
-              <label className="mb-2 block text-sm font-medium text-gray-700">
-                Mortgage Term:{" "}
-                <span className="font-bold text-blue-600">
+            <label className="block border-t border-[color:var(--rule-color)] pt-4">
+              <div className="flex items-baseline justify-between gap-3">
+                <span className={labMicroLabel}>Mortgage term</span>
+                <span className="text-[1.15rem] font-light tabular-nums text-[color:var(--foreground)]">
                   {mortgageTerm} years
                 </span>
-              </label>
+              </div>
               <input
                 type="range"
                 min={15}
                 max={35}
                 value={mortgageTerm}
-                onChange={(event) =>
-                  setMortgageTerm(Number(event.target.value))
-                }
-                className="w-full accent-blue-600"
+                onChange={(event) => setMortgageTerm(Number(event.target.value))}
+                className={`mt-3 ${labSlider}`}
               />
-            </div>
+            </label>
           </div>
         </div>
-      </div>
+      </LabSection>
 
-      <div className="mb-6 rounded-lg border border-gray-200 bg-white p-4 shadow-lg md:p-6">
-        <h3 className="mb-4 text-xl font-semibold text-gray-800">
-          Key Comparison: % of Earnings to Mortgage
-        </h3>
-        <div className="grid grid-cols-1 gap-4 text-sm md:grid-cols-3">
-          {[1980, 2000, 2020].map((keyYear, idx) => {
-            const palette = ["text-purple-700", "text-blue-700", "text-green-700"];
-            const largePalette = [
-              "text-purple-600",
-              "text-blue-600",
-              "text-green-600",
-            ];
-            const borderClasses = [
-              "md:border-r border-gray-200 md:pr-4",
-              "md:border-r border-gray-200 md:px-4",
-              "md:pl-4",
-            ];
-            const data = chartData.find((d) => d.year === keyYear);
+      <LabSection heading="Key comparison: share of earnings to mortgage">
+        <div className="grid grid-cols-1 gap-x-8 gap-y-9 md:grid-cols-3">
+          {[1980, 2000, 2020].map((keyYear) => {
+            const data = chartData.find((row) => row.year === keyYear);
+
             return (
-              <div
-                key={keyYear}
-                className={`${idx < 2 ? borderClasses[idx] : borderClasses[2]}`}
-              >
-                <p className={`mb-2 text-lg font-semibold ${palette[idx]}`}>
-                  {keyYear} Mortgage
-                </p>
-                <p className={`mb-2 mt-1 text-4xl font-bold ${largePalette[idx]}`}>
+              <div key={keyYear} className="border-t border-[color:var(--rule-color)] pt-4">
+                <div className="flex items-center gap-2">
+                  <span
+                    className="h-2.5 w-2.5 shrink-0 rounded-full"
+                    style={{ background: getYearColor(keyYear) }}
+                    aria-hidden="true"
+                  />
+                  <p className={labMicroLabel}>{keyYear} mortgage</p>
+                </div>
+                <p className="mt-3 text-[2.6rem] font-light leading-none tracking-[-0.04em] tabular-nums text-[color:var(--foreground)]">
                   {data?.mortgageAsPercentOfEarnings ?? "—"}%
                 </p>
-                <p className="text-xs font-medium uppercase text-gray-500">
-                  Total Payments
-                </p>
-                <p className="mb-1 text-sm font-medium text-gray-700">
-                  €
-                  {data?.totalMortgagePayments.toLocaleString(undefined, {
-                    maximumFractionDigits: 0,
-                  }) ?? "—"}
-                </p>
-                <p className="text-xs font-medium uppercase text-gray-500">
-                  Total Earnings ({mortgageTerm}yr)
-                </p>
-                <p className="text-sm font-medium text-gray-700">
-                  €
-                  {data?.totalEarningsOverTerm.toLocaleString(undefined, {
-                    maximumFractionDigits: 0,
-                  }) ?? "—"}
-                </p>
+                <dl className="mt-5">
+                  <div className="flex items-baseline justify-between gap-3 border-b border-[color:var(--rule-color)] py-2">
+                    <dt className="text-[0.9rem] text-[color:var(--text-muted)]">
+                      Total payments
+                    </dt>
+                    <dd className="text-[0.95rem] tabular-nums text-[color:var(--foreground)]">
+                      €
+                      {data?.totalMortgagePayments.toLocaleString(undefined, {
+                        maximumFractionDigits: 0,
+                      }) ?? "—"}
+                    </dd>
+                  </div>
+                  <div className="flex items-baseline justify-between gap-3 border-b border-[color:var(--rule-color)] py-2">
+                    <dt className="text-[0.9rem] text-[color:var(--text-muted)]">
+                      Total earnings ({mortgageTerm}yr)
+                    </dt>
+                    <dd className="text-[0.95rem] tabular-nums text-[color:var(--foreground)]">
+                      €
+                      {data?.totalEarningsOverTerm.toLocaleString(undefined, {
+                        maximumFractionDigits: 0,
+                      }) ?? "—"}
+                    </dd>
+                  </div>
+                </dl>
               </div>
             );
           })}
         </div>
-      </div>
+      </LabSection>
 
-      <div className="mb-6 rounded-lg border border-gray-200 bg-white p-4 shadow-lg md:p-6">
-        <h3 className="mb-4 text-xl font-semibold text-gray-800">
-          Total Mortgage Burden Over Time
-        </h3>
-        <p className="mb-4 text-sm text-gray-600">
-          Shows the total mortgage payments as a percentage of total earnings over
-          the {mortgageTerm}-year term.
-        </p>
+      <LabSection
+        heading="Total mortgage burden over time"
+        intro={`Shows the total mortgage payments as a percentage of total earnings over the ${mortgageTerm}-year term.`}
+      >
         <ResponsiveContainer width="100%" height={400}>
           <LineChart data={chartData} margin={{ top: 20, right: 30, bottom: 40, left: 30 }}>
-            <CartesianGrid stroke="#e0e0e0" strokeDasharray="3 3" />
+            <CartesianGrid {...labGridProps(chartTheme)} />
             <XAxis
               type="number"
               dataKey="year"
               domain={["dataMin", "dataMax"]}
               allowDecimals={false}
-              stroke="#4b5563"
+              {...labAxisProps(chartTheme)}
               label={{
-                value: "Mortgage Start Year",
+                value: "Mortgage start year",
                 position: "insideBottom",
                 offset: -15,
-                fill: "#4b5563",
-                fontSize: 14,
+                fill: chartTheme.muted,
+                fontSize: 11,
               }}
-              tick={{ fontSize: 12 }}
             />
             <YAxis
               type="number"
               dataKey="mortgageAsPercentOfEarningsNum"
               unit="%"
-              stroke="#4b5563"
+              {...labAxisProps(chartTheme)}
               label={{
-                value: "Mortgage as % of Earnings",
+                value: "Mortgage as % of earnings",
                 angle: -90,
                 position: "insideLeft",
                 offset: -5,
-                fill: "#4b5563",
-                fontSize: 14,
+                fill: chartTheme.muted,
+                fontSize: 11,
               }}
-              tick={{ fontSize: 12 }}
             />
-            <Tooltip content={<CustomTooltipBurden />} cursor={{ strokeDasharray: "3 3" }} />
+            <Tooltip
+              content={<CustomTooltipBurden />}
+              cursor={{ stroke: chartTheme.muted, strokeDasharray: "3 3" }}
+            />
             <Line
               name="Mortgage as % of Earnings"
               type="monotone"
@@ -697,179 +680,177 @@ const HousingMarketAnalysis = () => {
               stroke="#dc2626"
               strokeWidth={2.5}
               dot={false}
-              activeDot={{ r: 6 }}
+              activeDot={{ r: 5 }}
             />
           </LineChart>
         </ResponsiveContainer>
-      </div>
+      </LabSection>
 
-      <div className="rounded-lg border border-gray-200 bg-white shadow-lg">
-        <h3 className="border-b border-gray-200 p-4 text-xl font-semibold text-gray-800 md:p-6">
-          Detailed Data Table
-        </h3>
-        <div className="overflow-x-auto">
-          <div className="max-h-96 overflow-y-auto">
-            <table className="min-w-full border-collapse text-xs">
-              <thead className="sticky top-0 z-10 bg-gray-100">
-                <tr>
-                  {[
-                    "Year",
-                    "House Price",
-                    "House Δ%",
-                    "Annual Wage",
-                    "Wage Δ%",
-                    "Inflation %",
-                    "Price/Wage",
-                    "Deposit",
-                    "Loan Amount",
-                    "LTV %",
-                    "Initial Rate %",
-                    "Initial Monthly Payment",
-                    `Total Payments (${mortgageTerm}yr)`,
-                    "Total Interest",
-                    `Total Earnings (${mortgageTerm}yr)`,
-                    "Mortgage as % of Earnings",
-                  ].map((header) => (
-                    <th
-                      key={header}
-                      className="px-3 py-3 text-left font-semibold uppercase text-gray-600"
-                    >
-                      {header}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {chartData.map((row) => (
-                  <tr key={row.year} className="hover:bg-gray-50">
-                    <td className="whitespace-nowrap px-3 py-2 font-medium text-gray-900">
-                      {row.year}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-2 text-gray-700">
-                      €{row.housePrice.toLocaleString()}
-                    </td>
-                    <td
-                      className="whitespace-nowrap px-3 py-2"
-                      style={{
-                        color:
-                          row.housePriceYoY !== "N/A" &&
-                          parseFloat(row.housePriceYoY) > 5
-                            ? "#16a34a"
-                            : row.housePriceYoY !== "N/A" &&
-                                parseFloat(row.housePriceYoY) < 0
-                              ? "#dc2626"
-                              : "#4b5563",
-                      }}
-                    >
-                      {row.housePriceYoY !== "N/A"
-                        ? `${row.housePriceYoY}%`
-                        : "N/A"}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-2 text-gray-700">
-                      €{row.annualWage.toLocaleString()}
-                    </td>
-                    <td
-                      className="whitespace-nowrap px-3 py-2"
-                      style={{
-                        color:
-                          row.wageYoY !== "N/A" &&
-                          parseFloat(row.wageYoY) > 5
-                            ? "#16a34a"
-                            : "#4b5563",
-                      }}
-                    >
-                      {row.wageYoY !== "N/A" ? `${row.wageYoY}%` : "N/A"}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-2 text-gray-700">
-                      {row.inflation}%
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-2 text-gray-700">
-                      {row.priceToWageRatio}x
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-2 text-gray-700">
-                      €{row.deposit.toLocaleString()}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-2 text-gray-700">
-                      €{row.loanAmount.toLocaleString()}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-2 text-gray-700">
-                      {row.actualLTV}%
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-2 text-gray-700">
-                      {row.initialRate}%
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-2 text-gray-700">
-                      €{row.initialMonthlyPayment.toLocaleString()}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-2 text-gray-700">
-                      €{row.totalMortgagePayments.toLocaleString()}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-2 text-red-600">
-                      €{row.totalInterestPaid.toLocaleString()}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-2 text-gray-700">
-                      €{row.totalEarningsOverTerm.toLocaleString()}
-                    </td>
-                    <td
-                      className="whitespace-nowrap px-3 py-2 text-lg font-bold"
-                      style={{
-                        color:
-                          parseFloat(row.mortgageAsPercentOfEarnings) > 40
-                            ? "#dc2626"
-                            : parseFloat(row.mortgageAsPercentOfEarnings) > 30
-                              ? "#f97316"
-                              : "#16a34a",
-                      }}
-                    >
-                      {row.mortgageAsPercentOfEarnings}%
-                    </td>
-                  </tr>
+      <LabSection heading="Detailed data table">
+        <div className="max-h-96 overflow-auto">
+          <table className="min-w-full border-collapse text-left">
+            <thead className="sticky top-0 z-10 bg-[color:var(--background)]">
+              <tr>
+                {[
+                  "Year",
+                  "House price",
+                  "House Δ%",
+                  "Annual wage",
+                  "Wage Δ%",
+                  "Inflation %",
+                  "Price/wage",
+                  "Deposit",
+                  "Loan amount",
+                  "LTV %",
+                  "Initial rate %",
+                  "Initial monthly payment",
+                  `Total payments (${mortgageTerm}yr)`,
+                  "Total interest",
+                  `Total earnings (${mortgageTerm}yr)`,
+                  "Mortgage as % of earnings",
+                ].map((header) => (
+                  <th
+                    key={header}
+                    className={`border-b border-[color:var(--rule-color)] px-3 pt-1 pb-2.5 align-bottom whitespace-nowrap ${labMicroLabel}`}
+                  >
+                    {header}
+                  </th>
                 ))}
-              </tbody>
-            </table>
-          </div>
+              </tr>
+            </thead>
+            <tbody>
+              {chartData.map((row) => (
+                <tr key={row.year}>
+                  <td className="border-b border-[color:var(--rule-color)] px-3 py-2.5 whitespace-nowrap tabular-nums text-[color:var(--foreground)]">
+                    {row.year}
+                  </td>
+                  <td className="border-b border-[color:var(--rule-color)] px-3 py-2.5 whitespace-nowrap text-[0.92rem] tabular-nums text-[color:var(--text-muted)]">
+                    €{row.housePrice.toLocaleString()}
+                  </td>
+                  <td
+                    className="border-b border-[color:var(--rule-color)] px-3 py-2.5 whitespace-nowrap text-[0.92rem] tabular-nums"
+                    style={{
+                      color:
+                        row.housePriceYoY !== "N/A" && parseFloat(row.housePriceYoY) > 5
+                          ? "#16a34a"
+                          : row.housePriceYoY !== "N/A" && parseFloat(row.housePriceYoY) < 0
+                            ? "#dc2626"
+                            : "var(--text-muted)",
+                    }}
+                  >
+                    {row.housePriceYoY !== "N/A" ? `${row.housePriceYoY}%` : "N/A"}
+                  </td>
+                  <td className="border-b border-[color:var(--rule-color)] px-3 py-2.5 whitespace-nowrap text-[0.92rem] tabular-nums text-[color:var(--text-muted)]">
+                    €{row.annualWage.toLocaleString()}
+                  </td>
+                  <td
+                    className="border-b border-[color:var(--rule-color)] px-3 py-2.5 whitespace-nowrap text-[0.92rem] tabular-nums"
+                    style={{
+                      color:
+                        row.wageYoY !== "N/A" && parseFloat(row.wageYoY) > 5
+                          ? "#16a34a"
+                          : "var(--text-muted)",
+                    }}
+                  >
+                    {row.wageYoY !== "N/A" ? `${row.wageYoY}%` : "N/A"}
+                  </td>
+                  <td className="border-b border-[color:var(--rule-color)] px-3 py-2.5 whitespace-nowrap text-[0.92rem] tabular-nums text-[color:var(--text-muted)]">
+                    {row.inflation}%
+                  </td>
+                  <td className="border-b border-[color:var(--rule-color)] px-3 py-2.5 whitespace-nowrap text-[0.92rem] tabular-nums text-[color:var(--text-muted)]">
+                    {row.priceToWageRatio}x
+                  </td>
+                  <td className="border-b border-[color:var(--rule-color)] px-3 py-2.5 whitespace-nowrap text-[0.92rem] tabular-nums text-[color:var(--text-muted)]">
+                    €{row.deposit.toLocaleString()}
+                  </td>
+                  <td className="border-b border-[color:var(--rule-color)] px-3 py-2.5 whitespace-nowrap text-[0.92rem] tabular-nums text-[color:var(--text-muted)]">
+                    €{row.loanAmount.toLocaleString()}
+                  </td>
+                  <td className="border-b border-[color:var(--rule-color)] px-3 py-2.5 whitespace-nowrap text-[0.92rem] tabular-nums text-[color:var(--text-muted)]">
+                    {row.actualLTV}%
+                  </td>
+                  <td className="border-b border-[color:var(--rule-color)] px-3 py-2.5 whitespace-nowrap text-[0.92rem] tabular-nums text-[color:var(--text-muted)]">
+                    {row.initialRate}%
+                  </td>
+                  <td className="border-b border-[color:var(--rule-color)] px-3 py-2.5 whitespace-nowrap text-[0.92rem] tabular-nums text-[color:var(--text-muted)]">
+                    €{row.initialMonthlyPayment.toLocaleString()}
+                  </td>
+                  <td className="border-b border-[color:var(--rule-color)] px-3 py-2.5 whitespace-nowrap text-[0.92rem] tabular-nums text-[color:var(--text-muted)]">
+                    €{row.totalMortgagePayments.toLocaleString()}
+                  </td>
+                  <td
+                    className="border-b border-[color:var(--rule-color)] px-3 py-2.5 whitespace-nowrap text-[0.92rem] tabular-nums"
+                    style={{ color: "#dc2626" }}
+                  >
+                    €{row.totalInterestPaid.toLocaleString()}
+                  </td>
+                  <td className="border-b border-[color:var(--rule-color)] px-3 py-2.5 whitespace-nowrap text-[0.92rem] tabular-nums text-[color:var(--text-muted)]">
+                    €{row.totalEarningsOverTerm.toLocaleString()}
+                  </td>
+                  <td
+                    className="border-b border-[color:var(--rule-color)] px-3 py-2.5 whitespace-nowrap text-[1.05rem] font-medium tabular-nums"
+                    style={{
+                      color:
+                        parseFloat(row.mortgageAsPercentOfEarnings) > 40
+                          ? "#dc2626"
+                          : parseFloat(row.mortgageAsPercentOfEarnings) > 30
+                            ? "#f97316"
+                            : "#16a34a",
+                    }}
+                  >
+                    {row.mortgageAsPercentOfEarnings}%
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-      </div>
+      </LabSection>
 
-      <div className="mt-8 rounded-lg border border-gray-200 bg-gray-100 p-4 text-xs text-gray-600">
-        <p className="mb-2 text-sm font-semibold text-gray-800">
-          Calculation Methodology:
-        </p>
-        <ul className="list-inside list-disc space-y-1.5">
+      <LabDetails
+        heading="Calculation methodology"
+        summary="How the variable-rate model is built."
+      >
+        <ul className={`max-w-[760px] space-y-3 ${labFootnote}`}>
           <li>
-            <strong>Variable Rate Mortgage:</strong> Interest rate changes each
-            year to match historical rates for the duration of the loan.
+            <span className="text-[color:var(--foreground)]">Variable rate mortgage:</span>{" "}
+            interest rate changes each year to match historical rates for the duration of the
+            loan.
           </li>
           <li>
-            <strong>Payment Recalculation:</strong> Each year, the monthly
-            payment recalculates based on remaining principal, remaining term,
+            <span className="text-[color:var(--foreground)]">Payment recalculation:</span> each
+            year, the monthly payment recalculates based on remaining principal, remaining term,
             and the current year&apos;s interest rate.
           </li>
           <li>
-            <strong>Total Payments:</strong> Sum of all annual mortgage payments
-            over the {mortgageTerm}-year term.
+            <span className="text-[color:var(--foreground)]">Total payments:</span> sum of all
+            annual mortgage payments over the {mortgageTerm}-year term.
           </li>
           <li>
-            <strong>Total Earnings:</strong> Sum of average annual wages over
-            the {mortgageTerm}-year mortgage period, tracking historical data.
+            <span className="text-[color:var(--foreground)]">Total earnings:</span> sum of
+            average annual wages over the {mortgageTerm}-year mortgage period, tracking
+            historical data.
           </li>
           <li>
-            <strong>Mortgage as % of Earnings:</strong> Fraction of total lifetime
-            earnings (during the mortgage term) that went to housing payments.
+            <span className="text-[color:var(--foreground)]">
+              Mortgage as % of earnings:
+            </span>{" "}
+            fraction of total lifetime earnings (during the mortgage term) that went to housing
+            payments.
           </li>
           <li>
-            <strong>Key Insight:</strong> High initial rates with rapid wage
-            growth (1980s) can still result in manageable lifetime burdens compared
-            with lower-rate, high-price eras (2020s).
+            <span className="text-[color:var(--foreground)]">Key insight:</span> high initial
+            rates with rapid wage growth (1980s) can still result in manageable lifetime burdens
+            compared with lower-rate, high-price eras (2020s).
           </li>
           <li>
-            <strong>Extrapolation:</strong> Beyond 2024, interest rates stay at
-            2024 levels while wages grow annually at approximately{" "}
+            <span className="text-[color:var(--foreground)]">Extrapolation:</span> beyond 2024,
+            interest rates stay at 2024 levels while wages grow annually at approximately{" "}
             {wageGrowthMultiplier.toFixed(3)}x.
           </li>
         </ul>
-      </div>
-    </div>
+      </LabDetails>
+    </LabShell>
   );
 };
 
