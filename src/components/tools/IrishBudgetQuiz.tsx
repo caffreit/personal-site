@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState, useSyncExternalStore } from "react";
-import { RotateCcw } from "lucide-react";
+import { ArrowRight, Check, RotateCcw, X } from "lucide-react";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 
 import { LabDetails, LabHeader, LabSection, LabShell } from "@/components/labs/LabChrome";
@@ -10,8 +10,8 @@ import {
   labFootnote,
   labLink,
   labMicroLabel,
+  labPrimaryButton,
   labQuietButton,
-  labTextButton,
 } from "@/components/labs/labTokens";
 
 type QuizOption = {
@@ -549,6 +549,49 @@ function formatShare(value: number) {
   return `${value.toFixed(1)}%`;
 }
 
+const OPTION_MARKERS = ["A", "B", "C", "D", "E"];
+
+type OptionState = "choosable" | "correct" | "wrong" | "passed-over";
+
+/**
+ * An answer is a thing you press, so each option draws the same hairline
+ * enclosure the labs give form fields rather than sitting in a ruled list where
+ * it read as prose. Once answered, the verdict is carried by a heavy left rule
+ * in the marking colour so it is legible at a glance and from across the page.
+ */
+function optionClasses(state: OptionState) {
+  const base =
+    "flex w-full items-center gap-4 border border-l-[6px] px-4 py-4 text-left text-[1.05rem] transition-colors disabled:cursor-not-allowed";
+
+  switch (state) {
+    case "correct":
+      return `${base} border-[color:color-mix(in_srgb,var(--foreground)_16%,transparent)] border-l-emerald-600 bg-[color:color-mix(in_srgb,#10b981_10%,transparent)] text-[color:var(--foreground)] dark:border-l-emerald-400`;
+    case "wrong":
+      return `${base} border-[color:color-mix(in_srgb,var(--foreground)_16%,transparent)] border-l-rose-600 bg-[color:color-mix(in_srgb,#f43f5e_10%,transparent)] text-[color:var(--foreground)] dark:border-l-rose-400`;
+    case "passed-over":
+      return `${base} border-[color:color-mix(in_srgb,var(--foreground)_10%,transparent)] text-[color:var(--text-muted)]`;
+    default:
+      return `${base} cursor-pointer border-[color:color-mix(in_srgb,var(--foreground)_16%,transparent)] border-l-[color:color-mix(in_srgb,var(--foreground)_16%,transparent)] bg-[color:color-mix(in_srgb,var(--foreground)_3%,transparent)] text-[color:var(--foreground)] hover:border-[#F4CA16] hover:border-l-[#F4CA16] hover:bg-[color:color-mix(in_srgb,#F4CA16_8%,transparent)]`;
+  }
+}
+
+/** The A/B/C chip that tells you these rows are a pick-one set. */
+function optionMarkerClasses(state: OptionState) {
+  const base =
+    "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border font-mono text-[0.7rem]";
+
+  switch (state) {
+    case "correct":
+      return `${base} border-emerald-600 bg-emerald-600 text-white dark:border-emerald-400 dark:bg-emerald-400 dark:text-[#0A0A0A]`;
+    case "wrong":
+      return `${base} border-rose-600 bg-rose-600 text-white dark:border-rose-400 dark:bg-rose-400 dark:text-[#0A0A0A]`;
+    case "passed-over":
+      return `${base} border-[color:color-mix(in_srgb,var(--foreground)_16%,transparent)] text-[color:var(--text-muted)]`;
+    default:
+      return `${base} border-[color:color-mix(in_srgb,var(--foreground)_28%,transparent)] text-[color:var(--text-muted)]`;
+  }
+}
+
 function parseBestScore(value: string | null) {
   const parsed = Number(value);
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
@@ -625,6 +668,9 @@ export default function IrishBudgetQuiz() {
 
   const currentQuestion = quizData[currentIndex];
   const isComplete = quizData.length > 0 && currentIndex >= quizData.length;
+  const isLastQuestion = currentIndex + 1 === quizData.length;
+  const answeredCorrectly =
+    hasAnswered && selectedOptionId === currentQuestion?.correctOptionId;
   const chartNode = drilldownPath[drilldownPath.length - 1];
   const chartChildren = chartNode.children ?? EMPTY_CHILDREN;
   const currentLevel = drilldownPath.length;
@@ -677,28 +723,11 @@ export default function IrishBudgetQuiz() {
     setHasAnswered(false);
   }
 
-  /**
-   * Answer state is carried by the left accent rule rather than a fill, so the
-   * option rows keep reading as a single ruled list once answered.
-   */
-  function getOptionClass(optionId: string) {
-    if (!hasAnswered || !currentQuestion) {
-      return "border-l-transparent text-[color:var(--foreground)] hover:border-l-[#F4CA16]";
-    }
-    if (optionId === currentQuestion.correctOptionId) {
-      return "border-l-emerald-600 text-[color:var(--foreground)] dark:border-l-emerald-400";
-    }
-    if (optionId === selectedOptionId) {
-      return "border-l-rose-600 text-[color:var(--foreground)] dark:border-l-rose-400";
-    }
-    return "border-l-transparent text-[color:var(--text-muted)]";
-  }
-
-  function getOptionTag(optionId: string) {
-    if (!hasAnswered || !currentQuestion) return null;
-    if (optionId === currentQuestion.correctOptionId) return "Correct";
-    if (optionId === selectedOptionId) return "Your answer";
-    return null;
+  function getOptionState(optionId: string): OptionState {
+    if (!hasAnswered || !currentQuestion) return "choosable";
+    if (optionId === currentQuestion.correctOptionId) return "correct";
+    if (optionId === selectedOptionId) return "wrong";
+    return "passed-over";
   }
 
   function enterDrilldown(index: number) {
@@ -749,9 +778,14 @@ export default function IrishBudgetQuiz() {
             <h3 className="mb-7 max-w-[760px] text-[1.7rem] font-normal leading-snug tracking-[-0.015em] text-[color:var(--foreground)]">
               {currentQuestion.prompt}
             </h3>
-            <div className="border-t border-[color:var(--rule-color)]">
-              {currentQuestion.options.map((option) => {
-                const tag = getOptionTag(option.id);
+            <p className={`mb-3 ${labMicroLabel}`}>
+              {hasAnswered
+                ? "Answer locked in"
+                : `Choose one of ${currentQuestion.options.length}`}
+            </p>
+            <div className="space-y-2.5">
+              {currentQuestion.options.map((option, index) => {
+                const state = getOptionState(option.id);
 
                 return (
                   <button
@@ -759,11 +793,26 @@ export default function IrishBudgetQuiz() {
                     type="button"
                     disabled={hasAnswered}
                     onClick={() => handleAnswer(option.id)}
-                    className={`flex w-full items-baseline justify-between gap-5 border-b border-l-2 border-b-[color:var(--rule-color)] py-4 pl-4 text-left text-[1.05rem] transition-colors disabled:cursor-not-allowed ${getOptionClass(option.id)}`}
+                    className={optionClasses(state)}
                   >
-                    <span>{option.label}</span>
-                    {tag ? (
-                      <span className={`shrink-0 ${labMicroLabel}`}>{tag}</span>
+                    <span className={optionMarkerClasses(state)} aria-hidden="true">
+                      {state === "correct" ? (
+                        <Check className="h-4 w-4" strokeWidth={3} />
+                      ) : state === "wrong" ? (
+                        <X className="h-4 w-4" strokeWidth={3} />
+                      ) : (
+                        OPTION_MARKERS[index] ?? index + 1
+                      )}
+                    </span>
+                    <span className="flex-1">{option.label}</span>
+                    {state === "correct" ? (
+                      <span className="shrink-0 font-mono text-[0.55rem] uppercase tracking-[0.16em] text-emerald-700 dark:text-emerald-400">
+                        {option.id === selectedOptionId ? "Your answer, correct" : "Correct answer"}
+                      </span>
+                    ) : state === "wrong" ? (
+                      <span className="shrink-0 font-mono text-[0.55rem] uppercase tracking-[0.16em] text-rose-700 dark:text-rose-400">
+                        Your answer
+                      </span>
                     ) : null}
                   </button>
                 );
@@ -771,27 +820,64 @@ export default function IrishBudgetQuiz() {
             </div>
 
             {hasAnswered && (
-              <div className="mt-8 border-l-2 border-[#F4CA16] pl-5">
-                <p className="max-w-[720px] text-[1.05rem] leading-[1.7] text-[color:var(--text-body-rgb)]">
-                  {currentQuestion.feedback}
-                </p>
-                <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2">
-                  {currentQuestion.sources.map((source) => (
-                    <a
-                      key={source.href}
-                      href={source.href}
-                      target="_blank"
-                      rel="noreferrer"
-                      className={labQuietButton}
-                    >
-                      Source: {source.label}
-                    </a>
-                  ))}
+              <>
+                <div
+                  className={`mt-8 border-l-[6px] pl-5 ${
+                    answeredCorrectly
+                      ? "border-emerald-600 dark:border-emerald-400"
+                      : "border-rose-600 dark:border-rose-400"
+                  }`}
+                >
+                  <p
+                    className={`flex items-center gap-2 font-mono text-[0.7rem] uppercase tracking-[0.18em] ${
+                      answeredCorrectly
+                        ? "text-emerald-700 dark:text-emerald-400"
+                        : "text-rose-700 dark:text-rose-400"
+                    }`}
+                  >
+                    {answeredCorrectly ? (
+                      <Check className="h-4 w-4" strokeWidth={3} aria-hidden="true" />
+                    ) : (
+                      <X className="h-4 w-4" strokeWidth={3} aria-hidden="true" />
+                    )}
+                    {answeredCorrectly ? "Correct" : "Not quite"}
+                  </p>
+                  <p className="mt-3 max-w-[720px] text-[1.05rem] leading-[1.7] text-[color:var(--text-body-rgb)]">
+                    {currentQuestion.feedback}
+                  </p>
+                  <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2">
+                    {currentQuestion.sources.map((source) => (
+                      <a
+                        key={source.href}
+                        href={source.href}
+                        target="_blank"
+                        rel="noreferrer"
+                        className={labQuietButton}
+                      >
+                        Source: {source.label}
+                      </a>
+                    ))}
+                  </div>
                 </div>
-                <button type="button" onClick={goNext} className={`mt-6 ${labTextButton}`}>
-                  {currentIndex + 1 === quizData.length ? "See results" : "Next question"}
-                </button>
-              </div>
+
+                <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 border-t-2 border-[#F4CA16] pt-7">
+                  <button
+                    type="button"
+                    onClick={goNext}
+                    className={`${labPrimaryButton} w-full sm:w-auto`}
+                  >
+                    {isLastQuestion ? "See your results" : "Next question"}
+                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  </button>
+                  <p className={labFootnote}>
+                    {isLastQuestion
+                      ? "That was the last question."
+                      : `${quizData.length - currentIndex - 1} ${
+                          quizData.length - currentIndex - 1 === 1 ? "question" : "questions"
+                        } to go.`}
+                  </p>
+                </div>
+              </>
             )}
           </>
         )}
