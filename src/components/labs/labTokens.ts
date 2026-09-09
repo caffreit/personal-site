@@ -55,16 +55,43 @@ export const labFootnote = "text-[0.88rem] leading-relaxed text-[color:var(--tex
 export const labTextButton =
   "border-b border-[#F4CA16] pb-0.5 font-mono text-[0.62rem] uppercase tracking-[0.18em] text-[color:var(--foreground)] transition-opacity hover:opacity-70 disabled:cursor-not-allowed disabled:opacity-40";
 
+/**
+ * The one solid element the labs allow. An accent-underlined mono label is too
+ * quiet for the action a whole form leads up to, so the primary commit is a
+ * filled accent block that inverts to an outline on hover.
+ */
+export const labPrimaryButton =
+  "inline-flex items-center justify-center gap-2.5 border border-[#F4CA16] bg-[#F4CA16] px-8 py-4 font-mono text-[0.8rem] uppercase tracking-[0.14em] text-[#0A0A0A] transition-colors hover:bg-transparent hover:text-[color:var(--foreground)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F4CA16] disabled:cursor-not-allowed disabled:opacity-40";
+
 /** Quieter sibling of labTextButton for secondary actions such as "Back". */
 export const labQuietButton =
   "border-b border-[color:var(--rule-color)] pb-0.5 font-mono text-[0.62rem] uppercase tracking-[0.18em] text-[color:var(--text-muted)] transition-colors hover:border-[#F4CA16] hover:text-[color:var(--foreground)] disabled:cursor-not-allowed disabled:opacity-40";
 
-/** Underline-only form field. */
-export const labField =
-  "w-full border-0 border-b border-[color:var(--rule-color)] bg-transparent py-1.5 text-[0.98rem] text-[color:var(--foreground)] transition-colors focus:border-[#F4CA16] focus:outline-none";
+/**
+ * Form fields are the one place the labs draw a full enclosure: an underline
+ * alone reads as just another hairline rule, so an editable box needs its own
+ * outline to be findable. Kept to a hairline and an almost-invisible wash so it
+ * still belongs to the ruled language.
+ */
+const labFieldBox =
+  "border border-[color:color-mix(in_srgb,var(--foreground)_16%,transparent)] bg-[color:color-mix(in_srgb,var(--foreground)_3%,transparent)] transition-colors hover:border-[color:color-mix(in_srgb,var(--foreground)_32%,transparent)]";
+
+/** Single-element field, e.g. a select. */
+export const labField = `w-full appearance-none rounded-none px-3 py-2 text-[1rem] text-[color:var(--foreground)] focus:border-[#F4CA16] focus:outline-none ${labFieldBox}`;
+
+/** Field box that hosts an input plus a unit affix. */
+export const labFieldGroup = `flex items-center gap-2 rounded-none px-3 focus-within:border-[#F4CA16] ${labFieldBox}`;
+
+/** The input inside a labFieldGroup; the group draws the border. */
+export const labFieldInput =
+  "w-full min-w-0 rounded-none border-0 bg-transparent py-2 text-[1rem] tabular-nums text-[color:var(--foreground)] focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none";
+
+/** Unit marker sitting inside the field, e.g. EUR or %. */
+export const labFieldAffix =
+  "shrink-0 font-mono text-[0.75rem] text-[color:var(--text-muted)]";
 
 export const labFieldLabel =
-  "block font-mono text-[0.55rem] uppercase tracking-[0.16em] text-[color:var(--text-muted)]";
+  "mb-1.5 block text-[0.82rem] tracking-[0.01em] text-[color:var(--text-muted)]";
 
 export const labSlider = "w-full accent-[color:var(--foreground)]";
 

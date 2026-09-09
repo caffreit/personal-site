@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, ReactNode, useMemo, useState } from "react";
+import { ArrowRight, ChevronDown } from "lucide-react";
 import {
   Bar,
   BarChart,
@@ -21,14 +22,17 @@ import {
 } from "@/components/labs/labChartTheme";
 import {
   labField,
+  labFieldAffix,
+  labFieldGroup,
+  labFieldInput,
   labFieldLabel,
   labFootnote,
   labLink,
   labMicroLabel,
+  labPrimaryButton,
   labQuietButton,
   labSubheading,
   labTab,
-  labTextButton,
 } from "@/components/labs/labTokens";
 
 type ViewMode = "total" | "personal";
@@ -96,98 +100,36 @@ const CAT_THRESHOLDS: Record<Exclude<CatGroup, "none">, number> = {
 };
 const EMPTY_SPENDING_CHILDREN: SpendingNode[] = [];
 
+/**
+ * The form opens on a plausible single earner rather than on empty fields, so
+ * every input shows a real number the reader can overwrite. One-off events
+ * (asset sales, a car purchase, an inheritance) stay at zero: pre-filling them
+ * would quietly inflate the headline estimate for everyone.
+ */
 const DEFAULT_INPUTS: FiscalInputs = {
   maritalStatus: "single",
   employmentStatus: "paye",
   isMedicalCardHolder: false,
   isOver70: false,
-  grossSalary: 0,
-  spouseSalary: 0,
-  selfEmployedIncome: 0,
-  rentalIncome: 0,
-  spendingGroceries: 0,
-  spendingEnergy: 0,
-  spendingHospitality: 0,
-  spendingFuel: 0,
-  spendingAlcoholTobacco: 0,
-  spendingGeneral: 0,
-  totalSavings: 0,
-  interestRate: 0,
-  cgtGain: 0,
-  lpt: 0,
-  motorTax: 0,
-  vrtPrice: 0,
-  vrtCo2: 0,
-  catValue: 0,
-  catGroup: "none",
-};
-
-const ABOUT_YOU_DEFAULTS: Pick<
-  FiscalInputs,
-  "maritalStatus" | "employmentStatus" | "isMedicalCardHolder" | "isOver70" | "spouseSalary"
-> = {
-  maritalStatus: "single",
-  employmentStatus: "paye",
-  isMedicalCardHolder: false,
-  isOver70: false,
-  spouseSalary: 0,
-};
-
-const INCOME_DEFAULTS: Pick<
-  FiscalInputs,
-  "grossSalary" | "spouseSalary" | "selfEmployedIncome" | "rentalIncome"
-> = {
   grossSalary: 60_000,
   spouseSalary: 0,
   selfEmployedIncome: 0,
-  rentalIncome: 5_000,
-};
-
-const SPENDING_DEFAULTS: Pick<
-  FiscalInputs,
-  | "spendingGroceries"
-  | "spendingEnergy"
-  | "spendingHospitality"
-  | "spendingFuel"
-  | "spendingAlcoholTobacco"
-  | "spendingGeneral"
-> = {
+  rentalIncome: 0,
   spendingGroceries: 600,
   spendingEnergy: 150,
   spendingHospitality: 200,
   spendingFuel: 150,
   spendingAlcoholTobacco: 100,
   spendingGeneral: 400,
-};
-
-const OTHER_TAX_DEFAULTS: Pick<
-  FiscalInputs,
-  | "totalSavings"
-  | "interestRate"
-  | "cgtGain"
-  | "lpt"
-  | "motorTax"
-  | "vrtPrice"
-  | "vrtCo2"
-  | "catValue"
-  | "catGroup"
-> = {
   totalSavings: 10_000,
   interestRate: 3,
-  cgtGain: 5_000,
+  cgtGain: 0,
   lpt: 450,
   motorTax: 390,
-  vrtPrice: 30_000,
-  vrtCo2: 110,
-  catValue: 20_000,
-  catGroup: "B",
-};
-
-const ESTIMATE_TAX_DEFAULTS: Partial<FiscalInputs> = {
-  ...ABOUT_YOU_DEFAULTS,
-  ...INCOME_DEFAULTS,
-  ...SPENDING_DEFAULTS,
-  ...OTHER_TAX_DEFAULTS,
+  vrtPrice: 0,
+  vrtCo2: 0,
+  catValue: 0,
+  catGroup: "none",
 };
 
 const SPENDING_HIERARCHY: SpendingNode = {
@@ -587,31 +529,44 @@ function SpendingTooltip({ active, payload, viewMode, parentName }: SpendingTool
   );
 }
 
-/** Underline-only number field, the form equivalent of a hairline rule. */
+/**
+ * Number field carrying its unit inside the box, so no example value is needed.
+ * The keystrokes live in local state and the parsed number goes to the parent,
+ * which keeps half-typed decimals like "3." from being rewritten mid-entry.
+ * The form is remounted on reset, so there is no prop to resync against.
+ */
 function NumberField({
   label,
   value,
-  placeholder,
-  step,
+  unit = "EUR",
   onChange,
 }: {
   label: string;
   value: number;
-  placeholder: string;
-  step?: string;
+  unit?: string;
   onChange: (value: string) => void;
 }) {
+  const [draft, setDraft] = useState(() => String(value));
+
   return (
     <label className="block">
       <span className={labFieldLabel}>{label}</span>
-      <input
-        type="number"
-        step={step}
-        value={value || ""}
-        onChange={(event) => onChange(event.target.value)}
-        placeholder={placeholder}
-        className={labField}
-      />
+      <span className={labFieldGroup}>
+        <input
+          type="text"
+          inputMode="decimal"
+          value={draft}
+          onFocus={(event) => event.currentTarget.select()}
+          onChange={(event) => {
+            const next = event.target.value;
+            if (!/^\d*\.?\d*$/.test(next)) return;
+            setDraft(next);
+            onChange(next);
+          }}
+          className={labFieldInput}
+        />
+        <span className={labFieldAffix}>{unit}</span>
+      </span>
     </label>
   );
 }
@@ -632,13 +587,19 @@ function SelectField({
   return (
     <label className={`block ${className}`}>
       <span className={labFieldLabel}>{label}</span>
-      <select
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        className={labField}
-      >
-        {children}
-      </select>
+      <span className="relative block">
+        <select
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          className={`${labField} pr-9`}
+        >
+          {children}
+        </select>
+        <ChevronDown
+          className="pointer-events-none absolute top-1/2 right-3 h-3.5 w-3.5 -translate-y-1/2 text-[color:var(--text-muted)]"
+          aria-hidden="true"
+        />
+      </span>
     </label>
   );
 }
@@ -658,7 +619,7 @@ function CheckboxField({
         type="checkbox"
         checked={checked}
         onChange={(event) => onChange(event.target.checked)}
-        className="h-3.5 w-3.5 accent-[color:var(--foreground)]"
+        className="h-4 w-4 accent-[color:var(--foreground)]"
       />
       {label}
     </label>
@@ -666,14 +627,27 @@ function CheckboxField({
 }
 
 /** A numbered fieldset separated from its neighbours by a single rule. */
-function FormBlock({ step, title, children }: { step: string; title: string; children: ReactNode }) {
+function FormBlock({
+  step,
+  title,
+  note,
+  children,
+}: {
+  step: string;
+  title: string;
+  note?: string;
+  children: ReactNode;
+}) {
   return (
     <fieldset className="border-t border-[color:var(--rule-color)] pt-5">
       <legend className="sr-only">{title}</legend>
       <div className="flex items-baseline gap-3">
-        <span className={labMicroLabel}>{step}</span>
+        <span className="font-mono text-[0.7rem] tracking-[0.12em] text-[color:var(--text-muted)]">
+          {step}
+        </span>
         <h3 className={labSubheading}>{title}</h3>
       </div>
+      {note ? <p className={`mt-1.5 ${labFootnote}`}>{note}</p> : null}
       {children}
     </fieldset>
   );
@@ -681,6 +655,7 @@ function FormBlock({ step, title, children }: { step: string; title: string; chi
 
 export default function IrelandsFiscalFlow() {
   const [inputs, setInputs] = useState<FiscalInputs>(DEFAULT_INPUTS);
+  const [formKey, setFormKey] = useState(0);
   const [hasCalculated, setHasCalculated] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("total");
   const [drilldownPath, setDrilldownPath] = useState<SpendingNode[]>([
@@ -760,8 +735,10 @@ export default function IrelandsFiscalFlow() {
     setInputs((prev) => ({ ...prev, [key]: value }));
   }
 
-  function applyDefaults(defaults: Partial<FiscalInputs>) {
-    setInputs((prev) => ({ ...prev, ...defaults }));
+  /** Bumping the key remounts the form, so each field's draft text resets too. */
+  function resetInputs() {
+    setInputs(DEFAULT_INPUTS);
+    setFormKey((prev) => prev + 1);
   }
 
   function enterDrilldown(index: number) {
@@ -794,18 +771,14 @@ export default function IrelandsFiscalFlow() {
 
       <LabSection
         heading="Step 1: Estimate your tax"
-        intro="Enter your details to get an illustrative annual estimate. Use Fill defaults if you want quick sample values first."
+        intro="The form starts on a single PAYE earner on EUR 60,000. Change any figure to your own and recalculate."
         action={
-          <button
-            type="button"
-            onClick={() => applyDefaults(ESTIMATE_TAX_DEFAULTS)}
-            className={labQuietButton}
-          >
-            Fill defaults
+          <button type="button" onClick={resetInputs} className={labQuietButton}>
+            Reset figures
           </button>
         }
       >
-        <form onSubmit={handleSubmit} className="space-y-9">
+        <form key={formKey} onSubmit={handleSubmit} className="space-y-9">
           <FormBlock step="01" title="About you">
             <div className="mt-5 grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-2">
               <SelectField
@@ -857,7 +830,6 @@ export default function IrelandsFiscalFlow() {
               <NumberField
                 label="Gross salary (PAYE)"
                 value={inputs.grossSalary}
-                placeholder="e.g. 60000"
                 onChange={(value) => setNumberField("grossSalary", value)}
               />
 
@@ -865,7 +837,6 @@ export default function IrelandsFiscalFlow() {
                 <NumberField
                   label="Spouse gross salary"
                   value={inputs.spouseSalary}
-                  placeholder="e.g. 50000"
                   onChange={(value) => setNumberField("spouseSalary", value)}
                 />
               )}
@@ -873,14 +844,12 @@ export default function IrelandsFiscalFlow() {
               <NumberField
                 label="Self-employed income"
                 value={inputs.selfEmployedIncome}
-                placeholder="e.g. 25000"
                 onChange={(value) => setNumberField("selfEmployedIncome", value)}
               />
 
               <NumberField
                 label="Rental income"
                 value={inputs.rentalIncome}
-                placeholder="e.g. 5000"
                 onChange={(value) => setNumberField("rentalIncome", value)}
               />
             </div>
@@ -895,42 +864,40 @@ export default function IrelandsFiscalFlow() {
             )}
           </FormBlock>
 
-          <FormBlock step="03" title="Monthly spending">
+          <FormBlock
+            step="03"
+            title="Monthly spending"
+            note="Per month, not per year. The rate beside each label is the tax baked into that spending."
+          >
             <div className="mt-5 grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-2">
               <NumberField
                 label="Groceries (~4.6% VAT)"
                 value={inputs.spendingGroceries}
-                placeholder="e.g. 600"
                 onChange={(value) => setNumberField("spendingGroceries", value)}
               />
               <NumberField
                 label="Energy bills (9% VAT)"
                 value={inputs.spendingEnergy}
-                placeholder="e.g. 150"
                 onChange={(value) => setNumberField("spendingEnergy", value)}
               />
               <NumberField
                 label="Hospitality (13.5% VAT)"
                 value={inputs.spendingHospitality}
-                placeholder="e.g. 200"
                 onChange={(value) => setNumberField("spendingHospitality", value)}
               />
               <NumberField
                 label="Fuel (~50% tax)"
                 value={inputs.spendingFuel}
-                placeholder="e.g. 150"
                 onChange={(value) => setNumberField("spendingFuel", value)}
               />
               <NumberField
                 label="Alcohol/tobacco (~60% tax)"
                 value={inputs.spendingAlcoholTobacco}
-                placeholder="e.g. 100"
                 onChange={(value) => setNumberField("spendingAlcoholTobacco", value)}
               />
               <NumberField
                 label="Other general spending (23% VAT)"
                 value={inputs.spendingGeneral}
-                placeholder="e.g. 400"
                 onChange={(value) => setNumberField("spendingGeneral", value)}
               />
             </div>
@@ -945,55 +912,52 @@ export default function IrelandsFiscalFlow() {
             )}
           </FormBlock>
 
-          <FormBlock step="04" title="Other taxes (optional)">
+          <FormBlock
+            step="04"
+            title="Other taxes (optional)"
+            note="Leave a figure at zero if it does not apply to you this year."
+          >
             <div className="mt-5 grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-2">
               <NumberField
                 label="Total savings"
                 value={inputs.totalSavings}
-                placeholder="e.g. 10000"
                 onChange={(value) => setNumberField("totalSavings", value)}
               />
               <NumberField
-                label="Interest rate (%)"
+                label="Savings interest rate"
                 value={inputs.interestRate}
-                placeholder="e.g. 3.00"
-                step="0.01"
+                unit="%"
                 onChange={(value) => setNumberField("interestRate", value)}
               />
               <NumberField
                 label="Profit from assets (CGT)"
                 value={inputs.cgtGain}
-                placeholder="e.g. 5000"
                 onChange={(value) => setNumberField("cgtGain", value)}
               />
               <NumberField
                 label="Annual LPT"
                 value={inputs.lpt}
-                placeholder="e.g. 450"
                 onChange={(value) => setNumberField("lpt", value)}
               />
               <NumberField
                 label="Annual motor tax"
                 value={inputs.motorTax}
-                placeholder="e.g. 390"
                 onChange={(value) => setNumberField("motorTax", value)}
               />
               <NumberField
                 label="Vehicle purchase price (VRT)"
                 value={inputs.vrtPrice}
-                placeholder="e.g. 30000"
                 onChange={(value) => setNumberField("vrtPrice", value)}
               />
               <NumberField
-                label="Vehicle CO2 g/km (VRT)"
+                label="Vehicle emissions (VRT)"
                 value={inputs.vrtCo2}
-                placeholder="e.g. 110"
+                unit="g/km"
                 onChange={(value) => setNumberField("vrtCo2", value)}
               />
               <NumberField
                 label="Gift / inheritance value"
                 value={inputs.catValue}
-                placeholder="e.g. 20000"
                 onChange={(value) => setNumberField("catValue", value)}
               />
               <SelectField
@@ -1002,7 +966,7 @@ export default function IrelandsFiscalFlow() {
                 onChange={(value) => setStringField("catGroup", value as CatGroup)}
                 className="md:col-span-2"
               >
-                <option value="none">-- Select --</option>
+                <option value="none">Not applicable</option>
                 <option value="A">Child</option>
                 <option value="B">Parent, Sibling, etc.</option>
                 <option value="C">Other</option>
@@ -1010,10 +974,16 @@ export default function IrelandsFiscalFlow() {
             </div>
           </FormBlock>
 
-          <div className="border-t border-[color:var(--rule-color)] pt-6">
-            <button type="submit" className={labTextButton}>
-              Calculate &amp; view fiscal flow
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-3 border-t-2 border-[#F4CA16] pt-7">
+            <button type="submit" className={`${labPrimaryButton} w-full sm:w-auto`}>
+              Calculate your fiscal flow
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </button>
+            <p className={labFootnote}>
+              {hasCalculated
+                ? "Recalculates with the figures above."
+                : "Nothing is calculated until you press this."}
+            </p>
           </div>
         </form>
 
