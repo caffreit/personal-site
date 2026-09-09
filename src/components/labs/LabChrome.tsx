@@ -40,7 +40,7 @@ export function LabHeader({
   lede?: ReactNode;
 }) {
   return (
-    <header className="mb-12 border-b border-[color:var(--rule-color)] pb-10">
+    <header>
       <p className={`mb-4 ${labEyebrow}`}>{eyebrow}</p>
       <h1 className={`mb-5 ${labDisplayTitle}`}>{title}</h1>
       {lede ? <p className={labLede}>{lede}</p> : null}

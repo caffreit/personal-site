@@ -552,7 +552,7 @@ export default function TaxScheduleComparisonLab() {
         }
       />
 
-      <div className="grid gap-10 lg:grid-cols-[236px_minmax(0,1fr)] lg:gap-0">
+      <div className="mt-9 grid gap-10 lg:grid-cols-[236px_minmax(0,1fr)] lg:gap-0">
         <LabRail label="Metric">
           <div className="border-t border-[color:var(--rule-color)]">
             {METRICS.map((metric) => {

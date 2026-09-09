@@ -524,7 +524,7 @@ export default function IrelandsFinancesBreakdown() {
         lede="Compare income sources with expenditure categories and drill into spending segments for additional detail."
       />
 
-      <section className="grid grid-cols-1 gap-12 border-[color:var(--rule-color)] lg:grid-cols-2 lg:gap-0">
+      <section className="mt-9 grid grid-cols-1 gap-12 border-t border-[color:var(--rule-color)] pt-7 lg:grid-cols-2 lg:gap-0">
         <article className="min-w-0 border-[color:var(--rule-color)] lg:border-r lg:pr-10">
           <p className={labMicroLabel}>Total income</p>
           <h2 className="mt-2 text-[2.4rem] font-light tracking-[-0.03em] tabular-nums text-[color:var(--foreground)]">

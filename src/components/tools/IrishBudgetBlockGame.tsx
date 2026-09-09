@@ -1,6 +1,6 @@
 "use client";
 
-import { RotateCcw } from "lucide-react";
+import { GripHorizontal, RotateCcw } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { LabDetails, LabHeader, LabSection, LabShell } from "@/components/labs/LabChrome";
@@ -89,6 +89,39 @@ function roundedPercent(value: number) {
   return `${Math.round(value)}%`;
 }
 
+/**
+ * A block is the only thing on the page you are meant to pick up, so it is
+ * drawn as a physical object: a solid fill, a hatched grip, and a cast shadow
+ * that lifts on hover. Everything else in the lab stays a hairline rule.
+ */
+const BLOCK_GRIP =
+  "pointer-events-none block h-full w-full bg-[repeating-linear-gradient(135deg,transparent_0_3px,rgba(0,0,0,0.22)_3px_4px)]";
+
+/**
+ * The empty bay a block came from. Keeping all twenty slots visible means the
+ * bank reads as a fixed budget being emptied rather than a shrinking row.
+ */
+const EMPTY_SLOT =
+  "h-9 w-9 border border-dashed border-[color:color-mix(in_srgb,var(--foreground)_18%,transparent)]";
+
+/**
+ * Categories need to look like containers, not headings, so each one draws an
+ * enclosure the way form fields do elsewhere in the labs. While a block is in
+ * hand every zone brightens, and the one under the cursor fills in.
+ */
+function dropZoneClasses(state: "idle" | "armed" | "active") {
+  const base =
+    "relative mt-4 flex min-h-[6.75rem] flex-wrap content-start gap-2 rounded-none border border-dashed p-3 transition-colors";
+
+  if (state === "active") {
+    return `${base} border-solid border-[#F4CA16] bg-[color:color-mix(in_srgb,#F4CA16_16%,transparent)]`;
+  }
+  if (state === "armed") {
+    return `${base} border-[#F4CA16] bg-[color:color-mix(in_srgb,#F4CA16_6%,transparent)]`;
+  }
+  return `${base} border-[color:color-mix(in_srgb,var(--foreground)_20%,transparent)] bg-[color:color-mix(in_srgb,var(--foreground)_3%,transparent)]`;
+}
+
 export default function IrishBudgetBlockGame() {
   const [allocations, setAllocations] = useState<Record<number, string | null>>(
     () =>
@@ -101,6 +134,8 @@ export default function IrishBudgetBlockGame() {
       ),
   );
   const [draggedBlockId, setDraggedBlockId] = useState<number | null>(null);
+  const [selectedBlockId, setSelectedBlockId] = useState<number | null>(null);
+  const [hoverCategoryId, setHoverCategoryId] = useState<string | null>(null);
   const [checked, setChecked] = useState(false);
   const [expandedInfoIds, setExpandedInfoIds] = useState<string[]>([]);
 
@@ -127,14 +162,19 @@ export default function IrishBudgetBlockGame() {
   );
   const remainingBlocks = unallocatedBlockIds.length;
 
+  /** A block is in hand either because it is mid-drag or because it was tapped. */
+  const heldBlockId = draggedBlockId ?? selectedBlockId;
+
   function assignBlockToCategory(blockId: number, categoryId: string) {
     if (checked) return;
     setAllocations((prev) => ({ ...prev, [blockId]: categoryId }));
+    setSelectedBlockId(null);
   }
 
   function returnBlockToBank(blockId: number) {
     if (checked) return;
     setAllocations((prev) => ({ ...prev, [blockId]: null }));
+    setSelectedBlockId(null);
   }
 
   function addBlockViaButton(categoryId: string) {
@@ -162,6 +202,8 @@ export default function IrishBudgetBlockGame() {
       ),
     );
     setDraggedBlockId(null);
+    setSelectedBlockId(null);
+    setHoverCategoryId(null);
     setChecked(false);
     setExpandedInfoIds([]);
   }
@@ -184,7 +226,7 @@ export default function IrishBudgetBlockGame() {
 
       <LabSection
         heading="Your budget blocks"
-        intro="Drag blocks to categories, or use the add and remove controls on touch devices."
+        intro="Pick up a block and drop it into one of the seven category boxes below. On a touch screen, tap a block to pick it up and tap a box to drop it in."
         action={
           <span className={labMicroLabel}>
             {remainingBlocks} of {TOTAL_BLOCKS} left
@@ -200,21 +242,57 @@ export default function IrishBudgetBlockGame() {
             }
             setDraggedBlockId(null);
           }}
-          className="flex min-h-[5.5rem] flex-wrap content-start items-start gap-2 border-y border-[color:var(--rule-color)] py-5"
+          className="border border-[color:color-mix(in_srgb,var(--foreground)_20%,transparent)] bg-[color:color-mix(in_srgb,var(--foreground)_3%,transparent)] p-4"
         >
-          {unallocatedBlockIds.length === 0 && (
-            <p className={labFootnote}>All blocks allocated. Check your guess below.</p>
-          )}
-          {unallocatedBlockIds.map((blockId) => (
-            <div
-              key={blockId}
-              draggable={!checked}
-              onDragStart={() => setDraggedBlockId(blockId)}
-              onDragEnd={() => setDraggedBlockId(null)}
-              className="h-9 w-9 cursor-grab bg-[#F4CA16] transition-transform hover:-translate-y-0.5"
-              aria-label={`Budget block ${blockId + 1}`}
+          <div className="mb-3 flex items-center gap-2">
+            <GripHorizontal
+              className="h-3.5 w-3.5 text-[color:var(--text-muted)]"
+              aria-hidden="true"
             />
-          ))}
+            <span className={labMicroLabel}>
+              {remainingBlocks > 0 ? "Drag or tap a block" : "All blocks allocated"}
+            </span>
+          </div>
+
+          <div className="flex flex-wrap content-start items-start gap-2">
+            {BLOCK_IDS.map((blockId) =>
+              allocations[blockId] === null ? (
+                <button
+                  key={blockId}
+                  type="button"
+                  draggable={!checked}
+                  onDragStart={() => setDraggedBlockId(blockId)}
+                  onDragEnd={() => {
+                    setDraggedBlockId(null);
+                    setHoverCategoryId(null);
+                  }}
+                  onClick={() =>
+                    setSelectedBlockId((prev) => (prev === blockId ? null : blockId))
+                  }
+                  disabled={checked}
+                  aria-pressed={selectedBlockId === blockId}
+                  aria-label={`Budget block ${blockId + 1}, worth ${BLOCK_PERCENTAGE}% of spending`}
+                  className={`h-9 w-9 cursor-grab bg-[#F4CA16] shadow-[2px_2px_0_rgba(0,0,0,0.22)] transition-transform hover:-translate-y-1 active:cursor-grabbing disabled:cursor-not-allowed ${
+                    selectedBlockId === blockId
+                      ? "-translate-y-1 outline-2 outline-offset-2 outline-[color:var(--foreground)]"
+                      : ""
+                  }`}
+                >
+                  <span className={BLOCK_GRIP} />
+                </button>
+              ) : (
+                <span key={blockId} className={EMPTY_SLOT} aria-hidden="true" />
+              ),
+            )}
+          </div>
+
+          <p className={`mt-3 ${labFootnote}`}>
+            {selectedBlockId !== null
+              ? "Block in hand. Choose a category box below."
+              : remainingBlocks === 0
+                ? "Check your guess below, or drag a block back up here to change it."
+                : `Each block is ${BLOCK_PERCENTAGE}% of all public spending.`}
+          </p>
         </div>
       </LabSection>
 
@@ -227,18 +305,16 @@ export default function IrishBudgetBlockGame() {
           const isInfoOpen = expandedInfoIds.includes(category.id);
           const userPercentage = count * BLOCK_PERCENTAGE;
           const isCorrect = count === category.correctBlocks;
+          const zoneState =
+            hoverCategoryId === category.id && heldBlockId !== null
+              ? "active"
+              : heldBlockId !== null && !checked
+                ? "armed"
+                : "idle";
 
           return (
             <div
               key={category.id}
-              onDragOver={(event) => event.preventDefault()}
-              onDrop={(event) => {
-                event.preventDefault();
-                if (draggedBlockId !== null) {
-                  assignBlockToCategory(draggedBlockId, category.id);
-                }
-                setDraggedBlockId(null);
-              }}
               className="border-t border-[color:var(--rule-color)] pt-4"
             >
               {/* Fixed height so every category's figure sits on one baseline,
@@ -261,23 +337,73 @@ export default function IrishBudgetBlockGame() {
                 )}
               </div>
 
-              <p className="text-[2.2rem] font-light leading-none tracking-[-0.03em] tabular-nums text-[color:var(--foreground)]">
-                {userPercentage}%
-              </p>
+              <div className="flex items-baseline justify-between gap-3">
+                <p className="text-[2.2rem] font-light leading-none tracking-[-0.03em] tabular-nums text-[color:var(--foreground)]">
+                  {userPercentage}%
+                </p>
+                <span className={labMicroLabel}>
+                  {count} {count === 1 ? "block" : "blocks"}
+                </span>
+              </div>
 
-              <div className="mt-4 flex min-h-[3.25rem] flex-wrap content-start gap-2 border-t border-[color:var(--rule-color)] pt-3">
+              <div
+                onDragOver={(event) => {
+                  event.preventDefault();
+                  setHoverCategoryId(category.id);
+                }}
+                onDragLeave={() =>
+                  setHoverCategoryId((prev) => (prev === category.id ? null : prev))
+                }
+                onDrop={(event) => {
+                  event.preventDefault();
+                  if (draggedBlockId !== null) {
+                    assignBlockToCategory(draggedBlockId, category.id);
+                  }
+                  setDraggedBlockId(null);
+                  setHoverCategoryId(null);
+                }}
+                onClick={() => {
+                  if (selectedBlockId !== null) {
+                    assignBlockToCategory(selectedBlockId, category.id);
+                  }
+                }}
+                className={dropZoneClasses(zoneState)}
+                aria-label={`${category.name} drop zone, ${count} of ${TOTAL_BLOCKS} blocks`}
+              >
+                {count === 0 && (
+                  <span
+                    className={`pointer-events-none absolute inset-0 flex items-center justify-center px-3 text-center ${labMicroLabel}`}
+                  >
+                    {zoneState === "idle"
+                      ? "Drop blocks here"
+                      : `Add to ${category.shortLabel ?? category.name}`}
+                  </span>
+                )}
                 {assignedBlockIds.map((blockId) => (
                   <button
                     key={blockId}
                     type="button"
                     draggable={!checked}
-                    onDragStart={() => setDraggedBlockId(blockId)}
-                    onDragEnd={() => setDraggedBlockId(null)}
-                    onClick={() => returnBlockToBank(blockId)}
+                    onDragStart={(event) => {
+                      event.stopPropagation();
+                      setDraggedBlockId(blockId);
+                    }}
+                    onDragEnd={() => {
+                      setDraggedBlockId(null);
+                      setHoverCategoryId(null);
+                    }}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      returnBlockToBank(blockId);
+                    }}
                     disabled={checked}
-                    className="h-7 w-7 bg-[#F4CA16] disabled:cursor-not-allowed disabled:opacity-60"
-                    aria-label={`Remove block ${blockId + 1} from ${category.name}`}
-                  />
+                    style={{ background: category.color }}
+                    className="h-9 w-9 cursor-grab shadow-[2px_2px_0_rgba(0,0,0,0.18)] transition-transform hover:-translate-y-1 active:cursor-grabbing disabled:cursor-not-allowed disabled:opacity-70"
+                    aria-label={`Return block ${blockId + 1} from ${category.name} to your blocks`}
+                    title="Click to send this block back"
+                  >
+                    <span className={BLOCK_GRIP} />
+                  </button>
                 ))}
               </div>
 
