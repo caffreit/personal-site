@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, GripHorizontal, RotateCcw } from "lucide-react";
+import { ArrowRight, GripHorizontal, Minus, Plus, RotateCcw } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { LabDetails, LabHeader, LabSection, LabShell } from "@/components/labs/LabChrome";
@@ -111,7 +111,7 @@ const EMPTY_SLOT =
  */
 function dropZoneClasses(state: "idle" | "armed" | "active") {
   const base =
-    "relative mt-4 flex min-h-[6.75rem] flex-wrap content-start gap-2 rounded-none border border-dashed p-3 transition-colors";
+    "relative mt-4 flex min-h-[6.75rem] flex-col gap-2 rounded-none border border-dashed p-3 transition-colors";
 
   if (state === "active") {
     return `${base} border-solid border-[#F4CA16] bg-[color:color-mix(in_srgb,#F4CA16_16%,transparent)]`;
@@ -121,6 +121,13 @@ function dropZoneClasses(state: "idle" | "armed" | "active") {
   }
   return `${base} border-[color:color-mix(in_srgb,var(--foreground)_20%,transparent)] bg-[color:color-mix(in_srgb,var(--foreground)_3%,transparent)]`;
 }
+
+/**
+ * Block-sized steppers sit in the drop-zone footer so touch controls rhyme
+ * with the pieces themselves instead of adding another row of wide boxes.
+ */
+const BLOCK_CONTROL =
+  "inline-flex h-9 w-9 shrink-0 items-center justify-center border border-[color:color-mix(in_srgb,var(--foreground)_22%,transparent)] text-[color:var(--foreground)] transition-colors hover:border-[#F4CA16] hover:bg-[color:color-mix(in_srgb,#F4CA16_8%,transparent)] disabled:cursor-not-allowed disabled:opacity-35";
 
 export default function IrishBudgetBlockGame() {
   const [allocations, setAllocations] = useState<Record<number, string | null>>(
@@ -341,20 +348,15 @@ export default function IrishBudgetBlockGame() {
                 {checked ? (
                   <p className={labMicroLabel}>Your guess</p>
                 ) : null}
-                <div className="flex items-baseline justify-between gap-3">
-                  <p
-                    className={`text-[2.2rem] font-light leading-none tracking-[-0.03em] tabular-nums ${
-                      checked && !isCorrect
-                        ? "text-[color:var(--text-muted)]"
-                        : "text-[color:var(--foreground)]"
-                    }`}
-                  >
-                    {userPercentage}%
-                  </p>
-                  <span className={labMicroLabel}>
-                    {count} {count === 1 ? "block" : "blocks"}
-                  </span>
-                </div>
+                <p
+                  className={`text-[2.2rem] font-light leading-none tracking-[-0.03em] tabular-nums ${
+                    checked && !isCorrect
+                      ? "text-[color:var(--text-muted)]"
+                      : "text-[color:var(--foreground)]"
+                  }`}
+                >
+                  {userPercentage}%
+                </p>
               </div>
 
               {checked && (
@@ -414,63 +416,75 @@ export default function IrishBudgetBlockGame() {
                 className={dropZoneClasses(zoneState)}
                 aria-label={`${category.name} drop zone, ${count} of ${TOTAL_BLOCKS} blocks`}
               >
-                {count === 0 && (
-                  <span
-                    className={`pointer-events-none absolute inset-0 flex items-center justify-center px-3 text-center ${labMicroLabel}`}
-                  >
-                    {zoneState === "idle"
-                      ? "Drop blocks here"
-                      : `Add to ${category.shortLabel ?? category.name}`}
-                  </span>
-                )}
-                {assignedBlockIds.map((blockId) => (
-                  <button
-                    key={blockId}
-                    type="button"
-                    draggable={!checked}
-                    onDragStart={(event) => {
-                      event.stopPropagation();
-                      setDraggedBlockId(blockId);
-                    }}
-                    onDragEnd={() => {
-                      setDraggedBlockId(null);
-                      setHoverCategoryId(null);
-                    }}
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      returnBlockToBank(blockId);
-                    }}
-                    disabled={checked}
-                    style={{ background: category.color }}
-                    className="h-9 w-9 cursor-grab shadow-[2px_2px_0_rgba(0,0,0,0.18)] transition-transform hover:-translate-y-1 active:cursor-grabbing disabled:cursor-not-allowed disabled:opacity-70"
-                    aria-label={`Return block ${blockId + 1} from ${category.name} to your blocks`}
-                    title="Click to send this block back"
-                  >
-                    <span className={BLOCK_GRIP} />
-                  </button>
-                ))}
-              </div>
-
-              {!checked && (
-                <div className="mt-4 flex gap-5">
-                  <button
-                    type="button"
-                    onClick={() => addBlockViaButton(category.id)}
-                    disabled={remainingBlocks === 0}
-                    className={labQuietButton}
-                  >
-                    + Add
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => removeBlockViaButton(category.id)}
-                    disabled={count === 0}
-                    className={labQuietButton}
-                  >
-                    - Remove
-                  </button>
+                <div className="relative flex min-h-[4.25rem] flex-1 flex-wrap content-start gap-2">
+                  {count === 0 && (
+                    <span
+                      className={`pointer-events-none absolute inset-0 flex items-center justify-center px-3 text-center ${labMicroLabel}`}
+                    >
+                      {zoneState === "idle"
+                        ? "Drop blocks here"
+                        : `Add to ${category.shortLabel ?? category.name}`}
+                    </span>
+                  )}
+                  {assignedBlockIds.map((blockId) => (
+                    <button
+                      key={blockId}
+                      type="button"
+                      draggable={!checked}
+                      onDragStart={(event) => {
+                        event.stopPropagation();
+                        setDraggedBlockId(blockId);
+                      }}
+                      onDragEnd={() => {
+                        setDraggedBlockId(null);
+                        setHoverCategoryId(null);
+                      }}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        returnBlockToBank(blockId);
+                      }}
+                      disabled={checked}
+                      style={{ background: category.color }}
+                      className="h-9 w-9 cursor-grab shadow-[2px_2px_0_rgba(0,0,0,0.18)] transition-transform hover:-translate-y-1 active:cursor-grabbing disabled:cursor-not-allowed disabled:opacity-70"
+                      aria-label={`Return block ${blockId + 1} from ${category.name} to your blocks`}
+                      title="Click to send this block back"
+                    >
+                      <span className={BLOCK_GRIP} />
+                    </button>
+                  ))}
                 </div>
-              )}
+
+                {!checked && (
+                  <div className="flex items-center gap-2 border-t border-[color:color-mix(in_srgb,var(--foreground)_10%,transparent)] pt-2">
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        addBlockViaButton(category.id);
+                      }}
+                      disabled={remainingBlocks === 0}
+                      className={BLOCK_CONTROL}
+                      aria-label={`Add a block to ${category.name}`}
+                      title="Add block"
+                    >
+                      <Plus className="h-4 w-4" aria-hidden="true" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        removeBlockViaButton(category.id);
+                      }}
+                      disabled={count === 0}
+                      className={BLOCK_CONTROL}
+                      aria-label={`Remove a block from ${category.name}`}
+                      title="Remove block"
+                    >
+                      <Minus className="h-4 w-4" aria-hidden="true" />
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           );
         })}
