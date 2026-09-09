@@ -1,14 +1,14 @@
 "use client";
 
-import { GripHorizontal, RotateCcw } from "lucide-react";
+import { ArrowRight, GripHorizontal, RotateCcw } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { LabDetails, LabHeader, LabSection, LabShell } from "@/components/labs/LabChrome";
 import {
   labFootnote,
   labMicroLabel,
+  labPrimaryButton,
   labQuietButton,
-  labTextButton,
 } from "@/components/labs/labTokens";
 
 type BudgetCategory = {
@@ -337,14 +337,58 @@ export default function IrishBudgetBlockGame() {
                 )}
               </div>
 
-              <div className="flex items-baseline justify-between gap-3">
-                <p className="text-[2.2rem] font-light leading-none tracking-[-0.03em] tabular-nums text-[color:var(--foreground)]">
-                  {userPercentage}%
-                </p>
-                <span className={labMicroLabel}>
-                  {count} {count === 1 ? "block" : "blocks"}
-                </span>
+              <div>
+                {checked ? (
+                  <p className={labMicroLabel}>Your guess</p>
+                ) : null}
+                <div className="flex items-baseline justify-between gap-3">
+                  <p
+                    className={`text-[2.2rem] font-light leading-none tracking-[-0.03em] tabular-nums ${
+                      checked && !isCorrect
+                        ? "text-[color:var(--text-muted)]"
+                        : "text-[color:var(--foreground)]"
+                    }`}
+                  >
+                    {userPercentage}%
+                  </p>
+                  <span className={labMicroLabel}>
+                    {count} {count === 1 ? "block" : "blocks"}
+                  </span>
+                </div>
               </div>
+
+              {checked && (
+                <div
+                  className={`mt-4 border-l-2 pl-4 ${
+                    isCorrect
+                      ? "border-emerald-600 dark:border-emerald-400"
+                      : "border-[#F4CA16]"
+                  }`}
+                >
+                  <p
+                    className={`font-mono text-[0.62rem] uppercase tracking-[0.18em] ${
+                      isCorrect
+                        ? "text-emerald-700 dark:text-emerald-400"
+                        : "text-[color:var(--foreground)]"
+                    }`}
+                  >
+                    {isCorrect ? "Spot on" : "True spend"}
+                  </p>
+                  <p className="mt-1.5 text-[2.2rem] font-light leading-none tracking-[-0.03em] tabular-nums text-[color:var(--foreground)]">
+                    {roundedPercent(category.correctPercentage)}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => toggleInfo(category.id)}
+                    className={`mt-4 ${labQuietButton}`}
+                  >
+                    {isInfoOpen ? "Hide info" : "More info"}
+                  </button>
+                  {isInfoOpen && (
+                    <p className={`mt-3 ${labFootnote}`}>{category.info}</p>
+                  )}
+                </div>
+              )}
 
               <div
                 onDragOver={(event) => {
@@ -407,49 +451,24 @@ export default function IrishBudgetBlockGame() {
                 ))}
               </div>
 
-              <div className="mt-4 flex gap-5">
-                <button
-                  type="button"
-                  onClick={() => addBlockViaButton(category.id)}
-                  disabled={checked || remainingBlocks === 0}
-                  className={labQuietButton}
-                >
-                  + Add
-                </button>
-                <button
-                  type="button"
-                  onClick={() => removeBlockViaButton(category.id)}
-                  disabled={checked || count === 0}
-                  className={labQuietButton}
-                >
-                  - Remove
-                </button>
-              </div>
-
-              {checked && (
-                <div className="mt-5 border-t border-[color:var(--rule-color)] pt-3">
-                  <p
-                    className={`font-mono text-[0.58rem] uppercase tracking-[0.16em] ${
-                      isCorrect
-                        ? "text-emerald-700 dark:text-emerald-400"
-                        : "text-rose-700 dark:text-rose-400"
-                    }`}
-                  >
-                    {isCorrect ? "Spot on" : "True spend"}
-                  </p>
-                  <p className="mt-1.5 text-[1.3rem] font-light tabular-nums text-[color:var(--foreground)]">
-                    {roundedPercent(category.correctPercentage)}
-                  </p>
+              {!checked && (
+                <div className="mt-4 flex gap-5">
                   <button
                     type="button"
-                    onClick={() => toggleInfo(category.id)}
-                    className={`mt-3 ${labQuietButton}`}
+                    onClick={() => addBlockViaButton(category.id)}
+                    disabled={remainingBlocks === 0}
+                    className={labQuietButton}
                   >
-                    {isInfoOpen ? "Hide info" : "More info"}
+                    + Add
                   </button>
-                  {isInfoOpen && (
-                    <p className={`mt-3 ${labFootnote}`}>{category.info}</p>
-                  )}
+                  <button
+                    type="button"
+                    onClick={() => removeBlockViaButton(category.id)}
+                    disabled={count === 0}
+                    className={labQuietButton}
+                  >
+                    - Remove
+                  </button>
                 </div>
               )}
             </div>
@@ -458,10 +477,18 @@ export default function IrishBudgetBlockGame() {
       </section>
 
       {remainingBlocks === 0 && !checked && (
-        <div className="mt-10 border-t border-[color:var(--rule-color)] pt-7">
-          <button type="button" onClick={() => setChecked(true)} className={labTextButton}>
+        <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3 border-t-2 border-[#F4CA16] pt-7">
+          <button
+            type="button"
+            onClick={() => setChecked(true)}
+            className={`${labPrimaryButton} w-full sm:w-auto`}
+          >
             Check my guess
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </button>
+          <p className={labFootnote}>
+            All 20 blocks are allocated. Reveal how your guess compares to the published figures.
+          </p>
         </div>
       )}
 
