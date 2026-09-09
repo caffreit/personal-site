@@ -1,11 +1,8 @@
 "use client";
 
-import Link from "next/link";
-import { ArrowLeft, Briefcase, Info, PiggyBank } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import {
   CartesianGrid,
-  Legend,
   Line,
   LineChart,
   ReferenceLine,
@@ -14,6 +11,30 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+
+import {
+  LabHeader,
+  LabLedger,
+  LabLedgerRow,
+  LabRail,
+  LabSection,
+  LabShell,
+} from "@/components/labs/LabChrome";
+import {
+  LabLegend,
+  LabTooltip,
+  labAxisProps,
+  labGridProps,
+  useLabChartTheme,
+} from "@/components/labs/labChartTheme";
+import {
+  labEyebrow,
+  labFootnote,
+  labMicroLabel,
+  labSlider,
+  labSubheading,
+  labTab,
+} from "@/components/labs/labTokens";
 
 type ViewType = "effective" | "marginal";
 
@@ -150,10 +171,48 @@ const LABOUR_COST_ROWS: LabourCostRow[] = [
   },
 ];
 
+const RATE_SERIES = [
+  { key: "it", name: "Income Tax", color: "#3b82f6", width: 2 },
+  { key: "usc", name: "USC", color: "#f59e0b", width: 2 },
+  { key: "prsi", name: "PRSI", color: "#10b981", width: 2 },
+  { key: "total", name: "Total Rate", color: "#0f172a", width: 3.5 },
+];
+
+type RateTooltipProps = {
+  active?: boolean;
+  label?: string | number;
+  payload?: Array<{
+    name?: string | number;
+    value?: string | number;
+    color?: string;
+    payload: TaxBreakdownRow;
+  }>;
+};
+
+function RateTooltip({ active, label, payload }: RateTooltipProps) {
+  if (!active || !payload?.length) return null;
+
+  return (
+    <LabTooltip
+      label={`Gross income: €${Number(label).toLocaleString("en-IE")}`}
+      rows={payload.map((entry) => ({
+        key: String(entry.name),
+        name: String(entry.name),
+        value:
+          entry.name === "Total Rate"
+            ? `${entry.value}% (${entry.payload.totalEuro})`
+            : `${entry.value}%`,
+        color: entry.color,
+      }))}
+    />
+  );
+}
+
 export default function IrishTaxBreakdown2026() {
   const [isSelfEmployed, setIsSelfEmployed] = useState(false);
   const [pensionContrib, setPensionContrib] = useState(0);
   const [viewType, setViewType] = useState<ViewType>("effective");
+  const chartTheme = useLabChartTheme();
 
   const calculateTaxAtIncome = useCallback(
     (income: number): TaxBreakdownRow => {
@@ -308,68 +367,42 @@ export default function IrishTaxBreakdown2026() {
   }, [calculateTaxAtIncome]);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 pt-10 pb-24 sm:px-6 lg:px-8">
-      <Link
-        href="/labs"
-        className="mb-8 inline-flex items-center gap-2 text-stone-500 transition-colors hover:text-stone-900"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        <span className="font-mono text-sm font-medium uppercase tracking-[0.2em]">
-          Back to Labs
-        </span>
-      </Link>
+    <LabShell>
+      <LabHeader
+        eyebrow="Irish Income Tax - 2026 assumptions"
+        title="Irish Tax Breakdown 2026"
+        lede="Explore effective and marginal tax rates across income levels, including the USC threshold behavior around €13,000."
+      />
 
-      <header className="mb-10 space-y-4">
-        <p className="font-mono text-xs font-semibold uppercase tracking-[0.3em] text-stone-500">
-          Irish Income Tax • 2026 Assumptions
-        </p>
-        <h1 className="max-w-5xl text-5xl font-black uppercase leading-[0.9] tracking-tight text-stone-900 sm:text-7xl">
-          Irish Tax Breakdown 2026
-        </h1>
-        <p className="max-w-3xl text-lg leading-relaxed text-stone-600 sm:text-xl">
-          Explore effective and marginal tax rates across income levels, including
-          the USC threshold behavior around €13,000.
-        </p>
-      </header>
-
-      <section className="grid grid-cols-1 gap-8 lg:grid-cols-4">
-        <aside className="space-y-5 lg:col-span-1">
-          <article className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)]">
-            <h2 className="mb-4 flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">
-              <Briefcase className="h-4 w-4" />
-              Employment
-            </h2>
-            <div className="flex rounded-full border border-stone-200 bg-stone-100 p-1">
+      <div className="grid gap-10 lg:grid-cols-[236px_minmax(0,1fr)] lg:gap-0">
+        <LabRail label="Assumptions">
+          <div className="border-t border-[color:var(--rule-color)] pt-4">
+            <p className={labMicroLabel}>Employment</p>
+            <div className="mt-3 flex gap-5">
               <button
                 type="button"
                 onClick={() => setIsSelfEmployed(false)}
-                className={`flex-1 rounded-full px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] transition ${
-                  !isSelfEmployed
-                    ? "bg-white text-stone-900 shadow-sm"
-                    : "text-stone-500 hover:text-stone-700"
-                }`}
+                className={labTab(!isSelfEmployed)}
               >
                 Employee
               </button>
               <button
                 type="button"
                 onClick={() => setIsSelfEmployed(true)}
-                className={`flex-1 rounded-full px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] transition ${
-                  isSelfEmployed
-                    ? "bg-white text-stone-900 shadow-sm"
-                    : "text-stone-500 hover:text-stone-700"
-                }`}
+                className={labTab(isSelfEmployed)}
               >
-                Self-Employed
+                Self-employed
               </button>
             </div>
-          </article>
+          </div>
 
-          <article className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)]">
-            <h2 className="mb-3 flex items-center gap-2 font-mono text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">
-              <PiggyBank className="h-4 w-4" />
-              Pension Contribution
-            </h2>
+          <div className="mt-7 border-t border-[color:var(--rule-color)] pt-4">
+            <div className="flex items-baseline justify-between gap-3">
+              <p className={labMicroLabel}>Pension contribution</p>
+              <span className="text-[1.15rem] font-light tabular-nums text-[color:var(--foreground)]">
+                {pensionContrib}%
+              </span>
+            </div>
             <input
               type="range"
               min={0}
@@ -377,227 +410,218 @@ export default function IrishTaxBreakdown2026() {
               step={1}
               value={pensionContrib}
               onChange={(event) => setPensionContrib(Number(event.target.value))}
-              className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-stone-200 accent-blue-600"
+              className={`mt-3 ${labSlider}`}
+              aria-label="Pension contribution"
             />
-            <div className="mt-2 text-right text-lg font-black tracking-tight text-stone-900">
-              {pensionContrib}%
-            </div>
-            <p className="mt-2 text-xs leading-relaxed text-stone-500">
-              Pension relief reduces income-taxable pay in this model, but USC and PRSI
-              stay linked to gross income.
+            <p className={`mt-3 ${labFootnote}`}>
+              Pension relief reduces income-taxable pay in this model, but USC and PRSI stay
+              linked to gross income.
             </p>
-          </article>
+          </div>
 
-          <article className="rounded-2xl border border-blue-200 bg-blue-50 p-4">
-            <p className="flex items-start gap-3 text-sm leading-relaxed text-blue-900">
-              <Info className="mt-0.5 h-4 w-4 shrink-0" />
-              <span>
-                <strong>USC cliff:</strong> under this model, crossing from €13,000 to
-                €13,001 can trigger an immediate USC jump.
-              </span>
+          <div className="mt-7 border-l-2 border-[#F4CA16] pl-4">
+            <p className={labFootnote}>
+              <span className="text-[color:var(--foreground)]">USC cliff:</span> under this
+              model, crossing from €13,000 to €13,001 can trigger an immediate USC jump.
             </p>
-          </article>
-        </aside>
+          </div>
+        </LabRail>
 
-        <article className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)] sm:p-8 lg:col-span-3">
-          <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-2xl font-black tracking-tight text-stone-900 sm:text-3xl">
+        <article className="min-w-0 lg:pl-12">
+          <div className="mb-6 flex flex-wrap items-baseline justify-between gap-4">
+            <h2 className="text-[1.6rem] font-normal tracking-[-0.015em] text-[color:var(--foreground)]">
               Rate Profile by Gross Income
             </h2>
-            <div className="flex rounded-full border border-stone-200 bg-stone-100 p-1">
+            <div className="flex gap-5">
               <button
                 type="button"
                 onClick={() => setViewType("effective")}
-                className={`pill-control rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-[0.12em] transition ${
-                  viewType === "effective"
-                    ? "bg-stone-900 text-white"
-                    : "text-stone-600 hover:text-stone-900"
-                }`}
+                className={labTab(viewType === "effective")}
               >
-                <span className="pill-label">Effective Rate</span>
+                Effective rate
               </button>
               <button
                 type="button"
                 onClick={() => setViewType("marginal")}
-                className={`pill-control rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-[0.12em] transition ${
-                  viewType === "marginal"
-                    ? "bg-stone-900 text-white"
-                    : "text-stone-600 hover:text-stone-900"
-                }`}
+                className={labTab(viewType === "marginal")}
               >
-                <span className="pill-label">Marginal Rate</span>
+                Marginal rate
               </button>
             </div>
           </div>
 
+          <LabLegend
+            className="mb-5"
+            items={RATE_SERIES.map((series) => ({
+              key: series.key,
+              label: series.name,
+              color: series.color,
+            }))}
+          />
+
           <div className="h-[30rem] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData} margin={{ top: 16, right: 24, left: 0, bottom: 6 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e7e5e4" />
+              <LineChart data={chartData} margin={{ top: 20, right: 24, left: 0, bottom: 6 }}>
+                <CartesianGrid {...labGridProps(chartTheme)} />
                 <XAxis
                   dataKey="income"
-                  stroke="#78716c"
-                  fontSize={11}
                   interval={9}
                   tickFormatter={(value) => `€${value / 1_000}k`}
+                  {...labAxisProps(chartTheme)}
                 />
-                <YAxis unit="%" domain={[0, 60]} stroke="#78716c" fontSize={11} />
-                <Tooltip
-                  labelFormatter={(label) => `Gross income: €${Number(label).toLocaleString("en-IE")}`}
-                  formatter={(value, name, props) => {
-                    const seriesName = String(name).toUpperCase();
-
-                    if (name === "Total Rate") {
-                      return [`${value}% (${props.payload.totalEuro})`, seriesName];
-                    }
-                    return [`${value}%`, seriesName];
-                  }}
-                  contentStyle={{
-                    borderRadius: "12px",
-                    border: "1px solid #e7e5e4",
-                    boxShadow: "0 14px 28px -18px rgba(0,0,0,0.45)",
-                  }}
-                />
-                <Legend verticalAlign="top" height={42} />
+                <YAxis unit="%" domain={[0, 60]} {...labAxisProps(chartTheme)} />
+                <Tooltip content={<RateTooltip />} />
 
                 <ReferenceLine
                   x={13_000}
-                  stroke="#a8a29e"
+                  stroke={chartTheme.muted}
                   strokeDasharray="3 3"
-                  label={{ position: "top", value: "USC Cliff", fontSize: 10 }}
+                  label={{
+                    position: "top",
+                    value: "USC cliff",
+                    fontSize: 10,
+                    fill: chartTheme.muted,
+                  }}
                 />
                 <ReferenceLine
                   x={20_000}
-                  stroke="#60a5fa"
+                  stroke={chartTheme.muted}
                   strokeDasharray="2 2"
-                  label={{ position: "top", value: "IT Starts", fontSize: 10 }}
+                  label={{
+                    position: "top",
+                    value: "IT starts",
+                    fontSize: 10,
+                    fill: chartTheme.muted,
+                  }}
                 />
                 <ReferenceLine
                   x={44_000}
-                  stroke="#78716c"
-                  label={{ position: "top", value: "40% Band", fontSize: 10, fontWeight: "bold" }}
+                  stroke={chartTheme.foreground}
+                  strokeOpacity={0.4}
+                  label={{
+                    position: "top",
+                    value: "40% band",
+                    fontSize: 10,
+                    fill: chartTheme.muted,
+                  }}
                 />
 
-                <Line type="monotone" dataKey="it" stroke="#3b82f6" strokeWidth={2} dot={false} name="Income Tax" />
-                <Line type="monotone" dataKey="usc" stroke="#f59e0b" strokeWidth={2} dot={false} name="USC" />
-                <Line type="monotone" dataKey="prsi" stroke="#10b981" strokeWidth={2} dot={false} name="PRSI" />
-                <Line type="monotone" dataKey="total" stroke="#0f172a" strokeWidth={3.5} dot={false} name="Total Rate" />
+                {RATE_SERIES.map((series) => (
+                  <Line
+                    key={series.key}
+                    type="monotone"
+                    dataKey={series.key}
+                    stroke={series.color}
+                    strokeWidth={series.width}
+                    dot={false}
+                    name={series.name}
+                  />
+                ))}
               </LineChart>
             </ResponsiveContainer>
           </div>
 
-          <p className="mt-5 rounded-xl border border-stone-200 bg-stone-50 p-3 text-sm leading-relaxed text-stone-600">
-            This lab is an illustrative model based on embedded 2026 assumptions
-            (bands, rates, and credits) and is not financial or tax advice.
+          <p className={`mt-6 border-t border-[color:var(--rule-color)] pt-4 ${labFootnote}`}>
+            This lab is an illustrative model based on embedded 2026 assumptions (bands, rates,
+            and credits) and is not financial or tax advice.
           </p>
         </article>
-      </section>
+      </div>
 
-      <section className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-3">
-        <article className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)] sm:p-8 lg:col-span-2">
-          <p className="font-mono text-xs font-semibold uppercase tracking-[0.3em] text-stone-500">
-            Reading The Chart
-          </p>
-          <h2 className="mt-3 text-3xl font-black tracking-tight text-stone-900 sm:text-4xl">
-            Marginal pain, average calm
-          </h2>
-          <p className="mt-4 max-w-3xl text-base leading-relaxed text-stone-600">
-            The main illusion in the Irish tax system is the gap between marginal
-            and effective rates. The average rate stays relatively low for a long
-            time, but a raise, bonus, or extra contract can hit the high marginal
-            bands immediately.
-          </p>
+      <LabSection className="mt-12">
+        <p className={labEyebrow}>Reading the chart</p>
+        <h2 className="mt-4 text-[clamp(2.2rem,4vw,3.2rem)] font-light leading-[1.05] tracking-[-0.02em] text-[color:var(--foreground)]">
+          Marginal pain, average calm
+        </h2>
+        <p className="mt-5 max-w-[720px] text-[1.05rem] leading-[1.7] text-[color:var(--text-body-rgb)]">
+          The main illusion in the Irish tax system is the gap between marginal and effective
+          rates. The average rate stays relatively low for a long time, but a raise, bonus, or
+          extra contract can hit the high marginal bands immediately.
+        </p>
 
-          <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2">
-            {TAX_INSIGHTS.map((insight) => (
-              <div
-                key={insight.title}
-                className="rounded-2xl border border-stone-200 bg-stone-50 p-5"
-              >
-                <p className="font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-stone-500">
-                  {insight.label}
-                </p>
-                <h3 className="mt-2 text-lg font-black tracking-tight text-stone-900">
-                  {insight.title}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-stone-600">
-                  {insight.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </article>
-
-        <aside className="space-y-6">
-          <article className="rounded-[2rem] border border-stone-200 bg-stone-900 p-6 text-white shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)] sm:p-8">
-            <p className="font-mono text-xs font-semibold uppercase tracking-[0.3em] text-stone-400">
-              The Salient Number
-            </p>
-            <p className="mt-4 text-4xl font-black tracking-tight sm:text-5xl">€1.85</p>
-            <p className="mt-3 text-sm leading-relaxed text-stone-300">
-              For a high earner around €150k+, the economy can spend about €1.85
-              in total labour cost to leave €1.00 of spending power. The remaining
-              €0.85 is the combined drag from employee tax and employer PRSI.
-            </p>
-          </article>
-
-          <article className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)]">
-            <h2 className="text-xl font-black tracking-tight text-stone-900">
-              Income Landscape
-            </h2>
-            <p className="mt-3 text-sm leading-relaxed text-stone-600">
-              CSO data puts median annual full-time earnings at roughly €44,816
-              in 2024. The distribution is skewed: the top 10% earn above about
-              €77,500 and pay around 61% of personal income tax, while the top 1%
-              earn over €200,000 and pay roughly 19-20%.
-            </p>
-            <p className="mt-3 text-sm leading-relaxed text-stone-600">
-              At the other end, the bottom 40% pay less than 5% of income tax
-              collected, which makes the system highly progressive but also
-              dependent on a narrow high-earner base.
-            </p>
-          </article>
-        </aside>
-      </section>
-
-      <section className="mt-8 rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)] sm:p-8">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <p className="font-mono text-xs font-semibold uppercase tracking-[0.3em] text-stone-500">
-              Total Labour Cost
-            </p>
-            <h2 className="mt-3 text-3xl font-black tracking-tight text-stone-900 sm:text-4xl">
-              What it costs to deliver take-home pay
-            </h2>
-          </div>
-          <p className="max-w-xl text-sm leading-relaxed text-stone-600">
-            These rounded examples add employer PRSI to salary cost, then compare
-            the full economic cost with approximate net pay.
-          </p>
-        </div>
-
-        <div className="mt-8 overflow-hidden rounded-2xl border border-stone-200">
-          <div className="grid grid-cols-5 bg-stone-100 px-4 py-3 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-stone-500">
-            <span>Gross</span>
-            <span>Employer PRSI</span>
-            <span>Net Pay</span>
-            <span>Total Cost</span>
-            <span>Tax Per €1 Net</span>
-          </div>
-          {LABOUR_COST_ROWS.map((row) => (
-            <div
-              key={row.grossSalary}
-              className="grid grid-cols-1 gap-2 border-t border-stone-200 px-4 py-4 text-sm text-stone-700 sm:grid-cols-5 sm:gap-0"
-            >
-              <span className="font-bold text-stone-900">{row.grossSalary}</span>
-              <span>{row.employerPrsi}</span>
-              <span>{row.netPay}</span>
-              <span>{row.totalCost}</span>
-              <span className="font-bold text-stone-900">{row.taxPaidPerNetEuro}</span>
+        <div className="mt-10 grid grid-cols-1 gap-x-8 gap-y-8 md:grid-cols-2 xl:grid-cols-3">
+          {TAX_INSIGHTS.map((insight) => (
+            <div key={insight.title} className="border-t border-[color:var(--rule-color)] pt-4">
+              <p className={labMicroLabel}>{insight.label}</p>
+              <h3 className="mt-2.5 text-[1.15rem] font-normal text-[color:var(--foreground)]">
+                {insight.title}
+              </h3>
+              <p className={`mt-2.5 ${labFootnote}`}>{insight.description}</p>
             </div>
           ))}
         </div>
-      </section>
-    </div>
+      </LabSection>
+
+      <LabSection className="mt-12">
+        <div className="grid gap-10 md:grid-cols-2 md:gap-0">
+          <div className="border-[color:var(--rule-color)] md:border-r md:pr-10">
+            <p className={labMicroLabel}>The salient number</p>
+            <p className="mt-3 text-[clamp(3rem,6vw,4.5rem)] font-light leading-[0.9] tracking-[-0.04em] text-[color:var(--foreground)]">
+              €1.85
+            </p>
+            <p className="mt-5 max-w-[420px] text-[1rem] leading-[1.7] text-[color:var(--text-body-rgb)]">
+              For a high earner around €150k+, the economy can spend about €1.85 in total labour
+              cost to leave €1.00 of spending power. The remaining €0.85 is the combined drag
+              from employee tax and employer PRSI.
+            </p>
+          </div>
+
+          <div className="md:pl-10">
+            <h3 className={labSubheading}>Income Landscape</h3>
+            <p className="mt-4 text-[1rem] leading-[1.7] text-[color:var(--text-body-rgb)]">
+              CSO data puts median annual full-time earnings at roughly €44,816 in 2024. The
+              distribution is skewed: the top 10% earn above about €77,500 and pay around 61% of
+              personal income tax, while the top 1% earn over €200,000 and pay roughly 19-20%.
+            </p>
+            <p className="mt-4 text-[1rem] leading-[1.7] text-[color:var(--text-body-rgb)]">
+              At the other end, the bottom 40% pay less than 5% of income tax collected, which
+              makes the system highly progressive but also dependent on a narrow high-earner
+              base.
+            </p>
+          </div>
+        </div>
+      </LabSection>
+
+      <LabSection className="mt-12">
+        <div className="mb-8 flex flex-wrap items-end justify-between gap-6">
+          <div>
+            <p className={labEyebrow}>Total labour cost</p>
+            <h2 className="mt-4 text-[clamp(2.2rem,4vw,3.2rem)] font-light leading-[1.05] tracking-[-0.02em] text-[color:var(--foreground)]">
+              What it costs to deliver take-home pay
+            </h2>
+          </div>
+          <p className={`max-w-[420px] ${labFootnote}`}>
+            These rounded examples add employer PRSI to salary cost, then compare the full
+            economic cost with approximate net pay.
+          </p>
+        </div>
+
+        <LabLedger
+          label="Total labour cost by gross salary"
+          columns="minmax(0,1fr) repeat(4, minmax(4.5rem, 7rem))"
+          headers={["Gross", "Employer PRSI", "Net pay", "Total cost", "Tax per €1 net"]}
+        >
+          {LABOUR_COST_ROWS.map((row) => (
+            <LabLedgerRow key={row.grossSalary}>
+              <span className="text-[1.05rem] tabular-nums text-[color:var(--foreground)]">
+                {row.grossSalary}
+              </span>
+              <span className="text-right text-[0.95rem] tabular-nums text-[color:var(--text-muted)]">
+                {row.employerPrsi}
+              </span>
+              <span className="text-right text-[0.95rem] tabular-nums text-[color:var(--text-muted)]">
+                {row.netPay}
+              </span>
+              <span className="text-right text-[0.95rem] tabular-nums text-[color:var(--text-muted)]">
+                {row.totalCost}
+              </span>
+              <span className="text-right text-[1.05rem] font-medium tabular-nums text-[color:var(--foreground)]">
+                {row.taxPaidPerNetEuro}
+              </span>
+            </LabLedgerRow>
+          ))}
+        </LabLedger>
+      </LabSection>
+    </LabShell>
   );
 }

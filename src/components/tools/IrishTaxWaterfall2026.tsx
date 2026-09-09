@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-import { ArrowLeft, Info } from "lucide-react";
 import { useMemo, useState } from "react";
 import {
   Bar,
@@ -14,6 +12,15 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+
+import { LabDetails, LabHeader, LabSection, LabShell } from "@/components/labs/LabChrome";
+import {
+  LabTooltip,
+  labAxisProps,
+  labGridProps,
+  useLabChartTheme,
+} from "@/components/labs/labChartTheme";
+import { labFootnote, labMicroLabel, labSlider } from "@/components/labs/labTokens";
 
 type TaxRules = {
   srcop: number;
@@ -87,11 +94,75 @@ function calculateIncomeTaxes(grossIncome: number) {
   return { paye, usc, prsi, total };
 }
 
+type WaterfallTooltipProps = {
+  active?: boolean;
+  payload?: Array<{ payload: WaterfallPoint; value: number }>;
+};
+
+function WaterfallTooltip({ active, payload }: WaterfallTooltipProps) {
+  if (!active || !payload?.length) return null;
+  const point = payload[0].payload;
+
+  return (
+    <LabTooltip
+      label={point.label}
+      rows={[
+        {
+          key: "value",
+          name: point.value < 0 ? "Deducted" : "Amount",
+          value: formatCurrency(point.value),
+          color: point.color,
+        },
+      ]}
+    />
+  );
+}
+
+/** A slider with its live value on the label's baseline, over a hairline rule. */
+function WaterfallControl({
+  label,
+  value,
+  display,
+  min,
+  max,
+  step,
+  onChange,
+}: {
+  label: string;
+  value: number;
+  display: string;
+  min: number;
+  max: number;
+  step: number;
+  onChange: (value: number) => void;
+}) {
+  return (
+    <label className="block border-t border-[color:var(--rule-color)] pt-4">
+      <div className="flex items-baseline justify-between gap-3">
+        <span className={labMicroLabel}>{label}</span>
+        <span className="text-[1.15rem] font-light tabular-nums text-[color:var(--foreground)]">
+          {display}
+        </span>
+      </div>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={(event) => onChange(Number(event.target.value))}
+        className={`mt-3 ${labSlider}`}
+      />
+    </label>
+  );
+}
+
 export default function IrishTaxWaterfall2026() {
   const [grossIncome, setGrossIncome] = useState(65_000);
   const [spendingPct, setSpendingPct] = useState(70);
   const [savingsPct, setSavingsPct] = useState(10);
   const [investmentPct, setInvestmentPct] = useState(10);
+  const chartTheme = useLabChartTheme();
 
   const result = useMemo(() => {
     const taxes = calculateIncomeTaxes(grossIncome);
@@ -161,120 +232,117 @@ export default function IrishTaxWaterfall2026() {
     };
   }, [grossIncome, spendingPct, savingsPct, investmentPct]);
 
+  const summaryColumns = [
+    {
+      label: "Income taxes",
+      value: formatCurrency(result.total),
+      lines: [
+        { key: "paye", name: "PAYE", value: formatCurrency(result.paye) },
+        { key: "usc", name: "USC", value: formatCurrency(result.usc) },
+        { key: "prsi", name: "PRSI", value: formatCurrency(result.prsi) },
+      ],
+    },
+    {
+      label: "Consumption",
+      value: formatCurrency(result.amountSpent),
+      lines: [
+        { key: "vat", name: "VAT element", value: formatCurrency(result.vatPaid) },
+        { key: "exvat", name: "Non-VAT spend", value: formatCurrency(result.spendingExVat) },
+        {
+          key: "after",
+          name: "After spending",
+          value: formatCurrency(result.availableAfterSpending),
+        },
+      ],
+    },
+    {
+      label: "Savings + investing",
+      value: formatCurrency(result.amountSaved + result.amountInvested),
+      lines: [
+        { key: "saved", name: "Saved", value: formatCurrency(result.amountSaved) },
+        { key: "invested", name: "Invested", value: formatCurrency(result.amountInvested) },
+        {
+          key: "unallocated",
+          name: "Unallocated cash",
+          value: formatCurrency(result.unallocatedCash),
+        },
+      ],
+    },
+    {
+      label: "Return taxes + final",
+      value: formatCurrency(result.finalRetained),
+      lines: [
+        { key: "dirt", name: "DIRT", value: formatCurrency(result.dirtPaid) },
+        { key: "cgt", name: "CGT", value: formatCurrency(result.cgtPaid) },
+        {
+          key: "total",
+          name: "Total return taxes",
+          value: formatCurrency(result.totalReturnTaxes),
+        },
+      ],
+    },
+  ];
+
   return (
-    <div className="mx-auto max-w-7xl px-4 pt-10 pb-24 sm:px-6 lg:px-8">
-      <Link
-        href="/labs"
-        className="mb-8 inline-flex items-center gap-2 text-stone-500 transition-colors hover:text-stone-900"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        <span className="font-mono text-sm font-medium uppercase tracking-[0.2em]">Back to Labs</span>
-      </Link>
+    <LabShell>
+      <LabHeader
+        eyebrow="Irish Tax Lens - 2026 assumptions"
+        title="Your Income As A Waterfall"
+        lede="Follow one year of gross income through income taxes, consumption, and tax on returns. The controls let you test how lifestyle choices change the amount you retain."
+      />
 
-      <header className="mb-10 space-y-4">
-        <p className="font-mono text-xs font-semibold uppercase tracking-[0.3em] text-stone-500">
-          Irish Tax Lens • 2026 assumptions
-        </p>
-        <h1 className="text-5xl font-black uppercase leading-[0.9] tracking-tight text-stone-900 sm:text-7xl">
-          Your Income As A Waterfall
-        </h1>
-        <p className="max-w-4xl text-lg leading-relaxed text-stone-600 sm:text-xl">
-          Follow one year of gross income through income taxes, consumption, and tax on returns.
-          The controls let you test how lifestyle choices change the amount you retain.
-        </p>
-      </header>
-
-      <section className="mb-8 rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)] md:p-8">
-        <h2 className="mb-6 text-2xl font-black tracking-tight text-stone-900">Controls</h2>
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-          <label className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold uppercase tracking-[0.12em] text-stone-500">
-                Gross Income
-              </span>
-              <span className="text-sm font-bold text-stone-900">{formatCurrency(grossIncome)}</span>
-            </div>
-            <input
-              type="range"
-              min={15_000}
-              max={250_000}
-              step={1_000}
-              value={grossIncome}
-              onChange={(event) => setGrossIncome(Number(event.target.value))}
-              className="h-2 w-full cursor-pointer appearance-none rounded-full bg-stone-200 accent-stone-900"
-            />
-          </label>
-
-          <label className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold uppercase tracking-[0.12em] text-stone-500">
-                Spending
-              </span>
-              <span className="text-sm font-bold text-stone-900">{formatPercent(spendingPct)}</span>
-            </div>
-            <input
-              type="range"
-              min={0}
-              max={100}
-              step={1}
-              value={spendingPct}
-              onChange={(event) => setSpendingPct(Number(event.target.value))}
-              className="h-2 w-full cursor-pointer appearance-none rounded-full bg-stone-200 accent-stone-900"
-            />
-          </label>
-
-          <label className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold uppercase tracking-[0.12em] text-stone-500">
-                Savings Rate
-              </span>
-              <span className="text-sm font-bold text-stone-900">{formatPercent(savingsPct)}</span>
-            </div>
-            <input
-              type="range"
-              min={0}
-              max={50}
-              step={1}
-              value={savingsPct}
-              onChange={(event) => setSavingsPct(Number(event.target.value))}
-              className="h-2 w-full cursor-pointer appearance-none rounded-full bg-stone-200 accent-stone-900"
-            />
-          </label>
-
-          <label className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold uppercase tracking-[0.12em] text-stone-500">
-                Investment Rate
-              </span>
-              <span className="text-sm font-bold text-stone-900">{formatPercent(investmentPct)}</span>
-            </div>
-            <input
-              type="range"
-              min={0}
-              max={50}
-              step={1}
-              value={investmentPct}
-              onChange={(event) => setInvestmentPct(Number(event.target.value))}
-              className="h-2 w-full cursor-pointer appearance-none rounded-full bg-stone-200 accent-stone-900"
-            />
-          </label>
+      <LabSection heading="Controls">
+        <div className="grid gap-x-8 gap-y-6 md:grid-cols-2 xl:grid-cols-4">
+          <WaterfallControl
+            label="Gross income"
+            value={grossIncome}
+            display={formatCurrency(grossIncome)}
+            min={15_000}
+            max={250_000}
+            step={1_000}
+            onChange={setGrossIncome}
+          />
+          <WaterfallControl
+            label="Spending"
+            value={spendingPct}
+            display={formatPercent(spendingPct)}
+            min={0}
+            max={100}
+            step={1}
+            onChange={setSpendingPct}
+          />
+          <WaterfallControl
+            label="Savings rate"
+            value={savingsPct}
+            display={formatPercent(savingsPct)}
+            min={0}
+            max={50}
+            step={1}
+            onChange={setSavingsPct}
+          />
+          <WaterfallControl
+            label="Investment rate"
+            value={investmentPct}
+            display={formatPercent(investmentPct)}
+            min={0}
+            max={50}
+            step={1}
+            onChange={setInvestmentPct}
+          />
         </div>
 
         {result.allocationScale < 1 ? (
-          <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-            Savings and investment requests exceeded what remained after spending, so both were scaled
-            down proportionally.
-          </div>
+          <p className={`mt-7 border-l-2 border-[#F4CA16] pl-4 ${labFootnote}`}>
+            Savings and investment requests exceeded what remained after spending, so both were
+            scaled down proportionally.
+          </p>
         ) : null}
-      </section>
+      </LabSection>
 
-      <section className="mb-8 rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)] md:p-8">
-        <div className="mb-4 flex items-center justify-between gap-4">
-          <h2 className="text-2xl font-black tracking-tight text-stone-900">Waterfall</h2>
-          <span className="font-mono text-xs uppercase tracking-[0.25em] text-stone-400">
-            Signed Annual Amounts
-          </span>
-        </div>
+      <LabSection
+        heading="Waterfall"
+        action={<span className={labMicroLabel}>Signed annual amounts</span>}
+      >
         <div className="h-[430px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
@@ -282,31 +350,28 @@ export default function IrishTaxWaterfall2026() {
               margin={{ top: 16, right: 20, left: 8, bottom: 64 }}
               barCategoryGap={20}
             >
-              <CartesianGrid stroke="#e7e5e4" strokeDasharray="3 3" vertical={false} />
+              <CartesianGrid {...labGridProps(chartTheme)} />
               <XAxis
                 dataKey="label"
                 interval={0}
                 angle={-18}
                 textAnchor="end"
                 height={70}
-                tick={{ fill: "#57534e", fontSize: 12 }}
+                {...labAxisProps(chartTheme)}
               />
               <YAxis
-                tick={{ fill: "#57534e", fontSize: 12 }}
+                {...labAxisProps(chartTheme)}
                 tickFormatter={(value) =>
-                  value.toLocaleString("en-IE", { style: "currency", currency: "EUR", maximumFractionDigits: 0 })
+                  value.toLocaleString("en-IE", {
+                    style: "currency",
+                    currency: "EUR",
+                    maximumFractionDigits: 0,
+                  })
                 }
               />
-              <ReferenceLine y={0} stroke="#a8a29e" />
-              <Tooltip
-                formatter={(value: number) => formatCurrency(value)}
-                contentStyle={{
-                  borderRadius: "0.9rem",
-                  borderColor: "#e7e5e4",
-                  backgroundColor: "#fafaf9",
-                }}
-              />
-              <Bar dataKey="value" radius={[10, 10, 0, 0]}>
+              <ReferenceLine y={0} stroke={chartTheme.foreground} strokeOpacity={0.35} />
+              <Tooltip content={<WaterfallTooltip />} cursor={{ fill: chartTheme.rule, fillOpacity: 0.25 }} />
+              <Bar dataKey="value" radius={0}>
                 {result.waterfallData.map((entry) => (
                   <Cell key={entry.label} fill={entry.color} />
                 ))}
@@ -314,69 +379,45 @@ export default function IrishTaxWaterfall2026() {
             </BarChart>
           </ResponsiveContainer>
         </div>
-      </section>
+      </LabSection>
 
-      <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-        <article className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_35px_-26px_rgba(0,0,0,0.35)]">
-          <p className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">Income Taxes</p>
-          <p className="mt-3 text-3xl font-black text-stone-900">{formatCurrency(result.total)}</p>
-          <ul className="mt-4 space-y-1 text-sm text-stone-600">
-            <li>PAYE: {formatCurrency(result.paye)}</li>
-            <li>USC: {formatCurrency(result.usc)}</li>
-            <li>PRSI: {formatCurrency(result.prsi)}</li>
-          </ul>
-        </article>
-
-        <article className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_35px_-26px_rgba(0,0,0,0.35)]">
-          <p className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">
-            Consumption
-          </p>
-          <p className="mt-3 text-3xl font-black text-stone-900">{formatCurrency(result.amountSpent)}</p>
-          <ul className="mt-4 space-y-1 text-sm text-stone-600">
-            <li>VAT element: {formatCurrency(result.vatPaid)}</li>
-            <li>Non-VAT spend: {formatCurrency(result.spendingExVat)}</li>
-            <li>After spending: {formatCurrency(result.availableAfterSpending)}</li>
-          </ul>
-        </article>
-
-        <article className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_35px_-26px_rgba(0,0,0,0.35)]">
-          <p className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">
-            Savings + Investing
-          </p>
-          <p className="mt-3 text-3xl font-black text-stone-900">
-            {formatCurrency(result.amountSaved + result.amountInvested)}
-          </p>
-          <ul className="mt-4 space-y-1 text-sm text-stone-600">
-            <li>Saved: {formatCurrency(result.amountSaved)}</li>
-            <li>Invested: {formatCurrency(result.amountInvested)}</li>
-            <li>Unallocated cash: {formatCurrency(result.unallocatedCash)}</li>
-          </ul>
-        </article>
-
-        <article className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_35px_-26px_rgba(0,0,0,0.35)]">
-          <p className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">
-            Return Taxes + Final
-          </p>
-          <p className="mt-3 text-3xl font-black text-stone-900">{formatCurrency(result.finalRetained)}</p>
-          <ul className="mt-4 space-y-1 text-sm text-stone-600">
-            <li>DIRT: {formatCurrency(result.dirtPaid)}</li>
-            <li>CGT: {formatCurrency(result.cgtPaid)}</li>
-            <li>Total return taxes: {formatCurrency(result.totalReturnTaxes)}</li>
-          </ul>
-        </article>
-      </section>
-
-      <section className="mt-8 rounded-[2rem] border border-stone-200 bg-stone-50 p-6 text-sm leading-relaxed text-stone-600 md:p-8">
-        <div className="mb-3 flex items-center gap-2 text-stone-700">
-          <Info className="h-4 w-4" />
-          <p className="font-semibold">Illustrative assumptions</p>
+      <LabSection heading="Where it ends up">
+        <div className="grid gap-x-8 gap-y-8 md:grid-cols-2 xl:grid-cols-4">
+          {summaryColumns.map((column) => (
+            <article key={column.label} className="border-t border-[color:var(--rule-color)] pt-4">
+              <p className={labMicroLabel}>{column.label}</p>
+              <p className="mt-2 text-[1.9rem] font-light tracking-[-0.03em] tabular-nums text-[color:var(--foreground)]">
+                {column.value}
+              </p>
+              <dl className="mt-4">
+                {column.lines.map((line) => (
+                  <div
+                    key={line.key}
+                    className="flex items-baseline justify-between gap-3 border-b border-[color:var(--rule-color)] py-2"
+                  >
+                    <dt className="text-[0.9rem] text-[color:var(--text-muted)]">{line.name}</dt>
+                    <dd className="text-[0.95rem] tabular-nums text-[color:var(--foreground)]">
+                      {line.value}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </article>
+          ))}
         </div>
-        <p>
-          This tool is an educational model, not financial advice. It uses simplified 2026-style PAYE,
-          USC, and PRSI settings for a single PAYE earner, a 23% VAT assumption on spending, and stylized
-          annual return assumptions (3.5% for savings and 5% for investments) with DIRT/CGT overlays.
+      </LabSection>
+
+      <LabDetails
+        heading="Illustrative assumptions"
+        summary="What this model simplifies."
+      >
+        <p className="max-w-[720px] text-[1rem] leading-[1.7] text-[color:var(--text-body-rgb)]">
+          This tool is an educational model, not financial advice. It uses simplified 2026-style
+          PAYE, USC, and PRSI settings for a single PAYE earner, a 23% VAT assumption on spending,
+          and stylized annual return assumptions (3.5% for savings and 5% for investments) with
+          DIRT/CGT overlays.
         </p>
-      </section>
-    </div>
+      </LabDetails>
+    </LabShell>
   );
 }

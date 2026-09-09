@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-import { ArrowLeft, Info } from "lucide-react";
 import { useMemo, useState } from "react";
 import {
   CartesianGrid,
@@ -13,6 +11,21 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+
+import {
+  LabHeader,
+  LabNote,
+  LabRail,
+  LabSection,
+  LabShell,
+} from "@/components/labs/LabChrome";
+import {
+  LabTooltip,
+  labAxisProps,
+  labGridProps,
+  useLabChartTheme,
+} from "@/components/labs/labChartTheme";
+import { labFootnote, labMicroLabel } from "@/components/labs/labTokens";
 
 type MetricId =
   | "marginalRate"
@@ -180,8 +193,7 @@ const METRICS: { id: MetricId; label: string; description: string }[] = [
 ];
 
 const SALARY_TICKS = [10_000, 20_000, 40_000, 60_000, 100_000, 200_000, 500_000];
-const AXIS_TICK_FONT_SIZE = 14;
-const AXIS_LABEL_FONT_SIZE = 16;
+const AXIS_LABEL_FONT_SIZE = 11;
 const DEFAULT_VISIBLE_SCHEDULE_IDS: ScheduleId[] = [
   "currentIrish",
   "equalAbsolute",
@@ -474,10 +486,34 @@ function getYAxisLabel(metric: MetricId) {
   return "Minutes";
 }
 
+type ScheduleTooltipProps = {
+  active?: boolean;
+  label?: string | number;
+  metric: MetricId;
+  payload?: Array<{ name?: string | number; value?: string | number; color?: string }>;
+};
+
+function ScheduleTooltip({ active, label, metric, payload }: ScheduleTooltipProps) {
+  if (!active || !payload?.length) return null;
+
+  return (
+    <LabTooltip
+      label={`Gross salary: ${formatCurrency(Number(label))}`}
+      rows={payload.map((entry) => ({
+        key: String(entry.name),
+        name: String(entry.name),
+        value: formatMetricValue(Number(entry.value), metric),
+        color: entry.color,
+      }))}
+    />
+  );
+}
+
 export default function TaxScheduleComparisonLab() {
   const [selectedMetric, setSelectedMetric] = useState<MetricId>("averageRate");
   const [calibrationMode, setCalibrationMode] = useState<CalibrationMode>("statusQuo");
   const [visibleIds, setVisibleIds] = useState<ScheduleId[]>(DEFAULT_VISIBLE_SCHEDULE_IDS);
+  const chartTheme = useLabChartTheme();
 
   const calibration =
     calibrationMode === "statusQuo"
@@ -501,66 +537,60 @@ export default function TaxScheduleComparisonLab() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 pt-10 pb-24 sm:px-6 lg:px-8">
-      <Link
-        href="/labs"
-        className="mb-8 inline-flex items-center gap-2 text-stone-500 transition-colors hover:text-stone-900"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        <span className="font-mono text-sm font-medium uppercase tracking-[0.2em]">
-          Back to Labs
-        </span>
-      </Link>
+    <LabShell>
+      <LabHeader
+        eyebrow="Tax Philosophy - Interactive Comparison"
+        title="Tax Schedule Comparison"
+        lede={
+          <>
+            Compare eight ways of turning gross salary into tax, take-home pay, and working
+            time.{" "}
+            {isStatusQuo
+              ? "The stylised schedules are calibrated to the current Irish model at a €60,000 salary."
+              : "The stylised schedules show the rates needed to keep Ireland’s total income-tax take unchanged."}
+          </>
+        }
+      />
 
-      <header className="mb-10 space-y-4">
-        <p className="font-mono text-xs font-semibold uppercase tracking-[0.3em] text-stone-500">
-          Tax Philosophy - Interactive Comparison
-        </p>
-        <h1 className="max-w-5xl text-5xl font-black uppercase leading-[0.9] tracking-tight text-stone-900 sm:text-7xl">
-          Tax Schedule Comparison
-        </h1>
-        <p className="max-w-4xl text-lg leading-relaxed text-stone-600 sm:text-xl">
-          Compare eight ways of turning gross salary into tax, take-home pay, and
-          working time.{" "}
-          {isStatusQuo
-            ? "The stylised schedules are calibrated to the current Irish model at a €60,000 salary."
-            : "The stylised schedules show the rates needed to keep Ireland’s total income-tax take unchanged."}
-        </p>
-      </header>
+      <div className="mt-9 grid gap-10 lg:grid-cols-[236px_minmax(0,1fr)] lg:gap-0">
+        <LabRail label="Metric">
+          <div className="border-t border-[color:var(--rule-color)]">
+            {METRICS.map((metric) => {
+              const isSelected = selectedMetric === metric.id;
 
-      <section className="grid grid-cols-1 gap-8 lg:grid-cols-4">
-        <aside className="space-y-5 lg:col-span-1">
-          <article className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)]">
-            <div className="space-y-2">
-              {METRICS.map((metric) => (
+              return (
                 <button
                   key={metric.id}
                   type="button"
                   onClick={() => setSelectedMetric(metric.id)}
-                  className={`w-full rounded-2xl border px-4 py-3 text-left transition ${
-                    selectedMetric === metric.id
-                      ? "border-stone-900 bg-stone-900 text-white"
-                      : "border-stone-200 bg-stone-50 text-stone-700 hover:border-stone-400"
+                  className={`block w-full border-b border-l-2 border-b-[color:var(--rule-color)] py-3.5 pl-3.5 text-left transition-colors ${
+                    isSelected
+                      ? "border-l-[#F4CA16]"
+                      : "border-l-transparent hover:border-l-[color:var(--rule-color)]"
                   }`}
                 >
-                  <span className="block text-sm font-black tracking-tight">{metric.label}</span>
                   <span
-                    className={`mt-1 block text-xs leading-relaxed ${
-                      selectedMetric === metric.id ? "text-stone-300" : "text-stone-500"
+                    className={`block text-[0.98rem] ${
+                      isSelected
+                        ? "text-[color:var(--foreground)]"
+                        : "text-[color:var(--text-muted)]"
                     }`}
                   >
-                    {metric.description}
+                    {metric.label}
                   </span>
+                  <span className={`mt-1 block ${labFootnote}`}>{metric.description}</span>
                 </button>
-              ))}
-            </div>
-          </article>
+              );
+            })}
+          </div>
 
-          <fieldset className="rounded-[2rem] border border-stone-200 bg-white p-4 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)]">
-            <legend className="px-2 font-mono text-xs font-semibold uppercase tracking-[0.24em] text-stone-500">
-              Calibration
-            </legend>
-            <div className="grid gap-2" role="radiogroup" aria-label="Tax schedule calibration">
+          <div className="mt-8">
+            <p className={labMicroLabel}>Calibration</p>
+            <div
+              className="mt-3 border-t border-[color:var(--rule-color)]"
+              role="radiogroup"
+              aria-label="Tax schedule calibration"
+            >
               {(
                 [
                   {
@@ -576,6 +606,7 @@ export default function TaxScheduleComparisonLab() {
                 ] as const
               ).map((option) => {
                 const isSelected = calibrationMode === option.id;
+
                 return (
                   <button
                     key={option.id}
@@ -583,39 +614,43 @@ export default function TaxScheduleComparisonLab() {
                     role="radio"
                     aria-checked={isSelected}
                     onClick={() => setCalibrationMode(option.id)}
-                    className={`rounded-2xl border px-4 py-3 text-left transition ${
+                    className={`block w-full border-b border-l-2 border-b-[color:var(--rule-color)] py-3.5 pl-3.5 text-left transition-colors ${
                       isSelected
-                        ? "border-orange-600 bg-orange-50 text-stone-900"
-                        : "border-stone-200 bg-stone-50 text-stone-600 hover:border-stone-400"
+                        ? "border-l-[#F4CA16]"
+                        : "border-l-transparent hover:border-l-[color:var(--rule-color)]"
                     }`}
                   >
-                    <span className="block text-sm font-black tracking-tight">
+                    <span
+                      className={`block text-[0.98rem] ${
+                        isSelected
+                          ? "text-[color:var(--foreground)]"
+                          : "text-[color:var(--text-muted)]"
+                      }`}
+                    >
                       {option.label}
                     </span>
-                    <span className="mt-1 block text-xs text-stone-500">
-                      {option.description}
-                    </span>
+                    <span className={`mt-1 block ${labFootnote}`}>{option.description}</span>
                   </button>
                 );
               })}
             </div>
-          </fieldset>
+          </div>
+        </LabRail>
 
-        </aside>
-
-        <article className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)] sm:p-8 lg:col-span-3">
+        <article className="min-w-0 lg:pl-12">
           <div className="mb-6">
-            <h2 className="text-3xl font-black tracking-tight text-stone-900 sm:text-4xl">
+            <h2 className="text-[clamp(1.9rem,3.2vw,2.6rem)] font-light leading-[1.1] tracking-[-0.02em] text-[color:var(--foreground)]">
               {getMetricLabel(selectedMetric)}
             </h2>
-            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-stone-600">
+            <p className={`mt-3 max-w-[620px] ${labFootnote}`}>
               {getMetricDescription(selectedMetric)}
             </p>
           </div>
 
-          <div className="mb-5 flex flex-wrap gap-2">
+          <div className="mb-5 flex flex-wrap gap-x-6 gap-y-3 border-t border-[color:var(--rule-color)] pt-5">
             {SCHEDULES.map((schedule) => {
               const isVisible = visibleSet.has(schedule.id);
+
               return (
                 <button
                   key={schedule.id}
@@ -623,18 +658,25 @@ export default function TaxScheduleComparisonLab() {
                   onClick={() => toggleSchedule(schedule.id)}
                   aria-pressed={isVisible}
                   title={`${isVisible ? "Hide" : "Show"} ${schedule.label}`}
-                  style={{ borderColor: schedule.color }}
-                  className={`pill-control relative overflow-hidden rounded-full border-2 bg-white py-2 pr-3 pl-10 text-[10px] font-black uppercase tracking-[0.14em] transition ${
-                    isVisible
-                      ? "text-stone-900"
-                      : "opacity-45 hover:opacity-100"
-                  }`}
+                  className="flex items-center gap-2 border-b pb-1 transition-colors"
+                  style={{ borderBottomColor: isVisible ? schedule.color : "transparent" }}
                 >
                   <span
-                    className="absolute inset-y-1 left-1 aspect-square rounded-full"
-                    style={{ backgroundColor: schedule.color }}
+                    className="h-2.5 w-2.5 shrink-0 rounded-full"
+                    style={{
+                      backgroundColor: schedule.color,
+                      opacity: isVisible ? 1 : 0.35,
+                    }}
                   />
-                  <span className="pill-label relative">{schedule.label}</span>
+                  <span
+                    className={`font-mono text-[0.58rem] uppercase tracking-[0.14em] ${
+                      isVisible
+                        ? "text-[color:var(--foreground)]"
+                        : "text-[color:var(--text-muted)]"
+                    }`}
+                  >
+                    {schedule.label}
+                  </span>
                 </button>
               );
             })}
@@ -643,7 +685,7 @@ export default function TaxScheduleComparisonLab() {
           <div className="h-[34rem] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData} margin={{ top: 18, right: 28, left: 8, bottom: 32 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e7e5e4" />
+                <CartesianGrid {...labGridProps(chartTheme)} />
                 <XAxis
                   dataKey="income"
                   type="number"
@@ -651,67 +693,52 @@ export default function TaxScheduleComparisonLab() {
                   domain={[MIN_SALARY, MAX_SALARY]}
                   ticks={SALARY_TICKS}
                   allowDataOverflow
-                  stroke="#78716c"
-                  fontSize={AXIS_TICK_FONT_SIZE}
                   tickFormatter={formatSalaryTick}
+                  {...labAxisProps(chartTheme)}
                   label={{
                     value: "Gross Salary",
                     position: "insideBottom",
                     offset: -8,
                     fontSize: AXIS_LABEL_FONT_SIZE,
-                    fill: "#78716c",
+                    fill: chartTheme.muted,
                   }}
                 />
                 <YAxis
-                  stroke="#78716c"
-                  fontSize={AXIS_TICK_FONT_SIZE}
                   width={80}
+                  {...labAxisProps(chartTheme)}
                   label={{
                     value: getYAxisLabel(selectedMetric),
                     angle: -90,
                     position: "insideLeft",
                     fontSize: AXIS_LABEL_FONT_SIZE,
-                    fill: "#78716c",
+                    fill: chartTheme.muted,
                   }}
                   tickFormatter={(value) => formatMetricValue(Number(value), selectedMetric)}
                 />
-                <Tooltip
-                  labelFormatter={(label) =>
-                    `Gross salary: ${formatCurrency(Number(label))}`
-                  }
-                  formatter={(value, name) => [
-                    formatMetricValue(Number(value), selectedMetric),
-                    String(name),
-                  ]}
-                  contentStyle={{
-                    borderRadius: "12px",
-                    border: "1px solid #e7e5e4",
-                    boxShadow: "0 14px 28px -18px rgba(0,0,0,0.45)",
-                  }}
-                />
+                <Tooltip content={<ScheduleTooltip metric={selectedMetric} />} />
                 {isStatusQuo && (
                   <>
                     <ReferenceLine
                       x={BENCHMARK_INCOME}
-                      stroke="#a8a29e"
+                      stroke={chartTheme.muted}
                       strokeDasharray="4 4"
                       label={{
                         position: "top",
                         value: "€60k concordance",
                         fontSize: 10,
-                        fill: "#78716c",
+                        fill: chartTheme.muted,
                       }}
                     />
                     {selectedMetric === "averageRate" && (
                       <ReferenceLine
                         y={BENCHMARK_AVERAGE_RATE * 100}
-                        stroke="#d6d3d1"
+                        stroke={chartTheme.rule}
                         strokeDasharray="3 3"
                         label={{
                           position: "insideTopRight",
                           value: "benchmark rate",
                           fontSize: 10,
-                          fill: "#78716c",
+                          fill: chartTheme.muted,
                         }}
                       />
                     )}
@@ -735,99 +762,106 @@ export default function TaxScheduleComparisonLab() {
             </ResponsiveContainer>
           </div>
 
-          <p className="mt-5 rounded-xl border border-stone-200 bg-stone-50 p-3 text-sm leading-relaxed text-stone-600">
+          <p className={`mt-6 border-t border-[color:var(--rule-color)] pt-4 ${labFootnote}`}>
             {isStatusQuo ? (
               <>
-                All stylised schedules are calibrated to the current Irish model at
-                €60,000.
+                All stylised schedules are calibrated to the current Irish model at €60,000.
               </>
             ) : (
               <>
-                Each stylised schedule is calibrated to preserve Ireland&apos;s 2024
-                Income Tax and USC take. Nine equally weighted salary observations
-                are used behind the scenes to estimate the required rates.
+                Each stylised schedule is calibrated to preserve Ireland&apos;s 2024 Income Tax
+                and USC take. Nine equally weighted salary observations are used behind the
+                scenes to estimate the required rates.
               </>
             )}
           </p>
         </article>
-      </section>
+      </div>
 
-      <section className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <article className="rounded-[2rem] border border-stone-200 bg-stone-900 p-6 text-white shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)] sm:p-8">
-          <p className="font-mono text-xs font-semibold uppercase tracking-[0.3em] text-stone-400">
-            {isStatusQuo ? "Status Quo" : "2024 Income Tax Take"}
-          </p>
-          <p className="mt-4 text-4xl font-black tracking-tight">
-            {isStatusQuo
-              ? formatPercent(BENCHMARK_AVERAGE_RATE * 100)
-              : formatBillions(NATIONAL_INCOME_TAX_RECEIPTS_2024)}
-          </p>
-          {isStatusQuo ? (
-            <>
-              <p className="mt-3 text-sm leading-relaxed text-stone-300">
-                A single PAYE employee on {formatCurrency(BENCHMARK_INCOME)} pays about{" "}
-                {formatCurrency(BENCHMARK_TAX)} in PAYE, USC, and PRSI in this model.
-              </p>
-              <p className="mt-3 text-sm leading-relaxed text-stone-300">
-                I tuned the other tax schedules so that each reaches 25.2% at €60,000. I
-                chose this to allow rough comparison to the current Irish-tax status quo.
-              </p>
-            </>
-          ) : (
-            <>
-              <p className="mt-3 text-sm leading-relaxed text-stone-300">
-                Ireland collected €35.071 billion in net Income Tax receipts,
-                including USC, in 2024.
-              </p>
-              <p className="mt-3 text-sm leading-relaxed text-stone-300">
-                The nine salary observations are used behind the scenes to estimate
-                the rates each schedule would need to keep that national take unchanged.
-              </p>
-            </>
-          )}
-        </article>
+      <LabSection className="mt-12">
+        <div className="grid gap-10 lg:grid-cols-3 lg:gap-0">
+          <div className="border-[color:var(--rule-color)] lg:border-r lg:pr-10">
+            <p className={labMicroLabel}>
+              {isStatusQuo ? "Status quo" : "2024 income tax take"}
+            </p>
+            <p className="mt-3 text-[clamp(2.6rem,5vw,3.8rem)] font-light leading-[0.9] tracking-[-0.04em] tabular-nums text-[color:var(--foreground)]">
+              {isStatusQuo
+                ? formatPercent(BENCHMARK_AVERAGE_RATE * 100)
+                : formatBillions(NATIONAL_INCOME_TAX_RECEIPTS_2024)}
+            </p>
+            {isStatusQuo ? (
+              <>
+                <p className={`mt-5 ${labFootnote}`}>
+                  A single PAYE employee on {formatCurrency(BENCHMARK_INCOME)} pays about{" "}
+                  {formatCurrency(BENCHMARK_TAX)} in PAYE, USC, and PRSI in this model.
+                </p>
+                <p className={`mt-3 ${labFootnote}`}>
+                  I tuned the other tax schedules so that each reaches 25.2% at €60,000. I chose
+                  this to allow rough comparison to the current Irish-tax status quo.
+                </p>
+              </>
+            ) : (
+              <>
+                <p className={`mt-5 ${labFootnote}`}>
+                  Ireland collected €35.071 billion in net Income Tax receipts, including USC,
+                  in 2024.
+                </p>
+                <p className={`mt-3 ${labFootnote}`}>
+                  The nine salary observations are used behind the scenes to estimate the rates
+                  each schedule would need to keep that national take unchanged.
+                </p>
+              </>
+            )}
+          </div>
 
-        <article className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)] sm:p-8 lg:col-span-2">
-          <p className="flex items-start gap-3 text-sm leading-relaxed text-stone-600">
-            <Info className="mt-0.5 h-4 w-4 shrink-0 text-stone-500" />
-            <span>
-              The chart is a shape explorer, not a full-population revenue forecast.
-              It compares how different fairness rules distribute the burden across salaries after{" "}
+          <div className="min-w-0 lg:col-span-2 lg:pl-10">
+            <LabNote heading="What the chart is">
+              The chart is a shape explorer, not a full-population revenue forecast. It compares
+              how different fairness rules distribute the burden across salaries after{" "}
               {isStatusQuo
                 ? "they are anchored to the same benchmark taxpayer."
                 : "their parameters are adjusted to keep Ireland’s overall income-tax take unchanged."}
-            </span>
-          </p>
-          <div className="mt-5 grid gap-3 sm:grid-cols-2">
-            {SCHEDULES.map((schedule) => (
-              <div key={schedule.id} className="rounded-2xl border border-stone-200 bg-stone-50 p-4">
-                <div className="flex items-center gap-2">
-                  <span
-                    className="h-3 w-3 rounded-full"
-                    style={{ backgroundColor: schedule.color }}
-                  />
-                  <h3 className="text-sm font-black tracking-tight text-stone-900">
-                    {schedule.label}
-                  </h3>
+            </LabNote>
+
+            <div className="mt-9 grid gap-x-8 gap-y-7 sm:grid-cols-2">
+              {SCHEDULES.map((schedule) => (
+                <div
+                  key={schedule.id}
+                  className="border-t border-[color:var(--rule-color)] pt-4"
+                >
+                  <div className="flex items-baseline gap-2">
+                    <span
+                      className="mt-[0.35em] h-2.5 w-2.5 shrink-0 self-start rounded-full"
+                      style={{ backgroundColor: schedule.color }}
+                    />
+                    <h3 className="text-[1.02rem] font-normal leading-snug text-[color:var(--foreground)]">
+                      {schedule.label}
+                    </h3>
+                  </div>
+                  <p className={`mt-2.5 ${labFootnote}`}>{schedule.description}</p>
+                  {schedule.id === "equalPurchaseTime" && (
+                    <p
+                      className={`mt-3 border-t border-[color:var(--rule-color)] pt-3 ${labFootnote}`}
+                    >
+                      Its average tax rate reaches 50% at a salary of{" "}
+                      <span className="text-[color:var(--foreground)]">
+                        {formatCurrency(calibration.purchaseTimeK)}
+                      </span>
+                      . With 37.5 working hours a week for 52 weeks (
+                      {WORKING_MINUTES_PER_YEAR.toLocaleString("en-IE")} minutes a year), one
+                      gross minute at that salary buys about{" "}
+                      <span className="text-[color:var(--foreground)]">
+                        {formatCurrency(oneMinutePurchasePrice, 2)}
+                      </span>
+                      .
+                    </p>
+                  )}
                 </div>
-                <p className="mt-2 text-xs leading-relaxed text-stone-600">
-                  {schedule.description}
-                </p>
-                {schedule.id === "equalPurchaseTime" && (
-                  <p className="mt-3 border-t border-stone-200 pt-3 text-xs leading-relaxed text-stone-600">
-                    Its average tax rate reaches 50% at a salary of{" "}
-                    <strong>{formatCurrency(calibration.purchaseTimeK)}</strong>. With
-                    37.5 working hours a week for 52 weeks (
-                    {WORKING_MINUTES_PER_YEAR.toLocaleString("en-IE")} minutes a year),
-                    one gross minute at that salary buys about{" "}
-                    <strong>{formatCurrency(oneMinutePurchasePrice, 2)}</strong>.
-                  </p>
-                )}
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </article>
-      </section>
-    </div>
+        </div>
+      </LabSection>
+    </LabShell>
   );
 }

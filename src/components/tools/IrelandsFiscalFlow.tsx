@@ -1,8 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, ReactNode, useMemo, useState } from "react";
+import { ArrowRight, ChevronDown } from "lucide-react";
 import {
   Bar,
   BarChart,
@@ -13,6 +12,28 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+
+import { LabDetails, LabHeader, LabSection, LabShell } from "@/components/labs/LabChrome";
+import {
+  LabTooltip,
+  labAxisProps,
+  labGridProps,
+  useLabChartTheme,
+} from "@/components/labs/labChartTheme";
+import {
+  labField,
+  labFieldAffix,
+  labFieldGroup,
+  labFieldInput,
+  labFieldLabel,
+  labFootnote,
+  labLink,
+  labMicroLabel,
+  labPrimaryButton,
+  labQuietButton,
+  labSubheading,
+  labTab,
+} from "@/components/labs/labTokens";
 
 type ViewMode = "total" | "personal";
 type MaritalStatus =
@@ -79,98 +100,36 @@ const CAT_THRESHOLDS: Record<Exclude<CatGroup, "none">, number> = {
 };
 const EMPTY_SPENDING_CHILDREN: SpendingNode[] = [];
 
+/**
+ * The form opens on a plausible single earner rather than on empty fields, so
+ * every input shows a real number the reader can overwrite. One-off events
+ * (asset sales, a car purchase, an inheritance) stay at zero: pre-filling them
+ * would quietly inflate the headline estimate for everyone.
+ */
 const DEFAULT_INPUTS: FiscalInputs = {
   maritalStatus: "single",
   employmentStatus: "paye",
   isMedicalCardHolder: false,
   isOver70: false,
-  grossSalary: 0,
-  spouseSalary: 0,
-  selfEmployedIncome: 0,
-  rentalIncome: 0,
-  spendingGroceries: 0,
-  spendingEnergy: 0,
-  spendingHospitality: 0,
-  spendingFuel: 0,
-  spendingAlcoholTobacco: 0,
-  spendingGeneral: 0,
-  totalSavings: 0,
-  interestRate: 0,
-  cgtGain: 0,
-  lpt: 0,
-  motorTax: 0,
-  vrtPrice: 0,
-  vrtCo2: 0,
-  catValue: 0,
-  catGroup: "none",
-};
-
-const ABOUT_YOU_DEFAULTS: Pick<
-  FiscalInputs,
-  "maritalStatus" | "employmentStatus" | "isMedicalCardHolder" | "isOver70" | "spouseSalary"
-> = {
-  maritalStatus: "single",
-  employmentStatus: "paye",
-  isMedicalCardHolder: false,
-  isOver70: false,
-  spouseSalary: 0,
-};
-
-const INCOME_DEFAULTS: Pick<
-  FiscalInputs,
-  "grossSalary" | "spouseSalary" | "selfEmployedIncome" | "rentalIncome"
-> = {
   grossSalary: 60_000,
   spouseSalary: 0,
   selfEmployedIncome: 0,
-  rentalIncome: 5_000,
-};
-
-const SPENDING_DEFAULTS: Pick<
-  FiscalInputs,
-  | "spendingGroceries"
-  | "spendingEnergy"
-  | "spendingHospitality"
-  | "spendingFuel"
-  | "spendingAlcoholTobacco"
-  | "spendingGeneral"
-> = {
+  rentalIncome: 0,
   spendingGroceries: 600,
   spendingEnergy: 150,
   spendingHospitality: 200,
   spendingFuel: 150,
   spendingAlcoholTobacco: 100,
   spendingGeneral: 400,
-};
-
-const OTHER_TAX_DEFAULTS: Pick<
-  FiscalInputs,
-  | "totalSavings"
-  | "interestRate"
-  | "cgtGain"
-  | "lpt"
-  | "motorTax"
-  | "vrtPrice"
-  | "vrtCo2"
-  | "catValue"
-  | "catGroup"
-> = {
   totalSavings: 10_000,
   interestRate: 3,
-  cgtGain: 5_000,
+  cgtGain: 0,
   lpt: 450,
   motorTax: 390,
-  vrtPrice: 30_000,
-  vrtCo2: 110,
-  catValue: 20_000,
-  catGroup: "B",
-};
-
-const ESTIMATE_TAX_DEFAULTS: Partial<FiscalInputs> = {
-  ...ABOUT_YOU_DEFAULTS,
-  ...INCOME_DEFAULTS,
-  ...SPENDING_DEFAULTS,
-  ...OTHER_TAX_DEFAULTS,
+  vrtPrice: 0,
+  vrtCo2: 0,
+  catValue: 0,
+  catGroup: "none",
 };
 
 const SPENDING_HIERARCHY: SpendingNode = {
@@ -529,13 +488,180 @@ function calculateVrt(inputs: FiscalInputs) {
   return inputs.vrtPrice * rate;
 }
 
+type SpendingTooltipProps = {
+  active?: boolean;
+  viewMode: ViewMode;
+  parentName: string;
+  payload?: Array<{
+    value?: number;
+    payload: {
+      name: string;
+      color: string;
+      percentageOfTotal: number;
+      percentageOfParent: number;
+    };
+  }>;
+};
+
+function SpendingTooltip({ active, payload, viewMode, parentName }: SpendingTooltipProps) {
+  if (!active || !payload?.length) return null;
+  const entry = payload[0];
+  const slice = entry.payload;
+  const value = Number(entry.value ?? 0);
+
+  if (viewMode === "total") {
+    return (
+      <LabTooltip
+        label={slice.name}
+        rows={[{ key: "value", value: formatMillions(Math.round(value)), name: "Allocation", color: slice.color }]}
+        note={`${slice.percentageOfTotal.toFixed(2)}% of total, ${slice.percentageOfParent.toFixed(2)}% of ${parentName}`}
+      />
+    );
+  }
+
+  return (
+    <LabTooltip
+      label={slice.name}
+      rows={[
+        { key: "value", name: "Your share", value: formatCurrency(value), color: slice.color },
+      ]}
+    />
+  );
+}
+
+/**
+ * Number field carrying its unit inside the box, so no example value is needed.
+ * The keystrokes live in local state and the parsed number goes to the parent,
+ * which keeps half-typed decimals like "3." from being rewritten mid-entry.
+ * The form is remounted on reset, so there is no prop to resync against.
+ */
+function NumberField({
+  label,
+  value,
+  unit = "EUR",
+  onChange,
+}: {
+  label: string;
+  value: number;
+  unit?: string;
+  onChange: (value: string) => void;
+}) {
+  const [draft, setDraft] = useState(() => String(value));
+
+  return (
+    <label className="block">
+      <span className={labFieldLabel}>{label}</span>
+      <span className={labFieldGroup}>
+        <input
+          type="text"
+          inputMode="decimal"
+          value={draft}
+          onFocus={(event) => event.currentTarget.select()}
+          onChange={(event) => {
+            const next = event.target.value;
+            if (!/^\d*\.?\d*$/.test(next)) return;
+            setDraft(next);
+            onChange(next);
+          }}
+          className={labFieldInput}
+        />
+        <span className={labFieldAffix}>{unit}</span>
+      </span>
+    </label>
+  );
+}
+
+function SelectField({
+  label,
+  value,
+  onChange,
+  className = "",
+  children,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  className?: string;
+  children: ReactNode;
+}) {
+  return (
+    <label className={`block ${className}`}>
+      <span className={labFieldLabel}>{label}</span>
+      <span className="relative block">
+        <select
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          className={`${labField} pr-9`}
+        >
+          {children}
+        </select>
+        <ChevronDown
+          className="pointer-events-none absolute top-1/2 right-3 h-3.5 w-3.5 -translate-y-1/2 text-[color:var(--text-muted)]"
+          aria-hidden="true"
+        />
+      </span>
+    </label>
+  );
+}
+
+function CheckboxField({
+  label,
+  checked,
+  onChange,
+}: {
+  label: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+}) {
+  return (
+    <label className="inline-flex cursor-pointer items-center gap-2.5 text-[0.95rem] text-[color:var(--foreground)]">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(event) => onChange(event.target.checked)}
+        className="h-4 w-4 accent-[color:var(--foreground)]"
+      />
+      {label}
+    </label>
+  );
+}
+
+/** A numbered fieldset separated from its neighbours by a single rule. */
+function FormBlock({
+  step,
+  title,
+  note,
+  children,
+}: {
+  step: string;
+  title: string;
+  note?: string;
+  children: ReactNode;
+}) {
+  return (
+    <fieldset className="border-t border-[color:var(--rule-color)] pt-5">
+      <legend className="sr-only">{title}</legend>
+      <div className="flex items-baseline gap-3">
+        <span className="font-mono text-[0.7rem] tracking-[0.12em] text-[color:var(--text-muted)]">
+          {step}
+        </span>
+        <h3 className={labSubheading}>{title}</h3>
+      </div>
+      {note ? <p className={`mt-1.5 ${labFootnote}`}>{note}</p> : null}
+      {children}
+    </fieldset>
+  );
+}
+
 export default function IrelandsFiscalFlow() {
   const [inputs, setInputs] = useState<FiscalInputs>(DEFAULT_INPUTS);
+  const [formKey, setFormKey] = useState(0);
   const [hasCalculated, setHasCalculated] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>("total");
   const [drilldownPath, setDrilldownPath] = useState<SpendingNode[]>([
     SPENDING_HIERARCHY,
   ]);
+  const chartTheme = useLabChartTheme();
 
   const incomeTaxResult = useMemo(() => calculateIncomeTax(inputs), [inputs]);
   const consumptionTaxes = useMemo(() => calculateConsumptionTaxes(inputs), [inputs]);
@@ -609,8 +735,10 @@ export default function IrelandsFiscalFlow() {
     setInputs((prev) => ({ ...prev, [key]: value }));
   }
 
-  function applyDefaults(defaults: Partial<FiscalInputs>) {
-    setInputs((prev) => ({ ...prev, ...defaults }));
+  /** Bumping the key remounts the form, so each field's draft text resets too. */
+  function resetInputs() {
+    setInputs(DEFAULT_INPUTS);
+    setFormKey((prev) => prev + 1);
   }
 
   function enterDrilldown(index: number) {
@@ -623,482 +751,304 @@ export default function IrelandsFiscalFlow() {
     setDrilldownPath((prev) => (prev.length > 1 ? prev.slice(0, -1) : prev));
   }
 
+  const taxBreakdownLines = [
+    { key: "it", label: "Income tax", value: incomeTaxResult.incomeTax },
+    { key: "usc", label: "USC", value: incomeTaxResult.usc },
+    { key: "prsi", label: "PRSI", value: incomeTaxResult.prsi },
+    { key: "vat", label: "VAT", value: consumptionTaxes.vat },
+    { key: "excise", label: "Excise duties", value: consumptionTaxes.excise },
+    { key: "property", label: "Property & capital taxes", value: propertyAndCapitalTaxes },
+    { key: "motor", label: "Motor taxes", value: motorTaxes },
+  ];
+
   return (
-    <div className="mx-auto max-w-7xl px-4 pt-10 pb-24 sm:px-6 lg:px-8">
-      <Link
-        href="/labs"
-        className="mb-8 inline-flex items-center gap-2 text-stone-500 transition-colors hover:text-stone-900"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        <span className="font-mono text-sm font-medium uppercase tracking-[0.2em]">
-          Back to Labs
-        </span>
-      </Link>
+    <LabShell>
+      <LabHeader
+        eyebrow="Public Spending - Ireland 2024"
+        title="Ireland's Fiscal Flow"
+        lede="Estimate your tax contribution, then compare it against how the 2024 public spending pot is distributed across major services."
+      />
 
-      <header className="mb-10 space-y-4">
-        <p className="font-mono text-xs font-semibold uppercase tracking-[0.3em] text-stone-500">
-          Public Spending • Ireland 2024
-        </p>
-        <h1 className="max-w-4xl text-5xl font-black uppercase leading-[0.9] tracking-tight text-stone-900 sm:text-7xl">
-          Ireland&apos;s Fiscal Flow
-        </h1>
-        <p className="max-w-3xl text-lg leading-relaxed text-stone-600 sm:text-xl">
-          Estimate your tax contribution, then compare it against how the 2024
-          public spending pot is distributed across major services.
-        </p>
-      </header>
-
-      <section className="mb-8 rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)] sm:p-8">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <h2 className="text-2xl font-black tracking-tight text-stone-900 sm:text-3xl">
-              Step 1: Estimate Your Tax
-            </h2>
-            <p className="mt-2 text-stone-600">
-              Enter your details to get an illustrative annual estimate.
-            </p>
-            <p className="mt-1 text-sm text-stone-500">
-              Use Fill Defaults if you want quick sample values first.
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => applyDefaults(ESTIMATE_TAX_DEFAULTS)}
-            className="rounded-full bg-stone-900 px-5 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-white shadow-sm transition hover:bg-stone-700 sm:shrink-0"
-          >
-            Fill Defaults
+      <LabSection
+        heading="Step 1: Estimate your tax"
+        intro="The form starts on a single PAYE earner on EUR 60,000. Change any figure to your own and recalculate."
+        action={
+          <button type="button" onClick={resetInputs} className={labQuietButton}>
+            Reset figures
           </button>
-        </div>
+        }
+      >
+        <form key={formKey} onSubmit={handleSubmit} className="space-y-9">
+          <FormBlock step="01" title="About you">
+            <div className="mt-5 grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-2">
+              <SelectField
+                label="Marital status"
+                value={inputs.maritalStatus}
+                onChange={(value) => setStringField("maritalStatus", value as MaritalStatus)}
+              >
+                <option value="single">Single</option>
+                <option value="married-one-income">
+                  Married/Civil Partnership (One Income)
+                </option>
+                <option value="married-two-incomes">
+                  Married/Civil Partnership (Two Incomes)
+                </option>
+                <option value="widowed">Widowed</option>
+                <option value="separated">Separated</option>
+              </SelectField>
 
-        <form onSubmit={handleSubmit} className="mt-6 space-y-6">
-          <div className="rounded-2xl border border-stone-200 bg-stone-50 p-5">
-            <h3 className="text-lg font-bold text-stone-900">1) About You</h3>
-            <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-              <label className="text-sm font-semibold text-stone-700">
-                Marital Status
-                <select
-                  value={inputs.maritalStatus}
-                  onChange={(event) =>
-                    setStringField("maritalStatus", event.target.value as MaritalStatus)
-                  }
-                  className="mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-stone-900"
-                >
-                  <option value="single">Single</option>
-                  <option value="married-one-income">
-                    Married/Civil Partnership (One Income)
-                  </option>
-                  <option value="married-two-incomes">
-                    Married/Civil Partnership (Two Incomes)
-                  </option>
-                  <option value="widowed">Widowed</option>
-                  <option value="separated">Separated</option>
-                </select>
-              </label>
-
-              <label className="text-sm font-semibold text-stone-700">
-                Employment Status
-                <select
-                  value={inputs.employmentStatus}
-                  onChange={(event) =>
-                    setStringField(
-                      "employmentStatus",
-                      event.target.value as EmploymentStatus,
-                    )
-                  }
-                  className="mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-stone-900"
-                >
-                  <option value="paye">PAYE Employee</option>
-                  <option value="self-employed">Self-Employed</option>
-                  <option value="both">Both PAYE & Self-Employed</option>
-                  <option value="none">Unemployed / Not Working</option>
-                </select>
-              </label>
+              <SelectField
+                label="Employment status"
+                value={inputs.employmentStatus}
+                onChange={(value) =>
+                  setStringField("employmentStatus", value as EmploymentStatus)
+                }
+              >
+                <option value="paye">PAYE Employee</option>
+                <option value="self-employed">Self-Employed</option>
+                <option value="both">Both PAYE &amp; Self-Employed</option>
+                <option value="none">Unemployed / Not Working</option>
+              </SelectField>
             </div>
 
-            <div className="mt-4 flex flex-wrap gap-6">
-              <label className="inline-flex items-center gap-2 text-sm text-stone-700">
-                <input
-                  type="checkbox"
-                  checked={inputs.isMedicalCardHolder}
-                  onChange={(event) =>
-                    setBooleanField("isMedicalCardHolder", event.target.checked)
-                  }
-                />
-                Full Medical Card
-              </label>
-              <label className="inline-flex items-center gap-2 text-sm text-stone-700">
-                <input
-                  type="checkbox"
-                  checked={inputs.isOver70}
-                  onChange={(event) => setBooleanField("isOver70", event.target.checked)}
-                />
-                Over 70
-              </label>
+            <div className="mt-6 flex flex-wrap gap-8">
+              <CheckboxField
+                label="Full medical card"
+                checked={inputs.isMedicalCardHolder}
+                onChange={(checked) => setBooleanField("isMedicalCardHolder", checked)}
+              />
+              <CheckboxField
+                label="Over 70"
+                checked={inputs.isOver70}
+                onChange={(checked) => setBooleanField("isOver70", checked)}
+              />
             </div>
-          </div>
+          </FormBlock>
 
-          <div className="rounded-2xl border border-stone-200 bg-stone-50 p-5">
-            <h3 className="text-lg font-bold text-stone-900">2) Annual Income</h3>
-            <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-              <label className="text-sm font-semibold text-stone-700">
-                Gross Salary (PAYE)
-                <input
-                  type="number"
-                  value={inputs.grossSalary || ""}
-                  onChange={(event) => setNumberField("grossSalary", event.target.value)}
-                  className="mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-stone-900"
-                  placeholder="e.g. 60000"
-                />
-              </label>
+          <FormBlock step="02" title="Annual income">
+            <div className="mt-5 grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-2">
+              <NumberField
+                label="Gross salary (PAYE)"
+                value={inputs.grossSalary}
+                onChange={(value) => setNumberField("grossSalary", value)}
+              />
 
               {inputs.maritalStatus === "married-two-incomes" && (
-                <label className="text-sm font-semibold text-stone-700">
-                  Spouse Gross Salary
-                  <input
-                    type="number"
-                    value={inputs.spouseSalary || ""}
-                    onChange={(event) => setNumberField("spouseSalary", event.target.value)}
-                    className="mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-stone-900"
-                    placeholder="e.g. 50000"
-                  />
-                </label>
+                <NumberField
+                  label="Spouse gross salary"
+                  value={inputs.spouseSalary}
+                  onChange={(value) => setNumberField("spouseSalary", value)}
+                />
               )}
 
-              <label className="text-sm font-semibold text-stone-700">
-                Self-Employed Income
-                <input
-                  type="number"
-                  value={inputs.selfEmployedIncome || ""}
-                  onChange={(event) =>
-                    setNumberField("selfEmployedIncome", event.target.value)
-                  }
-                  className="mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-stone-900"
-                  placeholder="e.g. 25000"
-                />
-              </label>
+              <NumberField
+                label="Self-employed income"
+                value={inputs.selfEmployedIncome}
+                onChange={(value) => setNumberField("selfEmployedIncome", value)}
+              />
 
-              <label className="text-sm font-semibold text-stone-700">
-                Rental Income
-                <input
-                  type="number"
-                  value={inputs.rentalIncome || ""}
-                  onChange={(event) => setNumberField("rentalIncome", event.target.value)}
-                  className="mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-stone-900"
-                  placeholder="e.g. 5000"
-                />
-              </label>
+              <NumberField
+                label="Rental income"
+                value={inputs.rentalIncome}
+                onChange={(value) => setNumberField("rentalIncome", value)}
+              />
             </div>
 
             {incomeTaxResult.totalIncome > 0 && (
-              <div className="mt-4 rounded-xl border border-blue-200 bg-blue-50 p-3 text-center">
-                <p className="text-sm text-blue-800">Estimated Net Monthly Income</p>
-                <p className="text-xl font-bold text-blue-900">
+              <div className="mt-6 border-l-2 border-[#F4CA16] pl-4">
+                <p className={labMicroLabel}>Estimated net monthly income</p>
+                <p className="mt-1.5 text-[1.7rem] font-light tracking-[-0.02em] tabular-nums text-[color:var(--foreground)]">
                   {formatCurrency(incomeTaxResult.netPay / 12)}
                 </p>
               </div>
             )}
-          </div>
+          </FormBlock>
 
-          <div className="rounded-2xl border border-stone-200 bg-stone-50 p-5">
-            <h3 className="text-lg font-bold text-stone-900">3) Monthly Spending</h3>
-            <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-              <label className="text-sm font-semibold text-stone-700">
-                Groceries (~4.6% VAT)
-                <input
-                  type="number"
-                  value={inputs.spendingGroceries || ""}
-                  onChange={(event) =>
-                    setNumberField("spendingGroceries", event.target.value)
-                  }
-                  className="mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-stone-900"
-                  placeholder="e.g. 600"
-                />
-              </label>
-              <label className="text-sm font-semibold text-stone-700">
-                Energy Bills (9% VAT)
-                <input
-                  type="number"
-                  value={inputs.spendingEnergy || ""}
-                  onChange={(event) => setNumberField("spendingEnergy", event.target.value)}
-                  className="mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-stone-900"
-                  placeholder="e.g. 150"
-                />
-              </label>
-              <label className="text-sm font-semibold text-stone-700">
-                Hospitality (13.5% VAT)
-                <input
-                  type="number"
-                  value={inputs.spendingHospitality || ""}
-                  onChange={(event) =>
-                    setNumberField("spendingHospitality", event.target.value)
-                  }
-                  className="mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-stone-900"
-                  placeholder="e.g. 200"
-                />
-              </label>
-              <label className="text-sm font-semibold text-stone-700">
-                Fuel (~50% Tax)
-                <input
-                  type="number"
-                  value={inputs.spendingFuel || ""}
-                  onChange={(event) => setNumberField("spendingFuel", event.target.value)}
-                  className="mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-stone-900"
-                  placeholder="e.g. 150"
-                />
-              </label>
-              <label className="text-sm font-semibold text-stone-700">
-                Alcohol/Tobacco (~60% Tax)
-                <input
-                  type="number"
-                  value={inputs.spendingAlcoholTobacco || ""}
-                  onChange={(event) =>
-                    setNumberField("spendingAlcoholTobacco", event.target.value)
-                  }
-                  className="mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-stone-900"
-                  placeholder="e.g. 100"
-                />
-              </label>
-              <label className="text-sm font-semibold text-stone-700">
-                Other General Spending (23% VAT)
-                <input
-                  type="number"
-                  value={inputs.spendingGeneral || ""}
-                  onChange={(event) => setNumberField("spendingGeneral", event.target.value)}
-                  className="mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-stone-900"
-                  placeholder="e.g. 400"
-                />
-              </label>
+          <FormBlock
+            step="03"
+            title="Monthly spending"
+            note="Per month, not per year. The rate beside each label is the tax baked into that spending."
+          >
+            <div className="mt-5 grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-2">
+              <NumberField
+                label="Groceries (~4.6% VAT)"
+                value={inputs.spendingGroceries}
+                onChange={(value) => setNumberField("spendingGroceries", value)}
+              />
+              <NumberField
+                label="Energy bills (9% VAT)"
+                value={inputs.spendingEnergy}
+                onChange={(value) => setNumberField("spendingEnergy", value)}
+              />
+              <NumberField
+                label="Hospitality (13.5% VAT)"
+                value={inputs.spendingHospitality}
+                onChange={(value) => setNumberField("spendingHospitality", value)}
+              />
+              <NumberField
+                label="Fuel (~50% tax)"
+                value={inputs.spendingFuel}
+                onChange={(value) => setNumberField("spendingFuel", value)}
+              />
+              <NumberField
+                label="Alcohol/tobacco (~60% tax)"
+                value={inputs.spendingAlcoholTobacco}
+                onChange={(value) => setNumberField("spendingAlcoholTobacco", value)}
+              />
+              <NumberField
+                label="Other general spending (23% VAT)"
+                value={inputs.spendingGeneral}
+                onChange={(value) => setNumberField("spendingGeneral", value)}
+              />
             </div>
 
             {monthlySpending > 0 && (
-              <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-center">
-                <p className="text-sm text-emerald-800">Estimated Monthly Spending</p>
-                <p className="text-xl font-bold text-emerald-900">
+              <div className="mt-6 border-l-2 border-[#F4CA16] pl-4">
+                <p className={labMicroLabel}>Estimated monthly spending</p>
+                <p className="mt-1.5 text-[1.7rem] font-light tracking-[-0.02em] tabular-nums text-[color:var(--foreground)]">
                   {formatCurrency(monthlySpending)}
                 </p>
               </div>
             )}
-          </div>
+          </FormBlock>
 
-          <div className="rounded-2xl border border-stone-200 bg-stone-50 p-5">
-            <h3 className="text-lg font-bold text-stone-900">
-              4) Other Taxes (Optional)
-            </h3>
-            <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-              <label className="text-sm font-semibold text-stone-700">
-                Total Savings
-                <input
-                  type="number"
-                  value={inputs.totalSavings || ""}
-                  onChange={(event) => setNumberField("totalSavings", event.target.value)}
-                  className="mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-stone-900"
-                  placeholder="e.g. 10000"
-                />
-              </label>
-              <label className="text-sm font-semibold text-stone-700">
-                Interest Rate (%)
-                <input
-                  type="number"
-                  step="0.01"
-                  value={inputs.interestRate || ""}
-                  onChange={(event) => setNumberField("interestRate", event.target.value)}
-                  className="mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-stone-900"
-                  placeholder="e.g. 3.00"
-                />
-              </label>
-              <label className="text-sm font-semibold text-stone-700">
-                Profit from Assets (CGT)
-                <input
-                  type="number"
-                  value={inputs.cgtGain || ""}
-                  onChange={(event) => setNumberField("cgtGain", event.target.value)}
-                  className="mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-stone-900"
-                  placeholder="e.g. 5000"
-                />
-              </label>
-              <label className="text-sm font-semibold text-stone-700">
-                Annual LPT
-                <input
-                  type="number"
-                  value={inputs.lpt || ""}
-                  onChange={(event) => setNumberField("lpt", event.target.value)}
-                  className="mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-stone-900"
-                  placeholder="e.g. 450"
-                />
-              </label>
-              <label className="text-sm font-semibold text-stone-700">
-                Annual Motor Tax
-                <input
-                  type="number"
-                  value={inputs.motorTax || ""}
-                  onChange={(event) => setNumberField("motorTax", event.target.value)}
-                  className="mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-stone-900"
-                  placeholder="e.g. 390"
-                />
-              </label>
-              <label className="text-sm font-semibold text-stone-700">
-                Vehicle Purchase Price (VRT)
-                <input
-                  type="number"
-                  value={inputs.vrtPrice || ""}
-                  onChange={(event) => setNumberField("vrtPrice", event.target.value)}
-                  className="mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-stone-900"
-                  placeholder="e.g. 30000"
-                />
-              </label>
-              <label className="text-sm font-semibold text-stone-700">
-                Vehicle CO2 g/km (VRT)
-                <input
-                  type="number"
-                  value={inputs.vrtCo2 || ""}
-                  onChange={(event) => setNumberField("vrtCo2", event.target.value)}
-                  className="mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-stone-900"
-                  placeholder="e.g. 110"
-                />
-              </label>
-              <label className="text-sm font-semibold text-stone-700">
-                Gift / Inheritance Value
-                <input
-                  type="number"
-                  value={inputs.catValue || ""}
-                  onChange={(event) => setNumberField("catValue", event.target.value)}
-                  className="mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-stone-900"
-                  placeholder="e.g. 20000"
-                />
-              </label>
-              <label className="text-sm font-semibold text-stone-700 md:col-span-2">
-                Relationship to Giver
-                <select
-                  value={inputs.catGroup}
-                  onChange={(event) =>
-                    setStringField("catGroup", event.target.value as CatGroup)
-                  }
-                  className="mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-stone-900"
-                >
-                  <option value="none">-- Select --</option>
-                  <option value="A">Child</option>
-                  <option value="B">Parent, Sibling, etc.</option>
-                  <option value="C">Other</option>
-                </select>
-              </label>
+          <FormBlock
+            step="04"
+            title="Other taxes (optional)"
+            note="Leave a figure at zero if it does not apply to you this year."
+          >
+            <div className="mt-5 grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-2">
+              <NumberField
+                label="Total savings"
+                value={inputs.totalSavings}
+                onChange={(value) => setNumberField("totalSavings", value)}
+              />
+              <NumberField
+                label="Savings interest rate"
+                value={inputs.interestRate}
+                unit="%"
+                onChange={(value) => setNumberField("interestRate", value)}
+              />
+              <NumberField
+                label="Profit from assets (CGT)"
+                value={inputs.cgtGain}
+                onChange={(value) => setNumberField("cgtGain", value)}
+              />
+              <NumberField
+                label="Annual LPT"
+                value={inputs.lpt}
+                onChange={(value) => setNumberField("lpt", value)}
+              />
+              <NumberField
+                label="Annual motor tax"
+                value={inputs.motorTax}
+                onChange={(value) => setNumberField("motorTax", value)}
+              />
+              <NumberField
+                label="Vehicle purchase price (VRT)"
+                value={inputs.vrtPrice}
+                onChange={(value) => setNumberField("vrtPrice", value)}
+              />
+              <NumberField
+                label="Vehicle emissions (VRT)"
+                value={inputs.vrtCo2}
+                unit="g/km"
+                onChange={(value) => setNumberField("vrtCo2", value)}
+              />
+              <NumberField
+                label="Gift / inheritance value"
+                value={inputs.catValue}
+                onChange={(value) => setNumberField("catValue", value)}
+              />
+              <SelectField
+                label="Relationship to giver"
+                value={inputs.catGroup}
+                onChange={(value) => setStringField("catGroup", value as CatGroup)}
+                className="md:col-span-2"
+              >
+                <option value="none">Not applicable</option>
+                <option value="A">Child</option>
+                <option value="B">Parent, Sibling, etc.</option>
+                <option value="C">Other</option>
+              </SelectField>
             </div>
-          </div>
+          </FormBlock>
 
-          <div className="flex justify-center">
-            <button
-              type="submit"
-              className="rounded-full bg-stone-900 px-8 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-stone-700"
-            >
-              Calculate & View Fiscal Flow
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-3 border-t-2 border-[#F4CA16] pt-7">
+            <button type="submit" className={`${labPrimaryButton} w-full sm:w-auto`}>
+              Calculate your fiscal flow
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </button>
+            <p className={labFootnote}>
+              {hasCalculated
+                ? "Recalculates with the figures above."
+                : "Nothing is calculated until you press this."}
+            </p>
           </div>
         </form>
 
         {hasCalculated && (
-          <div className="mt-8 rounded-2xl border border-stone-200 bg-stone-50 p-5">
-            <h3 className="text-xl font-black tracking-tight text-stone-900">
-              Your Estimated Tax Breakdown
-            </h3>
-            <div className="mt-4 space-y-2 text-sm text-stone-700">
-              <div className="flex items-center justify-between border-b border-stone-200 py-2">
-                <span>Income Tax</span>
-                <span className="font-semibold">
-                  {formatCurrency(incomeTaxResult.incomeTax)}
-                </span>
-              </div>
-              <div className="flex items-center justify-between border-b border-stone-200 py-2">
-                <span>USC</span>
-                <span className="font-semibold">{formatCurrency(incomeTaxResult.usc)}</span>
-              </div>
-              <div className="flex items-center justify-between border-b border-stone-200 py-2">
-                <span>PRSI</span>
-                <span className="font-semibold">{formatCurrency(incomeTaxResult.prsi)}</span>
-              </div>
-              <div className="flex items-center justify-between border-b border-stone-200 py-2">
-                <span>VAT</span>
-                <span className="font-semibold">{formatCurrency(consumptionTaxes.vat)}</span>
-              </div>
-              <div className="flex items-center justify-between border-b border-stone-200 py-2">
-                <span>Excise Duties</span>
-                <span className="font-semibold">
-                  {formatCurrency(consumptionTaxes.excise)}
-                </span>
-              </div>
-              <div className="flex items-center justify-between border-b border-stone-200 py-2">
-                <span>Property & Capital Taxes</span>
-                <span className="font-semibold">
-                  {formatCurrency(propertyAndCapitalTaxes)}
-                </span>
-              </div>
-              <div className="flex items-center justify-between py-2">
-                <span>Motor Taxes</span>
-                <span className="font-semibold">{formatCurrency(motorTaxes)}</span>
-              </div>
-            </div>
+          <div className="mt-12">
+            <h3 className={labSubheading}>Your estimated tax breakdown</h3>
+            <div className="mt-5 grid gap-10 md:grid-cols-[minmax(0,1fr)_minmax(220px,0.7fr)] md:gap-12">
+              <dl className="border-t border-[color:var(--rule-color)]">
+                {taxBreakdownLines.map((line) => (
+                  <div
+                    key={line.key}
+                    className="flex items-baseline justify-between gap-4 border-b border-[color:var(--rule-color)] py-3"
+                  >
+                    <dt className="text-[1rem] text-[color:var(--text-muted)]">{line.label}</dt>
+                    <dd className="text-[1.05rem] tabular-nums text-[color:var(--foreground)]">
+                      {formatCurrency(line.value)}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
 
-            <div className="mt-4 rounded-xl bg-stone-900 p-4 text-white">
-              <p className="text-xs uppercase tracking-[0.16em] text-stone-300">
-                Total Estimated Annual Tax
-              </p>
-              <p className="mt-1 text-2xl font-black">
-                {formatCurrency(totalEstimatedAnnualTax)}
-              </p>
-              {taxAsIncomeShare !== null && (
-                <p className="mt-2 text-sm text-stone-300">
-                  Approx. {taxAsIncomeShare.toFixed(1)}% of annual income
+              <div className="border-t-2 border-[#F4CA16] pt-4">
+                <p className={labMicroLabel}>Total estimated annual tax</p>
+                <p className="mt-2 text-[clamp(2.2rem,4vw,3rem)] font-light leading-[0.95] tracking-[-0.04em] tabular-nums text-[color:var(--foreground)]">
+                  {formatCurrency(totalEstimatedAnnualTax)}
                 </p>
-              )}
+                {taxAsIncomeShare !== null && (
+                  <p className={`mt-3 ${labFootnote}`}>
+                    Approx. {taxAsIncomeShare.toFixed(1)}% of annual income
+                  </p>
+                )}
+              </div>
             </div>
           </div>
         )}
-      </section>
+      </LabSection>
 
       {hasCalculated && (
-        <section className="mb-8 rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)] sm:p-8">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <h2 className="text-2xl font-black tracking-tight text-stone-900 sm:text-3xl">
-              Step 2: See Where It Goes
-            </h2>
-            <div className="inline-flex rounded-xl border border-stone-300 bg-stone-100 p-1">
+        <LabSection
+          heading="Step 2: See where it goes"
+          intro="Click a bar to drill into further detail."
+          action={
+            <div className="flex gap-5">
               <button
                 type="button"
                 onClick={() => setViewMode("total")}
-                className={`rounded-lg px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] transition ${
-                  viewMode === "total"
-                    ? "bg-teal-500 text-white"
-                    : "text-stone-700 hover:bg-stone-200"
-                }`}
+                className={labTab(viewMode === "total")}
               >
                 Total + %
               </button>
               <button
                 type="button"
                 onClick={() => setViewMode("personal")}
-                className={`rounded-lg px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] transition ${
-                  viewMode === "personal"
-                    ? "bg-teal-500 text-white"
-                    : "text-stone-700 hover:bg-stone-200"
-                }`}
+                className={labTab(viewMode === "personal")}
               >
-                Your Share
+                Your share
               </button>
             </div>
-          </div>
-
-          <p className="mt-3 text-base font-semibold text-stone-700 sm:text-lg">
-            Click a bar to drill into further detail.
-          </p>
-          <div className="mt-3 flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-stone-600">
-            <span className="rounded-full border border-stone-300 bg-stone-100 px-3 py-1">
-              Viewing: {currentSpendingNode.name}
-            </span>
+          }
+        >
+          <div className="flex flex-wrap items-baseline justify-between gap-4 border-b border-[color:var(--rule-color)] pb-4">
+            <p className={labMicroLabel}>Viewing: {currentSpendingNode.name}</p>
             {drilldownPath.length > 1 && (
-              <button
-                type="button"
-                onClick={goBackDrilldown}
-                className="rounded-full border border-stone-300 bg-white px-3 py-1 text-stone-800 transition hover:border-stone-900"
-              >
-                Back One Level
+              <button type="button" onClick={goBackDrilldown} className={labQuietButton}>
+                Back one level
               </button>
             )}
           </div>
@@ -1110,32 +1060,33 @@ export default function IrelandsFiscalFlow() {
                 layout="vertical"
                 margin={{ top: 8, right: 24, left: 16, bottom: 8 }}
               >
-                <CartesianGrid strokeDasharray="3 3" stroke="#d6d3d1" opacity={0.45} />
+                <CartesianGrid {...labGridProps(chartTheme)} vertical horizontal={false} />
                 <XAxis
                   type="number"
                   tickFormatter={(value: number) => {
                     if (viewMode === "total") return formatMillions(Math.round(value));
                     return `EUR ${Math.round(value).toLocaleString("en-IE")}`;
                   }}
+                  {...labAxisProps(chartTheme)}
                 />
-                <YAxis type="category" dataKey="name" width={210} tick={{ fontSize: 12 }} />
+                <YAxis
+                  type="category"
+                  dataKey="name"
+                  width={210}
+                  {...labAxisProps(chartTheme)}
+                />
                 <Tooltip
-                  formatter={(value: number, _name, item) => {
-                    if (viewMode === "total") {
-                      const percentageOfTotal = Number(item.payload.percentageOfTotal ?? 0);
-                      const percentageOfParent = Number(item.payload.percentageOfParent ?? 0);
-                      return [
-                        `${formatMillions(Math.round(value))} (${percentageOfTotal.toFixed(2)}% of total, ${percentageOfParent.toFixed(2)}% of ${currentSpendingNode.name})`,
-                        item.payload.name,
-                      ];
-                    }
-                    return [formatCurrency(value), item.payload.name];
-                  }}
-                  contentStyle={{ borderRadius: "12px", borderColor: "#d6d3d1" }}
+                  content={
+                    <SpendingTooltip
+                      viewMode={viewMode}
+                      parentName={currentSpendingNode.name}
+                    />
+                  }
+                  cursor={{ fill: chartTheme.rule, fillOpacity: 0.25 }}
                 />
                 <Bar
                   dataKey="displayValue"
-                  radius={[0, 8, 8, 0]}
+                  radius={0}
                   onClick={(_entry, index) => {
                     if (typeof index === "number") {
                       enterDrilldown(index);
@@ -1149,27 +1100,23 @@ export default function IrelandsFiscalFlow() {
               </BarChart>
             </ResponsiveContainer>
           </div>
-        </section>
+        </LabSection>
       )}
 
-      <section className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)] sm:p-8">
-        <h2 className="text-2xl font-black tracking-tight text-stone-900 sm:text-3xl">
-          Notes & Sources
-        </h2>
-        <p className="mt-4 text-sm leading-relaxed text-stone-700">
-          This tool is an illustrative explainer and not personal tax advice.
-          Spending values are aggregated from 2024 public spending references.
+      <LabDetails heading="Notes and sources" summary="What this model assumes, and where the data comes from.">
+        <p className="max-w-[720px] text-[1rem] leading-[1.7] text-[color:var(--text-body-rgb)]">
+          This tool is an illustrative explainer and not personal tax advice. Spending values
+          are aggregated from 2024 public spending references.
         </p>
-        <ul className="mt-4 space-y-2 text-sm text-stone-700">
+        <ul className="mt-5 max-w-[720px] space-y-3 text-[1rem] leading-[1.7] text-[color:var(--text-body-rgb)]">
           <li>
             <a
               href="https://www.gov.ie/en/department-of-public-expenditure-infrastructure-public-service-reform-and-digitalisation/press-releases/minister-donohoe-publishes-the-revised-estimates-for-public-services-2024/"
               target="_blank"
               rel="noreferrer"
-              className="underline decoration-stone-400 underline-offset-4 transition hover:decoration-stone-900"
+              className={labLink}
             >
-              Department of Public Expenditure: Revised Estimates for Public
-              Services 2024
+              Department of Public Expenditure: Revised Estimates for Public Services 2024
             </a>
           </li>
           <li>
@@ -1177,14 +1124,14 @@ export default function IrelandsFiscalFlow() {
               href="https://data.oireachtas.ie/ie/oireachtas/parliamentaryBudgetOffice/2024/2024-02-14_overview-of-the-revised-estimates-for-public-services-2024_en.pdf"
               target="_blank"
               rel="noreferrer"
-              className="underline decoration-stone-400 underline-offset-4 transition hover:decoration-stone-900"
+              className={labLink}
             >
-              Oireachtas Parliamentary Budget Office: Overview of the Revised
-              Estimates for Public Services 2024
+              Oireachtas Parliamentary Budget Office: Overview of the Revised Estimates for
+              Public Services 2024
             </a>
           </li>
         </ul>
-      </section>
-    </div>
+      </LabDetails>
+    </LabShell>
   );
 }

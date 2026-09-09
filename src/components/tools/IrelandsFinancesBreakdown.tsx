@@ -1,9 +1,16 @@
 "use client";
 
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
-import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
+import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import { useMemo, useState } from "react";
+
+import { LabDetails, LabHeader, LabShell } from "@/components/labs/LabChrome";
+import { LabLegend, LabTooltip } from "@/components/labs/labChartTheme";
+import {
+  labFootnote,
+  labLink,
+  labMicroLabel,
+  labQuietButton,
+} from "@/components/labs/labTokens";
 
 type BudgetNode = {
   name: string;
@@ -467,13 +474,17 @@ function SliceTooltip({ active, payload }: SliceTooltipProps) {
   const percentage = (datum.percent * 100).toFixed(1);
 
   return (
-    <div className="max-w-xs rounded-xl border border-stone-300 bg-stone-900 px-3 py-2 text-sm text-white shadow-xl">
-      <p className="font-bold">{item.name}</p>
-      <p className="mt-1 text-stone-200">
-        {percentage}% ({formatBillions(datum.value)})
-      </p>
-      <p className="mt-2 text-xs leading-relaxed text-stone-300">{item.description}</p>
-    </div>
+    <LabTooltip
+      label={item.name}
+      rows={[
+        {
+          key: "share",
+          name: `${percentage}% of total`,
+          value: formatBillions(datum.value),
+        },
+      ]}
+      note={item.description}
+    />
   );
 }
 
@@ -506,36 +517,21 @@ export default function IrelandsFinancesBreakdown() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 pt-10 pb-24 sm:px-6 lg:px-8">
-      <Link
-        href="/labs"
-        className="mb-8 inline-flex items-center gap-2 text-stone-500 transition-colors hover:text-stone-900"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        <span className="font-mono text-sm font-medium uppercase tracking-[0.2em]">
-          Back to Labs
-        </span>
-      </Link>
+    <LabShell>
+      <LabHeader
+        eyebrow="Public Spending - Ireland 2024"
+        title="Ireland's Finances: Interactive Breakdown"
+        lede="Compare income sources with expenditure categories and drill into spending segments for additional detail."
+      />
 
-      <header className="mb-10 space-y-4">
-        <p className="font-mono text-xs font-semibold uppercase tracking-[0.3em] text-stone-500">
-          Public Spending • Ireland 2024
-        </p>
-        <h1 className="max-w-5xl text-5xl font-black uppercase leading-[0.9] tracking-tight text-stone-900 sm:text-7xl">
-          Ireland&apos;s Finances: Interactive Breakdown
-        </h1>
-        <p className="max-w-3xl text-lg leading-relaxed text-stone-600 sm:text-xl">
-          Compare income sources with expenditure categories and drill into spending
-          segments for additional detail.
-        </p>
-      </header>
-
-      <section className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-        <article className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)] sm:p-8">
-          <h2 className="text-2xl font-black tracking-tight text-stone-900 sm:text-3xl">
-            Total Income: {formatBillions(incomeTotal)}
+      <section className="mt-9 grid grid-cols-1 gap-12 border-t border-[color:var(--rule-color)] pt-7 lg:grid-cols-2 lg:gap-0">
+        <article className="min-w-0 border-[color:var(--rule-color)] lg:border-r lg:pr-10">
+          <p className={labMicroLabel}>Total income</p>
+          <h2 className="mt-2 text-[2.4rem] font-light tracking-[-0.03em] tabular-nums text-[color:var(--foreground)]">
+            {formatBillions(incomeTotal)}
           </h2>
-          <div className="mt-6 h-[24rem] w-full">
+
+          <div className="mt-6 h-[22rem] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -547,35 +543,41 @@ export default function IrelandsFinancesBreakdown() {
                   innerRadius={80}
                   outerRadius={138}
                   paddingAngle={2}
+                  stroke="none"
                 >
                   {INCOME_DATA.map((entry) => (
                     <Cell key={entry.name} fill={entry.color} />
                   ))}
                 </Pie>
                 <Tooltip content={<SliceTooltip />} />
-                <Legend layout="vertical" verticalAlign="middle" align="right" />
               </PieChart>
             </ResponsiveContainer>
           </div>
+
+          <LabLegend
+            className="mt-6 border-t border-[color:var(--rule-color)] pt-5"
+            items={INCOME_DATA.map((entry) => ({
+              key: entry.name,
+              label: entry.name,
+              color: entry.color,
+            }))}
+          />
         </article>
 
-        <article className="rounded-[2rem] border border-stone-200 bg-white p-6 shadow-[0_10px_40px_-25px_rgba(0,0,0,0.4)] sm:p-8">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-2xl font-black tracking-tight text-stone-900 sm:text-3xl">
-              {currentNode.name}: {formatBillions(expenditureTotal)}
-            </h2>
+        <article className="min-w-0 lg:pl-10">
+          <div className="flex flex-wrap items-baseline justify-between gap-4">
+            <p className={labMicroLabel}>{currentNode.name}</p>
             {drilldownPath.length > 1 && (
-              <button
-                type="button"
-                onClick={goBack}
-                className="rounded-full border border-stone-300 bg-white px-4 py-1 text-xs font-bold uppercase tracking-[0.16em] text-stone-800 transition hover:border-stone-900"
-              >
-                Back
+              <button type="button" onClick={goBack} className={labQuietButton}>
+                Back one level
               </button>
             )}
           </div>
+          <h2 className="mt-2 text-[2.4rem] font-light tracking-[-0.03em] tabular-nums text-[color:var(--foreground)]">
+            {formatBillions(expenditureTotal)}
+          </h2>
 
-          <div className="mt-6 h-[24rem] w-full">
+          <div className="mt-6 h-[22rem] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -587,6 +589,7 @@ export default function IrelandsFinancesBreakdown() {
                   innerRadius={80}
                   outerRadius={138}
                   paddingAngle={2}
+                  stroke="none"
                   onClick={(_, index) => {
                     if (typeof index === "number") {
                       enterDrilldown(index);
@@ -598,29 +601,46 @@ export default function IrelandsFinancesBreakdown() {
                   ))}
                 </Pie>
                 <Tooltip content={<SliceTooltip />} />
-                <Legend layout="vertical" verticalAlign="middle" align="right" />
               </PieChart>
             </ResponsiveContainer>
           </div>
 
-          <p className="mt-3 text-center text-xs italic text-stone-500">
+          <LabLegend
+            className="mt-6 border-t border-[color:var(--rule-color)] pt-5"
+            items={expenditureSlices.map((entry) => ({
+              key: entry.name,
+              label: entry.name,
+              color: entry.color,
+              dimmed: !entry.children?.length,
+            }))}
+            onSelect={(key) =>
+              enterDrilldown(expenditureSlices.findIndex((entry) => entry.name === key))
+            }
+          />
+
+          <p className={`mt-5 ${labFootnote}`}>
             Click a segment for a deeper spending breakdown where available.
           </p>
         </article>
       </section>
 
-      <footer className="mt-10 text-center text-sm text-stone-600">
-        Data sourced and aggregated from the{" "}
-        <a
-          href="https://assets.gov.ie/static/documents/revised-estimates-for-public-service-2024.pdf"
-          target="_blank"
-          rel="noreferrer"
-          className="underline decoration-stone-400 underline-offset-4 transition hover:decoration-stone-900"
-        >
-          Revised Estimates for Public Service 2024
-        </a>
-        .
-      </footer>
-    </div>
+      <LabDetails
+        heading="Notes and sources"
+        summary="Where these figures come from."
+      >
+        <p className="text-[1rem] leading-[1.7] text-[color:var(--text-body-rgb)]">
+          Data sourced and aggregated from the{" "}
+          <a
+            href="https://assets.gov.ie/static/documents/revised-estimates-for-public-service-2024.pdf"
+            target="_blank"
+            rel="noreferrer"
+            className={labLink}
+          >
+            Revised Estimates for Public Service 2024
+          </a>
+          .
+        </p>
+      </LabDetails>
+    </LabShell>
   );
 }
