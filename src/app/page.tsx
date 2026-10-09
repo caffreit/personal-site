@@ -17,9 +17,15 @@ export default function Home() {
     getAllLabs().find((lab) => lab.href === "/labs/tax-schedule-comparison") ??
     getFeaturedLab();
   const budgetQuizLab = getAllLabs().find((lab) => lab.href === "/labs/irish-budget-quiz");
+  const greekTheogonyLab = getAllLabs().find((lab) => lab.href === "/greek-theogeny");
   const recentLabs = [
+    ...(greekTheogonyLab ? [greekTheogonyLab] : []),
     ...(budgetQuizLab ? [budgetQuizLab] : []),
-    ...getRecentLabs(6).filter((lab) => lab.href !== budgetQuizLab?.href),
+    ...getRecentLabs(6).filter(
+      (lab) =>
+        lab.href !== budgetQuizLab?.href &&
+        lab.href !== greekTheogonyLab?.href,
+    ),
   ];
 
   return (
