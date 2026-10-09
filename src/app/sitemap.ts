@@ -12,6 +12,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/blog`, lastModified: now },
     { url: `${baseUrl}/labs`, lastModified: now },
     { url: `${baseUrl}/greek-theogeny`, lastModified: now },
+    {
+      url: `${baseUrl}/greek-theogeny/underground-lines`,
+      lastModified: now,
+    },
     { url: `${baseUrl}/labs/samd-fda-pre-sub-quiz`, lastModified: now },
     { url: `${baseUrl}/labs/samd-startup-quiz`, lastModified: now },
     { url: `${baseUrl}/labs/samd-qms-stages`, lastModified: now },
