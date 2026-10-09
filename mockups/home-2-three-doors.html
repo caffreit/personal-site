@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>02 · Three Doors — homepage mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Space+Grotesk:wght@400;500;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --paper: #F4EFE6; --ink: #1C1B18; --muted: rgba(28,27,24,0.55); --rule: #D9D2C3;
+    --yellow: #F4CA16; --emerald: #0A5C36; --terracotta: #C47A5A;
+    --sans: 'Space Grotesk', sans-serif; --mono: 'Geist Mono', monospace; --serif: 'Newsreader', Georgia, serif;
+    --ease: cubic-bezier(.25,1,.5,1);
+  }
+  body { background: var(--paper); color: var(--ink); font-family: var(--serif); }
+  a { color: inherit; text-decoration: none; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+  header { position: sticky; top: 0; z-index: 50; background: rgba(244,239,230,.9); backdrop-filter: blur(12px); border-bottom: 1px solid var(--rule); }
+  header .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+  .logo { font-family: var(--sans); font-weight: 700; letter-spacing: .14em; text-transform: uppercase; font-size: .85rem; display: flex; align-items: center; gap: 10px; }
+  .logo i { width: 18px; height: 18px; background: var(--yellow); display: inline-block; }
+  nav { display: flex; gap: 32px; font-family: var(--sans); font-size: .78rem; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
+  .note { position: fixed; right: 20px; bottom: 20px; z-index: 60; font-family: var(--mono); font-size: .66rem; background: var(--ink); color: var(--paper); padding: 8px 12px; max-width: 280px; line-height: 1.5; }
+
+  /* ticker */
+  .ticker { border-bottom: 1px solid var(--rule); overflow: hidden; height: 38px; display: flex; align-items: center; font-family: var(--mono); font-size: .68rem; text-transform: uppercase; letter-spacing: .14em; color: var(--muted); }
+  .ticker .track { display: flex; gap: 48px; white-space: nowrap; animation: tick 40s linear infinite; padding-left: 100%; }
+  .ticker:hover .track { animation-play-state: paused; }
+  .ticker i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 10px; vertical-align: middle; }
+  .ticker b { color: var(--ink); font-weight: 500; }
+  @keyframes tick { to { transform: translateX(-100%); } }
+
+  /* doors */
+  .doors { display: flex; height: calc(100vh - 98px); min-height: 620px; }
+  .door { position: relative; flex: 1 1 0; overflow: hidden; color: #fff; transition: flex 1s var(--ease); display: flex; flex-direction: column; justify-content: flex-end; }
+  .door:hover { flex: 2.4 1 0; }
+  .door .bg { position: absolute; inset: 0; transition: transform 1.4s var(--ease); }
+  .door:hover .bg { transform: scale(1.03); }
+  .door-photo .bg img { width: 100%; height: 100%; object-fit: cover; display: block; filter: saturate(.95); }
+  .door-photo .bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(10,10,10,.75), rgba(10,10,10,.1) 50%, transparent); }
+  .door-essay .bg { background: var(--emerald); }
+  .door-essay .bg img { position: absolute; left: 50%; top: 58%; width: 70%; max-width: 560px; transform: translate(-50%,-50%) rotate(-3deg); box-shadow: 0 40px 80px -30px rgba(0,0,0,.6); transition: transform 1.2s var(--ease); }
+  .door-essay:hover .bg img { transform: translate(-50%,-70%) rotate(0deg) scale(1.02); }
+  .door-lab .bg { background: linear-gradient(160deg, #B96A49 0%, var(--terracotta) 45%, #D9A07F 100%); }
+  .door-lab .bg svg { position: absolute; left: 8%; right: 8%; top: 34%; height: 44%; width: 84%; }
+  .door .n { position: absolute; top: 28px; left: 28px; font-family: var(--mono); font-size: .7rem; letter-spacing: .2em; opacity: .85; text-shadow: 0 1px 6px rgba(0,0,0,.5); }
+  .door .label { position: absolute; left: 28px; bottom: 36px; text-shadow: 0 2px 16px rgba(0,0,0,.35); transform-origin: left bottom; transform: rotate(-90deg) translate(0, 100%); font-size: clamp(2rem, 4vw, 3.6rem); font-weight: 600; letter-spacing: -.02em; line-height: 1; white-space: nowrap; transition: transform .9s var(--ease); }
+  .door:hover .label { transform: rotate(0deg) translate(0, -200px); }
+  .door .body { position: relative; z-index: 2; padding: 0 28px 40px; max-width: 520px; min-height: 190px; opacity: 0; transform: translateY(16px); transition: opacity .5s ease .25s, transform .8s var(--ease) .15s; }
+  .door:hover .body { opacity: 1; transform: translateY(0); }
+  .door .body .k { font-family: var(--sans); font-size: .64rem; text-transform: uppercase; letter-spacing: .2em; opacity: .75; margin-bottom: 10px; }
+  .door .body h3 { font-size: 1.5rem; font-weight: 600; line-height: 1.15; margin-bottom: 10px; }
+  .door .body p { font-size: 1rem; line-height: 1.55; opacity: .85; font-style: italic; }
+  .door .body .more { display: inline-block; margin-top: 16px; font-family: var(--sans); font-size: .66rem; text-transform: uppercase; letter-spacing: .16em; border-bottom: 2px solid var(--yellow); padding-bottom: 2px; }
+  .door + .door { border-left: 1px solid rgba(255,255,255,.18); }
+  .headline { position: absolute; z-index: 5; left: 50%; top: 11%; transform: translate(-50%,0); pointer-events: none; text-align: center; color: #fff; text-shadow: 0 2px 24px rgba(0,0,0,.45), 0 1px 2px rgba(0,0,0,.4); font-size: clamp(2.6rem, 6vw, 5.4rem); font-weight: 700; letter-spacing: -.03em; line-height: .95; transition: opacity .4s; }
+  .doors:hover .headline { opacity: 0; }
+  .headline em { font-style: italic; font-weight: 300; }
+
+  /* ledger */
+  .ledger { padding: 96px 0 100px; }
+  .sec-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 36px; border-bottom: 2px solid var(--ink); padding-bottom: 14px; }
+  .sec-head h2 { font-size: 2.6rem; font-weight: 600; letter-spacing: -.02em; }
+  .filters { display: flex; gap: 22px; font-family: var(--sans); font-size: .7rem; text-transform: uppercase; letter-spacing: .14em; color: var(--muted); }
+  .filters a { border-bottom: 2px solid transparent; padding-bottom: 3px; }
+  .filters a.on { color: var(--ink); border-color: var(--ink); }
+  .filters a[data-c="photo"]:hover { border-color: var(--yellow); } .filters a[data-c="essay"]:hover { border-color: var(--emerald); } .filters a[data-c="lab"]:hover { border-color: var(--terracotta); }
+  .month { font-family: var(--mono); font-size: .66rem; text-transform: uppercase; letter-spacing: .2em; color: var(--muted); margin: 36px 0 8px; }
+  .month:first-of-type { margin-top: 0; }
+  .item { display: grid; grid-template-columns: 6px 90px 1fr 140px 150px; gap: 24px; align-items: center; padding: 18px 0; border-bottom: 1px solid var(--rule); position: relative; }
+  .item .spine { width: 6px; height: 100%; min-height: 44px; border-radius: 3px; }
+  .item .d { font-family: var(--mono); font-size: .7rem; color: var(--muted); }
+  .item .t { font-size: 1.35rem; font-weight: 600; letter-spacing: -.01em; line-height: 1.2; transition: color .3s; }
+  .item .t small { display: block; font-size: .95rem; font-weight: 400; font-style: italic; color: var(--muted); margin-top: 3px; }
+  .item .k { font-family: var(--sans); font-size: .66rem; text-transform: uppercase; letter-spacing: .16em; color: var(--muted); }
+  .item .th { justify-self: end; width: 150px; height: 56px; overflow: hidden; }
+  .item .th img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .8s var(--ease); }
+  .item:hover .th img { transform: scale(1.06); }
+  .item:hover .t { color: var(--c); }
+  .item[data-c="photo"] { --c: #9C7F00; } .item[data-c="essay"] { --c: var(--emerald); } .item[data-c="lab"] { --c: var(--terracotta); }
+  .item[data-c="photo"] .spine { background: var(--yellow); } .item[data-c="essay"] .spine { background: var(--emerald); } .item[data-c="lab"] .spine { background: var(--terracotta); }
+  .item .th.gen { display: flex; align-items: center; justify-content: center; color: #fff; font-family: var(--mono); font-size: 1.6rem; font-weight: 300; }
+  footer { border-top: 1px solid var(--rule); padding: 28px 0; font-family: var(--sans); font-size: .7rem; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
+  footer .wrap { display: flex; justify-content: space-between; }
+  @media (max-width: 860px) {
+    .doors { flex-direction: column; height: auto; min-height: 0; }
+    .door { height: 44vh; min-height: 300px; flex: none !important; }
+    .door .label { transform: none; left: 28px; bottom: 36px; }
+    .door .body { display: none; }
+    .headline { display: none; }
+    .item { grid-template-columns: 6px 1fr; } .item .d, .item .k, .item .th { display: none; }
+  }
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="logo" href="#"><i></i>drdimg</a>
+  <nav><a href="#">Photos</a><a href="#">Writing</a><a href="#">Labs</a><a href="#">About</a></nav>
+</div></header>
+
+<div class="ticker"><div class="track">
+  <span><i style="background:var(--emerald)"></i>Essay · <b>Against Idle Land</b> · Jul 18</span>
+  <span><i style="background:var(--terracotta)"></i>Lab · <b>What Did That Really Cost?</b> · Jun 29</span>
+  <span><i style="background:var(--yellow)"></i>Photos · <b>Recents: six new frames</b> · Jun 12</span>
+  <span><i style="background:var(--terracotta)"></i>Lab · <b>Irish Budget Quiz</b> · Jun 10</span>
+  <span><i style="background:var(--emerald)"></i>Essay · <b>House Prices Are Not the Whole Affordability Story</b> · Jun 2</span>
+  <span><i style="background:var(--yellow)"></i>Photos · <b>Portraits album</b> · 45 frames</span>
+  <span><i style="background:var(--emerald)"></i>Essay · <b>Against Idle Land</b> · Jul 18</span>
+  <span><i style="background:var(--terracotta)"></i>Lab · <b>What Did That Really Cost?</b> · Jun 29</span>
+  <span><i style="background:var(--yellow)"></i>Photos · <b>Recents: six new frames</b> · Jun 12</span>
+</div></div>
+
+<section class="doors">
+  <div class="headline">Putting <em>data</em><br>in the frame.</div>
+
+  <a href="#" class="door door-photo">
+    <div class="bg"><img src="../public/photos/Faves/DSCF3535.jpg" alt=""></div>
+    <span class="n">01 / PHOTOGRAPHY</span>
+    <span class="label">Photographs</span>
+    <div class="body">
+      <div class="k">Eleven albums · 329 frames</div>
+      <h3>Portraits, streets, and the odd mountain.</h3>
+      <p>Mostly 35mm, mostly Dublin and wherever the ferry goes. Prints available from most of the Favourites wall.</p>
+      <span class="more">Open the albums →</span>
+    </div>
+  </a>
+
+  <a href="#" class="door door-essay">
+    <div class="bg"><img src="../public/blog/ireland-housing-market/cover.png" alt=""></div>
+    <span class="n">02 / WRITING</span>
+    <span class="label">Essays</span>
+    <div class="body">
+      <div class="k">Latest · Jul 18 2026</div>
+      <h3>Against Idle Land: A Case for Self-Assessed Property Tax</h3>
+      <p>Taxing self-assessed land value to curb dereliction, limit monopoly pricing, and improve allocative efficiency.</p>
+      <span class="more">Read the essays →</span>
+    </div>
+  </a>
+
+  <a href="#" class="door door-lab">
+    <div class="bg">
+      <svg viewBox="0 0 400 220" preserveAspectRatio="xMidYMid meet">
+        <g class="bars" fill="rgba(255,255,255,.85)">
+          <rect x="20" y="120" width="34" height="100" style="animation: grow 2.4s ease-in-out -0.2s infinite alternate; transform-origin: 37px 220px"/>
+          <rect x="70" y="80" width="34" height="140" style="animation: grow 2.4s ease-in-out -0.9s infinite alternate; transform-origin: 87px 220px"/>
+          <rect x="120" y="150" width="34" height="70" style="animation: grow 2.4s ease-in-out -1.6s infinite alternate; transform-origin: 137px 220px"/>
+          <rect x="170" y="40" width="34" height="180" style="animation: grow 2.4s ease-in-out -0.5s infinite alternate; transform-origin: 187px 220px"/>
+          <rect x="220" y="100" width="34" height="120" style="animation: grow 2.4s ease-in-out -1.2s infinite alternate; transform-origin: 237px 220px"/>
+          <rect x="270" y="60" width="34" height="160" style="animation: grow 2.4s ease-in-out -2s infinite alternate; transform-origin: 287px 220px"/>
+          <rect x="320" y="130" width="34" height="90" style="animation: grow 2.4s ease-in-out -0.3s infinite alternate; transform-origin: 337px 220px"/>
+        </g>
+        <path d="M20 160 Q 120 40, 200 110 T 380 60" fill="none" stroke="#F4CA16" stroke-width="3" stroke-dasharray="600" style="animation: draw 4s ease-in-out infinite alternate"/>
+      </svg>
+    </div>
+    <span class="n">03 / LABS</span>
+    <span class="label">Labs</span>
+    <div class="body">
+      <div class="k">Twelve interactive things</div>
+      <h3>Small tools for big public questions.</h3>
+      <p>Tax schedules, budget quizzes, mortgage simulators, and a map that argues with you about which train station to use.</p>
+      <span class="more">Open the labs →</span>
+    </div>
+  </a>
+</section>
+
+<section class="ledger"><div class="wrap">
+  <div class="sec-head">
+    <h2>Everything, in order</h2>
+    <div class="filters"><a class="on" href="#">All</a><a data-c="photo" href="#">Photos</a><a data-c="essay" href="#">Essays</a><a data-c="lab" href="#">Labs</a></div>
+  </div>
+
+  <div class="month">July 2026</div>
+  <a class="item" data-c="essay" href="#"><span class="spine"></span><span class="d">Jul 18</span><span class="t">Against Idle Land: A Case for Self-Assessed Property Tax<small>Written for an old company newsletter.</small></span><span class="k">Essay · Political economy</span><span class="th"><img src="../public/blog/property-tax/cover.png" alt=""></span></a>
+
+  <div class="month">June 2026</div>
+  <a class="item" data-c="lab" href="#"><span class="spine"></span><span class="d">Jun 29</span><span class="t">What Did That Really Cost?<small>Purchase tax, in hours of your life.</small></span><span class="k">Lab · Data viz</span><span class="th gen" style="background:linear-gradient(135deg,#B96A49,#D9A07F)">02</span></a>
+  <a class="item" data-c="photo" href="#"><span class="spine"></span><span class="d">Jun 12</span><span class="t">Recents<small>Six new frames from a fresh roll.</small></span><span class="k">Photos · Album</span><span class="th"><img src="../public/photos/Recents/img028.jpg" alt=""></span></a>
+  <a class="item" data-c="lab" href="#"><span class="spine"></span><span class="d">Jun 12</span><span class="t">FDA Pre-Sub Quiz<small>Tongue-in-cheek SaMD survival guide.</small></span><span class="k">Lab · SaMD</span><span class="th gen" style="background:linear-gradient(135deg,#6B5B95,#9C8DBE)">03</span></a>
+  <a class="item" data-c="lab" href="#"><span class="spine"></span><span class="d">Jun 10</span><span class="t">Irish Budget Quiz<small>How does Ireland spend €100bn?</small></span><span class="k">Lab · Civics</span><span class="th"><img src="../public/labs/irish-budget-quiz/cover.png" alt=""></span></a>
+  <a class="item" data-c="essay" href="#"><span class="spine"></span><span class="d">Jun 2</span><span class="t">House Prices Are Not the Whole Affordability Story<small>Five decades of mortgage-first data.</small></span><span class="k">Essay · Data story</span><span class="th"><img src="../public/blog/ireland-housing-market/cover.png" alt=""></span></a>
+
+  <div class="month">February 2026</div>
+  <a class="item" data-c="essay" href="#"><span class="spine"></span><span class="d">Feb 23</span><span class="t">The €27.8 Billion Question<small>Fifteen years of property data in context.</small></span><span class="k">Essay · Data story</span><span class="th"><img src="../public/blog/ireland-property-economy/cover.png" alt=""></span></a>
+  <a class="item" data-c="photo" href="#"><span class="spine"></span><span class="d">Feb 9</span><span class="t">Mountains<small>Seventeen frames above the tree line.</small></span><span class="k">Photos · Album</span><span class="th"><img src="../public/photos/Mountains/DSCF1182.jpg" alt=""></span></a>
+</div></section>
+
+<footer><div class="wrap"><span>© 2026 drdimg</span><span>Photography &amp; data — Dublin</span></div></footer>
+<div class="note">Mockup 02 · Three Doors. Hover a door to open it. Per-type colour: yellow / emerald / terracotta.</div>
+<style>
+  @keyframes grow { from { transform: scaleY(.55); } to { transform: scaleY(1); } }
+  @keyframes draw { from { stroke-dashoffset: 600; } to { stroke-dashoffset: 0; } }
+</style>
+</body>
+</html>

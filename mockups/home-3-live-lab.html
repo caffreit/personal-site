@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>03 · Play Above the Fold — homepage mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Space+Grotesk:wght@400;500;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --paper: #F4EFE6; --ink: #1C1B18; --muted: rgba(28,27,24,0.55); --rule: #D9D2C3;
+    --yellow: #F4CA16; --emerald: #0A5C36; --terracotta: #C47A5A;
+    --sans: 'Space Grotesk', sans-serif; --mono: 'Geist Mono', monospace; --serif: 'Newsreader', Georgia, serif;
+    --ease: cubic-bezier(.25,1,.5,1);
+  }
+  body { background: var(--paper); color: var(--ink); font-family: var(--serif); }
+  a { color: inherit; text-decoration: none; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+  header { position: sticky; top: 0; z-index: 50; background: rgba(244,239,230,.9); backdrop-filter: blur(12px); border-bottom: 1px solid var(--rule); }
+  header .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+  .logo { font-family: var(--sans); font-weight: 700; letter-spacing: .14em; text-transform: uppercase; font-size: .85rem; display: flex; align-items: center; gap: 10px; }
+  .logo i { width: 18px; height: 18px; background: var(--yellow); display: inline-block; }
+  nav { display: flex; gap: 32px; font-family: var(--sans); font-size: .78rem; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
+  .note { position: fixed; right: 20px; bottom: 20px; z-index: 60; font-family: var(--mono); font-size: .66rem; background: var(--ink); color: var(--paper); padding: 8px 12px; max-width: 280px; line-height: 1.5; }
+
+  /* hero */
+  .hero { display: grid; grid-template-columns: 1.15fr .85fr; gap: 56px; padding: 64px 0 72px; align-items: stretch; border-bottom: 1px solid var(--rule); }
+  .hero-l { display: flex; flex-direction: column; }
+  .kicker { font-family: var(--mono); font-size: .68rem; text-transform: uppercase; letter-spacing: .2em; color: var(--muted); display: flex; gap: 14px; align-items: center; }
+  .kicker .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--terracotta); animation: pulse 1.8s ease-in-out infinite; }
+  @keyframes pulse { 50% { transform: scale(1.6); opacity: .5; } }
+  h1 { font-size: clamp(3rem, 6vw, 5.4rem); font-weight: 700; letter-spacing: -.03em; line-height: .95; margin: 22px 0 18px; }
+  h1 em { font-style: italic; font-weight: 300; }
+  .lede { font-size: 1.2rem; line-height: 1.55; color: #3a3833; max-width: 520px; font-style: italic; }
+  .lede b { font-style: normal; font-weight: 500; }
+
+  .widget { margin-top: 40px; background: #fff; border: 1px solid var(--rule); padding: 26px 28px 24px; position: relative; box-shadow: 0 30px 60px -40px rgba(28,27,24,.3); }
+  .widget::before { content: ""; position: absolute; left: -1px; top: -1px; bottom: -1px; width: 5px; background: var(--terracotta); }
+  .w-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 14px; }
+  .w-head h3 { font-size: 1.35rem; font-weight: 600; letter-spacing: -.01em; }
+  .w-head span { font-family: var(--mono); font-size: .64rem; text-transform: uppercase; letter-spacing: .16em; color: var(--terracotta); }
+  .w-row { display: grid; grid-template-columns: 1fr 180px; gap: 24px; align-items: end; }
+  .chart { height: 190px; }
+  .chart svg { width: 100%; height: 100%; display: block; overflow: visible; }
+  .readout { font-family: var(--mono); font-size: .7rem; color: var(--muted); display: grid; gap: 10px; }
+  .readout .big { font-family: var(--serif); font-size: 2rem; font-weight: 600; color: var(--ink); letter-spacing: -.02em; line-height: 1; }
+  .readout .row { display: flex; justify-content: space-between; border-top: 1px solid var(--rule); padding-top: 8px; }
+  .readout .row b { font-weight: 500; }
+  .readout .cur { color: var(--ink); } .readout .flat { color: var(--terracotta); }
+  .slider { margin-top: 18px; display: grid; grid-template-columns: 110px 1fr 90px; gap: 16px; align-items: center; font-family: var(--mono); font-size: .68rem; text-transform: uppercase; letter-spacing: .14em; color: var(--muted); }
+  .slider output { text-align: right; color: var(--ink); font-size: .85rem; letter-spacing: 0; }
+  input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 3px; background: var(--rule); outline: none; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: var(--yellow); border: 2px solid var(--ink); cursor: grab; }
+  input[type=range]::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; background: var(--yellow); border: 2px solid var(--ink); cursor: grab; }
+  .w-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 18px; padding-top: 14px; border-top: 1px dashed var(--rule); font-family: var(--sans); font-size: .66rem; text-transform: uppercase; letter-spacing: .16em; }
+  .w-foot a { color: var(--terracotta); }
+  .w-foot .rot { color: var(--muted); display: flex; gap: 10px; align-items: center; }
+  .w-foot .rot i { width: 6px; height: 6px; border-radius: 50%; background: var(--rule); display: inline-block; }
+  .w-foot .rot i.on { background: var(--terracotta); }
+
+  .hero-r { position: relative; display: flex; flex-direction: column; }
+  .print { position: relative; background: #fff; padding: 12px 12px 44px; flex: 1; box-shadow: 0 30px 60px -40px rgba(28,27,24,.4); transform: rotate(1.2deg); transition: transform .6s var(--ease); cursor: crosshair; }
+  .print:hover { transform: rotate(0deg); }
+  .print .img { height: 100%; min-height: 520px; overflow: hidden; }
+  .print img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .exif { position: absolute; left: 14px; right: 14px; bottom: 12px; display: flex; justify-content: space-between; font-family: var(--mono); font-size: .62rem; letter-spacing: .06em; color: var(--muted); }
+  .exif b { font-family: var(--serif); font-style: italic; font-weight: 500; color: var(--ink); font-size: .9rem; letter-spacing: 0; }
+  .corner { position: absolute; width: 18px; height: 18px; border: 2px solid var(--ink); }
+  .corner.tl { top: 6px; left: 6px; border-right: 0; border-bottom: 0; } .corner.tr { top: 6px; right: 6px; border-left: 0; border-bottom: 0; }
+  .corner.bl { bottom: 38px; left: 6px; border-right: 0; border-top: 0; } .corner.br { bottom: 38px; right: 6px; border-left: 0; border-top: 0; }
+  .counter { position: absolute; top: 24px; right: 24px; font-family: var(--mono); font-size: .66rem; color: #fff; mix-blend-mode: difference; }
+
+  /* sections: one appearance each */
+  .sec { padding: 80px 0; border-bottom: 1px solid var(--rule); }
+  .sec-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 36px; }
+  .sec-head h2 { font-size: 2.4rem; font-weight: 600; letter-spacing: -.02em; }
+  .sec-head h2 i { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 14px; vertical-align: middle; }
+  .sec-head a { font-family: var(--sans); font-size: .7rem; text-transform: uppercase; letter-spacing: .14em; color: var(--muted); border-bottom: 2px solid var(--yellow); padding-bottom: 2px; }
+  .essays { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 28px; }
+  .essay { position: relative; }
+  .essay .cover { aspect-ratio: 16/10; overflow: hidden; background: var(--emerald); margin-bottom: 16px; }
+  .essay .cover img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 1s var(--ease); }
+  .essay:hover .cover img { transform: scale(1.04); }
+  .essay .k { font-family: var(--sans); font-size: .62rem; text-transform: uppercase; letter-spacing: .2em; color: var(--emerald); font-weight: 700; margin-bottom: 8px; }
+  .essay h3 { font-size: 1.35rem; font-weight: 600; letter-spacing: -.01em; line-height: 1.2; }
+  .essays .essay:first-child h3 { font-size: 2rem; }
+  .essay p { margin-top: 8px; font-size: 1rem; line-height: 1.5; color: #3a3833; font-style: italic; }
+  .essay .d { position: absolute; left: -90px; top: 2px; width: 70px; text-align: right; font-family: var(--mono); font-size: .64rem; color: var(--muted); line-height: 1.4; }
+  .labs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .labc { border: 1px solid var(--rule); padding: 20px; min-height: 200px; display: flex; flex-direction: column; justify-content: space-between; background: #fff; transition: transform .4s var(--ease), border-color .3s; }
+  .labc:hover { transform: rotate(-1deg) translateY(-4px); border-color: var(--terracotta); }
+  .labc .k { font-family: var(--mono); font-size: .62rem; text-transform: uppercase; letter-spacing: .16em; color: var(--terracotta); }
+  .labc h3 { font-size: 1.3rem; font-weight: 600; margin: 10px 0 6px; line-height: 1.15; }
+  .labc p { font-size: .95rem; line-height: 1.45; color: #3a3833; font-style: italic; }
+  .labc svg { width: 100%; height: 44px; margin-top: 14px; }
+  .photos { display: flex; gap: 14px; overflow-x: auto; padding-bottom: 20px; scrollbar-width: none; }
+  .photos::-webkit-scrollbar { display: none; }
+  .ph { flex: none; width: 260px; position: relative; cursor: crosshair; }
+  .ph img { width: 100%; aspect-ratio: 4/5; object-fit: cover; display: block; }
+  .ph .exif { position: static; margin-top: 8px; }
+  footer { padding: 28px 0; font-family: var(--sans); font-size: .7rem; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
+  footer .wrap { display: flex; justify-content: space-between; }
+  @media (max-width: 980px) { .hero { grid-template-columns: 1fr; } .print .img { min-height: 380px; } .essays, .labs { grid-template-columns: 1fr; } .essay .d { display: none; } }
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="logo" href="#"><i></i>drdimg</a>
+  <nav><a href="#">Photos</a><a href="#">Writing</a><a href="#">Labs</a><a href="#">About</a></nav>
+</div></header>
+
+<section class="wrap hero">
+  <div class="hero-l">
+    <div class="kicker"><span class="dot"></span>Live from the labs · today's rotation 1 / 3</div>
+    <h1>Putting <em>data</em> in the frame.</h1>
+    <p class="lede"><b>Photographs, essays and small interactive tools</b> about cities, money, and the systems underneath them. Here's one you can touch.</p>
+
+    <div class="widget">
+      <div class="w-head"><h3>Two ways to tax the same euro</h3><span>Tax Schedule Comparison</span></div>
+      <div class="w-row">
+        <div class="chart"><svg id="chart" viewBox="0 0 520 190" preserveAspectRatio="none"></svg></div>
+        <div class="readout">
+          <div><div class="big" id="net">€—</div><div style="margin-top:4px">net under <span class="cur">Ireland 2026</span></div></div>
+          <div class="row"><span>Flat 30% / €15k free</span><b class="flat" id="netflat">€—</b></div>
+          <div class="row"><span>Difference</span><b id="diff">€—</b></div>
+        </div>
+      </div>
+      <div class="slider"><label for="inc">Gross income</label><input id="inc" type="range" min="10000" max="200000" step="1000" value="52000"><output id="incv">€52,000</output></div>
+      <div class="w-foot"><a href="#">Open the full lab →</a><span class="rot"><i class="on"></i><i></i><i></i> Tomorrow: Budget quiz</span></div>
+    </div>
+  </div>
+
+  <div class="hero-r">
+    <div class="print">
+      <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+      <div class="img"><img src="../public/photos/Portraits/DSCF4666.jpg" alt=""></div>
+      <span class="counter">01 / 03</span>
+      <div class="exif"><b>Portraits</b><span>DSCF4666 · ƒ/2 · 1/250 · ISO 400 · Dublin</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec"><div class="wrap">
+  <div class="sec-head"><h2><i style="background:var(--emerald)"></i>Writing</h2><a href="#">All essays →</a></div>
+  <div class="essays">
+    <a class="essay" href="#"><span class="d">Nov 20<br>2025</span><div class="cover"><img src="../public/blog/dunbars-number/cover.png" alt=""></div><div class="k">Data science</div><h3>Calling Dunbar's Number: Number not in service</h3><p>Is the cognitive limit on social relationships a real biological constraint or a statistical artifact?</p></a>
+    <a class="essay" href="#"><span class="d">Jul 18<br>2026</span><div class="cover"><img src="../public/blog/property-tax/cover.png" alt=""></div><div class="k">Political economy</div><h3>Against Idle Land</h3><p>A case for self-assessed property tax.</p></a>
+    <a class="essay" href="#"><span class="d">Jun 2<br>2026</span><div class="cover"><img src="../public/blog/ireland-housing-market/cover.png" alt=""></div><div class="k">Data story</div><h3>House Prices Are Not the Whole Affordability Story</h3><p>Five decades, mortgage-first.</p></a>
+  </div>
+</div></section>
+
+<section class="sec"><div class="wrap">
+  <div class="sec-head"><h2><i style="background:var(--terracotta)"></i>Labs</h2><a href="#">All labs →</a></div>
+  <div class="labs">
+    <a class="labc" href="#"><div><div class="k">Civics · Quiz</div><h3>Irish Budget Quiz</h3><p>How does €100bn get spent?</p></div><svg viewBox="0 0 200 44"><g fill="#C47A5A"><rect x="0" y="20" width="60" height="24"/><rect x="66" y="8" width="40" height="36" opacity=".7"/><rect x="112" y="28" width="30" height="16" opacity=".5"/><rect x="148" y="34" width="52" height="10" opacity=".35"/></g></svg></a>
+    <a class="labc" href="#"><div><div class="k">Data viz · Time</div><h3>What Did That Really Cost?</h3><p>Purchase tax in hours of your life.</p></div><svg viewBox="0 0 200 44"><circle cx="22" cy="22" r="18" fill="none" stroke="#C47A5A" stroke-width="3"/><path d="M22 22 L22 8 M22 22 L32 28" stroke="#1C1B18" stroke-width="2.5" stroke-linecap="round"/><path d="M60 30 L200 30" stroke="#D9D2C3" stroke-width="2"/><path d="M60 30 L150 30" stroke="#F4CA16" stroke-width="4"/></svg></a>
+    <a class="labc" href="#"><div><div class="k">Housing · Simulation</div><h3>Ireland Housing Market</h3><p>Mortgage affordability across 50 years.</p></div><svg viewBox="0 0 200 44"><path d="M0 40 C 40 36, 70 30, 100 24 S 160 6, 200 2" fill="none" stroke="#1C1B18" stroke-width="2"/><path d="M0 40 C 50 40, 90 36, 130 32 S 180 26, 200 24" fill="none" stroke="#C47A5A" stroke-width="2" stroke-dasharray="4 3"/></svg></a>
+    <a class="labc" href="#"><div><div class="k">Google Maps · Transit</div><h3>Three Stations</h3><p>Which Dublin station is really closest?</p></div><svg viewBox="0 0 200 44"><g stroke="#C47A5A" stroke-width="2" fill="none"><path d="M10 34 Q 60 4, 110 20 T 190 10"/></g><g fill="#1C1B18"><circle cx="10" cy="34" r="4"/><circle cx="110" cy="20" r="4"/><circle cx="190" cy="10" r="4"/></g></svg></a>
+  </div>
+</div></section>
+
+<section class="sec"><div class="wrap">
+  <div class="sec-head"><h2><i style="background:var(--yellow)"></i>Photography</h2><a href="#">All albums →</a></div>
+  <div class="photos">
+    <a class="ph" href="#"><img src="../public/photos/Faves/DSCF3535.jpg" alt=""><div class="exif"><b>Favourites</b><span>42 frames</span></div></a>
+    <a class="ph" href="#"><img src="../public/photos/BnW/000226840017.jpg" alt=""><div class="exif"><b>Black &amp; White</b><span>30</span></div></a>
+    <a class="ph" href="#"><img src="../public/photos/Film/000361140009.jpg" alt=""><div class="exif"><b>Film</b><span>29</span></div></a>
+    <a class="ph" href="#"><img src="../public/photos/People/DSCF6615.jpg" alt=""><div class="exif"><b>People</b><span>58</span></div></a>
+    <a class="ph" href="#"><img src="../public/photos/Buildings/DSCF9580.jpg" alt=""><div class="exif"><b>Architecture</b><span>29</span></div></a>
+    <a class="ph" href="#"><img src="../public/photos/Mountains/DSCF1182.jpg" alt=""><div class="exif"><b>Mountains</b><span>17</span></div></a>
+    <a class="ph" href="#"><img src="../public/photos/Diptych/DSCF8969.jpg" alt=""><div class="exif"><b>Diptychs</b><span>22</span></div></a>
+  </div>
+</div></section>
+
+<footer><div class="wrap"><span>© 2026 drdimg</span><span>Photography &amp; data — Dublin</span></div></footer>
+<div class="note">Mockup 03 · Play Above the Fold. The slider is real: it computes two stylised tax schedules. EXIF captions + crosshair cursor borrowed from idea 05.</div>
+
+<script>
+  // Stylised schedules (illustrative, not advice).
+  const current = g => { // Ireland-ish: 20% to 44k, 40% above, minus ~€4k credits, +USC-ish 4% above 25k
+    const inc = Math.max(0, g);
+    let t = Math.min(inc, 44000) * .20 + Math.max(0, inc - 44000) * .40 - 4000;
+    t = Math.max(0, t) + Math.max(0, inc - 25000) * .04;
+    return inc - t;
+  };
+  const flat = g => g - Math.max(0, g - 15000) * .30;
+  const svg = document.getElementById('chart');
+  const W = 520, H = 190, PAD = 10, MAX = 200000;
+  const x = g => PAD + (g / MAX) * (W - 2 * PAD);
+  const y = n => H - PAD - (n / MAX) * (H - 2 * PAD);
+  const path = fn => { let d = ''; for (let g = 0; g <= MAX; g += 5000) d += (g ? 'L' : 'M') + x(g).toFixed(1) + ' ' + y(fn(g)).toFixed(1) + ' '; return d; };
+  svg.innerHTML = `
+    <g stroke="#E6DFD0" stroke-width="1">${[50,100,150].map(k => `<line x1="${PAD}" y1="${y(k*1000)}" x2="${W-PAD}" y2="${y(k*1000)}"/>`).join('')}</g>
+    <path d="${path(g => g)}" fill="none" stroke="#D9D2C3" stroke-width="1" stroke-dasharray="2 4"/>
+    <path d="${path(current)}" fill="none" stroke="#1C1B18" stroke-width="2.2"/>
+    <path d="${path(flat)}" fill="none" stroke="#C47A5A" stroke-width="2.2" stroke-dasharray="5 4"/>
+    <line id="vl" x1="0" y1="${PAD}" x2="0" y2="${H-PAD}" stroke="#F4CA16" stroke-width="2"/>
+    <circle id="c1" r="5" fill="#F4CA16" stroke="#1C1B18" stroke-width="2"/>
+    <circle id="c2" r="5" fill="#fff" stroke="#C47A5A" stroke-width="2"/>
+    <text x="${W-PAD}" y="${H-2}" text-anchor="end" font-family="Geist Mono, monospace" font-size="9" fill="#9a958b">gross → €200k</text>`;
+  const fmt = n => '€' + Math.round(n).toLocaleString('en-IE');
+  const inc = document.getElementById('inc');
+  function update() {
+    const g = +inc.value, a = current(g), b = flat(g);
+    document.getElementById('incv').value = fmt(g);
+    document.getElementById('net').textContent = fmt(a);
+    document.getElementById('netflat').textContent = fmt(b);
+    const d = b - a; document.getElementById('diff').textContent = (d >= 0 ? '+' : '−') + fmt(Math.abs(d));
+    const vx = x(g); const vl = svg.querySelector('#vl'); vl.setAttribute('x1', vx); vl.setAttribute('x2', vx);
+    const c1 = svg.querySelector('#c1'); c1.setAttribute('cx', vx); c1.setAttribute('cy', y(a));
+    const c2 = svg.querySelector('#c2'); c2.setAttribute('cx', vx); c2.setAttribute('cy', y(b));
+  }
+  inc.addEventListener('input', update); update();
+</script>
+</body>
+</html>
