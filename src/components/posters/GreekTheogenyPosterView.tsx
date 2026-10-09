@@ -130,6 +130,17 @@ export function GreekTheogenyPosterView() {
           On-screen previews use SVG · Print downloads are PDF · Raster exports
           at 300 DPI
         </p>
+        <p className="mt-6 font-[family-name:var(--font-newsreader)] text-base leading-relaxed text-[var(--foreground)]">
+          Also see the{" "}
+          <Link
+            href="/greek-theogeny/underground-lines"
+            className="underline decoration-[var(--rule-color)] underline-offset-4 transition-colors hover:decoration-[var(--foreground)]"
+          >
+            Theogony Underground
+          </Link>{" "}
+          prototype — the same genealogy drawn as coloured transit lines with
+          two automatic layouts.
+        </p>
       </header>
 
       <div className="flex flex-col gap-16">
