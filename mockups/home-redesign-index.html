@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Homepage — 5 ideas, 4 mocked up</title>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Space+Grotesk:wght@400;500;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --paper: #F4EFE6; --ink: #1C1B18; --muted: rgba(28,27,24,0.55); --rule: #D9D2C3;
+    --yellow: #F4CA16; --emerald: #0A5C36; --terracotta: #C47A5A;
+  }
+  body { background: var(--paper); color: var(--ink); font-family: 'Newsreader', Georgia, serif; }
+  .page { max-width: 1040px; margin: 0 auto; padding: 72px 40px 120px; }
+  .label { font-family: 'Space Grotesk', sans-serif; font-size: .68rem; text-transform: uppercase; letter-spacing: .2em; color: var(--muted); margin-bottom: 14px; }
+  h1 { font-size: clamp(2.4rem, 5vw, 4rem); font-weight: 700; letter-spacing: -.02em; line-height: 1.05; margin-bottom: 18px; }
+  .intro { font-size: 1.15rem; color: var(--muted); max-width: 640px; line-height: 1.6; margin-bottom: 56px; font-style: italic; }
+  .diag { border-left: 3px solid var(--yellow); padding: 4px 0 4px 20px; margin-bottom: 64px; max-width: 720px; }
+  .diag p { font-size: 1.05rem; line-height: 1.65; margin-bottom: 10px; }
+  .diag p:last-child { margin: 0; }
+  .ideas { display: grid; gap: 1px; background: var(--rule); border: 1px solid var(--rule); }
+  .idea { background: var(--paper); padding: 32px 32px 28px; display: grid; grid-template-columns: 64px 1fr 220px; gap: 28px; align-items: start; }
+  .idea .num { font-family: 'Geist Mono', monospace; font-size: 2.4rem; font-weight: 400; line-height: 1; color: var(--muted); letter-spacing: -.04em; }
+  .idea h2 { font-size: 1.6rem; font-weight: 600; letter-spacing: -.01em; margin-bottom: 8px; }
+  .idea h2 em { font-style: italic; font-weight: 300; color: var(--muted); }
+  .idea p { font-size: 1.02rem; line-height: 1.6; color: #3a3833; margin-bottom: 10px; }
+  .idea .fixes { font-family: 'Space Grotesk', sans-serif; font-size: .68rem; text-transform: uppercase; letter-spacing: .14em; color: var(--muted); margin-top: 14px; }
+  .idea .fixes b { color: var(--ink); font-weight: 500; }
+  .side { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+  .tag { font-family: 'Space Grotesk', sans-serif; font-size: .64rem; text-transform: uppercase; letter-spacing: .16em; padding: 5px 9px; border: 1px solid var(--rule); color: var(--muted); }
+  .tag.yes { border-color: var(--ink); color: var(--ink); background: var(--yellow); }
+  .side a { font-family: 'Space Grotesk', sans-serif; font-size: .78rem; text-transform: uppercase; letter-spacing: .12em; color: var(--ink); text-decoration: none; border-bottom: 2px solid var(--yellow); padding-bottom: 2px; margin-top: 6px; }
+  .side a:hover { background: var(--yellow); }
+  .side .risk { font-size: .9rem; font-style: italic; color: var(--muted); line-height: 1.45; }
+  .sw { display: inline-block; width: 10px; height: 10px; border-radius: 50%; vertical-align: middle; margin-right: 6px; }
+  .pal { margin-top: 72px; }
+  .pal h3 { font-size: 1.3rem; font-weight: 600; margin-bottom: 14px; }
+  .chips { display: flex; gap: 10px; flex-wrap: wrap; }
+  .chip { font-family: 'Geist Mono', monospace; font-size: .72rem; padding: 10px 14px; border: 1px solid var(--rule); display: flex; align-items: center; gap: 10px; }
+  .chip i { width: 22px; height: 22px; display: inline-block; border: 1px solid rgba(0,0,0,.1); }
+  @media (max-width: 760px) { .idea { grid-template-columns: 1fr; gap: 14px; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <p class="label">Homepage · brainstorm</p>
+  <h1>Five ways to let some air in.</h1>
+  <p class="intro">Same bones, different temperature. The brief: keep it clean, make it less dry, give photography, writing and labs equal billing, and soften the black / white / yellow.</p>
+
+  <div class="diag">
+    <p><strong>What's making it feel sterile.</strong> Every content type is rendered the same way: rectangle, hairline rule, caption. Writing and labs each appear twice (featured, then "recent", then writing again) so the page is long but says the same thing three times. The labs are the most playful things on the site and they get the least playful treatment: a text list. Nothing overlaps, tilts, or borrows colour from the content itself.</p>
+    <p><strong>What's already working.</strong> The headline. Newsreader at display size. The dropcap. The one yellow progress bar. The blog cover illustrations already have a warm palette (emerald, terracotta, gold) the shell never borrows.</p>
+  </div>
+
+  <div class="ideas">
+
+    <div class="idea">
+      <div class="num">01</div>
+      <div>
+        <h2>The Desk <em>— pinboard hero</em></h2>
+        <p>Replace the carousel with a surface. Three or four photo prints, one essay as an index card with a pull quote, one lab as a torn-out chart card. Everything tilted a couple of degrees, overlapping, held down with bits of yellow tape. You can drag them. A "shuffle" button re-deals the desk. Each type literally shares the same table, so none outranks the others.</p>
+        <p>Below the fold the page shrinks to one mixed feed ("on the desk this week") and a short filmstrip of albums, replacing the three repeated sections.</p>
+        <p class="fixes">Fixes: <b>static</b> · <b>equal billing</b> · <b>whimsy</b> · <b>palette</b> (paper, not white)</p>
+      </div>
+      <div class="side">
+        <span class="tag yes">Mocked up</span>
+        <a href="home-1-the-desk.html">Open mockup →</a>
+        <p class="risk">Risk: tips into scrapbook kitsch if the tilt and shadows are overdone. Keep to ±4° and one tape colour.</p>
+      </div>
+    </div>
+
+    <div class="idea">
+      <div class="num">02</div>
+      <div>
+        <h2>Three Doors <em>— triptych hero</em></h2>
+        <p>The hero is three full-height panels: Photography, Writing, Labs. Each has its own material (a photograph; the emerald of the essay illustrations; a lab-category gradient with a live little chart). Hover one and it widens, its vertical label turns horizontal and the description slides in. The split is exactly even at rest, so equal prominence is structural, not a layout accident.</p>
+        <p>A thin ticker above runs the latest item from every type. Below, one chronological "everything" ledger with a colour-coded spine replaces the three sections.</p>
+        <p class="fixes">Fixes: <b>equal billing</b> · <b>static</b> · <b>repetition</b> · <b>palette</b> (per-type colour)</p>
+      </div>
+      <div class="side">
+        <span class="tag yes">Mocked up</span>
+        <a href="home-2-three-doors.html">Open mockup →</a>
+        <p class="risk">Risk: on phones three stacked doors eat the first screen. Needs a stacked, shorter variant.</p>
+      </div>
+    </div>
+
+    <div class="idea">
+      <div class="num">03</div>
+      <div>
+        <h2>Play Above the Fold <em>— a live mini-lab in the hero</em></h2>
+        <p>The headline promises "data in the frame", so put a working piece of data in the frame. Next to the headline sits a small, real widget lifted from a lab (today: drag your income, watch two tax schedules diverge). The photograph stays as a tall print on the other side, captioned like a contact sheet in mono. The widget rotates daily across three labs; a small "today's rotation" strip shows what's coming.</p>
+        <p>It makes the page non-static in a way that means something: you can touch it. Below, the sections are kept but tightened to one appearance each.</p>
+        <p class="fixes">Fixes: <b>static</b> · <b>labs get a fun treatment</b> · <b>whimsy</b></p>
+      </div>
+      <div class="side">
+        <span class="tag yes">Mocked up</span>
+        <a href="home-3-live-lab.html">Open mockup →</a>
+        <p class="risk">Risk: a widget per lab is real engineering. Start with one and a daily rotation of the headline instead.</p>
+      </div>
+    </div>
+
+    <div class="idea">
+      <div class="num">04</div>
+      <div>
+        <h2>Warm Paper <em>— palette &amp; material pass</em></h2>
+        <p>Not structural. Swap pure white and black for paper and ink, add a faint grain, and borrow the emerald and terracotta from the blog illustrations as secondary accents so yellow isn't the only voice. Section headers get a hand-drawn SVG underline instead of a ruled border. Dates and metadata move into the margins as marginalia. Hover states lean (tilt 1°) rather than fade.</p>
+        <p>This is the cheapest idea and it underlies the other mockups: 01 is drawn on paper, 02 uses the per-type colours. It could ship on its own in an afternoon.</p>
+        <p class="fixes">Fixes: <b>harsh palette</b> · <b>dryness</b>, without touching layout</p>
+      </div>
+      <div class="side">
+        <span class="tag">Folded into 01 / 02 / 03 / 05</span>
+        <p class="risk">Every mockup is drawn on this palette rather than mocked separately. Risk: warm paper can read "vintage"; keep the type modern and the grain under 5%.</p>
+      </div>
+    </div>
+
+    <div class="idea">
+      <div class="num">05</div>
+      <div>
+        <h2>In the Frame <em>— viewfinder motif</em></h2>
+        <p>Take the headline literally. A thin frame with corner brackets sits in the viewport and re-crops as you scroll: around the hero photo, then around the featured essay's cover, then around a lab's chart. Photos carry EXIF-style mono captions (file, place, aperture). Links underline with a tiny sparkline instead of a rule. The cursor becomes a crosshair over images. It fuses the two halves of the site, photography and data, into one visual language.</p>
+        <p class="fixes">Fixes: <b>static</b> · <b>identity</b> (one idea tying photo + data together)</p>
+      </div>
+      <div class="side">
+        <span class="tag yes">Mocked up</span>
+        <a href="home-5-in-the-frame.html">Open mockup →</a>
+        <p class="risk">Risk: scroll-driven chrome can feel like a demo. Easy to pilot as just the EXIF captions + crosshair, which also appear in 03.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="pal">
+    <h3>Proposed palette extension</h3>
+    <div class="chips">
+      <span class="chip"><i style="background:#F4EFE6"></i>paper #F4EFE6</span>
+      <span class="chip"><i style="background:#1C1B18"></i>ink #1C1B18</span>
+      <span class="chip"><i style="background:#F4CA16"></i>yellow #F4CA16 (keep)</span>
+      <span class="chip"><i style="background:#0A5C36"></i>emerald #0A5C36 (writing)</span>
+      <span class="chip"><i style="background:#C47A5A"></i>terracotta #C47A5A (labs)</span>
+      <span class="chip"><i style="background:#D9D2C3"></i>rule #D9D2C3</span>
+    </div>
+  </div>
+</div>
+</body>
+</html>

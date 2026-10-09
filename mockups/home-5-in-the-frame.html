@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>05 · In the Frame — homepage mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Space+Grotesk:wght@400;500;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --paper: #F4EFE6; --ink: #1C1B18; --muted: rgba(28,27,24,0.55); --rule: #D9D2C3;
+    --yellow: #F4CA16; --emerald: #0A5C36; --terracotta: #C47A5A;
+    --sans: 'Space Grotesk', sans-serif; --mono: 'Geist Mono', monospace; --serif: 'Newsreader', Georgia, serif;
+    --ease: cubic-bezier(.22,1,.36,1);
+  }
+  body { background: var(--paper); color: var(--ink); font-family: var(--serif); }
+  a { color: inherit; text-decoration: none; }
+  img { cursor: crosshair; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+  header { position: sticky; top: 0; z-index: 50; background: rgba(244,239,230,.9); backdrop-filter: blur(12px); border-bottom: 1px solid var(--rule); }
+  header .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+  .logo { font-family: var(--sans); font-weight: 700; letter-spacing: .14em; text-transform: uppercase; font-size: .85rem; display: flex; align-items: center; gap: 10px; }
+  .logo i { width: 18px; height: 18px; border: 2px solid var(--ink); display: inline-block; position: relative; }
+  .logo i::after { content: ""; position: absolute; inset: 3px; background: var(--yellow); }
+  nav { display: flex; gap: 32px; font-family: var(--sans); font-size: .78rem; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
+  .note { position: fixed; right: 20px; bottom: 20px; z-index: 60; font-family: var(--mono); font-size: .66rem; background: var(--ink); color: var(--paper); padding: 8px 12px; max-width: 280px; line-height: 1.5; }
+
+  /* sparkline underline links */
+  .spark { position: relative; display: inline-block; padding-bottom: 6px; background-repeat: no-repeat; background-position: 0 100%; background-size: 100% 6px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 6' preserveAspectRatio='none'%3E%3Cpath d='M0 5 L10 4 L20 5 L30 2 L40 4 L50 1 L60 3 L70 2 L80 4 L90 1 L100 3' fill='none' stroke='%23F4CA16' stroke-width='1.6'/%3E%3C/svg%3E"); transition: background-size .3s; }
+  .spark:hover { background-size: 100% 10px; }
+
+  /* the viewfinder */
+  #vf { position: fixed; z-index: 40; pointer-events: none; left: 0; top: 0; width: 0; height: 0; opacity: 0;
+    transition: left .9s var(--ease), top .9s var(--ease), width .9s var(--ease), height .9s var(--ease), opacity .4s; }
+  #vf i { position: absolute; width: 26px; height: 26px; border: 2.5px solid var(--yellow); filter: drop-shadow(0 1px 1px rgba(0,0,0,.35)); }
+  #vf .tl { left: -2px; top: -2px; border-right: 0; border-bottom: 0; } #vf .tr { right: -2px; top: -2px; border-left: 0; border-bottom: 0; }
+  #vf .bl { left: -2px; bottom: -2px; border-right: 0; border-top: 0; } #vf .br { right: -2px; bottom: -2px; border-left: 0; border-top: 0; }
+  #vf .cross { position: absolute; left: 50%; top: 50%; width: 14px; height: 14px; transform: translate(-50%,-50%); opacity: .8; }
+  #vf .cross::before, #vf .cross::after { content: ""; position: absolute; background: var(--yellow); }
+  #vf .cross::before { left: 50%; top: 0; width: 1.5px; height: 100%; } #vf .cross::after { top: 50%; left: 0; height: 1.5px; width: 100%; }
+  #vf .read { position: absolute; left: 10px; bottom: 10px; font-family: var(--mono); font-size: .62rem; letter-spacing: .08em; text-transform: uppercase; color: var(--ink); background: var(--yellow); padding: 4px 8px; white-space: nowrap; }
+  #vf .read b { font-weight: 500; }
+  #vf .rec { position: absolute; right: 0; top: -22px; font-family: var(--mono); font-size: .6rem; letter-spacing: .16em; color: var(--ink); display: flex; gap: 6px; align-items: center; }
+  #vf .rec::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #D33; animation: blink 1.2s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* hero */
+  .hero { position: relative; height: calc(100vh - 60px); min-height: 640px; overflow: hidden; background: #111; }
+  .hero img { width: 100%; height: 100%; object-fit: cover; display: block; animation: kb 18s ease-in-out alternate infinite; }
+  @keyframes kb { to { transform: scale(1.06); } }
+  .hero .shade { position: absolute; inset: 0; background: linear-gradient(to top, rgba(10,10,10,.7), rgba(10,10,10,.05) 55%, transparent); }
+  .hero h1 { position: absolute; left: 6%; bottom: 14%; color: #fff; font-size: clamp(3rem, 7vw, 6.4rem); font-weight: 700; letter-spacing: -.03em; line-height: .92; max-width: 760px; }
+  .hero h1 em { font-style: italic; font-weight: 300; }
+  .hero h1 .fr { position: relative; display: inline-block; padding: 0 .1em; }
+  .hero h1 .fr i { position: absolute; width: .32em; height: .32em; border: 3px solid var(--yellow); }
+  .hero h1 .fr .a { left: -.08em; top: -.02em; border-right: 0; border-bottom: 0; } .hero h1 .fr .b { right: -.08em; top: -.02em; border-left: 0; border-bottom: 0; }
+  .hero h1 .fr .c { left: -.08em; bottom: -.02em; border-right: 0; border-top: 0; } .hero h1 .fr .d { right: -.08em; bottom: -.02em; border-left: 0; border-top: 0; }
+  .exif { font-family: var(--mono); font-size: .64rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); display: flex; gap: 18px; }
+  .exif b { font-family: var(--serif); font-style: italic; font-weight: 500; text-transform: none; letter-spacing: 0; font-size: .95rem; color: var(--ink); }
+  .hero .exif { position: absolute; right: 5%; bottom: 6%; color: rgba(255,255,255,.6); }
+  .hero .exif b { color: #fff; }
+  .hero .sub { position: absolute; left: 6%; bottom: 6%; color: rgba(255,255,255,.7); font-family: var(--sans); font-size: .7rem; letter-spacing: .14em; text-transform: uppercase; }
+
+  /* featured: essay + lab */
+  .feat { display: grid; grid-template-columns: 1fr 1fr; gap: 0; padding: 96px 0; }
+  .feat > div { padding: 0 48px; }
+  .feat > div + div { border-left: 1px solid var(--rule); }
+  .k { font-family: var(--sans); font-size: .64rem; text-transform: uppercase; letter-spacing: .2em; font-weight: 700; margin-bottom: 14px; display: flex; gap: 12px; align-items: center; }
+  .k i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .feat h2 { font-size: 2.3rem; font-weight: 600; letter-spacing: -.02em; line-height: 1.08; margin-bottom: 20px; min-height: 2.2em; }
+  .target { position: relative; overflow: hidden; margin-bottom: 20px; }
+  .target img { width: 100%; aspect-ratio: 3/2; object-fit: cover; display: block; }
+  .feat p { font-size: 1.1rem; line-height: 1.6; color: #3a3833; }
+  .dropcap::first-letter { float: left; font-size: 4rem; line-height: .8; margin: .08em .14em 0 0; font-weight: 700; color: var(--emerald); }
+  .feat .exif { margin-top: 10px; }
+  .feat .more { display: inline-block; margin-top: 22px; font-family: var(--sans); font-size: .7rem; text-transform: uppercase; letter-spacing: .16em; }
+  .labviz { aspect-ratio: 3/2; background: #fff; border: 1px solid var(--rule); display: flex; align-items: center; justify-content: center; padding: 24px; cursor: crosshair; }
+  .labviz svg { width: 100%; height: 100%; overflow: visible; }
+
+  /* photo grid */
+  .sec { padding: 80px 0; border-top: 1px solid var(--rule); }
+  .sec-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 36px; }
+  .sec-head h2 { font-size: 2.6rem; font-weight: 600; letter-spacing: -.02em; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px 18px; }
+  .cell { position: relative; }
+  .cell img { width: 100%; aspect-ratio: 4/5; object-fit: cover; display: block; }
+  .cell .exif { margin-top: 10px; justify-content: space-between; }
+  .cell:nth-child(2) { transform: translateY(40px); } .cell:nth-child(5) { transform: translateY(40px); }
+  /* writing index */
+  .idx a { display: grid; grid-template-columns: 90px 1fr 160px; gap: 24px; align-items: baseline; padding: 20px 0; border-top: 1px solid var(--rule); }
+  .idx a:last-child { border-bottom: 1px solid var(--rule); }
+  .idx .d { font-family: var(--mono); font-size: .68rem; color: var(--muted); }
+  .idx .t { font-size: 1.4rem; font-weight: 600; letter-spacing: -.01em; }
+  .idx .c { font-family: var(--sans); font-size: .64rem; text-transform: uppercase; letter-spacing: .16em; color: var(--emerald); text-align: right; }
+  footer { border-top: 1px solid var(--rule); padding: 28px 0; font-family: var(--sans); font-size: .7rem; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
+  footer .wrap { display: flex; justify-content: space-between; }
+  @media (max-width: 900px) { .feat { grid-template-columns: 1fr; } .feat > div + div { border-left: 0; border-top: 1px solid var(--rule); padding-top: 60px; margin-top: 60px; } .grid { grid-template-columns: 1fr 1fr; } .cell:nth-child(n) { transform: none; } .idx a { grid-template-columns: 1fr; } .idx .d, .idx .c { display: none; } #vf { display: none; } }
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="logo" href="#"><i></i>drdimg</a>
+  <nav><a href="#">Photos</a><a href="#">Writing</a><a href="#">Labs</a><a href="#">About</a></nav>
+</div></header>
+
+<div id="vf"><i class="tl"></i><i class="tr"></i><i class="bl"></i><i class="br"></i><span class="cross"></span><span class="rec">REC</span><span class="read" id="vfread"></span></div>
+
+<section class="hero" data-frame data-cap="PHOTO · Faves/DSCF3535 · ƒ/2.8 · 1/500">
+  <img src="../public/photos/Faves/DSCF3535.jpg" alt="">
+  <div class="shade"></div>
+  <h1>Putting <em>data</em><br>in the <span class="fr"><i class="a"></i><i class="b"></i><i class="c"></i><i class="d"></i>frame.</span></h1>
+  <span class="sub">Photographs · Essays · Labs — Dublin</span>
+  <div class="exif"><b>Favourites</b><span>DSCF3535</span><span>ƒ/2.8</span><span>1/500</span><span>ISO 200</span></div>
+</section>
+
+<section class="wrap feat">
+  <div>
+    <div class="k" style="color:var(--emerald)"><i style="background:var(--emerald)"></i>Featured essay</div>
+    <h2><a class="spark" href="#">Calling Dunbar's Number: Number not in service</a></h2>
+    <a href="#" class="target" data-frame data-cap="ESSAY · dunbars-number/cover · 1200×675"><img src="../public/blog/dunbars-number/cover.png" alt=""></a>
+    <p class="dropcap">Is the cognitive limit on social relationships a real biological constraint or a statistical artifact? A critique suggesting social layers might be artifacts of the fitting, not the brain.</p>
+    <div class="exif"><span>Nov 20 2025</span><span>14 min</span><span>Data science</span></div>
+    <a class="more spark" href="#">Read the essay →</a>
+  </div>
+  <div>
+    <div class="k" style="color:var(--terracotta)"><i style="background:var(--terracotta)"></i>Featured lab</div>
+    <h2><a class="spark" href="#">Tax Schedule Comparison</a></h2>
+    <a href="#" class="target labviz" data-frame data-cap="LAB · tax-schedule-comparison · live">
+      <svg viewBox="0 0 400 240" preserveAspectRatio="none">
+        <g stroke="#EEE8DA" stroke-width="1"><line x1="0" y1="60" x2="400" y2="60"/><line x1="0" y1="120" x2="400" y2="120"/><line x1="0" y1="180" x2="400" y2="180"/></g>
+        <path d="M0 240 L400 0" stroke="#D9D2C3" stroke-dasharray="3 5" fill="none"/>
+        <path d="M0 240 C 120 200, 200 150, 260 100 S 360 30, 400 20" fill="none" stroke="#1C1B18" stroke-width="2.5"/>
+        <path d="M0 240 C 140 215, 220 180, 290 130 S 370 60, 400 48" fill="none" stroke="#C47A5A" stroke-width="2.5" stroke-dasharray="6 4"/>
+        <g id="marker" style="animation: slide 6s ease-in-out infinite alternate">
+          <line x1="0" y1="0" x2="0" y2="240" stroke="#F4CA16" stroke-width="2"/>
+        </g>
+        <text x="8" y="16" font-family="Geist Mono, monospace" font-size="9" fill="#9a958b">NET INCOME vs GROSS · two schedules</text>
+      </svg>
+    </a>
+    <p>Compare stylised tax schedules against Ireland's current income tax shape across rates, net income, and working-time views.</p>
+    <div class="exif"><span>Jun 2026</span><span>Data viz</span><span>Interactive</span></div>
+    <a class="more spark" href="#">Open the lab →</a>
+  </div>
+</section>
+
+<section class="sec"><div class="wrap">
+  <div class="sec-head"><h2>Photography</h2><a class="spark" href="#" style="font-family:var(--sans);font-size:.7rem;text-transform:uppercase;letter-spacing:.14em">Eleven albums →</a></div>
+  <div class="grid">
+    <a class="cell" href="#" data-frame data-cap="PHOTO · Portraits/DSCF4666 · ƒ/2 · 1/250"><img src="../public/photos/Portraits/DSCF4666.jpg" alt=""><div class="exif"><b>Portraits</b><span>45 frames</span></div></a>
+    <a class="cell" href="#" data-frame data-cap="PHOTO · BnW/000226840017 · Tri-X 400"><img src="../public/photos/BnW/000226840017.jpg" alt=""><div class="exif"><b>Black &amp; White</b><span>30 frames</span></div></a>
+    <a class="cell" href="#" data-frame data-cap="PHOTO · Film/000361140009 · Portra 400"><img src="../public/photos/Film/000361140009.jpg" alt=""><div class="exif"><b>Film</b><span>29 frames</span></div></a>
+    <a class="cell" href="#" data-frame data-cap="PHOTO · People/DSCF6615 · ƒ/4 · 1/125"><img src="../public/photos/People/DSCF6615.jpg" alt=""><div class="exif"><b>People</b><span>58 frames</span></div></a>
+    <a class="cell" href="#" data-frame data-cap="PHOTO · Buildings/DSCF9580 · ƒ/8 · 1/60"><img src="../public/photos/Buildings/DSCF9580.jpg" alt=""><div class="exif"><b>Architecture</b><span>29 frames</span></div></a>
+    <a class="cell" href="#" data-frame data-cap="PHOTO · Mountains/DSCF1182 · ƒ/11 · 1/250"><img src="../public/photos/Mountains/DSCF1182.jpg" alt=""><div class="exif"><b>Mountains</b><span>17 frames</span></div></a>
+  </div>
+</div></section>
+
+<section class="sec"><div class="wrap">
+  <div class="sec-head"><h2>Writing</h2><a class="spark" href="#" style="font-family:var(--sans);font-size:.7rem;text-transform:uppercase;letter-spacing:.14em">All essays →</a></div>
+  <div class="idx">
+    <a href="#"><span class="d">Jul 18 2026</span><span class="t">Against Idle Land: A Case for Self-Assessed Property Tax</span><span class="c">Political economy</span></a>
+    <a href="#"><span class="d">Jun 2 2026</span><span class="t">House Prices Are Not the Whole Affordability Story</span><span class="c">Data story</span></a>
+    <a href="#"><span class="d">Feb 23 2026</span><span class="t">The €27.8 Billion Question</span><span class="c">Data story</span></a>
+    <a href="#"><span class="d">Nov 28 2025</span><span class="t">Software Costs Approach Zero</span><span class="c">Technology</span></a>
+  </div>
+</div></section>
+
+<footer><div class="wrap"><span>© 2026 drdimg</span><span>Photography &amp; data — Dublin</span></div></footer>
+<div class="note">Mockup 05 · In the Frame. Scroll: the yellow viewfinder re-crops to whatever is in the frame. EXIF captions, sparkline underlines, crosshair over images.</div>
+<style>@keyframes slide { from { transform: translateX(60px); } to { transform: translateX(340px); } }</style>
+
+<script>
+  const vf = document.getElementById('vf'), read = document.getElementById('vfread');
+  const targets = [...document.querySelectorAll('[data-frame]')];
+  let cur = null, raf = 0;
+  function pick() {
+    raf = 0;
+    const vh = innerHeight, mid = vh * .5;
+    let best = null, bd = Infinity;
+    for (const t of targets) {
+      const r = t.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > vh) continue;
+      const c = r.top + r.height / 2;
+      const d = Math.abs(c - mid) - Math.min(r.height, vh) * .25; // favour big things a bit
+      if (d < bd) { bd = d; best = { t, r }; }
+    }
+    if (!best) { vf.style.opacity = 0; return; }
+    const { t, r } = best;
+    const inset = 10;
+    vf.style.left = (r.left + inset) + 'px'; vf.style.top = (r.top + inset) + 'px';
+    vf.style.width = (r.width - inset * 2) + 'px'; vf.style.height = (r.height - inset * 2) + 'px';
+    vf.style.opacity = 1;
+    if (cur !== t) { cur = t; read.innerHTML = t.dataset.cap.replace(/^(\w+)/, '<b>$1</b>'); }
+  }
+  const sched = () => { if (!raf) raf = requestAnimationFrame(pick); };
+  addEventListener('scroll', sched, { passive: true }); addEventListener('resize', sched); addEventListener('load', pick); pick();
+</script>
+</body>
+</html>
