@@ -8,6 +8,7 @@ const BADGE_HUE: Record<string, number> = {
   Civics: 96,
   SaMD: 272,
   "Google Maps": 22,
+  Reference: 38,
 };
 
 const FALLBACK_HUE = 45;
