@@ -15,14 +15,14 @@ const LABS: Lab[] = [
   {
     title: "Greek Theogony Poster",
     description:
-      "An A2 chart of divine genealogy in two finishes — crisp outlines and a translucent fill — with SVG previews and print-ready PDF downloads.",
+      "Frameless A2 divine genealogy in two finishes — crisp outlines and a translucent fill — with SVG previews and print-ready PDF downloads.",
     href: "/greek-theogeny",
     badge: "Reference",
     meta: "Mythology • Poster",
     publishedAt: "2026-10-09",
-    image: "/posters/greek-theogony/greek_theogony_outlines_A2_300dpi.png",
+    image: "/posters/greek-theogony/greek_theogony_frameless_outlines_A2_300dpi.png",
     imageAlt:
-      "Preview of the Greek theogony poster outlines edition showing the divine family tree.",
+      "Preview of the frameless Greek theogony poster outlines edition showing the divine family tree.",
   },
   {
     title: "Three Stations",

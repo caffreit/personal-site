@@ -114,7 +114,7 @@ export function GreekTheogenyPosterView() {
 
       <header className="mb-12 max-w-3xl border-b border-[var(--rule-color)] pb-10">
         <p className="mb-3 font-mono text-xs uppercase tracking-[0.25em] text-[var(--text-muted)]">
-          Reference chart · A2
+          Reference chart · A2 frameless
         </p>
         <h1
           className="font-[family-name:var(--font-display)] text-5xl font-bold uppercase tracking-tight text-[var(--foreground)] sm:text-7xl"
@@ -123,8 +123,9 @@ export function GreekTheogenyPosterView() {
         </h1>
         <p className="mt-6 font-[family-name:var(--font-newsreader)] text-xl leading-relaxed text-[var(--text-muted)] italic">
           A family tree of the Greek gods — Titans, Olympians, and the lines
-          between them. Two finishes: crisp outlines and a translucent fill
-          you can layer over your own background.
+          between them. Frameless crop — no poster border or title block. Two
+          finishes: crisp outlines and a translucent fill you can layer over
+          your own background.
         </p>
         <p className="mt-4 font-mono text-xs uppercase tracking-[0.15em] text-[var(--text-muted)]">
           On-screen previews use SVG · Print downloads are PDF · Raster exports
