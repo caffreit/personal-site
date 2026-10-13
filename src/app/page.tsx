@@ -18,13 +18,16 @@ export default function Home() {
     getFeaturedLab();
   const budgetQuizLab = getAllLabs().find((lab) => lab.href === "/labs/irish-budget-quiz");
   const greekTheogonyLab = getAllLabs().find((lab) => lab.href === "/greek-theogeny");
+  const transitTheogonyLab = getAllLabs().find((lab) => lab.href === "/transit-theogony");
   const recentLabs = [
+    ...(transitTheogonyLab ? [transitTheogonyLab] : []),
     ...(greekTheogonyLab ? [greekTheogonyLab] : []),
     ...(budgetQuizLab ? [budgetQuizLab] : []),
     ...getRecentLabs(6).filter(
       (lab) =>
         lab.href !== budgetQuizLab?.href &&
-        lab.href !== greekTheogonyLab?.href,
+        lab.href !== greekTheogonyLab?.href &&
+        lab.href !== transitTheogonyLab?.href,
     ),
   ];
 

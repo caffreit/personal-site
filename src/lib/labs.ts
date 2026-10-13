@@ -13,6 +13,18 @@ export type Lab = {
 
 const LABS: Lab[] = [
   {
+    title: "Transit Theogony",
+    description:
+      "The Greek divine family as a transit map — left-to-right and ring A2 layouts, with SVG previews and print-ready PDF and PNG downloads.",
+    href: "/transit-theogony",
+    badge: "Reference",
+    meta: "Mythology • Poster",
+    publishedAt: "2026-10-13",
+    image: "/posters/transit-theogony/transit_theogony_ltr_A2_300dpi.png",
+    imageAlt:
+      "Preview of the left-to-right Transit Theogony map, with coloured lineage lines across generation bands.",
+  },
+  {
     title: "Greek Theogony Poster",
     description:
       "Frameless A2 divine genealogy in two finishes — crisp outlines and a translucent fill — with SVG previews and print-ready PDF downloads.",

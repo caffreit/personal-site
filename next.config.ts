@@ -1,6 +1,15 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    return [
+      {
+        source: "/greek-theogeny/underground-lines",
+        destination: "/transit-theogony",
+        permanent: false,
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       {
