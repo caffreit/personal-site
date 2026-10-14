@@ -15,24 +15,24 @@ const LABS: Lab[] = [
   {
     title: "Transit Theogony",
     description:
-      "The Greek divine family as a transit map — left-to-right and ring A2 layouts, with SVG previews and print-ready PDF and PNG downloads.",
+      "The Greek divine family as a transit map. Explore left-to-right and ring A2 posters, with detail previews and views on the wall.",
     href: "/transit-theogony",
     badge: "Reference",
     meta: "Mythology • Poster",
     publishedAt: "2026-10-13",
-    image: "/posters/transit-theogony/transit_theogony_ltr_A2_300dpi.png",
+    image: "/posters/transit-theogony/left-to-right/preview.webp",
     imageAlt:
       "Preview of the left-to-right Transit Theogony map, with coloured lineage lines across generation bands.",
   },
   {
     title: "Greek Theogony Poster",
     description:
-      "Frameless A2 divine genealogy in two finishes — crisp outlines and a translucent fill — with SVG previews and print-ready PDF downloads.",
+      "An A2 divine genealogy in two styles: crisp outlines and translucent panels. Explore the posters and their details.",
     href: "/greek-theogeny",
     badge: "Reference",
     meta: "Mythology • Poster",
     publishedAt: "2026-10-09",
-    image: "/posters/greek-theogony/greek_theogony_frameless_outlines_A2_300dpi.png",
+    image: "/posters/greek-theogony/outlines/preview.webp",
     imageAlt:
       "Preview of the frameless Greek theogony poster outlines edition showing the divine family tree.",
   },

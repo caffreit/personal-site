@@ -7,15 +7,14 @@ export function GreekTheogenyPosterView() {
   return (
     <GenealogyPosterView
       posterName="Greek theogony"
-      kicker="Reference chart · A2 frameless"
+      kicker="Mythology · A2 poster"
       title="Greek Theogony"
-      intro="A family tree of the Greek gods — Titans, Olympians, and the lines between them. Frameless crop — no poster border or title block. Two finishes: crisp outlines and a translucent fill you can layer over your own background."
+      intro="A family tree of the Greek gods, from the first beings to the Titans and Olympians."
+      story="Each connection follows a line of ancestry. Colour groups the gods by their place in the mythology, while nested rings trace the generations back to Chaos. Choose crisp outlines or soft translucent panels for the same divine family."
       related={{
         href: "/transit-theogony",
-        before: "Have a look at the",
         label: "Transit Theogony",
-        after:
-          " — another version of the same genealogy, drawn as coloured transit lines, which you might like if you want a map instead of a tree.",
+        description: "Explore the same divine family as a transit map.",
       }}
       variants={GREEK_THEOGONY_VARIANTS}
     />
