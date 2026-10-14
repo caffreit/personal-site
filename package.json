@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "generate:albums": "tsx scripts/generate-albums.ts",
-    "generate:photo-meta": "tsx scripts/generate-photo-meta.ts"
+    "generate:photo-meta": "tsx scripts/generate-photo-meta.ts",
+    "generate:poster-previews": "node --import tsx scripts/generate-poster-previews.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
@@ -40,6 +41,7 @@
     "eslint-config-next": "^16.0.7",
     "tailwindcss": "^4",
     "tsx": "^4.20.6",
-    "typescript": "^5"
+    "typescript": "^5",
+    "sharp": "^0.34.5"
   }
 }

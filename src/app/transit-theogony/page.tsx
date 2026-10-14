@@ -4,7 +4,7 @@ import { TransitTheogonyPosterView } from "@/components/posters/TransitTheogonyP
 export const metadata: Metadata = {
   title: "Transit Theogony",
   description:
-    "Left-to-right and ring A2 transit maps of the Greek divine genealogy — SVG previews with PDF and PNG downloads.",
+    "Explore A2 transit maps of the Greek divine family in left-to-right and ring layouts, with detail previews and illustrative room views.",
 };
 
 export default function TransitTheogonyPage() {

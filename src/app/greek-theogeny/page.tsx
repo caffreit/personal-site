@@ -4,7 +4,7 @@ import { GreekTheogenyPosterView } from "@/components/posters/GreekTheogenyPoste
 export const metadata: Metadata = {
   title: "Greek Theogony Poster",
   description:
-    "Frameless outlines and translucent editions of an A2 Greek divine genealogy chart — SVG previews with PDF and PNG downloads.",
+    "Explore the Greek Theogony A2 poster in outlines and translucent styles, with detail previews and an illustrative room view.",
 };
 
 export default function GreekTheogenyPage() {
