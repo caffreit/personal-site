@@ -58,8 +58,10 @@ const MAP_STYLES = [
   { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#9e9e9e' }] },
 ];
 
-const GOOGLE_MAPS_SRC =
-  'https://maps.googleapis.com/maps/api/js?key=AIzaSyAmq_h0qMknVu_EE_66YWzy1CWfp_CwY1Q';
+const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+const GOOGLE_MAPS_SRC = GOOGLE_MAPS_API_KEY
+  ? `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(GOOGLE_MAPS_API_KEY)}`
+  : null;
 
 export function ThreeStations({ onBack }: ThreeStationsProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -192,7 +194,7 @@ export function ThreeStations({ onBack }: ThreeStationsProps) {
 
   return (
     <>
-      <Script
+      {GOOGLE_MAPS_SRC && <Script
         id="google-maps-sdk"
         src={GOOGLE_MAPS_SRC}
         strategy="afterInteractive"
@@ -204,7 +206,7 @@ export function ThreeStations({ onBack }: ThreeStationsProps) {
         onError={(e) => {
           console.error('Failed to load Google Maps script:', e);
         }}
-      />
+      />}
       <div className="fixed inset-0 z-50 flex flex-col bg-stone-50 md:flex-row animate-in fade-in duration-300">
         <div className="order-1 md:order-2 relative h-[45vh] flex-grow bg-stone-200 md:h-full">
           <div ref={mapContainerRef} className="h-full w-full" />

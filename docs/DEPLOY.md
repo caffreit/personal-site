@@ -46,6 +46,9 @@
      - **Name:** `GEMINI_API_KEY`
        - **Value:** Your Google Gemini API key (get from https://aistudio.google.com/app/apikey)
        - This enables AI image analysis features
+     - **Name:** `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`
+       - **Value:** Your Google Maps JavaScript API key
+       - Restrict the key to the Maps JavaScript API and your site's HTTP referrers
    - Set for **Production** environment (and Preview/Development if desired)
 
 5. **Deploy:**
