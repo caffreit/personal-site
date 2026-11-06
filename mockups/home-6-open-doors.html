@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>06 · Open Doors — homepage mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,600;0,6..72,700;1,6..72,300;1,6..72,400&family=Space+Grotesk:wght@400;500;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --paper: #F4EFE6; --ink: #1C1B18; --muted: rgba(28,27,24,0.55); --rule: #D9D2C3;
+    --yellow: #F4CA16; --emerald: #0A5C36; --terracotta: #C47A5A;
+    --sans: 'Space Grotesk', sans-serif; --mono: 'Geist Mono', monospace; --serif: 'Newsreader', Georgia, serif;
+    --ease: cubic-bezier(.25,1,.5,1);
+    --head: 60px; --peek: 72px;
+  }
+  body { background: var(--paper); color: var(--ink); font-family: var(--serif); }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+  header { position: sticky; top: 0; z-index: 50; background: rgba(244,239,230,.9); backdrop-filter: blur(12px); border-bottom: 1px solid var(--rule); }
+  header .wrap { display: flex; align-items: center; justify-content: space-between; height: var(--head); }
+  .logo { font-family: var(--sans); font-weight: 700; letter-spacing: .14em; text-transform: uppercase; font-size: .85rem; display: flex; align-items: center; gap: 10px; }
+  .logo i { width: 18px; height: 18px; background: var(--yellow); display: inline-block; }
+  nav { display: flex; gap: 32px; font-family: var(--sans); font-size: .78rem; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
+  .note { position: fixed; right: 20px; bottom: 20px; z-index: 60; font-family: var(--mono); font-size: .66rem; background: var(--ink); color: var(--paper); padding: 8px 12px; max-width: 300px; line-height: 1.5; }
+
+  /* ───────── doors ───────── */
+  /* Shorter than the viewport on purpose: the "Everything" ledger peeks in below, so it's obvious the page scrolls. */
+  .doors { position: relative; display: flex; height: calc(100svh - var(--head) - var(--peek)); min-height: 600px; background: var(--ink); }
+  .door { position: relative; flex: 1 1 0; min-width: 0; overflow: hidden; transition: flex 1.1s var(--ease); cursor: pointer; outline: none; }
+  .door.open { flex: 5.2 1 0; cursor: default; }
+  .door + .door { border-left: 1px solid rgba(255,255,255,.16); }
+  .door:focus-visible { box-shadow: inset 0 0 0 3px var(--yellow); }
+
+  /* closed state: a slice of the material + a vertical label */
+  .door .tab { position: absolute; inset: 0; z-index: 4; display: flex; flex-direction: column; justify-content: space-between; padding: 26px 22px 30px; color: #fff; transition: opacity .5s ease; pointer-events: none; }
+  .door.open .tab { opacity: 0; }
+  .door .tab .n { font-family: var(--mono); font-size: .66rem; letter-spacing: .2em; opacity: .85; }
+  .door .tab .lbl { writing-mode: vertical-rl; transform: rotate(180deg); font-size: clamp(2rem, 3.4vw, 3.2rem); font-weight: 600; letter-spacing: -.02em; line-height: 1; white-space: nowrap; text-shadow: 0 2px 16px rgba(0,0,0,.3); }
+  .door .tab .peek { font-family: var(--sans); font-size: .62rem; text-transform: uppercase; letter-spacing: .16em; opacity: .75; max-width: 150px; line-height: 1.5; }
+  .door:not(.open):hover .bg { transform: scale(1.04); }
+
+  .door .bg { position: absolute; inset: 0; transition: transform 1.4s var(--ease); }
+  .door .content { position: absolute; inset: 0; z-index: 3; opacity: 0; visibility: hidden; transition: opacity .45s ease, visibility 0s linear .45s; }
+  .door.open .content { opacity: 1; visibility: visible; transition: opacity .7s ease .35s, visibility 0s; }
+  .door .content .rise { transform: translateY(18px); transition: transform .9s var(--ease) .3s; }
+  .door.open .content .rise { transform: none; }
+
+  /* progress: how long until the next door opens */
+  .prog { position: absolute; left: 0; right: 0; top: 0; height: 3px; z-index: 6; background: rgba(255,255,255,.14); opacity: 0; transition: opacity .3s; }
+  .door.open .prog { opacity: 1; }
+  .prog i { display: block; height: 100%; width: 0; background: var(--yellow); }
+  .door.open .prog i.run { animation: fill var(--dwell, 9s) linear forwards; }
+  .doors.held .prog i { animation-play-state: paused !important; }
+  @keyframes fill { to { width: 100%; } }
+
+  .kick { font-family: var(--sans); font-size: .64rem; text-transform: uppercase; letter-spacing: .2em; }
+  .more { display: inline-block; font-family: var(--sans); font-size: .66rem; text-transform: uppercase; letter-spacing: .16em; border-bottom: 2px solid var(--yellow); padding-bottom: 2px; }
+
+  /* 01 photo */
+  .door-photo .bg img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transform: scale(1.06); transition: opacity 1.4s ease, transform 9s linear; }
+  .door-photo .bg img.on { opacity: 1; transform: scale(1); }
+  .door-photo .bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(10,10,10,.72), rgba(10,10,10,.08) 55%, rgba(10,10,10,.18)); }
+  .door-photo .content { color: #fff; display: flex; align-items: flex-end; justify-content: space-between; gap: 40px; padding: 0 48px 52px; }
+  .door-photo h1 { font-size: clamp(3rem, 7vw, 6.6rem); font-weight: 700; letter-spacing: -.035em; line-height: .92; text-shadow: 0 2px 24px rgba(0,0,0,.35); }
+  .door-photo h1 em { font-style: italic; font-weight: 300; }
+  .door-photo .sub { margin-top: 18px; font-size: 1.15rem; font-style: italic; opacity: .9; max-width: 460px; line-height: 1.45; }
+  .door-photo .sub + .more { margin-top: 20px; }
+  .exif { font-family: var(--mono); font-size: .66rem; letter-spacing: .1em; text-align: right; line-height: 1.8; opacity: .9; white-space: nowrap; }
+  .exif .dots { display: flex; gap: 6px; justify-content: flex-end; margin-top: 10px; }
+  .exif .dots b { width: 22px; height: 3px; background: rgba(255,255,255,.35); transition: background .4s; }
+  .exif .dots b.on { background: var(--yellow); }
+  .door-photo .tab .lbl { text-shadow: 0 2px 18px rgba(0,0,0,.55); }
+  .door-photo:not(.open) .bg::after { background: rgba(10,10,10,.35); }
+
+  /* 02 essay */
+  .door-essay .bg { background: var(--emerald); }
+  .door-essay .bg::before { content: ""; position: absolute; inset: 0; opacity: .06; background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 4px 4px; }
+  .door-essay .content { color: var(--paper); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .72fr); gap: 56px; align-items: center; padding: 56px 56px 48px; }
+  .door-essay .kick { opacity: .7; display: flex; gap: 14px; }
+  .door-essay .kick span + span::before { content: "·"; margin-right: 14px; }
+  .door-essay h2 { margin-top: 18px; font-size: clamp(2.2rem, 4.2vw, 4rem); font-weight: 600; letter-spacing: -.025em; line-height: 1.02; }
+  .door-essay .dek { margin-top: 14px; font-size: 1.25rem; font-style: italic; font-weight: 300; opacity: .85; line-height: 1.4; max-width: 560px; }
+  .door-essay .excerpt { position: relative; margin-top: 30px; padding-top: 26px; border-top: 1px solid rgba(244,239,230,.25); font-size: 1.12rem; line-height: 1.65; max-width: 600px; max-height: 9.2em; overflow: hidden; }
+  .door-essay .excerpt::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3.4em; background: linear-gradient(to bottom, rgba(10,92,54,0), var(--emerald)); }
+  .door-essay .excerpt::first-letter { float: left; font-size: 4.1em; line-height: .82; font-weight: 600; margin: .06em .1em 0 0; color: var(--yellow); }
+  .door-essay .more { margin-top: 22px; }
+  .door-essay .plate { justify-self: center; width: 100%; max-width: 440px; transform: rotate(-2.5deg); box-shadow: 0 40px 80px -30px rgba(0,0,0,.6); background: var(--paper); padding: 12px 12px 40px; }
+  .door-essay .plate img { display: block; width: 100%; aspect-ratio: 4/3; object-fit: cover; }
+  .door-essay .plate figcaption { font-family: var(--mono); font-size: .62rem; color: var(--muted); margin-top: 12px; letter-spacing: .08em; }
+  .door-essay.open .plate { animation: settle 1.2s var(--ease) .35s both; }
+  @keyframes settle { from { transform: rotate(4deg) translateY(40px); opacity: 0; } }
+
+  /* 03 lab */
+  .door-lab .bg { background: linear-gradient(160deg, #B5653F 0%, var(--terracotta) 45%, #D9A07F 100%); }
+  .door-lab .content { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1fr); gap: 52px; align-items: center; padding: 48px 56px; color: #fff; }
+  .door-lab .kick { opacity: .8; }
+  .door-lab h2 { margin-top: 18px; font-size: clamp(2.2rem, 4vw, 3.8rem); font-weight: 600; letter-spacing: -.025em; line-height: 1.02; }
+  .door-lab h2 em { font-style: italic; font-weight: 300; }
+  .door-lab .dek { margin-top: 16px; font-size: 1.15rem; font-style: italic; opacity: .9; line-height: 1.45; max-width: 440px; }
+  .door-lab .dek + .more { margin-top: 22px; }
+
+  .widget { background: var(--paper); color: var(--ink); padding: 24px 26px 22px; position: relative; box-shadow: 0 40px 80px -36px rgba(40,14,0,.55); }
+  .widget::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--ink); }
+  .items { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .item-btn { border: 1px solid var(--rule); background: #fff; padding: 8px 6px 9px; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: border-color .25s, transform .25s var(--ease), background .25s; }
+  .item-btn img { width: 100%; max-width: 74px; aspect-ratio: 1; object-fit: contain; mix-blend-mode: multiply; image-rendering: pixelated; }
+  .item-btn span { font-family: var(--mono); font-size: .6rem; letter-spacing: .04em; color: var(--muted); }
+  .item-btn:hover { transform: translateY(-2px); }
+  .item-btn.on { border-color: var(--ink); background: #FFF8DA; box-shadow: inset 0 -3px 0 var(--yellow); }
+  .item-btn.on span { color: var(--ink); }
+  .slider { margin-top: 18px; display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: center; font-family: var(--mono); font-size: .64rem; text-transform: uppercase; letter-spacing: .14em; color: var(--muted); }
+  .slider output { color: var(--ink); font-size: .9rem; letter-spacing: 0; min-width: 76px; text-align: right; }
+  input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 3px; background: var(--rule); outline: none; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: var(--yellow); border: 2px solid var(--ink); cursor: grab; }
+  input[type=range]::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; background: var(--yellow); border: 2px solid var(--ink); cursor: grab; }
+  .answer { margin-top: 20px; padding-top: 18px; border-top: 1px dashed var(--rule); }
+  .answer .big { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+  .answer .big b { font-size: 3.4rem; font-weight: 700; letter-spacing: -.03em; line-height: 1; font-variant-numeric: tabular-nums; }
+  .answer .big span { font-size: 1.05rem; font-style: italic; color: #3a3833; }
+  .bar { margin-top: 16px; display: flex; height: 16px; overflow: hidden; background: var(--rule); }
+  .bar i { display: block; height: 100%; transition: width .6s var(--ease); }
+  .bar .b-item { background: var(--ink); } .bar .b-vat { background: var(--terracotta); } .bar .b-inc { background: var(--yellow); }
+  .legend { margin-top: 10px; display: flex; gap: 18px; flex-wrap: wrap; font-family: var(--mono); font-size: .62rem; color: var(--muted); }
+  .legend i { display: inline-block; width: 9px; height: 9px; margin-right: 6px; vertical-align: -1px; }
+  .legend b { color: var(--ink); font-weight: 500; }
+  .equiv { margin-top: 14px; font-size: .98rem; line-height: 1.45; color: #3a3833; }
+  .equiv b { color: var(--ink); font-weight: 600; }
+
+  /* auto-play control */
+  .auto { position: absolute; right: 18px; top: 18px; z-index: 8; display: flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: .6rem; text-transform: uppercase; letter-spacing: .16em; color: rgba(255,255,255,.75); background: rgba(10,10,10,.35); backdrop-filter: blur(6px); padding: 6px 10px; }
+  .auto:hover { color: #fff; }
+  .auto .ico { width: 8px; height: 9px; border-left: 3px solid currentColor; border-right: 3px solid currentColor; }
+  .doors.stopped .auto .ico { border-right: 0; border-left: 0; width: 0; height: 0; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-left: 8px solid currentColor; }
+
+  /* peek: the strip that shows there's more below */
+  .peekbar { height: var(--peek); border-bottom: 1px solid var(--rule); }
+  .peekbar .wrap { height: 100%; display: flex; align-items: center; justify-content: space-between; font-family: var(--mono); font-size: .66rem; text-transform: uppercase; letter-spacing: .16em; color: var(--muted); }
+  .peekbar a { display: flex; align-items: center; gap: 12px; color: var(--ink); }
+  .peekbar .arrow { display: inline-block; animation: nudge 2.2s ease-in-out infinite; }
+  .peekbar .latest { display: flex; gap: 26px; }
+  .peekbar .latest i { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 8px; vertical-align: 1px; }
+  @keyframes nudge { 0%, 60%, 100% { transform: none; } 30% { transform: translateY(4px); } }
+
+  /* ───────── ledger (unchanged from 02) ───────── */
+  .ledger { padding: 72px 0 100px; }
+  .sec-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 36px; border-bottom: 2px solid var(--ink); padding-bottom: 14px; }
+  .sec-head h2 { font-size: 2.6rem; font-weight: 600; letter-spacing: -.02em; }
+  .filters { display: flex; gap: 22px; font-family: var(--sans); font-size: .7rem; text-transform: uppercase; letter-spacing: .14em; color: var(--muted); }
+  .filters a { border-bottom: 2px solid transparent; padding-bottom: 3px; }
+  .filters a.on { color: var(--ink); border-color: var(--ink); }
+  .month { font-family: var(--mono); font-size: .66rem; text-transform: uppercase; letter-spacing: .2em; color: var(--muted); margin: 36px 0 8px; }
+  .month:first-of-type { margin-top: 0; }
+  .row { display: grid; grid-template-columns: 6px 90px 1fr 140px 150px; gap: 24px; align-items: center; padding: 18px 0; border-bottom: 1px solid var(--rule); }
+  .row .spine { width: 6px; height: 100%; min-height: 44px; border-radius: 3px; }
+  .row .d { font-family: var(--mono); font-size: .7rem; color: var(--muted); }
+  .row .t { font-size: 1.35rem; font-weight: 600; letter-spacing: -.01em; line-height: 1.2; transition: color .3s; }
+  .row .t small { display: block; font-size: .95rem; font-weight: 400; font-style: italic; color: var(--muted); margin-top: 3px; }
+  .row .k { font-family: var(--sans); font-size: .66rem; text-transform: uppercase; letter-spacing: .16em; color: var(--muted); }
+  .row .th { justify-self: end; width: 150px; height: 56px; overflow: hidden; }
+  .row .th img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .8s var(--ease); }
+  .row:hover .th img { transform: scale(1.06); }
+  .row:hover .t { color: var(--c); }
+  .row[data-c="photo"] { --c: #9C7F00; } .row[data-c="essay"] { --c: var(--emerald); } .row[data-c="lab"] { --c: var(--terracotta); }
+  .row[data-c="photo"] .spine { background: var(--yellow); } .row[data-c="essay"] .spine { background: var(--emerald); } .row[data-c="lab"] .spine { background: var(--terracotta); }
+  .row .th.gen { display: flex; align-items: center; justify-content: center; color: #fff; font-family: var(--mono); font-size: 1.6rem; font-weight: 300; }
+  footer { border-top: 1px solid var(--rule); padding: 28px 0; font-family: var(--sans); font-size: .7rem; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
+  footer .wrap { display: flex; justify-content: space-between; }
+
+  /* narrower desktop: drop the essay cover, keep the words */
+  @media (max-width: 1180px) {
+    .door-essay .content { grid-template-columns: 1fr; }
+    .door-essay .plate { display: none; }
+    .door-lab .content { grid-template-columns: 1fr; gap: 26px; align-content: center; }
+    .door-lab h2 { font-size: 2.4rem; }
+    .door-lab .dek { display: none; }
+    .door-lab .intro .more { display: none; }
+  }
+
+  /* phones: an accordion. Closed doors become 60px bars, the open one takes the screen. Same cycle. */
+  @media (max-width: 860px) {
+    :root { --peek: 0px; }
+    nav { display: none; }
+    .doors { flex-direction: column; height: auto; min-height: 0; }
+    .door { flex: none !important; height: 60px; transition: height .9s var(--ease); }
+    .door.open { height: min(78svh, 680px); }
+    .door-lab.open { height: auto; }
+    .door-lab.open .content { position: relative; }
+    .door + .door { border-left: 0; border-top: 1px solid rgba(255,255,255,.16); }
+    .door .tab { flex-direction: row; align-items: center; justify-content: flex-start; gap: 16px; padding: 0 20px; }
+    .door .tab .lbl { writing-mode: horizontal-tb; transform: none; font-size: 1.5rem; }
+    .door .tab .peek { display: none; }
+    .door-photo .content { flex-direction: column; align-items: flex-start; justify-content: flex-end; gap: 28px; padding: 0 22px 34px; }
+    .door-photo h1 { font-size: 3.2rem; }
+    .exif { text-align: left; }
+    .exif .dots { justify-content: flex-start; }
+    .door-essay .content { padding: 40px 22px 34px; align-content: end; }
+    .door-essay .excerpt { font-size: 1rem; }
+    .door-lab .content { padding: 34px 18px 64px; }
+    .widget { padding: 18px 16px; }
+    .answer .big b { font-size: 2.6rem; }
+    .peekbar { display: none; }
+    .auto { top: auto; bottom: 14px; }
+    .note { display: none; }
+    .sec-head { flex-direction: column; gap: 14px; } .sec-head h2 { font-size: 2rem; }
+    .item-btn span { font-size: .55rem; }
+    .row { grid-template-columns: 6px 1fr; } .row .d, .row .k, .row .th { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition-duration: .01ms !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="logo" href="#"><i></i>drdimg</a>
+  <nav><a href="#">Photos</a><a href="#">Writing</a><a href="#">Labs</a><a href="#">About</a></nav>
+</div></header>
+
+<section class="doors" id="doors" aria-label="Photographs, essays and labs">
+
+  <!-- 01 PHOTOGRAPHY -->
+  <div class="door door-photo open" data-door="0" data-dwell="9600" tabindex="0" aria-label="Photographs">
+    <div class="prog"><i></i></div>
+    <div class="bg">
+      <img class="on" src="../public/photos/Faves/DSCF3535.jpg" alt="" data-cap="DSCF3535 · FAVOURITES" data-exif="XF 23mm · f/5.6 · 1/250">
+      <img src="../public/photos/BnW/000226840017.jpg" alt="" data-cap="000226840017 · BLACK &amp; WHITE" data-exif="HP5 · 35mm · pushed one stop">
+      <img src="../public/photos/Diptych/DSCF8969.jpg" alt="" data-cap="DSCF8969 · DIPTYCHS" data-exif="XF 35mm · f/2 · 1/1000">
+    </div>
+    <div class="tab"><span class="n">01</span><span class="lbl">Photographs</span><span class="peek">11 albums</span></div>
+    <div class="content">
+      <div class="rise">
+        <h1>Putting <em>data</em><br>in the frame.</h1>
+        <p class="sub">Photographs, essays and small interactive labs, mostly from Dublin.</p>
+        <a class="more" href="#">Open the albums →</a>
+      </div>
+      <div class="exif rise">
+        <div id="cap">DSCF3535 · FAVOURITES</div>
+        <div id="exif">XF 23mm · f/5.6 · 1/250</div>
+        <div class="dots"><b class="on"></b><b></b><b></b></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 02 WRITING -->
+  <div class="door door-essay" data-door="1" data-dwell="8000" tabindex="0" aria-label="Essays">
+    <div class="prog"><i></i></div>
+    <div class="bg"></div>
+    <div class="tab"><span class="n">02</span><span class="lbl">Essays</span><span class="peek">Latest · Against Idle Land</span></div>
+    <div class="content">
+      <div class="rise">
+        <div class="kick"><span>Latest essay</span><span>Jul 18 2026</span><span>7 min read</span></div>
+        <h2>Against Idle Land</h2>
+        <p class="dek">A case for a self-assessed property tax, to curb dereliction and limit monopoly pricing.</p>
+        <p class="excerpt">Scattered across Dublin city centre is a blight of derelict buildings. These are an eyesore, a drag on the economy, and by limiting supply they contribute to higher commercial and residential rents. The value of these properties is tied to the surrounding neighbourhood, whose value in turn depends on the investment of private individuals and the state.</p>
+        <a class="more" href="#">Keep reading →</a>
+      </div>
+      <figure class="plate">
+        <img src="../public/blog/property-tax/cover.png" alt="">
+        <figcaption>FIG. 1 · Political economy · 5 essays</figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <!-- 03 LABS -->
+  <div class="door door-lab" data-door="2" data-dwell="9000" tabindex="0" aria-label="Labs">
+    <div class="prog"><i></i></div>
+    <div class="bg"></div>
+    <div class="tab"><span class="n">03</span><span class="lbl">Labs</span><span class="peek">Try one now</span></div>
+    <div class="content">
+      <div class="intro rise">
+        <div class="kick">Lab · What Did That Really Cost?</div>
+        <h2>How long do you work for <em id="q-item">a chicken fillet roll</em>?</h2>
+        <p class="dek">Pick something, set your salary. The answer counts the VAT in the price and the income tax on the money you earned to pay it.</p>
+        <a class="more" href="#">Open the full lab →</a>
+      </div>
+      <div class="widget rise" id="widget">
+        <div class="items" role="radiogroup" aria-label="Purchase">
+          <button class="item-btn on" data-id="roll" role="radio" aria-checked="true"><img src="../public/labs/irish-purchase-tax-time-2026/roll.png" alt=""><span>Roll €6</span></button>
+          <button class="item-btn" data-id="pint" role="radio" aria-checked="false"><img src="../public/labs/irish-purchase-tax-time-2026/pint.png" alt=""><span>Pint €6.50</span></button>
+          <button class="item-btn" data-id="petrol" role="radio" aria-checked="false"><img src="../public/labs/irish-purchase-tax-time-2026/petrol.png" alt=""><span>Petrol €108</span></button>
+          <button class="item-btn" data-id="camera" role="radio" aria-checked="false"><img src="../public/labs/irish-purchase-tax-time-2026/camera.png" alt=""><span>Camera €1.6k</span></button>
+        </div>
+        <label class="slider">Salary <input type="range" id="income" min="20000" max="250000" step="1000" value="60000"> <output id="income-out">€60,000</output></label>
+        <div class="answer">
+          <div class="big"><b id="a-time">16 min</b><span id="a-tax">of work. 5 min of that is tax.</span></div>
+          <div class="bar"><i class="b-item" id="b-item"></i><i class="b-vat" id="b-vat"></i><i class="b-inc" id="b-inc"></i></div>
+          <div class="legend">
+            <span><i style="background:var(--ink)"></i>The thing <b id="l-item">€5.29</b></span>
+            <span><i style="background:var(--terracotta)"></i>VAT &amp; duty <b id="l-vat">€0.71</b></span>
+            <span><i style="background:var(--yellow)"></i>Income tax, USC, PRSI <b id="l-inc">€2.03</b></span>
+          </div>
+          <p class="equiv" id="equiv">That tax pays for about <b>3 minutes</b> of a nurse's time.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="auto" id="auto" type="button" aria-pressed="false"><span class="ico"></span><span id="auto-lbl">Auto</span></button>
+</section>
+
+<div class="peekbar"><div class="wrap">
+  <a href="#everything"><span class="arrow">↓</span> Everything, in order</a>
+  <div class="latest">
+    <span><i style="background:var(--emerald)"></i>Essay · Jul 18</span>
+    <span><i style="background:var(--terracotta)"></i>Lab · Jun 29</span>
+    <span><i style="background:var(--yellow)"></i>Photos · Jun 12</span>
+  </div>
+</div></div>
+
+<section class="ledger" id="everything"><div class="wrap">
+  <div class="sec-head">
+    <h2>Everything, in order</h2>
+    <div class="filters"><a class="on" href="#">All</a><a href="#">Photos</a><a href="#">Essays</a><a href="#">Labs</a></div>
+  </div>
+
+  <div class="month">July 2026</div>
+  <a class="row" data-c="essay" href="#"><span class="spine"></span><span class="d">Jul 18</span><span class="t">Against Idle Land: A Case for Self-Assessed Property Tax<small>Written for an old company newsletter.</small></span><span class="k">Essay · Political economy</span><span class="th"><img src="../public/blog/property-tax/cover.png" alt=""></span></a>
+
+  <div class="month">June 2026</div>
+  <a class="row" data-c="lab" href="#"><span class="spine"></span><span class="d">Jun 29</span><span class="t">What Did That Really Cost?<small>Purchase tax, in hours of your life.</small></span><span class="k">Lab · Data viz</span><span class="th gen" style="background:linear-gradient(135deg,#B96A49,#D9A07F)">02</span></a>
+  <a class="row" data-c="photo" href="#"><span class="spine"></span><span class="d">Jun 12</span><span class="t">Recents<small>Six new frames from a fresh roll.</small></span><span class="k">Photos · Album</span><span class="th"><img src="../public/photos/Recents/img028.jpg" alt=""></span></a>
+  <a class="row" data-c="lab" href="#"><span class="spine"></span><span class="d">Jun 10</span><span class="t">Irish Budget Quiz<small>How does Ireland spend €100bn?</small></span><span class="k">Lab · Civics</span><span class="th"><img src="../public/labs/irish-budget-quiz/cover.png" alt=""></span></a>
+  <a class="row" data-c="essay" href="#"><span class="spine"></span><span class="d">Jun 2</span><span class="t">House Prices Are Not the Whole Affordability Story<small>Five decades of mortgage-first data.</small></span><span class="k">Essay · Data story</span><span class="th"><img src="../public/blog/ireland-housing-market/cover.png" alt=""></span></a>
+
+  <div class="month">February 2026</div>
+  <a class="row" data-c="essay" href="#"><span class="spine"></span><span class="d">Feb 23</span><span class="t">The €27.8 Billion Question<small>Fifteen years of property data in context.</small></span><span class="k">Essay · Data story</span><span class="th"><img src="../public/blog/ireland-property-economy/cover.png" alt=""></span></a>
+  <a class="row" data-c="photo" href="#"><span class="spine"></span><span class="d">Feb 9</span><span class="t">Mountains<small>Seventeen frames above the tree line.</small></span><span class="k">Photos · Album</span><span class="th"><img src="../public/photos/Mountains/DSCF1182.jpg" alt=""></span></a>
+</div></section>
+
+<footer><div class="wrap"><span>© 2026 drdimg</span><span>Photography &amp; data — Dublin</span></div></footer>
+<div class="note">Mockup 06 · Open Doors. One door is always open and it moves on by itself (yellow bar). Hover or tap a door to take over. Touching the lab stops the cycle.</div>
+
+<script>
+/* ───────── the lab: same maths as IrishPurchaseTaxTime2026.tsx, stripped down ───────── */
+const RULES = { srcop: 44000, credits: 4000, uscExempt: 13000, uscBands: [12012, 28700, 70044], uscRates: [.005, .02, .03, .08], prsiRate: .0435, prsiThreshold: 18304 };
+const HOURS_PER_YEAR = 37.5 * 52;
+const ITEMS = {
+  roll:   { name: 'a chicken fillet roll', price: 6,    vat: .135, fixed: 0 },
+  pint:   { name: 'a pint',                price: 6.5,  vat: .23,  fixed: .55 },
+  petrol: { name: 'a tank of petrol',      price: 108,  vat: .23,  fixed: 33 },
+  camera: { name: 'a new camera',          price: 1600, vat: .23,  fixed: 0 },
+};
+
+function incomeTax(g) {
+  const paye = Math.max(0, (g <= RULES.srcop ? g * .2 : RULES.srcop * .2 + (g - RULES.srcop) * .4) - RULES.credits);
+  const [b1, b2, b3] = RULES.uscBands, [r1, r2, r3, r4] = RULES.uscRates;
+  let usc = 0;
+  if (g > RULES.uscExempt) usc = Math.min(g, b1) * r1 + Math.max(0, Math.min(g, b2) - b1) * r2 + Math.max(0, Math.min(g, b3) - b2) * r3 + Math.max(0, g - b3) * r4;
+  const prsi = g > RULES.prsiThreshold ? g * RULES.prsiRate : 0;
+  return paye + usc + prsi;
+}
+const num = (v) => (v < 10 ? +v.toFixed(1) : Math.round(v)).toLocaleString('en-IE');
+const eur = (v) => v.toLocaleString('en-IE', { style: 'currency', currency: 'EUR', maximumFractionDigits: v < 100 ? 2 : 0 });
+function workTime(h) {
+  if (h < 1) return Math.max(1, Math.round(h * 60)) + ' min';
+  if (h < 24) return h.toFixed(h < 10 ? 1 : 0) + ' h';
+  return (h / 7.5).toFixed(1) + ' days';
+}
+function equivalent(tax) {
+  if (tax < 25) { const m = tax / (55 / 60); return `That tax pays for about <b>${num(m)} minutes</b> of a nurse's time.`; }
+  const v = tax / 60; return `That tax covers about <b>${num(v)} subsidised GP visits</b>.`;
+}
+
+let itemId = 'roll';
+const $ = (id) => document.getElementById(id);
+function renderLab() {
+  const it = ITEMS[itemId], gross = +$('income').value;
+  const netRate = (gross - incomeTax(gross)) / gross;
+  const hourly = gross / HOURS_PER_YEAR;
+  const vat = it.vat ? it.price - it.price / (1 + it.vat) : 0;
+  const purchaseTax = vat + it.fixed;
+  const grossNeeded = it.price / Math.max(netRate, .01);
+  const incTax = grossNeeded - it.price;
+  const totalTax = purchaseTax + incTax;
+  const pre = it.price - purchaseTax;
+
+  $('income-out').textContent = eur(gross);
+  $('q-item').textContent = it.name;
+  $('a-time').textContent = workTime(grossNeeded / hourly);
+  $('a-tax').textContent = `of work. ${workTime(totalTax / hourly)} of that is tax (${Math.round(totalTax / grossNeeded * 100)}%).`;
+  $('b-item').style.width = (pre / grossNeeded * 100) + '%';
+  $('b-vat').style.width = (purchaseTax / grossNeeded * 100) + '%';
+  $('b-inc').style.width = (incTax / grossNeeded * 100) + '%';
+  $('l-item').textContent = eur(pre); $('l-vat').textContent = eur(purchaseTax); $('l-inc').textContent = eur(incTax);
+  $('equiv').innerHTML = equivalent(totalTax);
+}
+document.querySelectorAll('.item-btn').forEach((b) => b.addEventListener('click', () => {
+  document.querySelectorAll('.item-btn').forEach((x) => { x.classList.toggle('on', x === b); x.setAttribute('aria-checked', x === b); });
+  itemId = b.dataset.id; renderLab();
+}));
+$('income').addEventListener('input', renderLab);
+renderLab();
+
+/* ───────── the doors: one always open, cycling until someone takes over ───────── */
+const doorsEl = $('doors');
+const doors = [...doorsEl.querySelectorAll('.door')];
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const finePointer = matchMedia('(hover: hover) and (pointer: fine)').matches;
+let current = 0, timer = null, held = false, stopped = reduced;
+
+function openDoor(n) {
+  if (n !== current) {
+    doors[current].classList.remove('open');
+    doors[n].classList.add('open');
+    current = n;
+  }
+  photoCycle(n === 0);
+  restartProgress();
+  schedule();
+}
+function restartProgress() {
+  const d = doors[current], bar = d.querySelector('.prog i');
+  d.style.setProperty('--dwell', d.dataset.dwell + 'ms');
+  bar.classList.remove('run'); void bar.offsetWidth;
+  if (!stopped) bar.classList.add('run');
+}
+function schedule() {
+  clearTimeout(timer);
+  if (held || stopped) return;
+  timer = setTimeout(() => openDoor((current + 1) % doors.length), +doors[current].dataset.dwell);
+}
+function setHeld(v) { held = v; doorsEl.classList.toggle('held', v); if (!v) { restartProgress(); schedule(); } else clearTimeout(timer); }
+function setStopped(v) {
+  stopped = v; doorsEl.classList.toggle('stopped', v);
+  $('auto').setAttribute('aria-pressed', v); $('auto-lbl').textContent = v ? 'Paused' : 'Auto';
+  restartProgress(); schedule();
+}
+
+// the photo door flicks through the same three frames as today's hero while it's open
+const photos = [...doors[0].querySelectorAll('.bg img')], dots = [...doors[0].querySelectorAll('.dots b')];
+let photoIdx = 0, photoTimer = null;
+function showPhoto(i) {
+  photoIdx = i;
+  photos.forEach((p, k) => p.classList.toggle('on', k === i));
+  dots.forEach((d, k) => d.classList.toggle('on', k === i));
+  $('cap').innerHTML = photos[i].dataset.cap; $('exif').textContent = photos[i].dataset.exif;
+}
+function photoCycle(on) {
+  clearInterval(photoTimer);
+  if (on && !reduced) photoTimer = setInterval(() => showPhoto((photoIdx + 1) % photos.length), 3200);
+}
+
+doors.forEach((d, n) => {
+  let hoverT;
+  if (finePointer) {
+    d.addEventListener('mouseenter', () => { hoverT = setTimeout(() => openDoor(n), 140); });
+    d.addEventListener('mouseleave', () => clearTimeout(hoverT));
+  }
+  d.addEventListener('click', () => { if (!d.classList.contains('open')) openDoor(n); });
+  d.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && e.target === d) { e.preventDefault(); openDoor(n); } });
+});
+doorsEl.addEventListener('mouseenter', () => finePointer && setHeld(true));
+doorsEl.addEventListener('mouseleave', () => finePointer && setHeld(false));
+doorsEl.addEventListener('focusin', () => setHeld(true));
+doorsEl.addEventListener('focusout', (e) => { if (!doorsEl.contains(e.relatedTarget)) setHeld(false); });
+// playing with the lab means you want it to stay put
+$('widget').addEventListener('pointerdown', () => { if (!stopped) setStopped(true); });
+$('auto').addEventListener('click', (e) => { e.stopPropagation(); setStopped(!stopped); });
+
+// ?door=1 or ?door=2 opens straight onto the essay or the lab (handy for reviewing); ?hold stops the cycle
+const params = new URLSearchParams(location.search);
+if (params.has('hold')) { stopped = true; $('auto-lbl').textContent = 'Paused'; $('auto').setAttribute('aria-pressed', true); }
+doorsEl.classList.toggle('stopped', stopped);
+openDoor(Math.min(2, Math.max(0, +params.get('door') || 0)));
+</script>
+</body>
+</html>
