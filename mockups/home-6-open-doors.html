@@ -143,28 +143,147 @@
   .peekbar .latest i { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 8px; vertical-align: 1px; }
   @keyframes nudge { 0%, 60%, 100% { transform: none; } 30% { transform: translateY(4px); } }
 
-  /* ───────── ledger (unchanged from 02) ───────── */
-  .ledger { padding: 72px 0 100px; }
-  .sec-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 36px; border-bottom: 2px solid var(--ink); padding-bottom: 14px; }
-  .sec-head h2 { font-size: 2.6rem; font-weight: 600; letter-spacing: -.02em; }
-  .filters { display: flex; gap: 22px; font-family: var(--sans); font-size: .7rem; text-transform: uppercase; letter-spacing: .14em; color: var(--muted); }
-  .filters a { border-bottom: 2px solid transparent; padding-bottom: 3px; }
-  .filters a.on { color: var(--ink); border-color: var(--ink); }
-  .month { font-family: var(--mono); font-size: .66rem; text-transform: uppercase; letter-spacing: .2em; color: var(--muted); margin: 36px 0 8px; }
-  .month:first-of-type { margin-top: 0; }
-  .row { display: grid; grid-template-columns: 6px 90px 1fr 140px 150px; gap: 24px; align-items: center; padding: 18px 0; border-bottom: 1px solid var(--rule); }
-  .row .spine { width: 6px; height: 100%; min-height: 44px; border-radius: 3px; }
-  .row .d { font-family: var(--mono); font-size: .7rem; color: var(--muted); }
-  .row .t { font-size: 1.35rem; font-weight: 600; letter-spacing: -.01em; line-height: 1.2; transition: color .3s; }
-  .row .t small { display: block; font-size: .95rem; font-weight: 400; font-style: italic; color: var(--muted); margin-top: 3px; }
-  .row .k { font-family: var(--sans); font-size: .66rem; text-transform: uppercase; letter-spacing: .16em; color: var(--muted); }
-  .row .th { justify-self: end; width: 150px; height: 56px; overflow: hidden; }
-  .row .th img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .8s var(--ease); }
-  .row:hover .th img { transform: scale(1.06); }
-  .row:hover .t { color: var(--c); }
-  .row[data-c="photo"] { --c: #9C7F00; } .row[data-c="essay"] { --c: var(--emerald); } .row[data-c="lab"] { --c: var(--terracotta); }
-  .row[data-c="photo"] .spine { background: var(--yellow); } .row[data-c="essay"] .spine { background: var(--emerald); } .row[data-c="lab"] .spine { background: var(--terracotta); }
-  .row .th.gen { display: flex; align-items: center; justify-content: center; color: #fff; font-family: var(--mono); font-size: 1.6rem; font-weight: 300; }
+  /* ───────── sections: one each, each with its own colour ───────── */
+  .sec { padding: 96px 0 104px; }
+  .sec + .sec { border-top: 1px solid var(--rule); }
+  .sec-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 40px; }
+  .sec-head h2 { font-size: clamp(2.4rem, 4vw, 3.4rem); font-weight: 600; letter-spacing: -.025em; line-height: 1; display: flex; align-items: center; gap: 16px; }
+  .sec-head h2 i { width: 14px; height: 14px; border-radius: 50%; flex: none; }
+  .sec-head .meta { display: flex; align-items: baseline; gap: 28px; font-family: var(--mono); font-size: .66rem; text-transform: uppercase; letter-spacing: .16em; color: var(--muted); }
+  .sec-head .meta a { font-family: var(--sans); font-size: .7rem; letter-spacing: .14em; color: var(--ink); border-bottom: 2px solid var(--c, var(--yellow)); padding-bottom: 2px; }
+
+  /* writing: a full-width lead, three cards, then a long list of thumbnail rows */
+  .writing { --c: var(--emerald); }
+  .lead { display: grid; grid-template-columns: 1.45fr 1fr; gap: 48px; align-items: center; padding-bottom: 56px; margin-bottom: 52px; border-bottom: 1px solid var(--rule); }
+  .lead .cover { position: relative; aspect-ratio: 16/10; overflow: hidden; background: var(--emerald); }
+  .lead .cover img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 1.4s var(--ease); }
+  .lead:hover .cover img { transform: scale(1.04); }
+  .lead .cover .tag { position: absolute; left: 0; top: 0; background: var(--emerald); color: var(--paper); font-family: var(--sans); font-size: .62rem; text-transform: uppercase; letter-spacing: .2em; font-weight: 700; padding: 10px 14px; }
+  .lead h3 { font-size: clamp(2.4rem, 3.6vw, 3.4rem); font-weight: 600; letter-spacing: -.03em; line-height: 1.02; transition: color .3s; }
+  .lead:hover h3 { color: var(--emerald); }
+  .lead .dek { margin-top: 14px; font-size: 1.3rem; line-height: 1.45; color: #3a3833; font-style: italic; }
+  .lead .first { margin-top: 22px; padding-top: 22px; border-top: 1px solid var(--rule); font-size: 1.1rem; line-height: 1.7; color: #2b2925; }
+  .lead .first::first-letter { font-size: 3.6em; float: left; line-height: .82; margin: .06em .1em 0 0; color: var(--emerald); font-weight: 600; }
+  .lead .go { display: inline-block; margin-top: 20px; font-family: var(--sans); font-size: .7rem; text-transform: uppercase; letter-spacing: .16em; font-weight: 700; color: var(--emerald); border-bottom: 2px solid var(--emerald); padding-bottom: 3px; }
+  .essays { display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px; align-items: start; }
+  .essay { display: block; }
+  .essay .cover { position: relative; aspect-ratio: 16/10; overflow: hidden; background: var(--emerald); margin-bottom: 18px; }
+  .essay .cover img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 1.1s var(--ease), filter .6s; }
+  .essay .open { position: absolute; inset: auto 0 0 0; padding: 22px 22px 20px; background: var(--emerald); color: var(--paper); font-size: 1rem; line-height: 1.55; transform: translateY(101%); transition: transform .7s var(--ease); }
+  .essay .open::first-letter { font-size: 2.6em; float: left; line-height: .85; margin: .04em .08em 0 0; color: var(--yellow); font-weight: 600; }
+  .essay .open small { display: block; margin-top: 12px; font-family: var(--sans); font-size: .62rem; text-transform: uppercase; letter-spacing: .16em; color: var(--yellow); }
+  .essay:hover .open, .essay:focus-visible .open { transform: none; }
+  .essay:hover .cover img { transform: scale(1.05); filter: saturate(.8); }
+  .k { display: flex; justify-content: space-between; font-family: var(--sans); font-size: .62rem; text-transform: uppercase; letter-spacing: .2em; color: var(--emerald); font-weight: 700; margin-bottom: 10px; }
+  .k span:last-child { font-family: var(--mono); font-weight: 400; letter-spacing: .08em; color: var(--muted); }
+  .lead .k { margin-bottom: 16px; }
+  .essay h3 { font-size: 1.5rem; font-weight: 600; letter-spacing: -.015em; line-height: 1.15; transition: color .3s; }
+  .essay:hover h3 { color: var(--emerald); }
+  .essay .dek { margin-top: 8px; font-size: 1.05rem; line-height: 1.5; color: #3a3833; font-style: italic; }
+  /* the archive list: thumbnail rows (after mockup 02) that open up on hover */
+  .more-essays { margin-top: 64px; border-top: 2px solid var(--ink); }
+  .row { display: grid; grid-template-columns: 6px 100px 1fr 150px auto; column-gap: 28px; align-items: start; padding: 20px 0; border-bottom: 1px solid var(--rule); }
+  .row .spine { align-self: stretch; width: 6px; border-radius: 3px; background: var(--c); opacity: .35; transition: opacity .4s; }
+  .row .d, .row .r { font-family: var(--mono); font-size: .68rem; color: var(--muted); padding-top: 8px; }
+  .row .t { font-size: 1.4rem; font-weight: 600; letter-spacing: -.012em; line-height: 1.2; transition: color .3s; }
+  .row .t small { display: block; font-size: 1rem; font-weight: 400; font-style: italic; color: var(--muted); margin-top: 4px; letter-spacing: 0; }
+  .row .x { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .6s var(--ease); }
+  .row .x > div { overflow: hidden; }
+  .row .x p { padding-top: 14px; font-size: 1.02rem; line-height: 1.62; color: #2b2925; max-width: 62ch; opacity: 0; transition: opacity .5s .1s; }
+  .row .x p b { font-family: var(--sans); font-size: .62rem; text-transform: uppercase; letter-spacing: .16em; color: var(--c); font-weight: 700; margin-left: 8px; white-space: nowrap; }
+  .row .c { font-family: var(--sans); font-size: .62rem; text-transform: uppercase; letter-spacing: .16em; color: var(--c); padding-top: 9px; line-height: 1.8; }
+  .row .c span { display: block; font-family: var(--mono); letter-spacing: .06em; text-transform: none; color: var(--muted); }
+  .row .th { width: 200px; height: 76px; overflow: hidden; background: var(--c); transition: height .6s var(--ease); }
+  .row .th img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .9s var(--ease); }
+  .row:hover .spine, .row:focus-visible .spine { opacity: 1; }
+  .row:hover .t, .row:focus-visible .t { color: var(--c); }
+  .row:hover .x, .row:focus-visible .x { grid-template-rows: 1fr; }
+  .row:hover .x p, .row:focus-visible .x p { opacity: 1; }
+  .row:hover .th, .row:focus-visible .th { height: 150px; }
+  .row:hover .th img { transform: scale(1.05); }
+  .writing .row .th { background: var(--emerald); }
+  .row.ph .t::after { content: "placeholder"; display: inline-block; margin-top: 8px; font-family: var(--mono); font-size: .56rem; font-weight: 400; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); border: 1px dashed var(--muted); padding: 2px 6px; }
+
+  /* labs: a bento of real covers, no bespoke mini-versions needed */
+  .labs-sec { --c: var(--terracotta); background: #EDE5D8; }
+  .labs { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 270px; gap: 18px; }
+  .lab { position: relative; overflow: hidden; background: #FBF8F2; border: 1px solid var(--rule); display: block; transition: border-color .3s, transform .5s var(--ease), box-shadow .5s; }
+  .lab:hover { border-color: var(--terracotta); transform: translateY(-4px); box-shadow: 0 30px 50px -34px rgba(90,40,10,.45); }
+  .lab .art { position: absolute; inset: 0; }
+  .lab .art img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 1.2s var(--ease); }
+  .lab:hover .art img { transform: scale(1.05); }
+  .lab .cap { position: absolute; left: 0; right: 0; bottom: 0; padding: 18px 20px 18px; background: linear-gradient(to top, rgba(251,248,242,1) 62%, rgba(251,248,242,0)); padding-top: 40px; }
+  .lab .k { font-family: var(--mono); font-size: .6rem; text-transform: uppercase; letter-spacing: .16em; color: var(--terracotta); }
+  .lab h3 { font-size: 1.3rem; font-weight: 600; letter-spacing: -.01em; line-height: 1.12; margin-top: 6px; }
+  .lab p { font-size: .95rem; line-height: 1.45; color: #3a3833; font-style: italic; max-height: 0; opacity: 0; overflow: hidden; transition: max-height .6s var(--ease), opacity .4s, margin .6s var(--ease); }
+  .lab:hover p, .lab:focus-visible p { max-height: 5em; opacity: 1; margin-top: 6px; }
+  .lab .go { position: absolute; top: 14px; right: 14px; z-index: 2; font-family: var(--mono); font-size: .58rem; text-transform: uppercase; letter-spacing: .14em; background: var(--ink); color: var(--paper); padding: 5px 8px; opacity: 0; transform: translateY(-6px); transition: opacity .3s, transform .4s var(--ease); }
+  .lab:hover .go { opacity: 1; transform: none; }
+  .lab.big { grid-column: span 2; grid-row: span 2; }
+  .lab.big h3 { font-size: 2.2rem; letter-spacing: -.02em; }
+  .lab.big p { font-size: 1.1rem; max-height: none; opacity: 1; margin-top: 8px; max-width: 480px; }
+  .lab.big .cap { padding: 60px 28px 26px; }
+  .lab.wide { grid-column: span 2; }
+  /* art for labs that have no cover: arrange the lab's own assets */
+  .lab .art.items { display: grid; grid-template-columns: repeat(6, 1fr); align-items: center; padding: 14px 18px 96px; gap: 4px; }
+  .lab .art.items img { width: 100%; height: auto; aspect-ratio: 1; object-fit: contain; mix-blend-mode: multiply; image-rendering: pixelated; transition: transform .6s var(--ease); }
+  .lab:hover .art.items img { transform: translateY(-6px) rotate(-4deg); }
+  .lab:hover .art.items img:nth-child(even) { transform: translateY(-3px) rotate(4deg); }
+  .lab .art.icons { display: grid; grid-template-columns: repeat(3, 1fr); padding: 16px 16px 100px; gap: 8px; }
+  .lab .art.icons img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; }
+  .lab .art.type { display: flex; align-items: flex-start; padding: 22px; background: linear-gradient(150deg, #B5653F, var(--terracotta) 50%, #D9A07F); }
+  .lab .art.type b { font-family: var(--mono); font-weight: 400; font-size: 4.4rem; color: rgba(255,255,255,.85); letter-spacing: -.04em; line-height: 1; }
+  /* the rest of the labs: same ruled rows as Writing, in a box that scrolls with a fade at the bottom */
+  .lab-list { position: relative; margin-top: 56px; border-top: 2px solid var(--ink); }
+  .lab-list .scroller { max-height: 468px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--terracotta) transparent; padding-right: 10px; }
+  .lab-list::after { content: ""; position: absolute; left: 0; right: 10px; bottom: 0; height: 110px; pointer-events: none; background: linear-gradient(to top, #EDE5D8 15%, rgba(237,229,216,0)); transition: opacity .4s; }
+  .lab-list.at-end::after { opacity: 0; }
+  .lab-list-foot { display: flex; justify-content: space-between; gap: 16px; white-space: nowrap; padding-top: 16px; font-family: var(--mono); font-size: .66rem; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
+  .lab-list-foot a:hover { color: var(--terracotta); }
+  /* stand-in thumbnails for labs without a cover: drawn in CSS, no bespoke artwork */
+  .th.g { position: relative; background: #F7F1E7; border: 1px solid var(--rule); }
+  .th.g img { object-fit: contain; padding: 8px; }
+  .th.bars { display: flex; align-items: flex-end; gap: 6%; padding: 12px 14% 0; }
+  .th.bars i { flex: 1; background: var(--terracotta); border-radius: 2px 2px 0 0; }
+  .th.bars i:nth-child(even) { background: #E2A98E; }
+  .th.fall { display: flex; align-items: flex-start; gap: 5%; padding: 12px 14%; }
+  .th.fall i { flex: 1; position: relative; background: var(--terracotta); border-radius: 2px; }
+  .th.fall i:last-child { background: var(--emerald); }
+  .th.donut::before { content: ""; position: absolute; left: 50%; top: 50%; width: 58px; height: 58px; translate: -50% -50%; border-radius: 50%;
+    background: radial-gradient(circle, #F7F1E7 46%, transparent 47%), conic-gradient(var(--terracotta) 0 34%, var(--emerald) 0 55%, var(--yellow) 0 72%, #E2A98E 0 86%, var(--ink) 0); transition: scale .6s var(--ease); }
+  .row:hover .th.donut::before { scale: 1.5; }
+  .th.blocks { display: grid; grid-template-columns: repeat(10, 1fr); gap: 3px; padding: 12px 18px; align-content: center; }
+  .th.blocks i { aspect-ratio: 1; border-radius: 2px; background: var(--terracotta); }
+  .th.blocks i:nth-child(3n) { background: var(--emerald); } .th.blocks i:nth-child(5n) { background: var(--yellow); } .th.blocks i:nth-child(7n) { background: var(--ink); }
+  .th.line svg { width: 100%; height: 100%; display: block; }
+
+  /* photography: full bleed, two rows deep */
+  .photo-sec { --c: var(--yellow); padding-bottom: 0; }
+  /* albums: a two-row strip that scrolls sideways through every album */
+  .strip { position: relative; }
+  .albums { display: grid; grid-auto-flow: column dense; grid-template-rows: repeat(2, 24vw); grid-auto-columns: 19vw; gap: 6px; padding: 0 6px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; scroll-padding: 0 6px; scrollbar-width: none; cursor: grab; }
+  .albums::-webkit-scrollbar { display: none; }
+  .albums.dragging { cursor: grabbing; scroll-snap-type: none; }
+  .albums.dragging .album { pointer-events: none; }
+  .album { position: relative; overflow: hidden; display: block; background: #222; scroll-snap-align: start; }
+  .album img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 1.4s var(--ease); -webkit-user-drag: none; user-select: none; }
+  .album:hover img { transform: scale(1.04); }
+  .album.big { grid-column: span 2; grid-row: span 2; }
+  .album.tall { grid-row: span 2; }
+  .album .lbl { position: absolute; left: 0; right: 0; bottom: 0; padding: 40px 18px 14px; display: flex; justify-content: space-between; align-items: baseline; color: #fff; background: linear-gradient(to top, rgba(0,0,0,.6), transparent); }
+  .album .lbl b { font-style: italic; font-weight: 400; font-size: 1.25rem; }
+  .album.big .lbl b { font-size: 2rem; }
+  .album .lbl span { font-family: var(--mono); font-size: .62rem; letter-spacing: .1em; opacity: .85; }
+  .strip::after { content: ""; position: absolute; top: 0; right: 0; bottom: 0; width: 8vw; pointer-events: none; background: linear-gradient(to left, var(--paper), transparent); transition: opacity .4s; }
+  .strip.at-end::after { opacity: 0; }
+  .scrub { display: flex; align-items: center; gap: 18px; }
+  .scrub button { width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid var(--ink); background: none; color: var(--ink); font-size: 1.1rem; cursor: pointer; transition: background .3s, color .3s, opacity .3s; }
+  .scrub button:hover:not(:disabled) { background: var(--ink); color: var(--paper); }
+  .scrub button:disabled { opacity: .25; cursor: default; }
+  .track { flex: 1; height: 2px; background: var(--rule); position: relative; }
+  .track i { position: absolute; top: -1px; left: 0; height: 4px; background: var(--ink); border-radius: 2px; }
+  .albums-foot { display: grid; grid-template-columns: 1fr minmax(200px, 420px) auto; align-items: center; gap: 32px; padding: 22px 0 64px; font-family: var(--mono); font-size: .66rem; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
+  .albums-foot a:hover { color: var(--ink); }
   footer { border-top: 1px solid var(--rule); padding: 28px 0; font-family: var(--sans); font-size: .7rem; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
   footer .wrap { display: flex; justify-content: space-between; }
 
@@ -176,6 +295,11 @@
     .door-lab h2 { font-size: 2.4rem; }
     .door-lab .dek { display: none; }
     .door-lab .intro .more { display: none; }
+    .lead { grid-template-columns: 1fr; gap: 28px; }
+    .essays { grid-template-columns: 1fr 1fr; } .essays .essay:nth-child(3) { display: none; }
+    .row { grid-template-columns: 6px 1fr 120px auto; } .row .d { display: none; } .row .th { width: 150px; }
+    .labs { grid-template-columns: repeat(2, 1fr); } .lab.big { grid-row: span 2; }
+    .albums { grid-template-rows: repeat(2, 34vw); grid-auto-columns: 28vw; }
   }
 
   /* phones: an accordion. Closed doors become 60px bars, the open one takes the screen. Same cycle. */
@@ -205,7 +329,17 @@
     .note { display: none; }
     .sec-head { flex-direction: column; gap: 14px; } .sec-head h2 { font-size: 2rem; }
     .item-btn span { font-size: .55rem; }
-    .row { grid-template-columns: 6px 1fr; } .row .d, .row .k, .row .th { display: none; }
+    .sec { padding: 64px 0 72px; }
+    .sec-head { flex-direction: column; align-items: flex-start; }
+    .sec-head .meta span { display: none; }
+    .lead { padding-bottom: 40px; margin-bottom: 40px; } .lead h3 { font-size: 2rem; } .lead .dek { font-size: 1.1rem; }
+    .essays { grid-template-columns: 1fr; gap: 40px; } .essays .essay:nth-child(3) { display: block; }
+    .essay .open { display: none; }
+    .row { grid-template-columns: 4px 1fr 96px; column-gap: 16px; } .row .c, .row .x { display: none; } .row .th { width: 96px; height: 64px; } .row:hover .th { height: 64px; } .row .t { font-size: 1.15rem; }
+    .labs { grid-template-columns: 1fr; grid-auto-rows: 240px; } .lab.big, .lab.wide { grid-column: auto; grid-row: span 1; } .lab.big { grid-row: span 2; }
+    .lab p { display: none; } .lab.big p { display: block; } .lab .go { opacity: 1; transform: none; }
+    .albums { grid-template-rows: repeat(2, 56vw); grid-auto-columns: 42vw; } .album .lbl b { font-size: 1rem; } .album.big .lbl b { font-size: 1.5rem; }
+    .albums-foot { grid-template-columns: 1fr; gap: 14px; padding: 18px 0 48px; } .albums-foot .count { display: none; }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -251,7 +385,7 @@
     <div class="tab"><span class="n">02</span><span class="lbl">Essays</span><span class="peek">Latest · Against Idle Land</span></div>
     <div class="content">
       <div class="rise">
-        <div class="kick"><span>Latest essay</span><span>Jul 18 2026</span><span>7 min read</span></div>
+        <div class="kick"><span>Latest essay</span><span>Jul 18 2026</span><span>3 min read</span></div>
         <h2>Against Idle Land</h2>
         <p class="dek">A case for a self-assessed property tax, to curb dereliction and limit monopoly pricing.</p>
         <p class="excerpt">Scattered across Dublin city centre is a blight of derelict buildings. These are an eyesore, a drag on the economy, and by limiting supply they contribute to higher commercial and residential rents. The value of these properties is tied to the surrounding neighbourhood, whose value in turn depends on the investment of private individuals and the state.</p>
@@ -302,36 +436,179 @@
 </section>
 
 <div class="peekbar"><div class="wrap">
-  <a href="#everything"><span class="arrow">↓</span> Everything, in order</a>
+  <a href="#writing"><span class="arrow">↓</span> Writing · Labs · Photography</a>
   <div class="latest">
-    <span><i style="background:var(--emerald)"></i>Essay · Jul 18</span>
-    <span><i style="background:var(--terracotta)"></i>Lab · Jun 29</span>
-    <span><i style="background:var(--yellow)"></i>Photos · Jun 12</span>
+    <span><i style="background:var(--emerald)"></i>5 essays</span>
+    <span><i style="background:var(--terracotta)"></i>16 labs</span>
+    <span><i style="background:var(--yellow)"></i>11 albums</span>
   </div>
 </div></div>
 
-<section class="ledger" id="everything"><div class="wrap">
+<!-- ───────── WRITING ───────── -->
+<section class="sec writing" id="writing"><div class="wrap">
   <div class="sec-head">
-    <h2>Everything, in order</h2>
-    <div class="filters"><a class="on" href="#">All</a><a href="#">Photos</a><a href="#">Essays</a><a href="#">Labs</a></div>
+    <h2><i style="background:var(--emerald)"></i>Writing</h2>
+    <div class="meta"><span>Hover any essay to read the opening</span><a href="#">All essays →</a></div>
   </div>
-
-  <div class="month">July 2026</div>
-  <a class="row" data-c="essay" href="#"><span class="spine"></span><span class="d">Jul 18</span><span class="t">Against Idle Land: A Case for Self-Assessed Property Tax<small>Written for an old company newsletter.</small></span><span class="k">Essay · Political economy</span><span class="th"><img src="../public/blog/property-tax/cover.png" alt=""></span></a>
-
-  <div class="month">June 2026</div>
-  <a class="row" data-c="lab" href="#"><span class="spine"></span><span class="d">Jun 29</span><span class="t">What Did That Really Cost?<small>Purchase tax, in hours of your life.</small></span><span class="k">Lab · Data viz</span><span class="th gen" style="background:linear-gradient(135deg,#B96A49,#D9A07F)">02</span></a>
-  <a class="row" data-c="photo" href="#"><span class="spine"></span><span class="d">Jun 12</span><span class="t">Recents<small>Six new frames from a fresh roll.</small></span><span class="k">Photos · Album</span><span class="th"><img src="../public/photos/Recents/img028.jpg" alt=""></span></a>
-  <a class="row" data-c="lab" href="#"><span class="spine"></span><span class="d">Jun 10</span><span class="t">Irish Budget Quiz<small>How does Ireland spend €100bn?</small></span><span class="k">Lab · Civics</span><span class="th"><img src="../public/labs/irish-budget-quiz/cover.png" alt=""></span></a>
-  <a class="row" data-c="essay" href="#"><span class="spine"></span><span class="d">Jun 2</span><span class="t">House Prices Are Not the Whole Affordability Story<small>Five decades of mortgage-first data.</small></span><span class="k">Essay · Data story</span><span class="th"><img src="../public/blog/ireland-housing-market/cover.png" alt=""></span></a>
-
-  <div class="month">February 2026</div>
-  <a class="row" data-c="essay" href="#"><span class="spine"></span><span class="d">Feb 23</span><span class="t">The €27.8 Billion Question<small>Fifteen years of property data in context.</small></span><span class="k">Essay · Data story</span><span class="th"><img src="../public/blog/ireland-property-economy/cover.png" alt=""></span></a>
-  <a class="row" data-c="photo" href="#"><span class="spine"></span><span class="d">Feb 9</span><span class="t">Mountains<small>Seventeen frames above the tree line.</small></span><span class="k">Photos · Album</span><span class="th"><img src="../public/photos/Mountains/DSCF1182.jpg" alt=""></span></a>
+  <a class="lead" href="#">
+    <div class="cover"><img src="../public/blog/ireland-housing-market/cover.png" alt=""><span class="tag">Featured</span></div>
+    <div>
+      <div class="k"><span>Data story</span><span>Jun 2 2026 · 10 min</span></div>
+      <h3>House Prices Are Not the Whole Affordability Story</h3>
+      <p class="dek">A mortgage-first view of affordability across five decades of Irish housing data.</p>
+      <p class="first">The usual housing affordability story is simple: house prices rise, wages fail to keep up, and price-to-wage ratios climb. That story is true, but incomplete. What a household actually feels each month is the repayment, and the repayment depends on the interest rate as much as the price.</p>
+      <span class="go">Read the essay →</span>
+    </div>
+  </a>
+  <div class="essays">
+    <a class="essay" href="#">
+      <div class="cover"><img src="../public/blog/ireland-property-economy/cover.png" alt="">
+        <div class="open">Ireland's housing market has become more than a place where homes are bought and sold. It has become a dominant channel through which national wealth, household savings, and economic expectation are expressed.<small>Keep reading →</small></div></div>
+      <div class="k"><span>Data story</span><span>Feb 23 2026 · 3 min</span></div>
+      <h3>The €27.8 Billion Question</h3>
+      <p class="dek">Fifteen years of Irish property data, set against wealth, income, savings and the real economy.</p>
+    </a>
+    <a class="essay" href="#">
+      <div class="cover"><img src="../public/blog/software-costs-approach-zero/cover.png" alt="" style="object-position:100% 50%">
+        <div class="open">Software development is undergoing a revolution. Imagine a world where anyone with a good idea can bring it to life regardless of their coding skills.<small>Keep reading →</small></div></div>
+      <div class="k"><span>AI &amp; product</span><span>Nov 28 2025 · 4 min</span></div>
+      <h3>Software Costs Approach Zero</h3>
+      <p class="dek">LLMs are collapsing development costs and inviting domain experts to become founders.</p>
+    </a>
+    <a class="essay" href="#">
+      <div class="cover"><img src="../public/blog/dunbars-number/cover.png" alt="">
+        <div class="open">It's been several years since a colleague shared an intriguing paper with me: "Calling Dunbar's Numbers". But as I read through their methodology and findings, something didn't quite add up.<small>Keep reading →</small></div></div>
+      <div class="k"><span>Data science</span><span>Nov 20 2025 · 11 min</span></div>
+      <h3>Calling Dunbar's Number</h3>
+      <p class="dek">Is the limit on our social circles biology, or a statistical artifact?</p>
+    </a>
+  </div>
+  <div class="more-essays">
+    <a class="row" href="#"><span class="spine"></span><span class="d">Jul 18 2026</span>
+      <span><span class="t">Against Idle Land<small>A case for self-assessed property tax</small></span><span class="x"><div><p>Scattered across Dublin city centre is a blight of derelict buildings. These are an eyesore, a drag on the economy, and by limiting supply they contribute to higher commercial and residential rents.<b>Keep reading →</b></p></div></span></span>
+      <span class="c">Political economy<span>3 min read</span></span><span class="th"><img src="../public/blog/property-tax/cover.png" alt=""></span></a>
+    <a class="row ph" href="#"><span class="spine"></span><span class="d">May 2026</span>
+      <span><span class="t">On Shooting Film Again<small>Why a slower camera made me a better photographer</small></span><span class="x"><div><p>Placeholder copy. The opening lines of the essay would sit here: two or three sentences, enough to tell you what it is about and whether you want to keep going.<b>Keep reading →</b></p></div></span></span>
+      <span class="c">Photography<span>6 min read</span></span><span class="th"><img src="../public/photos/Film/000361140009.jpg" alt=""></span></a>
+    <a class="row ph" href="#"><span class="spine"></span><span class="d">Apr 2026</span>
+      <span><span class="t">The Quality System Nobody Reads<small>Notes on ISO 13485 as a living document</small></span><span class="x"><div><p>Placeholder copy. The opening lines of the essay would sit here: two or three sentences, enough to tell you what it is about and whether you want to keep going.<b>Keep reading →</b></p></div></span></span>
+      <span class="c">Medical devices<span>8 min read</span></span><span class="th"><img src="../public/labs/samd-iso-standard-quiz/qms.png" alt=""></span></a>
+    <a class="row ph" href="#"><span class="spine"></span><span class="d">Mar 2026</span>
+      <span><span class="t">Where the Budget Goes<small>A walk through €100bn of Irish public spending</small></span><span class="x"><div><p>Placeholder copy. The opening lines of the essay would sit here: two or three sentences, enough to tell you what it is about and whether you want to keep going.<b>Keep reading →</b></p></div></span></span>
+      <span class="c">Data story<span>7 min read</span></span><span class="th"><img src="../public/labs/irish-budget-quiz/cover.png" alt=""></span></a>
+    <a class="row ph" href="#"><span class="spine"></span><span class="d">Jan 2026</span>
+      <span><span class="t">Concrete and Light<small>Looking up at Dublin&rsquo;s newer buildings</small></span><span class="x"><div><p>Placeholder copy. The opening lines of the essay would sit here: two or three sentences, enough to tell you what it is about and whether you want to keep going.<b>Keep reading →</b></p></div></span></span>
+      <span class="c">Photography<span>4 min read</span></span><span class="th"><img src="../public/photos/Buildings/DSCF9580.jpg" alt=""></span></a>
+  </div>
 </div></section>
 
+<!-- ───────── LABS ───────── -->
+<section class="sec labs-sec" id="labs"><div class="wrap">
+  <div class="sec-head">
+    <h2><i style="background:var(--terracotta)"></i>Labs</h2>
+    <div class="meta"><span>Sixteen interactive things</span><a href="#">All labs →</a></div>
+  </div>
+  <div class="labs">
+    <a class="lab big" href="#">
+      <div class="art"><img src="../public/posters/transit-theogony/left-to-right/detail-1.webp" alt=""></div>
+      <span class="go">Explore →</span>
+      <div class="cap"><div class="k">Poster · Map</div><h3>Transit Theogony</h3><p>The Greek divine family as a transit map. Follow the lineage lines across generations, then see it as an A2 print on the wall.</p></div>
+    </a>
+    <a class="lab wide" href="#">
+      <div class="art"><img src="../public/labs/tax-schedule-comparison/cover.png" alt="" style="object-position:50% 30%"></div>
+      <span class="go">Open →</span>
+      <div class="cap"><div class="k">Tax · Comparison</div><h3>Tax Schedule Comparison</h3><p>Stylised tax schedules against Ireland's current income tax shape.</p></div>
+    </a>
+    <a class="lab" href="#">
+      <div class="art"><img src="../public/labs/three-stations/thumbnail.png" alt="" style="object-position:100% 45%"></div>
+      <span class="go">Open →</span>
+      <div class="cap"><div class="k">Google Maps · Transit</div><h3>Three Stations</h3><p>Which Dublin station is really closest? Tap the map.</p></div>
+    </a>
+    <a class="lab" href="#">
+      <div class="art"><img src="../public/labs/irish-budget-quiz/cover.png" alt=""></div>
+      <span class="go">Play →</span>
+      <div class="cap"><div class="k">Civics · Quiz</div><h3>Irish Budget Quiz</h3><p>How does Ireland spend €100bn? Guess, then check.</p></div>
+    </a>
+    <a class="lab wide" href="#">
+      <div class="art items">
+        <img src="../public/labs/irish-purchase-tax-time-2026/roll.png" alt=""><img src="../public/labs/irish-purchase-tax-time-2026/pint.png" alt=""><img src="../public/labs/irish-purchase-tax-time-2026/petrol.png" alt=""><img src="../public/labs/irish-purchase-tax-time-2026/camera.png" alt=""><img src="../public/labs/irish-purchase-tax-time-2026/car.png" alt=""><img src="../public/labs/irish-purchase-tax-time-2026/house.png" alt="">
+      </div>
+      <span class="go">Open →</span>
+      <div class="cap"><div class="k">Data viz · Time</div><h3>What Did That Really Cost?</h3><p>From a chicken fillet roll to a house: the hours you work for it, and how many go to tax.</p></div>
+    </a>
+    <a class="lab" href="#">
+      <div class="art icons"><img src="../public/labs/samd-iso-standard-quiz/qms.png" alt=""><img src="../public/labs/samd-iso-standard-quiz/risk.png" alt=""><img src="../public/labs/samd-iso-standard-quiz/software.png" alt=""></div>
+      <span class="go">Play →</span>
+      <div class="cap"><div class="k">SaMD · Quiz</div><h3>Which ISO Standard Are You?</h3><p>A standards personality quiz for medical-software people.</p></div>
+    </a>
+    <a class="lab" href="#">
+      <div class="art"><img src="../public/posters/greek-theogony/outlines/detail-1.webp" alt=""></div>
+      <span class="go">Explore →</span>
+      <div class="cap"><div class="k">Poster · Genealogy</div><h3>Greek Theogony</h3><p>An A2 divine family tree in two styles.</p></div>
+    </a>
+  </div>
+  <div class="lab-list" id="lab-list">
+    <div class="scroller" id="lab-scroll">
+      <a class="row" href="#"><span class="spine"></span><span class="d">Jun 2026</span>
+        <span><span class="t">Irish Tax Breakdown 2026<small>Effective and marginal rates, by income</small></span><span class="x"><div><p>Explore effective and marginal income tax, USC, and PRSI rates across incomes with pension and employment controls.<b>Open →</b></p></div></span></span>
+        <span class="c">Data viz<span>Tax · Explorer</span></span><span class="th g bars"><i style="height:18%"></i><i style="height:26%"></i><i style="height:34%"></i><i style="height:46%"></i><i style="height:60%"></i><i style="height:74%"></i><i style="height:86%"></i></span></a>
+      <a class="row" href="#"><span class="spine"></span><span class="d">Jun 2026</span>
+        <span><span class="t">Irish Tax Waterfall 2026<small>From gross pay to what you keep</small></span><span class="x"><div><p>Trace how illustrative 2026 taxes, spending, and return taxes convert gross pay into retained annual wealth.<b>Open →</b></p></div></span></span>
+        <span class="c">Data viz<span>Tax · Waterfall</span></span><span class="th g fall"><i style="top:0%;height:30%"></i><i style="top:30%;height:16%"></i><i style="top:46%;height:12%"></i><i style="top:58%;height:10%"></i><i style="top:68%;height:32%"></i></span></a>
+      <a class="row" href="#"><span class="spine"></span><span class="d">Jun 2026</span>
+        <span><span class="t">Ireland's Finances Breakdown<small>Where the money comes from, and goes</small></span><span class="x"><div><p>Explore Ireland's 2024 income and expenditure mix with interactive doughnut charts and clickable spending drilldowns.<b>Open →</b></p></div></span></span>
+        <span class="c">Civics<span>Budget · Data viz</span></span><span class="th g donut"></span></a>
+      <a class="row" href="#"><span class="spine"></span><span class="d">Jun 2026</span>
+        <span><span class="t">FDA Pre-Sub Quiz<small>Surviving the pre-submission meeting</small></span><span class="x"><div><p>A tongue-in-cheek SaMD quiz on surviving FDA pre-sub meetings, while pressure-testing the quality of your validation story.<b>Open →</b></p></div></span></span>
+        <span class="c">SaMD<span>FDA · Quiz</span></span><span class="th g img"><img src="../public/labs/samd-iso-standard-quiz/clinical.png" alt=""></span></a>
+      <a class="row" href="#"><span class="spine"></span><span class="d">Jun 2026</span>
+        <span><span class="t">SaMD Startup Quiz<small>Find your startup archetype</small></span><span class="x"><div><p>Find your SaMD startup archetype across intended use, QMS maturity, validation discipline, and claim strategy.<b>Open →</b></p></div></span></span>
+        <span class="c">SaMD<span>Startup · Quiz</span></span><span class="th g img"><img src="../public/labs/samd-iso-standard-quiz/security.png" alt=""></span></a>
+      <a class="row" href="#"><span class="spine"></span><span class="d">Jun 2026</span>
+        <span><span class="t">12 Stages of QMS<small>When quality can no longer wait</small></span><span class="x"><div><p>A satirical but practical interactive journey through the 12 moments when a SaMD team realises quality management can no longer be postponed.<b>Open →</b></p></div></span></span>
+        <span class="c">SaMD<span>QMS · Interactive</span></span><span class="th g img"><img src="../public/labs/samd-iso-standard-quiz/usability.png" alt=""></span></a>
+      <a class="row" href="#"><span class="spine"></span><span class="d">Jun 2026</span>
+        <span><span class="t">Irish Budget Block Game<small>Twenty blocks, one national budget</small></span><span class="x"><div><p>Allocate 20 budget blocks across major spending categories, then compare your guess to Ireland's rounded 2024 expenditure mix.<b>Open →</b></p></div></span></span>
+        <span class="c">Civics<span>Budget · Game</span></span><span class="th g blocks"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span></a>
+      <a class="row" href="#"><span class="spine"></span><span class="d">Jun 2026</span>
+        <span><span class="t">Ireland's Fiscal Flow<small>Your tax, followed out the door</small></span><span class="x"><div><p>Estimate your annual tax contribution and compare it with how Ireland's 2024 public spending is distributed.<b>Open →</b></p></div></span></span>
+        <span class="c">Civics<span>Budget · Explorer</span></span><span class="th g donut"></span></a>
+      <a class="row" href="#"><span class="spine"></span><span class="d">Mar 2026</span>
+        <span><span class="t">Ireland Housing Market<small>Mortgage affordability, simulated</small></span><span class="x"><div><p>Explore interactive mortgage affordability simulations across historical prices, wages, rates, and inflation.<b>Open →</b></p></div></span></span>
+        <span class="c">Data viz<span>Housing · Simulation</span></span><span class="th g line"><svg viewBox="0 0 200 76" preserveAspectRatio="none"><polyline points="0,64 25,60 50,56 70,40 95,46 120,30 140,34 165,14 200,20" fill="none" stroke="#C47A5A" stroke-width="3"/><polyline points="0,58 40,54 80,52 120,48 160,44 200,40" fill="none" stroke="#0A5C36" stroke-width="2" stroke-dasharray="4 4"/></svg></span></a>
+    </div>
+  </div>
+  <div class="lab-list-foot"><span>Nine more labs · scroll</span><a href="#">All sixteen →</a></div>
+</div></section>
+
+<!-- ───────── PHOTOGRAPHY (full bleed) ───────── -->
+<section class="sec photo-sec" id="photography">
+  <div class="wrap"><div class="sec-head">
+    <h2><i style="background:var(--yellow)"></i>Photography</h2>
+    <div class="meta"><span>Drag or scroll sideways for all eleven</span></div>
+  </div></div>
+  <div class="strip" id="strip"><div class="albums" id="albums">
+    <a class="album big" href="#"><img src="../public/photos/Portraits/DSCF4666.jpg" alt="" draggable="false"><span class="lbl"><b>Portraits</b><span>56 frames</span></span></a>
+    <a class="album" href="#"><img src="../public/photos/BnW/000226840017.jpg" alt="" draggable="false"><span class="lbl"><b>Black &amp; White</b><span>31</span></span></a>
+    <a class="album" href="#"><img src="../public/photos/Film/000361140009.jpg" alt="" draggable="false"><span class="lbl"><b>Film</b><span>38</span></span></a>
+    <a class="album" href="#"><img src="../public/photos/People/DSCF6615.jpg" alt="" draggable="false"><span class="lbl"><b>People</b><span>62</span></span></a>
+    <a class="album" href="#"><img src="../public/photos/Buildings/DSCF9580.jpg" alt="" draggable="false"><span class="lbl"><b>Architecture</b><span>29</span></span></a>
+    <a class="album big" href="#"><img src="../public/photos/Faves/000226830008.jpg" alt="" draggable="false"><span class="lbl"><b>Favourites</b><span>50 frames</span></span></a>
+    <a class="album" href="#"><img src="../public/photos/Diptych/000393120003.jpg" alt="" draggable="false"><span class="lbl"><b>Diptychs</b><span>22</span></span></a>
+    <a class="album" href="#"><img src="../public/photos/Mountains/DSCF1182.jpg" alt="" draggable="false"><span class="lbl"><b>Mountains</b><span>17</span></span></a>
+    <a class="album" href="#"><img src="../public/photos/Minimal/DSCF0816.jpg" alt="" draggable="false"><span class="lbl"><b>Minimal</b><span>20</span></span></a>
+    <a class="album" href="#"><img src="../public/photos/Animals/000160980013.jpg" alt="" draggable="false"><span class="lbl"><b>Animals</b><span>31</span></span></a>
+    <a class="album tall" href="#"><img src="../public/photos/Recents/img022.jpg" alt="" draggable="false"><span class="lbl"><b>Recents</b><span>6</span></span></a>
+  </div></div>
+  <div class="wrap"><div class="albums-foot">
+    <span class="count">Eleven albums · 362 frames</span>
+    <div class="scrub"><button id="alb-prev" aria-label="Previous albums">←</button><span class="track"><i id="alb-bar"></i></span><button id="alb-next" aria-label="More albums">→</button></div>
+    <a href="#">All albums →</a>
+  </div></div>
+</section>
+
 <footer><div class="wrap"><span>© 2026 drdimg</span><span>Photography &amp; data — Dublin</span></div></footer>
-<div class="note">Mockup 06 · Open Doors. One door is always open and it moves on by itself (yellow bar). Hover or tap a door to take over. Touching the lab stops the cycle.</div>
+<div class="note">Mockup 06 · Open Doors. One door is always open and it moves on by itself (yellow bar). Hover or tap a door to take over. Touching the lab stops the cycle. Below: Writing (hover a cover), Labs (bento of real covers, then a scrolling list of the rest), Photography (drag or scroll sideways).</div>
 
 <script>
 /* ───────── the lab: same maths as IrishPurchaseTaxTime2026.tsx, stripped down ───────── */
@@ -465,6 +742,33 @@ const params = new URLSearchParams(location.search);
 if (params.has('hold')) { stopped = true; $('auto-lbl').textContent = 'Paused'; $('auto').setAttribute('aria-pressed', true); }
 doorsEl.classList.toggle('stopped', stopped);
 openDoor(Math.min(2, Math.max(0, +params.get('door') || 0)));
+
+// ── album strip: arrows, progress bar, drag to scroll ──
+(() => {
+  const $id = id => document.getElementById(id);
+  const el = $id('albums'), strip = $id('strip'), bar = $id('alb-bar'), prev = $id('alb-prev'), next = $id('alb-next');
+  const update = () => {
+    const max = el.scrollWidth - el.clientWidth, f = max ? el.scrollLeft / max : 1, w = el.clientWidth / el.scrollWidth;
+    bar.style.width = (w * 100) + '%'; bar.style.left = (f * (1 - w) * 100) + '%';
+    prev.disabled = el.scrollLeft < 4; next.disabled = el.scrollLeft > max - 4;
+    strip.classList.toggle('at-end', el.scrollLeft > max - 4);
+  };
+  const step = d => el.scrollBy({ left: d * el.clientWidth * .75, behavior: 'smooth' });
+  prev.onclick = () => step(-1); next.onclick = () => step(1);
+  el.addEventListener('scroll', update, { passive: true }); addEventListener('resize', update); update();
+  let x0 = 0, s0 = 0, down = false, moved = false;
+  el.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse') return; down = true; moved = false; x0 = e.clientX; s0 = el.scrollLeft; });
+  addEventListener('pointermove', e => { if (!down) return; const dx = e.clientX - x0; if (Math.abs(dx) > 5) { moved = true; el.classList.add('dragging'); } if (moved) el.scrollLeft = s0 - dx; });
+  addEventListener('pointerup', () => { down = false; setTimeout(() => el.classList.remove('dragging'), 0); });
+  el.addEventListener('click', e => { if (moved) { e.preventDefault(); moved = false; } }, true);
+})();
+
+// ── lab list: drop the bottom fade once the list is scrolled to the end ──
+(() => {
+  const box = document.getElementById('lab-scroll'), wrap = document.getElementById('lab-list');
+  const update = () => wrap.classList.toggle('at-end', box.scrollTop + box.clientHeight >= box.scrollHeight - 4);
+  box.addEventListener('scroll', update, { passive: true }); addEventListener('resize', update); update();
+})();
 </script>
 </body>
 </html>
