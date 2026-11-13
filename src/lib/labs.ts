@@ -36,7 +36,7 @@ const LABS: Lab[] = [
   {
     title: "Greek Theogony Poster",
     description:
-      "An A2 divine genealogy in two styles: crisp outlines and translucent panels. Explore the posters and their details.",
+      "An A2 divine genealogy in frameless and frameless outlines editions. Explore the posters and their details.",
     href: "/greek-theogeny",
     badge: "Reference",
     meta: "Mythology • Poster",
