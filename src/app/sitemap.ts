@@ -18,6 +18,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/labs/samd-qms-stages`, lastModified: now },
     { url: `${baseUrl}/labs/samd-iso-standard-quiz`, lastModified: now },
     { url: `${baseUrl}/labs/tax-schedule-comparison`, lastModified: now },
+    { url: `${baseUrl}/labs/hlth-2026-field-notes`, lastModified: now },
   ];
   const posts = getAllPosts();
   for (const p of posts) {

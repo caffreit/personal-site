@@ -13,6 +13,15 @@ export type Lab = {
 
 const LABS: Lab[] = [
   {
+    title: "HLTH 2026 Field Notes: AI in Medical Devices",
+    description:
+      "Searchable field notes from HLTH 2026: BlueBridge positions on AI in medical devices, current developments, questions for AI startups, and the regulatory picture as of November 2026.",
+    href: "/labs/hlth-2026-field-notes",
+    badge: "SaMD",
+    meta: "AI • Field Notes",
+    publishedAt: "2026-11-13",
+  },
+  {
     title: "Transit Theogony",
     description:
       "The Greek divine family as a transit map. Explore left-to-right and ring A2 posters, with detail previews and views on the wall.",
