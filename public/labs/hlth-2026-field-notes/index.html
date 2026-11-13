@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en-IE">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HLTH 2026 field notes: AI in medical devices</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,600;7..72,700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: light;
+  --ink:#13294B;
+  --ink-soft:#3D5170;
+  --paper:#EEF2F5;
+  --sheet:#FFFFFF;
+  --rule:#C9D3DD;
+  --bridge:#2457B8;
+  --bridge-wash:#E3ECFA;
+  --amber:#A86A00;
+  --amber-wash:#FBF0DA;
+  --red:#A83232;
+  --red-wash:#F8E4E4;
+  --green:#22704E;
+  --green-wash:#E0F1E8;
+  --focus:#2457B8;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --ink:#E4EAF2;
+    --ink-soft:#A9B6C8;
+    --paper:#0E1726;
+    --sheet:#16233A;
+    --rule:#2C3D58;
+    --bridge:#8FB3F5;
+    --bridge-wash:#1C3157;
+    --amber:#F0B44A;
+    --amber-wash:#3A2C10;
+    --red:#F08A8A;
+    --red-wash:#3D1C1C;
+    --green:#7CD3A8;
+    --green-wash:#163A2A;
+    --focus:#8FB3F5;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --ink:#E4EAF2;
+  --ink-soft:#A9B6C8;
+  --paper:#0E1726;
+  --sheet:#16233A;
+  --rule:#2C3D58;
+  --bridge:#8FB3F5;
+  --bridge-wash:#1C3157;
+  --amber:#F0B44A;
+  --amber-wash:#3A2C10;
+  --red:#F08A8A;
+  --red-wash:#3D1C1C;
+  --green:#7CD3A8;
+  --green-wash:#163A2A;
+  --focus:#8FB3F5;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 7.5rem);-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-size:1rem;line-height:1.55;
+}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--sheet)}
+a{color:var(--bridge)}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:3px}
+
+.wrap{max-width:46rem;margin:0 auto;padding:0 1.1rem}
+
+/* Masthead */
+.mast{padding:2.4rem 0 1.6rem}
+.mast .for{font-size:.9rem;color:var(--ink-soft);margin:0 0 .9rem}
+.mast h1{
+  font-family:"Literata",Georgia,serif;font-weight:700;
+  font-size:clamp(2rem,6.5vw,3.1rem);line-height:1.08;letter-spacing:-.01em;margin:0 0 1rem;
+}
+.mast .lede{font-family:"Literata",Georgia,serif;font-size:1.15rem;line-height:1.5;margin:0;max-width:38rem}
+.legend{display:flex;flex-wrap:wrap;gap:.5rem 1rem;margin:1.4rem 0 0;padding:0;list-style:none;font-size:.85rem;color:var(--ink-soft)}
+.legend li{display:flex;align-items:center;gap:.4rem}
+
+/* Sticky bar */
+.bar{
+  position:sticky;top:env(safe-area-inset-top,0px);z-index:5;
+  background:var(--sheet);border-bottom:1px solid var(--rule);
+}
+.bar .wrap{display:flex;flex-direction:column;gap:.55rem;padding-top:.6rem;padding-bottom:.6rem}
+.tools{display:flex;gap:.5rem;align-items:center}
+.tools input{
+  flex:1;min-width:0;font:inherit;font-size:.95rem;color:var(--ink);
+  background:var(--paper);border:1px solid var(--rule);border-radius:8px;padding:.5rem .7rem;
+}
+.tools input::placeholder{color:var(--ink-soft)}
+
+/* Sections */
+main{padding-bottom:4rem}
+section{padding-top:2.2rem}
+details.sec > summary{
+  list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:1rem;
+  padding:.5rem 0 .6rem;border-bottom:2px solid var(--ink);margin:0 0 1rem;
+}
+details.sec > summary::-webkit-details-marker{display:none}
+details.sec > summary h2{
+  font-family:"Literata",Georgia,serif;font-size:1.55rem;font-weight:700;line-height:1.2;margin:0;
+}
+details.sec > summary::after{
+  content:"";flex:none;width:.7rem;height:.7rem;margin-right:.2rem;
+  border-right:2px solid var(--ink);border-bottom:2px solid var(--ink);transform:rotate(45deg);
+  transition:transform .15s ease;
+}
+details.sec[open] > summary::after{transform:rotate(225deg)}
+
+/* Sound-bite items */
+details.item{
+  background:var(--sheet);border:1px solid var(--rule);border-left:4px solid var(--bridge);
+  border-radius:4px 10px 10px 4px;margin:0 0 .7rem;
+}
+details.item.discuss{border-left-color:var(--amber)}
+details.item.avoid{border-left-color:var(--red)}
+details.item.ask{border-left-color:var(--green)}
+details.item > summary{
+  list-style:none;cursor:pointer;padding:.9rem 2.6rem .9rem 1rem;position:relative;
+}
+details.item > summary::-webkit-details-marker{display:none}
+details.item > summary::after{
+  content:"";position:absolute;right:1rem;top:1.15rem;width:.6rem;height:.6rem;
+  border-right:2px solid var(--ink-soft);border-bottom:2px solid var(--ink-soft);transform:rotate(45deg);
+  transition:transform .15s ease;
+}
+details.item[open] > summary::after{transform:rotate(225deg);top:1.4rem}
+.say{font-family:"Literata",Georgia,serif;font-size:1.12rem;line-height:1.45;margin:0;display:block}
+.topic{display:block;font-size:.8rem;font-weight:600;color:var(--ink-soft);margin:0 0 .3rem}
+.tag{
+  display:inline-block;font-size:.72rem;font-weight:700;padding:.1rem .45rem;border-radius:4px;margin-left:.35rem;vertical-align:.1em;
+}
+.tag.d{background:var(--amber-wash);color:var(--amber)}
+.tag.v{background:var(--red-wash);color:var(--red)}
+details.item.flat > summary{cursor:default;pointer-events:none}
+details.item.flat > summary::after{display:none}
+.more{padding:0 1rem 1rem;border-top:1px dashed var(--rule);margin:0 1rem 0;padding-left:0;padding-right:0}
+.more p,.more ul{margin:.8rem 0 0}
+.more ul{padding-left:1.15rem}
+.more li{margin:.3rem 0}
+.more .src{font-size:.82rem;color:var(--ink-soft)}
+.more .src a{word-break:break-word}
+.more strong{font-weight:600}
+
+/* Project rows */
+.proj summary .name{font-weight:700;font-size:1.02rem}
+.proj summary .where{font-weight:400;color:var(--ink-soft);font-size:.9rem}
+.proj summary .two{display:block;margin-top:.35rem;font-family:"Literata",Georgia,serif;font-size:1.02rem;line-height:1.45}
+
+/* Elevator block */
+.elevator{
+  background:var(--ink);color:var(--sheet);border-radius:12px;padding:1.3rem 1.2rem 1.2rem;margin:0 0 .9rem;
+}
+.elevator p{font-family:"Literata",Georgia,serif;font-size:1.25rem;line-height:1.45;margin:0}
+.elevator p + p{margin-top:.8rem}
+
+.legend .sw{width:.8rem;height:.8rem;border-radius:2px;display:inline-block}
+.sw.b{background:var(--bridge)} .sw.a{background:var(--amber)} .sw.r{background:var(--red)} .sw.g{background:var(--green)}
+
+.empty{display:none;padding:2rem 0;color:var(--ink-soft)}
+.hidden{display:none !important}
+footer{color:var(--ink-soft);font-size:.85rem;padding:2rem 0 3rem;border-top:1px solid var(--rule);margin-top:2rem}
+
+mark{background:var(--amber-wash);color:inherit;padding:0 .1em;border-radius:2px}
+
+@media (min-width:720px){
+  .tools{max-width:28rem}
+}
+@media (prefers-reduced-motion: reduce){*{transition:none !important;scroll-behavior:auto !important}}
+@media print{
+  .bar{position:static}
+  details.item > .more{display:block}
+}
+</style>
+</head>
+<body>
+
+<header class="wrap mast">
+  <h1>AI in medical devices: BlueBridge positions and current developments</h1>
+  <p class="lede">Each line is a short statement. Tap it for supporting detail.</p>
+</header>
+
+<div class="bar">
+  <div class="wrap">
+    <div class="tools">
+      <input id="q" type="search" placeholder="Search, e.g. agent, evaluation, UpDoc" aria-label="Search the sheet">
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+
+<section id="pitch">
+  <details class="sec" open data-open>
+    <summary><h2>The 20-second version</h2></summary>
+    <div class="sec-body">
+
+  <div class="elevator">
+    <p>Most AI health startups can build the model. The hard part is proving it’s safe enough to clear.</p>
+    <p>We have twenty years’ experience in regulated medical software, taking AI imaging devices through design controls and clinical validation.</p>
+    <p>We’re now developing new methodologies for LLM-based devices.</p>
+    <p>We’ve built our own design-control platform to maintain the traceability and rigour while letting us move as fast as AI tools write code, so documentation never lags behind the product.</p>
+  </div>
+    </div>
+  </details>
+</section>
+
+<section id="direction">
+  <details class="sec">
+    <summary><h2>Where we’re heading</h2></summary>
+    <div class="sec-body">
+
+  <details class="item">
+    <summary><span class="topic">AI-enabled devices</span><span class="say">We already deliver AI imaging devices through design controls, risk management and clinical validation.</span></summary>
+    <div class="more">
+      <p>So far our regulated AI work has been computer vision rather than generative AI. That’s where most of the market is: of about 1,500 AI devices on FDA’s list, roughly three quarters are radiology.</p>
+      <p>An <strong>AI-enabled device</strong> has AI somewhere in it, for example in the interface. With <strong>AI as the device</strong>, the AI function itself makes the medical claim. Regulators care about the second much more.</p>
+    </div>
+  </details>
+
+  <details class="item">
+    <summary><span class="topic">LLMs in devices</span><span class="say">We’re building an evaluation harness for LLM-based devices, because nobody has a settled answer yet for how you show a generative model is safe enough.</span></summary>
+    <div class="more">
+      <p>Our starting assumptions: the model is locked, we don’t fine-tune, and the things that vary are the prompt and the context. That turns the problem into one we can measure: for a given input, how repeatable and how safe is the output?</p>
+      <p>We bring evaluation experience from two non-regulated LLM projects (RFX and Propylon, see Projects) and from regulated imaging AI. There are no LLM device clients yet.</p>
+    </div>
+  </details>
+
+  <details class="item">
+    <summary><span class="topic">Our own platform</span><span class="say">We’ve built our own design-control platform so our process can keep up with AI-speed development without dropping traceability.</span></summary>
+    <div class="more">
+      <p>See “Our platform” for detail. Short version: we decided to build rather than buy, rewrote our SOPs at the same time, and the platform is those SOPs in software form. We build it with Claude, inside our ISO 13485 system.</p>
+    </div>
+  </details>
+    </div>
+  </details>
+</section>
+
+<section id="qdp">
+  <details class="sec">
+    <summary><h2>Our platform (QDP)</h2></summary>
+    <div class="sec-body">
+
+  <details class="item">
+    <summary><span class="topic">Why</span><span class="say">Code is fast now. Design controls are the bottleneck.</span></summary>
+    <div class="more">
+      <ul>
+        <li>SOPs overhauled alongside the platform.</li>
+      </ul>
+    </div>
+  </details>
+  <details class="item">
+    <summary><span class="topic">The idea</span><span class="say">The software is a manifestation of our SOPs.</span></summary>
+    <div class="more">
+      <ul>
+        <li>Process is the path of least resistance.</li>
+        <li>Human in the loop makes the best choices.</li>
+        <li>Required steps happen by default.</li>
+      </ul>
+    </div>
+  </details>
+  <details class="item">
+    <summary><span class="topic">Traceability</span><span class="say">Traceability is the default.</span></summary>
+    <div class="more">
+      <ul>
+        <li>V-model links and traceability matrix.</li>
+        <li>Upstream change flags suspect links.</li>
+        <li>Impact analysis before a change goes in.</li>
+        <li>Gap list: no test, failed test, open risk.</li>
+        <li>Signed revisions. Full audit trail.</li>
+      </ul>
+    </div>
+  </details>
+  <details class="item">
+    <summary><span class="topic">AI’s role</span><span class="say">AI drafts and checks. A named human approves.</span></summary>
+    <div class="more">
+      <ul>
+        <li>Platform is the system of record.</li>
+        <li>Approval on record: ID, version, reason, author, approver.</li>
+        <li>AI inputs kept so outputs can be reproduced.</li>
+      </ul>
+    </div>
+  </details>
+  <details class="item">
+    <summary><span class="topic">Non-determinism</span><span class="say">LLMs get narrow jobs, never open-ended ones.</span></summary>
+    <div class="more">
+      <ul>
+        <li>One task per call.</li>
+        <li>Specific prompt and context, version-controlled.</li>
+        <li>A rubric for each task.</li>
+        <li>Easier to test, repeat and review.</li>
+      </ul>
+    </div>
+  </details>
+  <details class="item">
+    <summary><span class="topic">Results</span><span class="say">Time savings being measured on past and mock projects. No figures yet.</span></summary>
+  </details>
+    </div>
+  </details>
+</section>
+
+<section id="current">
+  <details class="sec">
+    <summary><h2>Current developments</h2></summary>
+    <div class="sec-body">
+
+  <details class="item">
+    <summary><span class="topic">Agents</span><span class="say">Agents raise the bar for evaluation, because the route to the answer has to be checked as well as the answer itself.</span></summary>
+    <div class="more"><p>More detail under “Agents” in Evaluation. UpDoc, the first cleared device described as an agent, kept the regulated function deterministic.</p></div>
+  </details>
+
+  <details class="item">
+    <summary><span class="topic">Recent references</span><span class="say">Developments from the last six months.</span></summary>
+    <div class="more">
+      <ul>
+        <li>UpDoc clearance (announced June 2026).</li>
+        <li>EU AI Omnibus deal (May 2026) and the 2028 date for devices.</li>
+        <li>FDA’s January 2026 CDS and wellness changes; QMSR in force since February.</li>
+        <li>CDRH’s FY2027 guidance agenda (October 2026).</li>
+        <li>OpenAI’s HealthBench Professional (April 2026), aimed at clinician workflows: care consultation, documentation, research.</li>
+        <li>“Emerging Trends in AI Agent Evaluation”, Princeton, Stanford, UK AISI and others (October 2026).</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="item">
+    <summary><span class="topic">Open problem</span><span class="say">There is no settled method yet for validating generative AI in a medical device.</span></summary>
+    <div class="more"><p>FDA has said traditional performance metrics may not be enough for generative AI and that new metrics may be needed.</p></div>
+  </details>
+    </div>
+  </details>
+</section>
+
+<section id="ask">
+  <details class="sec">
+    <summary><h2>Questions for AI startups</h2></summary>
+    <div class="sec-body">
+
+  <details class="item ask">
+    <summary><span class="say">If you run the same case ten times, how different are the answers?</span></summary>
+    <div class="more"><p>Leads into repeatability, worst of n and our evaluation harness.</p></div>
+  </details>
+  <details class="item ask">
+    <summary><span class="say">What happens to your evidence when your model provider releases a new version?</span></summary>
+    <div class="more"><p>Leads into locked versions, PCCPs and treating the vendor as a supplier.</p></div>
+  </details>
+  <details class="item ask">
+    <summary><span class="say">Have you tested whether clinicians actually catch the model’s mistakes?</span></summary>
+    <div class="more"><p>Seeded errors in a usability study show whether the human in the loop is a real control.</p></div>
+  </details>
+  <details class="item ask">
+    <summary><span class="say">Which patient data goes to the model provider, and where is it processed?</span></summary>
+    <div class="more"><p>Hosted models mean PHI may leave their environment. Leads into our de-identification and data pipeline work.</p></div>
+  </details>
+    </div>
+  </details>
+</section>
+
+<section id="regulation">
+  <details class="sec">
+    <summary><h2>Regulation as of November 2026</h2></summary>
+    <div class="sec-body">
+
+  <details class="item">
+    <summary><span class="topic">FDA · first LLM device</span><span class="say">The first patient-facing LLM device FDA cleared kept the LLM away from the dose. The LLM turns what the patient says into data, and a rules-based engine does the calculation.</span></summary>
+    <div class="more">
+      <ul>
+        <li>UpDoc, 510(k) K253281, cleared 23 December 2025 and announced in June 2026. Insulin management for adults with type 2 diabetes.</li>
+        <li>The insulin instructions come from a deterministic service using clinician-set parameters. The predicate was an existing dose calculator, so no De Novo was needed.</li>
+        <li>Where the LLM sits in the architecture determines the regulatory path.</li>
+        <li>UpDoc was on our list of possible contacts.</li>
+      </ul>
+      <p class="src">Sources: <a href="https://innolitics.com/articles/updoc-fda-cleared-ai-agent/">Innolitics</a>, <a href="https://intuitionlabs.ai/articles/fda-clears-first-llm-medical-device">IntuitionLabs</a></p>
+    </div>
+  </details>
+
+  <details class="item">
+    <summary><span class="topic">FDA · lifecycle guidance</span><span class="say">FDA’s main AI lifecycle guidance has been in draft since January 2025, and finalising it is at the top of the device centre’s list for this year.</span></summary>
+    <div class="more">
+      <ul>
+        <li>It applies a total product lifecycle approach: data management, bias, user interface and what clinicians need to understand, post-market monitoring.</li>
+        <li>Also on CDRH’s FY2027 priority list: a draft guidance on generative AI conversational devices for mental health.</li>
+        <li>One trade article describes this guidance as already final. RAPS reported it as still to be finalised on 2 October. FDA’s own guidance page is the reference.</li>
+      </ul>
+      <p class="src">Source: <a href="https://www.raps.org/resource/fda-s-device-center-releases-guidance-agenda-for-fy-2027.html">RAPS, 2 Oct 2026</a></p>
+    </div>
+  </details>
+
+  <details class="item">
+    <summary><span class="topic">FDA · decision support</span><span class="say">In January FDA widened the room for decision-support software that isn’t regulated as a device. That gets startups to market faster, and it doesn’t give them evidence a hospital or an acquirer will accept.</span></summary>
+    <div class="more">
+      <ul>
+        <li>6 January 2026: revised CDS and general wellness guidance, published without a comment period.</li>
+        <li>FDA will use enforcement discretion for CDS that gives a single recommendation, if it is the only clinically appropriate option.</li>
+        <li>Most of the “time-critical means it’s a device” language came out, and the transparency expected of CDS can be less detailed.</li>
+        <li>Patient-facing tools and opaque models are still treated as devices. Generative AI isn’t addressed directly.</li>
+      </ul>
+      <p class="src">Sources: <a href="https://www.thefdalawblog.com/2026/01/a-busy-day-in-the-cdrh-neighborhood-updates-to-the-cds-and-general-wellness-guidance-documents/">FDA Law Blog</a>, <a href="https://www.mcdermottlaw.com/?p=349174">McDermott</a></p>
+    </div>
+  </details>
+
+  <details class="item">
+    <summary><span class="topic">FDA · quality system</span><span class="say">Since February, FDA’s quality system rule lines up with ISO 13485. We’ve run a certified 13485 system for years, so for our clients nothing has to change.</span></summary>
+    <div class="more">
+      <ul>
+        <li>QMSR took effect on 2 February 2026.</li>
+        <li>FDA also finalised updated cybersecurity guidance in February 2026. Most AI devices that connect to the internet count as cyber devices.</li>
+      </ul>
+      <p class="src">Sources: <a href="https://www.ballardspahr.com/insights/alerts-and-articles/2025/08/fda-issues-guidance-on-ai-for-medical-devices">Ballard Spahr</a>, <a href="https://www.everycrsreport.com/files/2026-06-10_IF13245_a062d3256b14467042f923d516b73e8dded4e8a0.html">Congressional Research Service</a></p>
+    </div>
+  </details>
+
+  <details class="item">
+    <summary><span class="topic">Canada</span><span class="say">Health Canada has its own route for pre-approving model updates, and this year it tightened what it expects after launch.</span></summary>
+    <div class="more">
+      <ul>
+        <li>Pre-market guidance for machine-learning-enabled medical devices, Class II to IV, including PCCPs, good machine learning practice and sex- and gender-based analysis (SGBA Plus).</li>
+        <li>March–April 2026: five new or revised guidances, including terms and conditions that can be put on a licence at any point, and clinical evidence across the lifecycle.</li>
+        <li>Relevant to the Canada outreach, and TomoVerse is Canadian.</li>
+      </ul>
+      <p class="src">Sources: <a href="https://www.blg.com/en/insights/2025/02/health-canadas-evolving-regulatory-framework-for-machine-learning-enabled-medical-devices">BLG</a>, <a href="https://www.nsf.org/au/en/life-science-regulatory-news/new-health-canada-guidance-documents-medical-devices-published-march-april-2026">NSF</a></p>
+    </div>
+  </details>
+    </div>
+  </details>
+</section>
+
+<section id="terms">
+  <details class="sec">
+    <summary><h2>AI terms you’ll hear</h2></summary>
+    <div class="sec-body">
+
+  <details class="item"><summary><span class="topic">Foundation model / LLM</span><span class="say">A large general-purpose model, such as GPT, Claude or Gemini, trained by a vendor and used by others as a component.</span></summary><div class="more"><p>For a device company it’s usually off-the-shelf software (SOUP) from a supplier that releases new versions on its own schedule. FDA has said it wants to start tagging devices that use foundation models on its AI device list.</p></div></details>
+
+  <details class="item"><summary><span class="topic">Agent</span><span class="say">An LLM that plans over several steps and acts by calling tools, rather than answering one prompt.</span></summary><div class="more"><p>Examples: looking things up in an EHR, running a calculation, writing to a system, messaging a patient. More autonomy means more ways to go wrong, and evaluation has to check each step as well as the result.</p></div></details>
+
+  <details class="item"><summary><span class="topic">Scaffold / harness</span><span class="say">The code, tools and prompts wrapped around a model to make it an agent. An evaluation harness is the setup that runs the tests.</span></summary><div class="more"><p>Change the scaffold and performance changes, even with the same model, so the model and scaffold are evaluated as a combination.</p></div></details>
+
+  <details class="item"><summary><span class="topic">Trajectory</span><span class="say">The full record of what an agent did: every step, tool call and intermediate result.</span></summary><div class="more"><p>Reviewing trajectories is how you spot shortcuts or unsafe actions that a correct final answer hides.</p></div></details>
+
+  <details class="item"><summary><span class="topic">Tool use / MCP</span><span class="say">Letting a model call external functions. MCP (Model Context Protocol) is the emerging standard for plugging tools and data sources into models.</span></summary><div class="more"><p>Each connected tool is something the model can misuse or be tricked into misusing, so it belongs in the risk analysis.</p></div></details>
+
+  <details class="item"><summary><span class="topic">RAG / grounding</span><span class="say">Retrieval-augmented generation: the system fetches relevant documents and the model answers from them, ideally citing them.</span></summary><div class="more"><p>The usual way to get current or product-specific knowledge without retraining. Two things to test: did retrieval find the right documents, and does the answer actually match them.</p></div></details>
+
+  <details class="item"><summary><span class="topic">Context and prompt</span><span class="say">The prompt is the instructions; the context is everything the model sees for a given request, including retrieved documents and conversation history.</span></summary><div class="more"><p>With a locked model these are the things that vary, so they need version control like any other design input.</p></div></details>
+
+  <details class="item"><summary><span class="topic">Hallucination</span><span class="say">Output that is fluent and confident but not supported by the input or by fact.</span></summary><div class="more"><p>Measure the rate, and grade each one by how much harm it could do.</p></div></details>
+
+  <details class="item"><summary><span class="topic">Non-determinism</span><span class="say">The same input can give different outputs from one run to the next.</span></summary><div class="more"><p>Settings such as temperature reduce it but rarely remove it, and hosted models can change behind the same name. Hence repeated runs and pinned model versions.</p></div></details>
+
+  <details class="item"><summary><span class="topic">Fine-tuning vs prompting</span><span class="say">Fine-tuning retrains the model on your data; prompting and retrieval steer a model that stays unchanged.</span></summary><div class="more"><p>Fine-tuning brings training-data obligations with it. Our default is a locked model with controlled prompts and context.</p></div></details>
+
+  <details class="item"><summary><span class="topic">Reasoning models</span><span class="say">Models that work through a problem in visible intermediate steps before answering, often called chain of thought.</span></summary><div class="more"><p>Useful for monitoring, but the visible reasoning isn’t guaranteed to reflect what actually drove the answer.</p></div></details>
+
+  <details class="item"><summary><span class="topic">LLM as judge</span><span class="say">Using one model to grade another’s output. It needs calibrating against human experts before you trust it.</span></summary><div class="more"><p>Also called an autograder. Its own error should show up in the reported uncertainty.</p></div></details>
+
+  <details class="item"><summary><span class="topic">pass@k vs pass^k</span><span class="say">pass@k means it succeeds at least once in k tries; pass^k means it succeeds every time. Devices need the second.</span></summary><div class="more"><p>See “Worst case” under Evaluation for the worked numbers.</p></div></details>
+
+  <details class="item"><summary><span class="topic">Red-teaming</span><span class="say">Deliberately trying to make the system fail or misbehave before users do.</span></summary><div class="more"><p>For LLMs that includes jailbreaks (talking the model past its safeguards) and adversarial phrasing of clinical questions.</p></div></details>
+
+  <details class="item"><summary><span class="topic">Prompt injection</span><span class="say">Instructions hidden in content the model reads, such as a document or web page, that hijack what it does.</span></summary><div class="more"><p>The main security risk for agents that read external data. It’s a cybersecurity issue as well as an AI one.</p></div></details>
+
+  <details class="item"><summary><span class="topic">Contamination</span><span class="say">When test questions or answers were in the model’s training data, so a high score reflects memory rather than ability.</span></summary><div class="more"><p>One reason public benchmark scores say little about a specific device.</p></div></details>
+
+  <details class="item"><summary><span class="topic">Reward hacking</span><span class="say">The system meets the letter of the test without doing the task as intended.</span></summary><div class="more"><p>For example, an agent that finds the answer key instead of solving the problem. Trajectory review catches it.</p></div></details>
+    </div>
+  </details>
+</section>
+
+<section id="evaluation">
+  <details class="sec">
+    <summary><h2>Evaluation</h2></summary>
+    <div class="sec-body">
+
+  <details class="item">
+    <summary><span class="topic">The core position</span><span class="say">You don’t validate an LLM. You validate a bounded system that contains one: this task, for these users, in this workflow.</span></summary>
+    <div class="more">
+      <p>FDA defines an AI device function by what it’s intended to do, and the EU AI Act classifies risk the same way. The same model writing a meeting summary and recommending a cancer treatment sits in completely different risk classes. The model is identical; the system around it is what changed.</p>
+    </div>
+  </details>
+
+  <details class="item">
+    <summary><span class="topic">No single score</span><span class="say">With generative AI there isn’t one right answer, so one accuracy number won’t do. We report a set of metrics, and we weight each error by how much harm it could do.</span></summary>
+    <div class="more">
+      <p>Typical set: clinically significant hallucination rate, critical omission rate, consistency when the question is reworded, refusal rate, and performance by subgroup and site.</p>
+      <p>Example: inventing a patient’s middle name and inventing a contraindication are both hallucinations, and only one of them can hurt someone. FDA’s advisory committee asked for error frequency and severity for this reason.</p>
+    </div>
+  </details>
+
+  <details class="item">
+    <summary><span class="topic">Worst case</span><span class="say">Averages hide the dangerous cases. We run the same case many times and look at the worst answer, because any one of those answers could be the one a patient gets.</span></summary>
+    <div class="more">
+      <p>The Princeton, Stanford and UK AI Security Institute survey of agent evaluation (October 2026) has a clean illustration. Give an agent four tasks, five tries each. It succeeds on a single try 45% of the time. It succeeds at least once on 75% of tasks. It succeeds every time on only 25%. Companies tend to quote the 75%. For a device, the 25% is the number that matters.</p>
+      <p>OpenAI’s HealthBench reports “worst of n” for the same reason.</p>
+    </div>
+  </details>
+
+  <details class="item">
+    <summary><span class="topic">LLM as judge</span><span class="say">An LLM grader is a measuring instrument. Before we trust its scores, we calibrate it against clinicians, the same way you’d calibrate a lab assay.</span></summary>
+    <div class="more">
+      <ul>
+        <li>Check the grader against expert-labelled cases from the actual intended use.</li>
+        <li>Put the grader’s own error into the error bars. UK AISI uses a panel of LLM graders and reports the median.</li>
+        <li>Have experts review flagged cases plus a random sample.</li>
+      </ul>
+      <p>It isn’t a new idea, but most startups skip it.</p>
+    </div>
+  </details>
+
+  <details class="item">
+    <summary><span class="topic">Use the right tool</span><span class="say">Wherever a deterministic check exists, we use it. Expert judgement is for the parts that genuinely need a judgement.</span></summary>
+    <div class="more">
+      <p>Doses, units, required fields, citations and structured output can all be checked by code. Clinical quality and tone need rubrics graded by experts or a calibrated LLM. Questions about how people use the tool need human studies. Google’s health-agent work splits the evaluation in this way.</p>
+    </div>
+  </details>
+
+  <details class="item">
+    <summary><span class="topic">Locked model</span><span class="say">We lock the model and treat the prompt and context as the variables. The question becomes: for a given input, how repeatable is the output?</span></summary>
+    <div class="more">
+      <p>We record model version, prompt version and the identity of every source the model saw, so any output can be reproduced. A new model version is treated as a design change and re-run against the full test set.</p>
+    </div>
+  </details>
+
+  <details class="item">
+    <summary><span class="topic">Agents</span><span class="say">With agents, how they got there matters as much as the answer. Two runs can reach the same result and one of them took an unsafe shortcut on the way.</span></summary>
+    <div class="more">
+      <p>From the October agent-evaluation survey:</p>
+      <ul>
+        <li>Performance depends on the model and on the scaffolding and tools around it. Swap either and the results change, so you evaluate the combination.</li>
+        <li>Read the logs, not just the final answers. That’s where shortcuts, cheating and contamination show up.</li>
+        <li>The test harness is itself something that can be wrong, and it needs checking.</li>
+        <li>Agents that use tools expand the security surface: prompt injection through a document the agent reads is a real hazard.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="item">
+    <summary><span class="topic">Human in the loop</span><span class="say">A human in the loop counts as a risk control only if you’ve tested whether the human actually catches the errors.</span></summary>
+    <div class="more">
+      <p>Automation bias is well documented: people approve confident-looking output. FDA’s January 2026 decision-support guidance discusses automation bias explicitly. So validation should include the clinician and the AI together, with seeded errors, to measure how many get caught.</p>
+    </div>
+  </details>
+
+  <details class="item">
+    <summary><span class="topic">Benchmarks</span><span class="say">A high score on a medical exam benchmark tells you something about the model and nothing about your device.</span></summary>
+    <div class="more">
+      <p>Example: researchers took USMLE questions and swapped brand drug names for generic names. The models often gave different answers, even though they knew the two names meant the same drug. That suggests memorisation rather than understanding. HealthBench is a good benchmark, and its authors would agree it isn’t a validation framework for a specific device.</p>
+    </div>
+  </details>
+
+  <details class="item">
+    <summary><span class="topic">Summary</span><span class="say">Done properly, LLM validation looks like regulatory science again: a test harness and a set of metrics in place of sensitivity and specificity.</span></summary>
+    <div class="more">
+      <p>Worked example. Intended use: write patient discharge instructions from a clinician-approved summary. Take about 2,000 representative cases, several prompt variants and repeated runs: tens of thousands of outputs. Code checks catch medication and dose errors. A calibrated LLM grader scores clarity and completeness. Clinicians review everything flagged plus a sample. You report hallucination rate, critical omission rate, medication transcription errors, consistency and subgroup performance.</p>
+    </div>
+  </details>
+    </div>
+  </details>
+</section>
+
+<section id="opinions">
+  <details class="sec">
+    <summary><h2>Opinions for debate</h2></summary>
+    <div class="sec-body">
+
+  <details class="item discuss">
+    <summary><span class="topic">Architecture<span class="tag d">Discuss</span></span><span class="say">Design LLM devices so the AI never makes the medical decision itself.</span></summary>
+    <div class="more">
+      <ul>
+        <li>An LLM (large language model) is the type of AI behind ChatGPT and Claude. Its answers can vary from run to run and can be wrong.</li>
+        <li>Use it for language: taking in what the patient says, summarising, explaining.</li>
+        <li>Leave the medical step, such as a dose calculation or a classification, to ordinary software. It gives the same result every time and can be tested the usual way.</li>
+        <li>UpDoc, the first cleared LLM device, was built like this.</li>
+        <li>Counter: if the AI’s clinical reasoning is the whole value of the product, this doesn’t work, and the evidence needed is much harder to produce.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="item discuss">
+    <summary><span class="topic">Deregulation<span class="tag d">Discuss</span></span><span class="say">Less regulation doesn’t remove the need to prove the product works.</span></summary>
+    <div class="more">
+      <ul>
+        <li>FDA is easing oversight of some software, so some products now need less regulatory review.</li>
+        <li>Buyers of the company will still want proof that the product does what it says.</li>
+        <li>Hospitals and other customers want that proof too, before they trust it with patients.</li>
+        <li>Testing and quality records are good practice whether or not a regulator demands them.</li>
+        <li>A later feature change can bring a product back under device rules.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="item discuss">
+    <summary><span class="topic">Model vendors<span class="tag d">Discuss</span></span><span class="say">Treat the company supplying the AI model like any other critical supplier.</span></summary>
+    <div class="more">
+      <ul>
+        <li>Most startups build on a model made by another company, such as OpenAI, Anthropic or Google. This is called a foundation model.</li>
+        <li>Those companies update their models regularly, which can change how the product behaves.</li>
+        <li>ISO 13485 already covers this for suppliers: assess them, control what you buy, track their changes.</li>
+        <li>So a model update is a supplier change: re-test before accepting it.</li>
+        <li>That’s why we pin each product to one specific model version instead of letting it update itself.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="item discuss">
+    <summary><span class="topic">The bottleneck<span class="tag d">Discuss</span></span><span class="say">Building a medical AI product is cheap now. Showing it’s safe and works is the expensive part.</span></summary>
+    <div class="more">
+      <ul>
+        <li>AI tools let a small team build a working prototype quickly.</li>
+        <li>The slow, costly work is the testing, documentation and clinical evidence that regulators and buyers need.</li>
+        <li>So the advantage goes to companies that can produce that proof efficiently, not to those that build fastest.</li>
+      </ul>
+    </div>
+  </details>
+    </div>
+  </details>
+</section>
+
+<section id="careful">
+  <details class="sec">
+    <summary><h2>Limits of current claims</h2></summary>
+    <div class="sec-body">
+
+  <details class="item avoid">
+    <summary><span class="say">No time-saving figures for the platform. We’re still measuring.</span></summary>
+    <div class="more"><p>Testing is under way on past and mock projects.</p></div>
+  </details>
+  <details class="item avoid">
+    <summary><span class="say">The LLM evaluation harness is in development.</span></summary>
+    <div class="more">
+      <p>The methods are well thought through; the tooling isn’t finished. What it’s designed to do, in short:</p>
+      <ul>
+        <li><strong>Worst of n:</strong> run each test case several times and score the worst answer, not the average. Any one of those answers could be the one a patient gets.</li>
+        <li><strong>Repeat and compare:</strong> run the same input many times and measure how much the answers vary. Low variation is evidence in itself.</li>
+        <li><strong>Look at the spread:</strong> report the distribution of outputs, not one headline number, so rare bad answers are visible.</li>
+        <li><strong>Reliability as a metric:</strong> succeeding every time counts for more than succeeding at least once.</li>
+        <li><strong>Deterministic wherever possible:</strong> fixed model version, controlled settings, and code-based checks for anything that can be checked by code.</li>
+        <li><strong>Calibrated grading:</strong> where an LLM grades outputs, its scores are checked against expert judgement first.</li>
+      </ul>
+    </div>
+  </details>
+  <details class="item avoid">
+    <summary><span class="say">Our LLM projects so far were not medical devices.</span></summary>
+    <div class="more"><p>RFX and Propylon show evaluation skill, not regulatory experience with LLMs. Our regulated AI is computer vision.</p></div>
+  </details>
+    </div>
+  </details>
+</section>
+
+<section id="projects">
+  <details class="sec">
+    <summary><h2>Projects</h2></summary>
+    <div class="sec-body">
+
+  <details class="item proj">
+    <summary><span class="name">TomoVerse</span> <span class="where">Canada · cardiology · AI imaging SaMD</span>
+      <span class="two">tvCT: AI-assisted CT planning for TAVR. The AI proposes segmentations and measurements of the aortic root; a clinician reviews and adjusts.</span></summary>
+    <div class="more">
+      <ul>
+        <li>Locked, clinician-supervised model.</li>
+        <li>AI development practice follows ISO/IEC 5338, with FDA AI guidance as the reference.</li>
+        <li>Model development plan and data management plan, plus a clinical validation plan built around a multi-centre comparison of automated measurements with expert readers.</li>
+        <li>Data pipeline: DICOM ingestion, de-identification, pre- and post-processing, enforced governance.</li>
+        <li>Evaluated at three levels: the model, the derived measurements, and the locked end-to-end workflow.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="item proj">
+    <summary><span class="name">Entia</span></summary>
+    <div class="more">
+      <ul>
+        <li>AI computer vision in a regulated diagnostic setting.</li>
+        <li>Finds cell layers in centrifuged blood samples, more robustly than the previous approach.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="item proj">
+    <summary><span class="name">Novus</span></summary>
+    <div class="more">
+      <ul>
+        <li>AI computer vision in a regulated diagnostic instrument.</li>
+        <li>Detects fluid fill state in assay cartridges, robust to lighting, exposure and camera alignment.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="item proj">
+    <summary><span class="name">RFX</span> <span class="where">Not regulated · LLM scoring</span>
+      <span class="two">LLMs score tender responses against a rubric.</span></summary>
+    <div class="more">
+      <ul>
+        <li>Scored against a rubric, with reasons and quoted source text.</li>
+        <li>Tested answers of different strength: strong, medium, deliberately weakened.</li>
+        <li>Checked scores fall as quality falls (monotonicity).</li>
+        <li>Measured variance across runs, prompts and models.</li>
+        <li>Compared with expert judgement. Reported model disagreement.</li>
+        <li>Transfers to devices: same problem as validating an LLM judge.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="item proj">
+    <summary><span class="name">Propylon</span> <span class="where">Not regulated · legal tech</span>
+      <span class="two">LLM search and version comparison over legislation.</span></summary>
+    <div class="more">
+      <ul>
+        <li>Compares two versions of a law. Classifies each change: minimal, minor or material.</li>
+        <li>Several LLMs compared against expert judgement.</li>
+        <li>Rubrics and a defined evaluation process.</li>
+        <li>Transfers to devices: material-change classification is change-impact analysis for requirements, risk controls and tests.</li>
+      </ul>
+    </div>
+  </details>
+    </div>
+  </details>
+</section>
+
+<p class="empty" id="empty">Nothing matches that search. Try a shorter word.</p>
+
+<footer>
+  BlueBridge Technologies internal notes for HLTH 2026. Regulatory items checked on 11 November 2026.
+</footer>
+</main>
+
+<script>
+(function(){
+  var items = Array.prototype.slice.call(document.querySelectorAll('details.item'));
+  var sections = Array.prototype.slice.call(document.querySelectorAll('main section'));
+  var q = document.getElementById('q');
+  var empty = document.getElementById('empty');
+
+  var secs = Array.prototype.slice.call(document.querySelectorAll('details.sec'));
+
+  var elevator = document.querySelector('.elevator');
+  q.addEventListener('input', function(){
+    var term = q.value.trim().toLowerCase();
+    var any = false;
+    items.forEach(function(d){
+      var hit = !term || d.textContent.toLowerCase().indexOf(term) !== -1;
+      d.classList.toggle('hidden', !hit);
+      if(term && hit){ d.open = true; any = true; }
+      if(!term){ any = true; }
+    });
+    if(elevator) elevator.classList.toggle('hidden', !!term && elevator.textContent.toLowerCase().indexOf(term) === -1);
+    sections.forEach(function(s){
+      var visible = s.querySelectorAll('details.item:not(.hidden)').length > 0 || (s.contains(elevator) && !elevator.classList.contains('hidden'));
+      s.classList.toggle('hidden', !visible);
+    });
+    empty.style.display = any ? 'none' : 'block';
+    if(!term){ items.forEach(function(d){ d.open = false; }); }
+    secs.forEach(function(sd){
+      if(term){ if(!sd.parentNode.classList.contains('hidden')) sd.open = true; }
+      else { sd.open = sd.hasAttribute('data-open'); }
+    });
+  });
+
+  function openFromHash(){
+    var id = location.hash.slice(1);
+    if(!id) return;
+    var el = document.getElementById(id);
+    if(el){
+      var sd = el.querySelector ? el.querySelector('details.sec') : null;
+      if(sd) sd.open = true;
+      el.scrollIntoView();
+    }
+  }
+  window.addEventListener('hashchange', openFromHash);
+  openFromHash();
+})();
+</script>
+</body>
+</html>
