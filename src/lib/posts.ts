@@ -80,3 +80,54 @@ export function getAllPosts(): PostListItem[] {
 }
 
 
+
+/**
+ * The opening lines of a post as plain text, for teasers on the home page.
+ * Skips embedded JSX, headings, quotes and images, then takes whole sentences up to roughly `maxChars`.
+ */
+export function getPostOpening(slug: string, maxChars = 320): string {
+  const { content } = readPostMdx(slug);
+  const paragraphs: string[] = [];
+  let inJsx = false;
+
+  for (const block of content.split(/\n\s*\n/)) {
+    const text = block.trim();
+    if (!text) continue;
+    if (inJsx) {
+      if (/<\/[A-Za-z][^>]*>\s*$/.test(text)) inJsx = false;
+      continue;
+    }
+    if (text.startsWith("<")) {
+      // a JSX block may span several paragraphs; skip until its closing tag
+      if (!/(\/>|<\/[A-Za-z][^>]*>)\s*$/.test(text)) inJsx = true;
+      continue;
+    }
+    if (/^(#|>|!\[|import |export |```|[-*] |\d+\. |\|)/.test(text)) {
+      if (paragraphs.length) break; // the opening ends at the first heading, quote or list
+      continue;
+    }
+    paragraphs.push(
+      text
+        .replace(/\s+/g, " ")
+        .replace(/!\[[^\]]*\]\([^)]*\)/g, "")
+        .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+        .replace(/[*_`]+/g, "")
+        .trim(),
+    );
+    if (paragraphs.join(" ").length >= maxChars) break;
+  }
+
+  const full = paragraphs.join(" ");
+  if (full.length <= maxChars) return full;
+
+  // prefer to stop at the end of a sentence
+  const sentences = full.match(/[^.!?]+[.!?]+(\s|$)/g) ?? [full];
+  let out = "";
+  for (const sentence of sentences) {
+    if (out && (out + sentence).length > maxChars) break;
+    out += sentence;
+  }
+  out = out.trim();
+  if (out.length > maxChars * 1.4) out = `${out.slice(0, maxChars).replace(/\s+\S*$/, "")}…`;
+  return out;
+}
