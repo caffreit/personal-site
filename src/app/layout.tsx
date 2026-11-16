@@ -23,6 +23,8 @@ const newsreader = Newsreader({
   variable: "--font-newsreader",
   subsets: ["latin"],
   style: ["normal", "italic"],
+  // optical sizing: large headlines get the finer display cut
+  axes: ["opsz"],
 });
 
 const mono = Geist_Mono({
