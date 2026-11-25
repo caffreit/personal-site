@@ -25,7 +25,6 @@ export function GenealogyPosterView({ posterName, posterId, stripePrices, stripe
   const [variant, setVariant] = useState(variants[0]);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const stripePrice = stripePrices[variant.id];
-  const canUseStripe = Boolean(stripePrice && stripePublishableKey);
   const [activeImage, setActiveImage] = useState(variant.gallery[0]);
   const dimensions = variant.orientation === "landscape" ? "594 × 420 mm" : "420 × 594 mm";
 
@@ -97,7 +96,7 @@ export function GenealogyPosterView({ posterName, posterId, stripePrices, stripe
           </dl>
 
           <div className="mt-6" aria-live="polite">
-            {canUseStripe ? (
+            {stripePrice && stripePublishableKey ? (
               <>
                 <p className="mb-4 font-[family-name:var(--font-display)] text-3xl">
                   {new Intl.NumberFormat("en-IE", { style: "currency", currency: stripePrice.currency }).format(stripePrice.amount / 100)}
