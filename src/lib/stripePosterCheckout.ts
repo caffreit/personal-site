@@ -4,6 +4,16 @@ export type PosterPrice = { amount: number; currency: string };
 
 export const STRIPE_API_VERSION = "2026-11-18.endive";
 
+// Default to sandbox; live payments require an explicit go-live switch.
+export function stripeKeysReady(): boolean {
+  const secret = process.env.STRIPE_SECRET_KEY ?? "";
+  const publishable = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? "";
+  return (secret.startsWith("sk_test_") && publishable.startsWith("pk_test_")) ||
+    (process.env.STRIPE_ENABLE_LIVE_PAYMENTS === "true" &&
+      secret.startsWith("sk_live_") && publishable.startsWith("pk_live_"));
+}
+
+
 const PRICE_IDS: Record<PosterId, Record<string, string | undefined>> = {
   "greek-theogony": {
     outlines: process.env.STRIPE_PRICE_GREEK_THEOGONY_OUTLINES,
@@ -27,7 +37,7 @@ export async function getPosterPrice(
     ? PRICE_IDS[posterId][variantId]
     : undefined;
   const secret = process.env.STRIPE_SECRET_KEY;
-  if (!secret || !priceId || !/^price_[A-Za-z0-9_]+$/.test(priceId)) return null;
+  if (!stripeKeysReady() || !priceId || !/^price_[A-Za-z0-9_]+$/.test(priceId)) return null;
 
   try {
     const response = await fetch(
