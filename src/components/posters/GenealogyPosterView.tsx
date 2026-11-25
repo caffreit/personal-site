@@ -5,9 +5,14 @@ import Link from "next/link";
 import { useState } from "react";
 import { ArrowLeft, ArrowUpRight } from "lucide-react";
 import type { GenealogyPosterVariant } from "@/lib/posterProducts";
+import type { PosterId, PosterPrice } from "@/lib/stripePosterCheckout";
+import StripePosterForm from "@/components/posters/StripePosterForm";
 
 export type GenealogyPosterPage = {
   posterName: string;
+  posterId: PosterId;
+  stripePrices: Record<string, PosterPrice>;
+  stripePublishableKey: string;
   kicker: string;
   title: string;
   intro: string;
@@ -16,8 +21,11 @@ export type GenealogyPosterPage = {
   variants: [GenealogyPosterVariant, ...GenealogyPosterVariant[]];
 };
 
-export function GenealogyPosterView({ posterName, kicker, title, intro, story, related, variants }: GenealogyPosterPage) {
+export function GenealogyPosterView({ posterName, posterId, stripePrices, stripePublishableKey, kicker, title, intro, story, related, variants }: GenealogyPosterPage) {
   const [variant, setVariant] = useState(variants[0]);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const stripePrice = stripePrices[variant.id];
+  const canUseStripe = Boolean(stripePrice && stripePublishableKey);
   const [activeImage, setActiveImage] = useState(variant.gallery[0]);
   const dimensions = variant.orientation === "landscape" ? "594 × 420 mm" : "420 × 594 mm";
 
@@ -75,7 +83,7 @@ export function GenealogyPosterView({ posterName, kicker, title, intro, story, r
             <div className="flex clear-both flex-wrap gap-2">
               {variants.map((option) => (
                 <label key={option.id} className="cursor-pointer">
-                  <input type="radio" name="poster-version" value={option.id} checked={option.id === variant.id} className="peer sr-only" onChange={() => { setVariant(option); setActiveImage(option.gallery[0]); }} />
+                  <input type="radio" name="poster-version" value={option.id} checked={option.id === variant.id} className="peer sr-only" onChange={() => { setVariant(option); setActiveImage(option.gallery[0]); setCheckoutOpen(false); }} />
                   <span className="block border border-[var(--rule-color)] px-4 py-3 font-mono text-[11px] uppercase tracking-[0.08em] transition-colors hover:border-[var(--foreground)] peer-checked:border-[var(--foreground)] peer-checked:bg-[var(--foreground)] peer-checked:text-[var(--background)] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-4 peer-focus-visible:outline-[var(--color-yellow)]">{option.label}</span>
                 </label>
               ))}
@@ -89,7 +97,29 @@ export function GenealogyPosterView({ posterName, kicker, title, intro, story, r
           </dl>
 
           <div className="mt-6" aria-live="polite">
-            {variant.order.status === "available" ? (
+            {canUseStripe ? (
+              <>
+                <p className="mb-4 font-[family-name:var(--font-display)] text-3xl">
+                  {new Intl.NumberFormat("en-IE", { style: "currency", currency: stripePrice.currency }).format(stripePrice.amount / 100)}
+                </p>
+                <button
+                  type="button"
+                  aria-expanded={checkoutOpen}
+                  onClick={() => setCheckoutOpen((open) => !open)}
+                  className="flex w-full items-center justify-between bg-[var(--color-yellow)] px-5 py-4 font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-[#0a0a0a] transition-opacity hover:opacity-80"
+                >
+                  {checkoutOpen ? "Close checkout" : "Buy this poster"} <ArrowUpRight className="h-4 w-4" />
+                </button>
+                {checkoutOpen && (
+                  <StripePosterForm
+                    key={posterId + ":" + variant.id}
+                    posterId={posterId}
+                    variantId={variant.id}
+                    publishableKey={stripePublishableKey}
+                  />
+                )}
+              </>
+            ) : variant.order.status === "available" ? (
               <>
                 <p className="mb-4 font-[family-name:var(--font-display)] text-3xl">
                   {new Intl.NumberFormat("en-IE", { style: "currency", currency: variant.order.currency }).format(variant.order.price)}
