@@ -3,13 +3,14 @@ import {
   getPosterPrice,
   isPosterId,
   STRIPE_API_VERSION,
+  stripeKeysReady,
 } from "@/lib/stripePosterCheckout";
 
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   const secret = process.env.STRIPE_SECRET_KEY;
-  if (!secret || !process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
+  if (!secret || !stripeKeysReady()) {
     return NextResponse.json({ error: "Checkout is not configured." }, { status: 503 });
   }
 
