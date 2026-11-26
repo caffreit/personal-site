@@ -1,0 +1,23 @@
+name: Poster fulfilment tests
+on:
+  pull_request:
+    paths:
+      - 'src/lib/prodigiOrders.ts'
+      - 'src/lib/poster*.ts'
+      - 'scripts/test-prodigi-orders.ts'
+      - 'package*.json'
+      - '.github/workflows/poster-tests.yml'
+permissions:
+  contents: read
+jobs:
+  mock-provider:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run test:prodigi
