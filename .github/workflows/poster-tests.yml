@@ -1,0 +1,95 @@
+name: Poster fulfilment tests
+on:
+  pull_request:
+    paths:
+      - 'src/lib/prodigiOrders.ts'
+      - 'src/lib/poster*.ts'
+      - 'scripts/test-prodigi-orders.ts'
+      - 'scripts/test-poster-claims.ts'
+      - 'package*.json'
+      - '.github/workflows/poster-tests.yml'
+permissions:
+  contents: read
+jobs:
+  mock-provider:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      # Temporary until the Neon dependency is added to the committed lockfile.
+      - run: npm install --ignore-scripts
+      - run: npm run test:prodigi
+
+  postgres-claims:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: poster
+          POSTGRES_PASSWORD: poster
+          POSTGRES_DB: poster_test
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --ignore-scripts
+      - run: npx --no-install tsx scripts/test-poster-claims.ts
+
+  dependency-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --package-lock-only --ignore-scripts
+      - name: Verify clean installation
+        run: npm ci --ignore-scripts
+      - name: Report dependency audit
+        run: npm audit --json > npm-audit.json
+        continue-on-error: true
+      - name: Upload regenerated lockfile and audit
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-review
+          path: |
+            package-lock.json
+            npm-audit.json
+          retention-days: 3
+
+  security-patch-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --package-lock-only --ignore-scripts
+      - run: npm audit fix --package-lock-only --ignore-scripts
+        continue-on-error: true
+      - run: npm ci --ignore-scripts
+      - run: npm run test:prodigi
+      - run: npx --no-install tsc --noEmit
+      - run: npm audit --json > npm-audit-patched.json
+        continue-on-error: true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-patch-review
+          path: |
+            package.json
+            package-lock.json
+            npm-audit-patched.json
+          retention-days: 3

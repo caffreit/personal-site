@@ -2,11 +2,15 @@
 
 import { GenealogyPosterView } from "@/components/posters/GenealogyPosterView";
 import { GREEK_THEOGONY_VARIANTS } from "@/lib/greekTheogenyPoster";
+import type { PosterPrice } from "@/lib/stripePosterCheckout";
 
-export function GreekTheogenyPosterView() {
+export function GreekTheogenyPosterView({ stripePrices, stripePublishableKey }: { stripePrices: Record<string, PosterPrice>; stripePublishableKey: string }) {
   return (
     <GenealogyPosterView
       posterName="Greek theogony"
+      posterId="greek-theogony"
+      stripePrices={stripePrices}
+      stripePublishableKey={stripePublishableKey}
       kicker="Mythology · A2 poster"
       title="Greek Theogony"
       intro="A family tree of the Greek gods, from the first beings to the Titans and Olympians."

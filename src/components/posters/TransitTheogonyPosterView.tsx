@@ -2,11 +2,15 @@
 
 import { GenealogyPosterView } from "@/components/posters/GenealogyPosterView";
 import { TRANSIT_THEOGONY_VARIANTS } from "@/lib/transitTheogonyPoster";
+import type { PosterPrice } from "@/lib/stripePosterCheckout";
 
-export function TransitTheogonyPosterView() {
+export function TransitTheogonyPosterView({ stripePrices, stripePublishableKey }: { stripePrices: Record<string, PosterPrice>; stripePublishableKey: string }) {
   return (
     <GenealogyPosterView
       posterName="Transit theogony"
+      posterId="transit-theogony"
+      stripePrices={stripePrices}
+      stripePublishableKey={stripePublishableKey}
       kicker="Mythology · A2 poster"
       title="Transit Theogony"
       intro="The Greek divine family, drawn as a transit map. Follow the lines from Chaos to the Olympians."

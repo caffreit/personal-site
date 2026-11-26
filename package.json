@@ -9,7 +9,8 @@
     "lint": "eslint",
     "generate:albums": "tsx scripts/generate-albums.ts",
     "generate:photo-meta": "tsx scripts/generate-photo-meta.ts",
-    "generate:poster-previews": "node --import tsx scripts/generate-poster-previews.ts"
+    "generate:poster-previews": "node --import tsx scripts/generate-poster-previews.ts",
+    "test:prodigi": "tsx scripts/test-prodigi-orders.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
@@ -30,7 +31,8 @@
     "recharts": "^3.4.1",
     "rehype-highlight": "^7.0.2",
     "remark-gfm": "^4.0.1",
-    "yet-another-react-lightbox": "^3.25.0"
+    "yet-another-react-lightbox": "^3.25.0",
+    "@neondatabase/serverless": "^1.0.2"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
