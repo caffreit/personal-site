@@ -1,5 +1,6 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
+import { recordPaidPosterOrder, type PaidPosterSession } from "@/lib/posterOrders";
 
 export const runtime = "nodejs";
 
@@ -30,7 +31,7 @@ export async function POST(request: Request) {
     return new Response("Invalid signature", { status: 400 });
   }
 
-  let event: { id?: string; type?: string; data?: { object?: { id?: string; payment_status?: string } } };
+  let event: { id?: string; type?: string; livemode?: boolean; data?: { object?: PaidPosterSession } };
   try {
     event = JSON.parse(rawBody);
   } catch {
@@ -43,9 +44,15 @@ export async function POST(request: Request) {
   ) {
     const session = event.data?.object;
     if (session?.payment_status === "paid") {
-      // TODO: Idempotently persist paid order and send to print/fulfilment provider.
-      // Webhook event IDs can be delivered more than once. Never fulfil from redirect alone.
-      console.info("Stripe poster payment received:", event.id, session.id);
+      if (event.livemode !== false) return new Response("Sandbox only", { status: 400 });
+      if (!session.metadata?.poster_id) return NextResponse.json({ received: true });
+      try {
+        const created = await recordPaidPosterOrder(session);
+        console.info(created ? "Poster order recorded" : "Duplicate poster order ignored", session.id);
+      } catch {
+        console.error("Poster order persistence failed", session.id);
+        return new Response("Order persistence failed", { status: 503 });
+      }
     }
   }
   return NextResponse.json({ received: true });
