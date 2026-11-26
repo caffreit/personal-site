@@ -37,6 +37,8 @@ export async function POST(request: Request) {
     ui_mode: "form",
     "line_items[0][price]": price.id,
     "line_items[0][quantity]": "1",
+    "metadata[poster_id]": input.posterId,
+    "metadata[variant_id]": input.variantId,
     billing_address_collection: "auto",
     "phone_number_collection[enabled]": "false",
     "automatic_tax[enabled]": "false",
