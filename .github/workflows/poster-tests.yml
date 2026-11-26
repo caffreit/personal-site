@@ -5,6 +5,7 @@ on:
       - 'src/lib/prodigiOrders.ts'
       - 'src/lib/poster*.ts'
       - 'scripts/test-prodigi-orders.ts'
+      - 'scripts/test-poster-claims.ts'
       - 'package*.json'
       - '.github/workflows/poster-tests.yml'
 permissions:
@@ -22,3 +23,24 @@ jobs:
       # Temporary until the Neon dependency is added to the committed lockfile.
       - run: npm install --ignore-scripts
       - run: npm run test:prodigi
+
+  postgres-claims:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: poster
+          POSTGRES_PASSWORD: poster
+          POSTGRES_DB: poster_test
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --ignore-scripts
+      - run: npx --no-install tsx scripts/test-poster-claims.ts
