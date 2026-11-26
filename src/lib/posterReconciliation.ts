@@ -11,7 +11,7 @@ export async function syncSubmittedOrders(readStatus = readProdigiStatus) {
   const sql = database();
   const rows = await sql`SELECT stripe_session_id, prodigi_order_id, status FROM poster_orders
     WHERE prodigi_order_id IS NOT NULL AND status NOT IN ('completed','cancelled','failed')
-    ORDER BY updated_at ASC LIMIT 20`;
+    ORDER BY updated_at ASC LIMIT 3`;
   let updated = 0, errors = 0;
   for (const row of rows) {
     try {
@@ -20,7 +20,11 @@ export async function syncSubmittedOrders(readStatus = readProdigiStatus) {
         WHERE stripe_session_id = ${row.stripe_session_id} AND prodigi_order_id = ${row.prodigi_order_id}
         AND status = ${row.status} RETURNING stripe_session_id`;
       updated += changed.length;
-    } catch { errors++; }
+    } catch {
+      errors++;
+      // Rotate failed lookups so one unavailable order cannot starve the queue.
+      await sql`UPDATE poster_orders SET updated_at = now() WHERE stripe_session_id = ${row.stripe_session_id} AND status = ${row.status} AND prodigi_order_id = ${row.prodigi_order_id}`;
+    }
   }
   return {updated,errors};
 }
