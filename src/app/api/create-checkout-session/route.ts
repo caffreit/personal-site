@@ -30,8 +30,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "This poster is not yet available." }, { status: 404 });
   }
 
-  const origin = process.env.NEXT_PUBLIC_SITE_URL ||
-    (process.env.VERCEL_URL ? "https://" + process.env.VERCEL_URL : "http://localhost:3000");
+  // Preview payments must return to the deployed preview, not the live site.
+  const origin = process.env.VERCEL_ENV === "preview" && process.env.VERCEL_URL
+    ? "https://" + process.env.VERCEL_URL
+    : process.env.NEXT_PUBLIC_SITE_URL ||
+      (process.env.VERCEL_URL ? "https://" + process.env.VERCEL_URL : "http://localhost:3000");
   const params = new URLSearchParams({
     mode: "payment",
     ui_mode: "form",
