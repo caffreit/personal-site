@@ -19,5 +19,6 @@ jobs:
         with:
           node-version: '22'
           cache: npm
-      - run: npm ci
+      # Temporary until the Neon dependency is added to the committed lockfile.
+      - run: npm install --ignore-scripts
       - run: npm run test:prodigi
