@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     const data = await response.json();
     const q = data.quotes?.find((q: { shipmentMethod: string }) => q.shipmentMethod === "Standard");
     const money = (m: { amount: string; currency: string }) => {
-      if (m?.currency !== "EUR" || !/^\\d+(\\.\\d{1,2})?$/.test(m.amount)) throw new Error("Invalid quote amount");
+      if (m?.currency !== "EUR" || !/^\d+(\.\d{1,2})?$/.test(m.amount)) throw new Error("Invalid quote amount");
       return Math.round(Number(m.amount) * 100);
     };
     if (!response.ok || !q || !["Created","CreatedWithIssues"].includes(data.outcome) ||
@@ -56,7 +56,8 @@ export async function POST(request: Request) {
         !Array.isArray(q.shipments) || !q.shipments.length) throw new Error("Invalid quote");
     shippingCents = money(q.costSummary.shipping) + q.shipments.reduce((sum: number, s: {tax: {amount: string; currency: string}}) => sum + money(s.tax), 0);
     if (!Number.isSafeInteger(shippingCents) || shippingCents <= 0) throw new Error("Invalid shipping");
-  } catch {
+  } catch (error) {
+    console.error("Prodigi shipping validation failed:", error instanceof Error ? error.message : "Unknown error");
     return NextResponse.json({ error: "Unable to quote shipping. Please try again." }, { status: 502 });
   }
 
