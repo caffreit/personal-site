@@ -52,27 +52,33 @@ export default function StripePosterForm({
   variantId: string;
   publishableKey: string;
 }) {
+  const [country, setCountry] = useState("");
+  const [shipping, setShipping] = useState<number | null>(null);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [stripeReady, setStripeReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const formId = "stripe-checkout-form-" + posterId + "-" + variantId;
 
   useEffect(() => {
+    if (!country) return;
     const controller = new AbortController();
     async function startCheckout() {
       try {
         const response = await fetch("/api/create-checkout-session", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ posterId, variantId }),
+          body: JSON.stringify({ posterId, variantId, country }),
           signal: controller.signal,
           cache: "no-store",
         });
-        const data = (await response.json()) as { client_secret?: string; error?: string };
+        const data = (await response.json()) as { client_secret?: string; error?: string; shipping_cents?: number };
         if (!response.ok || !data.client_secret) {
           throw new Error(data.error || "Could not start checkout.");
         }
-        if (!controller.signal.aborted) setClientSecret(data.client_secret);
+        if (!controller.signal.aborted) {
+          setShipping(data.shipping_cents ?? null);
+          setClientSecret(data.client_secret);
+        }
       } catch (reason) {
         if (!controller.signal.aborted) {
           setError(reason instanceof Error ? reason.message : "Could not start checkout.");
@@ -81,7 +87,7 @@ export default function StripePosterForm({
     }
     void startCheckout();
     return () => controller.abort();
-  }, [posterId, variantId]);
+  }, [posterId, variantId, country]);
 
   useEffect(() => {
     if (!clientSecret || !stripeReady) return;
@@ -132,7 +138,21 @@ export default function StripePosterForm({
         onReady={() => setStripeReady(true)}
         onError={() => setError("Stripe could not load. Please refresh and try again.")}
       />
-      {!clientSecret && !error && <p role="status" className="text-sm">Preparing secure checkout…</p>}
+      <label className="block text-sm mb-3">
+        Delivery country
+        <select className="block w-full border rounded p-2 mt-1" value={country} onChange={(event) => {
+          setClientSecret(null);
+          setShipping(null);
+          setError(null);
+          setCountry(event.target.value);
+        }}>
+          <option value="">Select country</option>
+          {Object.entries({IE:"Ireland",GB:"United Kingdom",DE:"Germany",FR:"France",US:"United States",CA:"Canada",AU:"Australia"}).map(([code,name]) => <option key={code} value={code}>{name}</option>)}
+        </select>
+      </label>
+      {shipping !== null && <p className="mb-3 text-sm">Standard shipping: €{(shipping / 100).toFixed(2)}</p>}
+      {country === "US" && <p className="mb-3 text-xs">Additional sales tax may apply.</p>}
+      {country && !clientSecret && !error && <p role="status" className="text-sm">Preparing secure checkout…</p>}
       {error && <p role="alert" className="mb-3 text-sm text-red-700">{error}</p>}
       <div id={formId} aria-label="Stripe secure payment form" />
       <p className="mt-4 text-xs text-neutral-600">
