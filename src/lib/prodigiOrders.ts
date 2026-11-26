@@ -21,7 +21,7 @@ export function buildProdigiRequest(order: Order, artwork: string) {
     }
   }, items: [{sku:"GLOBAL-FAP-A2",copies:1,sizing:"fillPrintArea",assets:[{printArea:"default",url:artwork}]}] };
 }
-function sandboxKey() {
+function sandboxKey(readOnly = false) {
   const key = process.env.PRODIGI_API_KEY;
   if (process.env.VERCEL_ENV !== "preview" || process.env.PRODIGI_ENABLE_FULFILMENT !== "true" || !key?.startsWith("test_"))
     throw new Error("Sandbox fulfilment disabled");
@@ -48,7 +48,7 @@ export function createProdigiSubmit(artwork: string, request: typeof fetch = fet
   };
 }
 export async function readProdigiOrder(id: string, request: typeof fetch = fetch) {
-  const key = sandboxKey();
+  const key = sandboxKey(true);
   if (!/^ord_\d+$/.test(id)) throw new Error("Invalid order ID");
   const response = await request("https://api.sandbox.prodigi.com/v4.0/orders/"+encodeURIComponent(id), {
     headers:{"X-API-Key":key},cache:"no-store",signal:AbortSignal.timeout(15000)
