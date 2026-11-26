@@ -16,7 +16,6 @@ export function stripeKeysReady(): boolean {
 
 const PRICE_IDS: Record<PosterId, Record<string, string | undefined>> = {
   "greek-theogony": {
-    outlines: process.env.STRIPE_PRICE_GREEK_THEOGONY,
     translucent: process.env.STRIPE_PRICE_GREEK_THEOGONY,
   },
   "transit-theogony": {
