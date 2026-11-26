@@ -47,7 +47,7 @@ export function createProdigiSubmit(artwork: string, request: typeof fetch = fet
     } catch { return {kind:"uncertain"}; }
   };
 }
-export async function readProdigiStatus(id: string, request: typeof fetch = fetch) {
+export async function readProdigiOrder(id: string, request: typeof fetch = fetch) {
   const key = sandboxKey();
   if (!/^ord_\d+$/.test(id)) throw new Error("Invalid order ID");
   const response = await request("https://api.sandbox.prodigi.com/v4.0/orders/"+encodeURIComponent(id), {
@@ -57,7 +57,12 @@ export async function readProdigiStatus(id: string, request: typeof fetch = fetc
   const data = await response.json();
   const order = data?.order;
   if (String(data?.outcome).toLowerCase() !== "ok" || order?.id !== id) throw new Error("Unexpected provider status");
-  switch (order.status?.stage) {
+  let trackingUrl: string | null = null;
+  for (const shipment of Array.isArray(order.shipments) ? order.shipments : []) {
+    if (shipment?.status !== "Shipped" || typeof shipment.tracking?.url !== "string") continue;
+    try { const url = new URL(shipment.tracking.url); if (url.protocol === "https:" && !url.username && !url.password) { trackingUrl = url.href; break; } } catch { /* ignore malformed URL */ }
+  }
+  const status = (() => { switch (order.status?.stage) {
     case "Complete": return "completed";
     case "Cancelled": return "cancelled";
     case "InProgress":
@@ -66,5 +71,9 @@ export async function readProdigiStatus(id: string, request: typeof fetch = fetc
       if (order.status.details?.inProduction === "InProgress" || order.status.details?.inProduction === "Complete") return "in_production";
       return "submitted";
     default: throw new Error("Unexpected provider status");
-  }
+  } })();
+  return {status, trackingUrl, merchantReference: order.merchantReference, idempotencyKey: order.idempotencyKey};
+}
+export async function readProdigiStatus(id: string, request: typeof fetch = fetch) {
+  return (await readProdigiOrder(id, request)).status;
 }
