@@ -24,14 +24,14 @@ const LABS: Lab[] = [
   {
     title: "Transit Theogony",
     description:
-      "The Greek divine family as a transit map. Explore left-to-right and ring A2 posters, with detail previews and views on the wall.",
+      "The Greek divine family as a transit map. Explore ring and left-to-right A2 posters, with print mockups and detail previews.",
     href: "/transit-theogony",
     badge: "Reference",
     meta: "Mythology • Poster",
     publishedAt: "2026-10-13",
-    image: "/posters/transit-theogony/left-to-right/preview.webp",
+    image: "/posters/transit-theogony/ring/head-on.webp",
     imageAlt:
-      "Preview of the left-to-right Transit Theogony map, with coloured lineage lines across generation bands.",
+      "Head-on print mockup of the ring Transit Theogony A2 poster, showing coloured lineage lines across nested generation zones.",
   },
   {
     title: "Greek Theogony Poster",
@@ -41,9 +41,9 @@ const LABS: Lab[] = [
     badge: "Reference",
     meta: "Mythology • Poster",
     publishedAt: "2026-10-09",
-    image: "/posters/greek-theogony/outlines/preview.webp",
+    image: "/posters/greek-theogony/translucent/head-on.webp",
     imageAlt:
-      "Preview of the frameless Greek theogony poster outlines edition showing the divine family tree.",
+      "Head-on print mockup of the frameless translucent Greek Theogony A2 poster showing the divine family tree.",
   },
   {
     title: "Three Stations",

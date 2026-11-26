@@ -30,14 +30,18 @@ export function GenealogyPosterView({ posterName, kicker, title, intro, story, r
       <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] lg:gap-16">
         <section aria-label={`${posterName} preview gallery`} className="min-w-0">
           <figure>
-            <div id="poster-gallery-image" className="relative flex h-[420px] items-center justify-center border border-[var(--rule-color)] bg-[#f0eee9] p-5 sm:h-[580px] sm:p-8 lg:h-[620px]">
+            <div
+              id="poster-gallery-image"
+              style={{ backgroundColor: activeImage.background ?? "#f0eee9" }}
+              className="relative flex h-[420px] items-center justify-center border border-[var(--rule-color)] p-5 sm:h-[580px] sm:p-8 lg:h-[620px]"
+            >
               <Image
                 key={activeImage.src}
                 src={activeImage.src}
                 alt={`${posterName}, ${variant.label}: ${activeImage.label.toLowerCase()}`}
                 fill
                 unoptimized
-                className={activeImage.label === "Whole poster" ? "object-contain p-5 sm:p-8" : "object-contain"}
+                className={activeImage.padded ? "object-contain p-5 sm:p-8" : "object-contain"}
                 priority
               />
             </div>
@@ -56,8 +60,11 @@ export function GenealogyPosterView({ posterName, kicker, title, intro, story, r
                 onClick={() => setActiveImage(entry)}
                 className={`group text-left ${entry.src === activeImage.src ? "text-[var(--foreground)]" : "text-[var(--text-muted)]"}`}
               >
-                <span className={`relative block aspect-[4/3] overflow-hidden border bg-[#f0eee9] transition-colors ${entry.src === activeImage.src ? "border-[var(--foreground)]" : "border-[var(--rule-color)] group-hover:border-[var(--foreground)]"}`}>
-                  <Image src={entry.src} alt="" fill unoptimized className="object-contain p-1" />
+                <span
+                  style={{ backgroundColor: entry.background ?? "#f0eee9" }}
+                  className={`relative block aspect-[4/3] overflow-hidden border transition-colors ${entry.src === activeImage.src ? "border-[var(--foreground)]" : "border-[var(--rule-color)] group-hover:border-[var(--foreground)]"}`}
+                >
+                  <Image src={entry.src} alt="" fill unoptimized className={entry.background ? "object-contain" : "object-contain p-1"} />
                 </span>
                 <span className="mt-2 block font-mono text-[9px] uppercase tracking-[0.08em] sm:text-[10px]">{entry.label}</span>
               </button>
