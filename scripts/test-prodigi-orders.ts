@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { buildProdigiRequest, createProdigiSubmit, orderKey, readProdigiStatus } from "../src/lib/prodigiOrders";
+import { buildProdigiRequest, createProdigiSubmit, orderKey, readProdigiOrder, readProdigiStatus } from "../src/lib/prodigiOrders";
 
 async function main() {
   process.env.VERCEL_ENV = "preview";
@@ -27,6 +27,9 @@ async function main() {
   assert.deepEqual(await createProdigiSubmit(artwork,async()=>Response.json({data:{}}))(order,order.stripe_session_id),{kind:"uncertain"});
   assert.equal(await readProdigiStatus("ord_123",async()=>Response.json({outcome:"Ok",order:{id:"ord_123",status:{stage:"Complete"}}})),"completed");
   await assert.rejects(readProdigiStatus("ord_123",async()=>Response.json({outcome:"Ok",order:{id:"ord_456",status:{stage:"Complete"}}})));
+  const tracking = await readProdigiOrder("ord_123",async()=>Response.json({outcome:"Ok",order:{id:"ord_123",status:{stage:"Complete"},shipments:[{status:"Shipped",tracking:{url:"javascript:alert(1)"}},{status:"Shipped",tracking:{url:"https://example.com/track/123"}}]}}));
+  assert.equal(tracking.trackingUrl,"https://example.com/track/123");
+  assert.equal(tracking.status,"completed");
   process.env.PRODIGI_ENABLE_FULFILMENT = "false";
   await assert.rejects(createProdigiSubmit(artwork,mock)(order,order.stripe_session_id));
   console.log("Mock Prodigi contract checks passed");
