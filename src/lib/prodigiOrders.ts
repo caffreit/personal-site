@@ -23,7 +23,7 @@ export function buildProdigiRequest(order: Order, artwork: string) {
 }
 function sandboxKey(readOnly = false) {
   const key = process.env.PRODIGI_API_KEY;
-  if (process.env.VERCEL_ENV !== "preview" || process.env.PRODIGI_ENABLE_FULFILMENT !== "true" || !key?.startsWith("test_"))
+  if (process.env.VERCEL_ENV !== "preview" || (process.env.PRODIGI_ENABLE_FULFILMENT !== "true" && !(readOnly && process.env.PRODIGI_ENABLE_WEBHOOK === "true")) || !key?.startsWith("test_"))
     throw new Error("Sandbox fulfilment disabled");
   return key;
 }
