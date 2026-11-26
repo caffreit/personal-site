@@ -44,3 +44,26 @@ jobs:
           node-version: '22'
       - run: npm install --ignore-scripts
       - run: npx --no-install tsx scripts/test-poster-claims.ts
+
+  dependency-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --package-lock-only --ignore-scripts
+      - name: Verify clean installation
+        run: npm ci --ignore-scripts
+      - name: Report dependency audit
+        run: npm audit --json > npm-audit.json
+        continue-on-error: true
+      - name: Upload regenerated lockfile and audit
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-review
+          path: |
+            package-lock.json
+            npm-audit.json
+          retention-days: 3
