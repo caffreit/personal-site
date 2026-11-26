@@ -10,16 +10,13 @@ const greekCrops: [Crop, Crop] = [
   { left: 0.32, top: 0.28, width: 0.36, height: 0.25 },
   { left: 0.5, top: 0.5, width: 0.38, height: 0.25 },
 ];
+// Editions using studio print mockups (greek-theogony/translucent and transit-theogony/ring)
+// are managed directly under public/posters and excluded from generated preview output.
 const sources: PreviewSource[] = [
   { family: "greek-theogony", id: "outlines", master: "greek_theogony_frameless_outlines_A2_300dpi.png", crops: greekCrops },
-  { family: "greek-theogony", id: "translucent", master: "greek_theogony_frameless_A2_300dpi.png", crops: greekCrops },
   { family: "transit-theogony", id: "left-to-right", master: "transit_theogony_ltr_A2_300dpi.png", crops: [
     { left: 0.26, top: 0.28, width: 0.3, height: 0.34 },
     { left: 0.59, top: 0.39, width: 0.3, height: 0.34 },
-  ] },
-  { family: "transit-theogony", id: "ring", master: "transit_theogony_ring_A2_300dpi.png", crops: [
-    { left: 0.3, top: 0.24, width: 0.4, height: 0.25 },
-    { left: 0.51, top: 0.48, width: 0.4, height: 0.25 },
   ] },
 ];
 
