@@ -2,6 +2,8 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { recordPaidPosterOrder, type PaidPosterSession } from "@/lib/posterOrders";
 
+import { fulfilPaidPoster } from "@/lib/posterFulfilment";
+
 export const runtime = "nodejs";
 
 function verifyStripeSignature(body: string, header: string, secret: string): boolean {
@@ -49,6 +51,8 @@ export async function POST(request: Request) {
       try {
         const created = await recordPaidPosterOrder(session);
         console.info(created ? "Poster order recorded" : "Duplicate poster order ignored", session.id);
+        // Provider adapter deliberately absent until the artwork contract is verified.
+        if (session.id) await fulfilPaidPoster(session.id);
       } catch {
         console.error("Poster order persistence failed", session.id);
         return new Response("Order persistence failed", { status: 503 });
